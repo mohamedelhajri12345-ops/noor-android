@@ -39,14 +39,14 @@ object Base44Auth {
         }
     }
 
-    private val client: OkHttpClient by lazy {
+    private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .cookieJar(cookieJar)
             .build()
     }
 
-    fun getClient(): OkHttpClient = client
-    fun apiClient(): OkHttpClient = client
+    fun getClient(): OkHttpClient = httpClient
+    fun apiClient(): OkHttpClient = httpClient
     fun getAuthToken(): String? = authToken
 
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
@@ -85,7 +85,7 @@ object Base44Auth {
                 .post(requestBody)
                 .build()
 
-            val response = client.newCall(request).execute()
+            val response = httpClient.newCall(request).execute()
             if (response.isSuccessful) {
                 val bodyStr = response.body?.string() ?: ""
                 if (bodyStr.isNotEmpty()) {
@@ -129,7 +129,7 @@ object Base44Auth {
                 .post(requestBody)
                 .build()
 
-            val response = client.newCall(request).execute()
+            val response = httpClient.newCall(request).execute()
             if (response.isSuccessful) {
                 inMemoryLoggedIn = true
                 context?.let { ctx ->
@@ -158,7 +158,7 @@ object Base44Auth {
                 .post(requestBody)
                 .build()
 
-            val response = client.newCall(request).execute()
+            val response = httpClient.newCall(request).execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
@@ -185,7 +185,7 @@ object Base44Auth {
                 .post(requestBody)
                 .build()
 
-            val response = client.newCall(request).execute()
+            val response = httpClient.newCall(request).execute()
             if (response.isSuccessful) {
                 Result.success(Unit)
             } else {
