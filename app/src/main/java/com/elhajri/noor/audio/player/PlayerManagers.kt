@@ -25,13 +25,14 @@ object PlayerInterop {
 }
 
 object QuranPlayerManager {
-    val engine = PlayerEngine(QuranPlayerService::class.java) { PlayerInterop.pauseOthers(engine) }
+    val engine = PlayerEngine(QuranPlayerService::class.java)
 
     init { PlayerInterop.register(engine) }
 
     val state get() = engine.state
 
     fun ensure(context: android.content.Context) { engine.ensurePlayer(context) }
+    fun exposedPlayer() = engine.exposedPlayer()
 
     fun playQueue(tracks: List<PlayerTrack>, startIndex: Int = 0) = engine.playQueue(tracks, startIndex)
     fun play(track: PlayerTrack) = engine.play(track)
@@ -48,13 +49,14 @@ object QuranPlayerManager {
 }
 
 object NasheedPlayerManager {
-    val engine = PlayerEngine(NasheedPlayerService::class.java) { PlayerInterop.pauseOthers(engine) }
+    val engine = PlayerEngine(NasheedPlayerService::class.java)
 
     init { PlayerInterop.register(engine) }
 
     val state get() = engine.state
 
     fun ensure(context: android.content.Context) { engine.ensurePlayer(context) }
+    fun exposedPlayer() = engine.exposedPlayer()
 
     fun playQueue(tracks: List<PlayerTrack>, startIndex: Int = 0) = engine.playQueue(tracks, startIndex)
     fun play(track: PlayerTrack) = engine.play(track)

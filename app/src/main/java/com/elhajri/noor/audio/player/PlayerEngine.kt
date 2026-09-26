@@ -47,8 +47,7 @@ data class PlayerState(
 )
 
 class PlayerEngine(
-    private val serviceClass: Class<*>,
-    private val pauseOtherEngines: () -> Unit
+    private val serviceClass: Class<*>
 ) {
     private val handler = Handler(Looper.getMainLooper())
     private var appContext: Context? = null
@@ -110,7 +109,7 @@ class PlayerEngine(
     fun playQueue(tracks: List<PlayerTrack>, startIndex: Int = 0) {
         if (tracks.isEmpty()) return
         val ctx = appContext ?: return
-        pauseOtherEngines()
+        PlayerInterop.pauseOthers(this)
         val p = ensurePlayer(ctx)
         queue = tracks
         fallbackIndex = 0
