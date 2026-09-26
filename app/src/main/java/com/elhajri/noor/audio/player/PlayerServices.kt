@@ -49,10 +49,10 @@ class QuranPlayerService : MediaSessionService() {
     }
 
     override fun onDestroy() {
-        mediaSession?.run {
-            player.release()
-            release()
-        }
+        // لا نُحرّر مشغّل ExoPlayer المشترَك هنا (هو مملوك للـ manager الدائم)،
+        // نُحرّر جلسة الوسائط فقط. إن أردنا تحرير المشغّل فعلياً نستخدم release()
+        // في المدير نفسه حتى لا يبقى مرجع "ميت" يسبب تعطّل التطبيق عند التشغيل التالي.
+        mediaSession?.release()
         mediaSession = null
         super.onDestroy()
     }
@@ -93,10 +93,8 @@ class NasheedPlayerService : MediaSessionService() {
     }
 
     override fun onDestroy() {
-        mediaSession?.run {
-            player.release()
-            release()
-        }
+        // نفس الإصلاح: لا نحرّر المشغّل المشترك، فقط جلسة الوسائط
+        mediaSession?.release()
         mediaSession = null
         super.onDestroy()
     }

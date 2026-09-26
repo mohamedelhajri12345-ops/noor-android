@@ -46,6 +46,7 @@ object QuranPlayerManager {
     fun toggleRepeat() = engine.toggleRepeat()
     fun setSleepTimer(minutes: Int) = engine.setSleepTimer(minutes)
     fun clearSleepTimer() = engine.clearSleepTimer()
+    fun release() = engine.releasePlayer()
 }
 
 object NasheedPlayerManager {
@@ -70,4 +71,5 @@ object NasheedPlayerManager {
     fun toggleRepeat() = engine.toggleRepeat()
     fun setSleepTimer(minutes: Int) = engine.setSleepTimer(minutes)
     fun clearSleepTimer() = engine.clearSleepTimer()
+    fun release() = engine.releasePlayer()
 }

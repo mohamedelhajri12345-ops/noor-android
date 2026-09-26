@@ -92,6 +92,7 @@ import androidx.compose.ui.unit.sp
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.elhajri.noor.auth.Base44Auth.init(applicationContext)
         com.elhajri.noor.audio.player.QuranPlayerManager.ensure(applicationContext)
         com.elhajri.noor.audio.player.NasheedPlayerManager.ensure(applicationContext)
 
@@ -248,12 +249,14 @@ fun NoorApp() {
             }
 
             composable("login") { LoginScreen(
-                onSuccess = { navController.navigate("home") { popUpTo("login") { inclusive = true } } },
+                // كان يذهب دائماً إلى الرئيسية بعد الدخول، فيقطع المستخدم عن شاشة "المجتمع" التي طلبت تسجيل الدخول؛
+                // الآن يرجع لنفس الشاشة التي طلبت تسجيل الدخول (المجتمع مثلاً)
+                onSuccess = { navController.popBackStack() },
                 onRegister = { navController.navigate("register") },
                 onForgot = { navController.navigate("forgot") }
             ) }
             composable("register") { RegisterScreen(
-                onSuccess = { navController.navigate("home") { popUpTo("register") { inclusive = true } } },
+                onSuccess = { navController.popBackStack("login", inclusive = true) },
                 onLogin = { navController.popBackStack() }
             ) }
             composable("forgot") { ForgotPasswordScreen(onBack = { navController.popBackStack() }) }
@@ -262,7 +265,11 @@ fun NoorApp() {
             composable("journal") { JournalScreen() }
             composable("calendar") { CalendarScreen() }
             composable("privacy") { PrivacyPolicyScreen(onBack = { navController.popBackStack() }) }
-            composable("community") { CommunityScreen(onBack = { navController.popBackStack() }) }
+            composable("community") { CommunityScreen(
+                onBack = { navController.popBackStack() },
+                // هذا كان ناقصاً بالكامل: زر "تسجيل الدخول" في المجتمع لم يكن مرتبطاً بأي تنقّل فعلي
+                onNavigateToLogin = { navController.navigate("login") }
+            ) }
             composable("ai") { AIAssistantScreen(onBack = { navController.popBackStack() }) }
             composable("favorites") { FavoritesScreen(
                 onOpenSurah = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") },

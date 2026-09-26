@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
+import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -39,9 +40,24 @@ object Base44Auth {
         }
     }
 
+    // Attaches "Authorization: Bearer <token>" to every request once logged in —
+    // without this, entity/community calls always look unauthenticated even after a
+    // successful login (the token was fetched but never sent back to the server).
+    private val authInterceptor = Interceptor { chain ->
+        val original = chain.request()
+        val token = authToken
+        val request = if (!token.isNullOrBlank() && original.header("Authorization") == null) {
+            original.newBuilder().header("Authorization", "Bearer $token").build()
+        } else {
+            original
+        }
+        chain.proceed(request)
+    }
+
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .cookieJar(cookieJar)
+            .addInterceptor(authInterceptor)
             .build()
     }
 

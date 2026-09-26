@@ -104,6 +104,19 @@ class PlayerEngine(
     /** Raw ExoPlayer for the MediaSessionService to attach to. */
     fun exposedPlayer(): ExoPlayer? = player
 
+    /**
+     * Safely tears down the player AND forgets the stale reference.
+     * Before this fix the service released the shared ExoPlayer on onDestroy()
+     * (e.g. when the user swiped the app away) but the manager kept pointing at
+     * that now-released instance — the next play() call then threw on a released
+     * player, which is exactly what caused the sudden app close and the "reciters
+     * don't play" bug. Now ensurePlayer() always gets a fresh, valid instance.
+     */
+    fun releasePlayer() {
+        player?.release()
+        player = null
+    }
+
     // ---------------------------------------------------------------- web API
 
     fun playQueue(tracks: List<PlayerTrack>, startIndex: Int = 0) {
