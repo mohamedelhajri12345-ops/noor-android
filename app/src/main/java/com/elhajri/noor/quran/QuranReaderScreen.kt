@@ -33,6 +33,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.ui.platform.LocalClipboardManager
+import android.content.Intent
+import android.widget.Toast
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import com.elhajri.noor.data.DataLoader
 import com.elhajri.noor.data.Prefs
 import com.elhajri.noor.data.Reciter
@@ -204,6 +221,161 @@ fun QuranReaderScreen(
         }
     }
 
+    // ===== استنساخ: نسخ الآيات والمصحف =====
+    val clipboard = LocalClipboardManager.current
+    var showCopySheet by remember { mutableStateOf(false) }
+    var copyFrom by remember(currentSurahNum) { mutableIntStateOf(1) }
+    var copyTo by remember(currentSurahNum) { mutableIntStateOf(currentSurah?.ayahs ?: 1) }
+
+    fun buildMushafText(from: Int, to: Int): String {
+        val selected = ayahs.filter { it.number in from..to }
+        val body = selected.joinToString(" ") { a ->
+            "${a.text} ﴿${toArabicNumber(a.number)}﴾"
+        }
+        val ref = "﴾ سورة ${currentName}"
+        return "$body\n$ref"
+    }
+
+    fun copyToClipboard(from: Int, to: Int) {
+        val text = buildMushafText(from, to)
+        clipboard.setText(androidx.compose.ui.text.AnnotatedString(text))
+        Toast.makeText(context, "تم نسخ المصحف بنجاح", Toast.LENGTH_SHORT).show()
+        showCopySheet = false
+    }
+
+    fun shareSurah(from: Int, to: Int) {
+        val text = buildMushafText(from, to)
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        context.startActivity(Intent.createChooser(send, "مشاركة المصحف"))
+        showCopySheet = false
+    }
+
+    if (showCopySheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showCopySheet = false },
+            containerColor = NavyCard
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 24.dp)
+            ) {
+                Text(
+                    "استنساخ المصحف",
+                    color = Gold,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    "انسخ آيات سورة $currentName أو شاركها",
+                    color = GoldSoft,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                // نسخ السورة كاملة
+                Button(
+                    onClick = { copyToClipboard(1, currentSurah?.ayahs ?: ayahs.size) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("نسخ السورة كاملة", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                }
+
+                Spacer(Modifier.height(10.dp))
+
+                // مشاركة السورة كاملة
+                OutlinedButton(
+                    onClick = { shareSurah(1, currentSurah?.ayahs ?: ayahs.size) },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Gold),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.5f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("مشاركة السورة", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // نسخ نطاق آيات محدد
+                Text("نسخ نطاق محدد من الآيات", color = TextMain, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Spacer(Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedButton(
+                        onClick = { if (copyFrom > 1) copyFrom-- },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Gold),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.4f)),
+                        modifier = Modifier.size(40.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                    ) { Text("−", fontSize = 18.sp) }
+                    Text(
+                        "من الآية ${toArabicNumber(copyFrom)}",
+                        color = Gold,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
+                    OutlinedButton(
+                        onClick = { if (copyFrom < (currentSurah?.ayahs ?: copyFrom + 1) - 1) copyFrom++ },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Gold),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.4f)),
+                        modifier = Modifier.size(40.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                    ) { Text("+", fontSize = 18.sp) }
+                }
+                Spacer(Modifier.height(6.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedButton(
+                        onClick = { if (copyTo > copyFrom) copyTo-- },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Gold),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.4f)),
+                        modifier = Modifier.size(40.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                    ) { Text("−", fontSize = 18.sp) }
+                    Text(
+                        "إلى الآية ${toArabicNumber(copyTo)}",
+                        color = Gold,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
+                    OutlinedButton(
+                        onClick = { if (copyTo < (currentSurah?.ayahs ?: copyTo)) copyTo++ },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Gold),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.4f)),
+                        modifier = Modifier.size(40.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                    ) { Text("+", fontSize = 18.sp) }
+                }
+                Spacer(Modifier.height(14.dp))
+                Button(
+                    onClick = { if (copyFrom <= copyTo) copyToClipboard(copyFrom, copyTo) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Text("نسخ الآيات المحددة", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -221,6 +393,14 @@ fun QuranReaderScreen(
                     }
                 },
                 actions = {
+                    // استنساخ: نسخ المصحف
+                    IconButton(onClick = { showCopySheet = true }) {
+                        Icon(
+                            imageVector = Icons.Default.ContentCopy,
+                            contentDescription = "استنساخ المصحف",
+                            tint = Gold
+                        )
+                    }
                     // Reading Mode Toggle
                     IconButton(onClick = { isLightMode = !isLightMode }) {
                         Icon(
