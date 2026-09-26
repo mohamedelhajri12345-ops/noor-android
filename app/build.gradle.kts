@@ -68,6 +68,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("com.google.android.material:material:1.11.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
