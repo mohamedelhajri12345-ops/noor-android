@@ -21,7 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Sparkles
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -306,7 +306,7 @@ fun AthkarDetailScreen(
             containerColor = NavyCard,
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Sparkles,
+                    imageVector = Icons.Default.AutoAwesome,
                     contentDescription = null,
                     tint = Gold,
                     modifier = Modifier.size(36.dp)

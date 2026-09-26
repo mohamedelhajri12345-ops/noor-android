@@ -60,7 +60,7 @@ object AdhanScheduler {
             }
         }
 
-        val triggerAtMillis = nextCal.timeInMillis
+        val triggerAtMillis = (nextCal ?: Calendar.getInstance().apply { add(Calendar.MINUTE, 60) }).timeInMillis
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AdhanReceiver::class.java)
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE

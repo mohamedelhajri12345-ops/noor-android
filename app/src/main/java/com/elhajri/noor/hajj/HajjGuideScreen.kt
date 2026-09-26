@@ -16,7 +16,7 @@ import androidx.compose.material.icons.filled.ChevronDown
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Landmark
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -144,7 +144,7 @@ fun HajjGuideScreen(onBack: () -> Unit = {}) {
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Landmark,
+                            imageVector = Icons.Default.AccountBalance,
                             contentDescription = null,
                             tint = Gold,
                             modifier = Modifier.size(32.dp)

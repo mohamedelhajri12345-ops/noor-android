@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ChevronLeft
 import androidx.compose.material.icons.automirrored.filled.ChevronRight
-import androidx.compose.material.icons.filled.Sparkles
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -437,7 +437,7 @@ fun CalendarScreen() {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Sparkles,
+                                    imageVector = Icons.Default.AutoAwesome,
                                     contentDescription = null,
                                     tint = Gold,
                                     modifier = Modifier.size(20.dp)

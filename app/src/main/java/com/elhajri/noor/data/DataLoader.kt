@@ -13,7 +13,7 @@ data class Story(val id: Int, val prophet: String, val title: String, val icon: 
 data class NameOfAllah(val name: String, val meaning: String)
 
 /**
- * Loads NOOR's bundled dataset from assets/data/*.json.
+ * Loads NOOR dataset from JSON files under assets/data.
  * All features work offline; no WebView anywhere in this app.
  */
 object DataLoader {
