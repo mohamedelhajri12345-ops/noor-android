@@ -804,14 +804,18 @@
       "id": "alafasy",
       "name": "مشاري العفاسي",
       "servers": [
-        "https://server8.mp3quran.net/afs/"
+        "https://server11.mp3quran.net/afs/",
+        "https://server8.mp3quran.net/afs/",
+        "https://server12.mp3quran.net/afs/"
       ]
     },
     {
       "id": "dossari",
       "name": "ياسر الدوسري",
       "servers": [
-        "https://server11.mp3quran.net/yasser/"
+        "https://server11.mp3quran.net/yasser/",
+        "https://server8.mp3quran.net/yasser/",
+        "https://server12.mp3quran.net/yasser/"
       ]
     },
     {

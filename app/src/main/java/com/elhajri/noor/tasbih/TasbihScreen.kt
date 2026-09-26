@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import com.elhajri.noor.audio.SoundEffects
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -90,10 +89,8 @@ fun TasbihScreen() {
 
         triggerVibration()
         if (nextCount > 0 && nextCount % preset.target == 0) {
-            SoundEffects.success()
             showCelebration = true
         } else {
-            SoundEffects.tasbih()
         }
     }
 

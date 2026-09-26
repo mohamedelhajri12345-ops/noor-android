@@ -284,9 +284,9 @@ fun QuizScreen() {
                                             selectedAnswer = i
                                             if (i == q.correct) {
                                                 score++
-                                                com.elhajri.noor.audio.SoundEffects.success()
+                                                com.elhajri.noor.audio.
                                             } else {
-                                                com.elhajri.noor.audio.SoundEffects.click()
+                                                com.elhajri.noor.audio.
                                             }
                                         },
                                     colors = CardDefaults.cardColors(containerColor = containerColor),

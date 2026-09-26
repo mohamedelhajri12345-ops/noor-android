@@ -12,7 +12,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
-// TODO: Paths mirror the @base44/sdk web auth
 private const val BASE_URL = "https://app.base44.com"
 private const val APP_ID = "6a833faeb9e42cca9a6576fa"
 private const val LOGIN_PATH = "/api/apps/$APP_ID/auth/login"
@@ -45,6 +44,10 @@ object Base44Auth {
             .cookieJar(cookieJar)
             .build()
     }
+
+    fun getClient(): OkHttpClient = client
+    fun apiClient(): OkHttpClient = client
+    fun getAuthToken(): String? = authToken
 
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
 

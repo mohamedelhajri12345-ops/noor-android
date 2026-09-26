@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,7 +13,10 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -70,18 +74,20 @@ import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NoorTheme
+import com.elhajri.noor.ui.NoorPlayerBar
 import com.elhajri.noor.ui.NoorTopBar
 import com.elhajri.noor.ui.NoorSplash
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import com.elhajri.noor.audio.SoundEffects
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        SoundEffects.init(this)
-        com.elhajri.noor.audio.NoorAudioController.appContext = applicationContext
+        com.elhajri.noor.audio.player.QuranPlayerManager.ensure(applicationContext)
+        com.elhajri.noor.audio.player.NasheedPlayerManager.ensure(applicationContext)
         setContent {
             NoorTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -96,10 +102,10 @@ private data class Tab(val route: String, val label: String, val icon: ImageVect
 
 private val tabs = listOf(
     Tab("home", "الرئيسية", Icons.Filled.Home),
-    Tab("prayer", "الصلاة", Icons.Filled.Schedule),
-    Tab("quran", "المصحف", Icons.Filled.MenuBook),
-    Tab("athkar", "الأذكار", Icons.Filled.Favorite),
-    Tab("more", "المزيد", Icons.Filled.MoreHoriz)
+    Tab("quran", "القرآن", Icons.Filled.MenuBook),
+    Tab("tasbih", "السبحة", Icons.Filled.TouchApp),
+    Tab("games", "الألعاب", Icons.Filled.SportsEsports),
+    Tab("more", "المزيد", Icons.Filled.GridView)
 )
 
 @Composable
@@ -114,6 +120,7 @@ fun NoorApp() {
     Scaffold(
         topBar = {
             if (showBar) NoorTopBar(
+                onCommunity = { navController.navigate("community") },
                 onDonate = { navController.navigate("donation") },
                 onAssistant = { navController.navigate("ai") },
                 onSettings = { navController.navigate("settings") }
@@ -121,31 +128,63 @@ fun NoorApp() {
         },
         bottomBar = {
             if (showBar) {
-                NavigationBar(
-                containerColor = NavyCard,
-                modifier = Modifier.height(58.dp),
-                tonalElevation = 0.dp
-            ) {
-                    tabs.forEach { tab ->
-                        NavigationBarItem(
-                            selected = currentRoute == tab.route,
-                            onClick = {
-                                SoundEffects.click()
-                                navController.navigate(tab.route) {
-                                    popUpTo("home") { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = { Icon(tab.icon, contentDescription = tab.label) },
-                            label = { Text(tab.label) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = Gold,
-                                selectedTextColor = Gold,
-                                unselectedIconColor = GoldSoft.copy(alpha = 0.5f),
-                                indicatorColor = Gold.copy(alpha = 0.15f)
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // player bar (mini) — directly above the bottom bar, like the web
+                    NoorPlayerBar()
+                    // web bottom nav: thin bar, small icons, gold dot under active tab
+                    NavigationBar(
+                        containerColor = Color(0xE60A0F1A),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(58.dp),
+                        tonalElevation = 0.dp
+                    ) {
+                        tabs.forEach { tab ->
+                            val selected = currentRoute == tab.route
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(tab.route) {
+                                        popUpTo("home") { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                },
+                                icon = {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Icon(
+                                            tab.icon,
+                                            contentDescription = tab.label,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(Modifier.height(2.dp))
+                                        // gold dot under the active tab (web style)
+                                        Box(
+                                            modifier = Modifier
+                                                .size(4.dp)
+                                                .background(
+                                                    if (selected) Gold else Color.Transparent,
+                                                    CircleShape
+                                                )
+                                        )
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        tab.label,
+                                        fontSize = 10.sp,
+                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = Gold,
+                                    selectedTextColor = Gold,
+                                    unselectedIconColor = GoldSoft.copy(alpha = 0.45f),
+                                    unselectedTextColor = GoldSoft.copy(alpha = 0.45f),
+                                    indicatorColor = Color.Transparent
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }

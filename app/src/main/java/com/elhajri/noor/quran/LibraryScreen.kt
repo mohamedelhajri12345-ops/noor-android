@@ -114,29 +114,27 @@ fun LibraryScreen(onBack: () -> Unit) {
         favIdsStr = arr.toString()
     }
 
-    // Audio Player State — backed by the shared background Media3 service
-    var currentlyPlayingId by remember { mutableStateOf<String?>(null) }
-    var isPlayingAudio by remember { mutableStateOf(false) }
-    val controller = com.elhajri.noor.audio.NoorAudioController
-    val audioPlaying by controller.isPlaying.collectAsState()
-
-    // keep local flag in sync with the real shared player
-    LaunchedEffect(audioPlaying) {
-        isPlayingAudio = audioPlaying && currentlyPlayingId != null
-        if (!audioPlaying) currentlyPlayingId = null
-    }
+    // Audio player — the SEPARATE native nasheed player (web audioManager port)
+    val playerState by com.elhajri.noor.audio.player.NasheedPlayerManager.state.collectAsState()
+    val currentlyPlayingId = playerState.currentId
+    val isPlayingAudio = playerState.isPlaying
 
     val playTrack = { track: Nasheed ->
-        val ctx = controller.appContext
-        if (ctx != null) {
-            if (currentlyPlayingId == track.id) {
-                controller.toggle()
-                isPlayingAudio = controller.isPlaying.value
-            } else {
-                currentlyPlayingId = track.id
-                isPlayingAudio = true
-                controller.play(ctx, track.url, track.title)
-            }
+        com.elhajri.noor.audio.player.NasheedPlayerManager.ensure(context)
+        // like the web Library.jsx playTrack: queue = all filtered tracks
+        val queue = filteredNasheeds.map { t ->
+            com.elhajri.noor.audio.player.PlayerTrack(
+                id = t.id,
+                url = t.url,
+                title = t.title,
+                artist = t.artist
+            )
+        }
+        val idx = filteredNasheeds.indexOfFirst { it.id == track.id }.coerceAtLeast(0)
+        if (currentlyPlayingId == track.id) {
+            com.elhajri.noor.audio.player.NasheedPlayerManager.toggle()
+        } else {
+            com.elhajri.noor.audio.player.NasheedPlayerManager.playQueue(queue, idx)
         }
     }
 

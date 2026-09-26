@@ -2,7 +2,6 @@ package com.elhajri.noor.ai
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,24 +14,30 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FrontHand
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
-import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,13 +46,19 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
 import org.json.JSONObject
+import org.json.JSONTokener
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 data class ChatMessage(
     val role: String,
-    val content: String
+    val text: String
+)
+
+data class SuggestionChipItem(
+    val icon: ImageVector,
+    val text: String
 )
 
 private const val SYSTEM_PROMPT = """أنت "المساعد الذكي" في تطبيق "القرآن الكريم"، مساعد ذكاء اصطناعي إسلامي متخصص، تجيب على الأسئلة الإسلامية بناءً على القرآن الكريم والسنة النبوية المطهرة بفهم السلف الصالح.
@@ -71,13 +82,15 @@ private const val SYSTEM_PROMPT = """أنت "المساعد الذكي" في ت�
 - لا تتدخل في السياسة ولا في النزاعات الشخصية.
 
 ## الأسلوب
-- عربي فصيح واضح، مع روح إيمانية دافئة."""
+- عربي فصيح واضح، مع روح إيمانية دافئة.
+- ابدأ التحية مرة واحدة فقط، ثم ادخل في صلب الإجابة.
+- استخدم الترقيم والنقاط لتنظيم الإجابة الطويلة."""
 
-private val SUGGESTED_QUESTIONS = listOf(
-    "⏰ ما هي أوقات الصلاة الخمس؟",
-    "🤲 ما هي أذكار الصباح؟",
-    "📖 ما فضل سورة الإخلاص؟",
-    "❤️ كيف أزيد في محبة النبي ﷺ؟"
+private val SUGGESTIONS = listOf(
+    SuggestionChipItem(Icons.Default.AccessTime, "ما هي أوقات الصلاة الخمس؟"),
+    SuggestionChipItem(Icons.Default.FrontHand, "ما هي أذكار الصباح؟"),
+    SuggestionChipItem(Icons.Default.Book, "ما فضل سورة الإخلاص؟"),
+    SuggestionChipItem(Icons.Default.Favorite, "كيف أزيد في محبة النبي ﷺ؟")
 )
 
 private val okHttpClient by lazy {
@@ -90,44 +103,44 @@ private val okHttpClient by lazy {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AIAssistantScreen(onBack: () -> Unit) {
+fun AIAssistantScreen(onBack: () -> Unit = {}) {
     var messages by remember {
         mutableStateOf(
             listOf(
                 ChatMessage(
                     role = "assistant",
-                    content = "السلام عليكم ورحمة الله 🌙\nأنا مساعدك الذكي في تطبيق \"القرآن الكريم\"، مساعدك في الأمور الإسلامية. كيف يمكنني مساعدتك اليوم؟"
+                    text = "السلام عليكم ورحمة الله 🌙\nأنا مساعدك الذكي في تطبيق \"القرآن الكريم\"، مساعدك في الأمور الإسلامية. كيف يمكنني مساعدتك اليوم؟"
                 )
             )
         )
     }
-    var inputText by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
+    var input by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+    var isOffline by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val sendMessage: (String) -> Unit = { textToSend ->
+    val sendText: (String) -> Unit = { textToSend ->
         val trimmed = textToSend.trim()
-        if (trimmed.isNotEmpty() && !isLoading) {
+        if (trimmed.isNotEmpty() && !loading) {
             val userMsg = ChatMessage("user", trimmed)
             val updatedMessages = messages + userMsg
             messages = updatedMessages
-            inputText = ""
-            isLoading = true
+            input = ""
+            loading = true
             keyboardController?.hide()
 
             coroutineScope.launch(Dispatchers.IO) {
                 try {
-                    // Same InvokeLLM integration the web app uses (verified public endpoint)
-                    val conversation = updatedMessages.joinToString("\n") { msg ->
-                        if (msg.role == "user") "المستخدم: " + msg.content else "المساعد: " + msg.content
+                    val conversation = updatedMessages.joinToString("\n") { m ->
+                        if (m.role == "user") "المستخدم: ${m.text}" else "المساعد: ${m.text}"
                     }
-                    val prompt = SYSTEM_PROMPT + "\n\n" + conversation + "\n\nالمساعد:"
+                    val fullPrompt = "$SYSTEM_PROMPT\n\n$conversation\n\nالمساعد:"
 
                     val reqBodyJson = JSONObject()
-                    reqBodyJson.put("prompt", prompt)
+                    reqBodyJson.put("prompt", fullPrompt)
 
                     val mediaType = "application/json; charset=utf-8".toMediaType()
                     val body = reqBodyJson.toString().toRequestBody(mediaType)
@@ -138,61 +151,71 @@ fun AIAssistantScreen(onBack: () -> Unit) {
                         .build()
 
                     val response = okHttpClient.newCall(request).execute()
-                    val responseBody = response.body?.string()
+                    val responseBody = response.body?.string() ?: ""
 
-                    if (response.isSuccessful && !responseBody.isNullOrBlank()) {
-                        val replyText: String = try {
-                            when (val parsed = org.json.JSONTokener(responseBody).nextValue()) {
-                                is String -> parsed
-                                is JSONObject -> parsed.optString("reply", parsed.optString("content", parsed.optString("text", "")))
-                                else -> ""
+                    if (response.isSuccessful && responseBody.isNotBlank()) {
+                        var parsedText = ""
+                        try {
+                            val token = JSONTokener(responseBody).nextValue()
+                            if (token is String) {
+                                parsedText = token
+                            } else if (token is JSONObject) {
+                                parsedText = when {
+                                    token.has("text") -> token.optString("text", "")
+                                    token.has("response") -> token.optString("response", "")
+                                    token.has("content") -> token.optString("content", "")
+                                    token.has("message") -> token.optString("message", "")
+                                    token.has("reply") -> token.optString("reply", "")
+                                    else -> token.toString()
+                                }
                             }
                         } catch (e: Exception) {
-                            try {
-                                val respObj = JSONObject(responseBody)
-                                when {
-                                    respObj.has("choices") -> respObj.getJSONArray("choices").getJSONObject(0).getJSONObject("message").optString("content", "")
-                                    respObj.has("content") -> respObj.optString("content", "")
-                                    respObj.has("text") -> respObj.optString("text", "")
-                                    else -> ""
-                                }
-                            } catch (e2: Exception) { "" }
+                            parsedText = responseBody
                         }
 
-                        val finalText = if (replyText.isNotBlank()) replyText else "عذرًا، لم أتمكن من الرد الآن."
+                        val reply = if (parsedText.isNotBlank()) parsedText else "عذرًا، لم أتمكن من الرد الآن."
                         withContext(Dispatchers.Main) {
-                            messages = messages + ChatMessage("assistant", finalText)
-                            isLoading = false
+                            messages = messages + ChatMessage("assistant", reply)
+                            isOffline = false
+                            loading = false
                         }
                     } else {
                         withContext(Dispatchers.Main) {
                             messages = messages + ChatMessage("assistant", "عذرًا، حدث خطأ. تأكد من اتصالك بالإنترنت وحاول مرة أخرى.")
-                            isLoading = false
+                            loading = false
                         }
+                    }
+                } catch (e: IOException) {
+                    withContext(Dispatchers.Main) {
+                        isOffline = true
+                        val offlineMsg = "🌙 عذرًا، المساعد الذكي يحتاج إلى اتصال بالإنترنت. باقي خصائص التطبيق (القرآن، الأذكار، القبلة...) تعمل بدون إنترنت."
+                        messages = messages + ChatMessage("assistant", offlineMsg)
+                        loading = false
                     }
                 } catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         messages = messages + ChatMessage("assistant", "عذرًا، حدث خطأ. تأكد من اتصالك بالإنترنت وحاول مرة أخرى.")
-                        isLoading = false
+                        loading = false
                     }
                 }
             }
         }
     }
 
-    LaunchedEffect(messages.size, isLoading) {
+    LaunchedEffect(messages.size, loading) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
         }
     }
 
     Scaffold(
+        containerColor = Color(0xFF0A0F1A),
         topBar = {
             TopAppBar(
                 title = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Box(
                             modifier = Modifier
@@ -213,7 +236,8 @@ fun AIAssistantScreen(onBack: () -> Unit) {
                                 text = "مساعد القرآن الكريم",
                                 color = Gold,
                                 fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = AmiriFamily
                             )
                             Text(
                                 text = "اسألني عن أي أمر ديني",
@@ -232,30 +256,56 @@ fun AIAssistantScreen(onBack: () -> Unit) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Navy)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFF0A0F1A)
+                )
             )
-        },
-        containerColor = Navy
-    ) { innerPadding ->
+        }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 12.dp)
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
+            if (isOffline) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = NavyCard.copy(alpha = 0.8f),
+                    border = BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Text(text = "🌙", fontSize = 18.sp)
+                        Text(
+                            text = "أنت بدون اتصال — المساعد الذكي يحتاج إنترنت، باقي الخصائص تعمل أوفلاين",
+                            color = TextMain.copy(alpha = 0.8f),
+                            fontSize = 12.sp,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+
             LazyColumn(
                 state = listState,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(vertical = 12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(messages) { msg ->
                     val isUser = msg.role == "user"
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
+                        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
+                        verticalAlignment = Alignment.Top
                     ) {
                         if (!isUser) {
                             Box(
@@ -275,33 +325,18 @@ fun AIAssistantScreen(onBack: () -> Unit) {
                             Spacer(modifier = Modifier.width(8.dp))
                         }
 
-                        Card(
-                            modifier = Modifier
-                                .widthIn(max = 280.dp)
-                                .then(
-                                    if (!isUser) {
-                                        Modifier.border(
-                                            width = 1.dp,
-                                            color = Gold.copy(alpha = 0.3f),
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
-                                    } else Modifier
-                                ),
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (isUser) Gold else NavyCard
-                            ),
-                            shape = if (isUser) {
-                                RoundedCornerShape(16.dp, 16.dp, 2.dp, 16.dp)
-                            } else {
-                                RoundedCornerShape(16.dp, 16.dp, 16.dp, 2.dp)
-                            }
+                        Surface(
+                            modifier = Modifier.widthIn(max = 280.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (isUser) Gold else NavyCard,
+                            border = if (isUser) null else BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
                         ) {
                             Text(
-                                text = msg.content,
+                                text = msg.text,
+                                modifier = Modifier.padding(12.dp),
                                 color = if (isUser) Navy else TextMain,
                                 fontSize = 14.sp,
-                                lineHeight = 22.sp,
-                                modifier = Modifier.padding(12.dp)
+                                lineHeight = 22.sp
                             )
                         }
 
@@ -311,26 +346,29 @@ fun AIAssistantScreen(onBack: () -> Unit) {
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
-                                    .background(Gold.copy(alpha = 0.25f)),
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            listOf(Gold, GoldSoft)
+                                        )
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Person,
                                     contentDescription = null,
                                     tint = Navy,
-                                    modifier = Modifier.size(18.dp)
+                                    modifier = Modifier.size(16.dp)
                                 )
                             }
                         }
                     }
                 }
 
-                if (isLoading) {
+                if (loading) {
                     item {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.padding(vertical = 4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -346,12 +384,13 @@ fun AIAssistantScreen(onBack: () -> Unit) {
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
-                            Card(
-                                colors = CardDefaults.cardColors(containerColor = NavyCard),
-                                shape = RoundedCornerShape(16.dp)
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = NavyCard,
+                                border = BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                    modifier = Modifier.padding(12.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
@@ -376,90 +415,102 @@ fun AIAssistantScreen(onBack: () -> Unit) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                        .padding(vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "أسئلة مقترحة:",
-                        color = GoldSoft,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    SUGGESTED_QUESTIONS.chunked(2).forEach { rowQuestions ->
+                    SUGGESTIONS.chunked(2).forEach { rowChips ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            rowQuestions.forEach { q ->
-                                Card(
+                            rowChips.forEach { chip ->
+                                Surface(
                                     modifier = Modifier
                                         .weight(1f)
-                                        .clickable { sendMessage(q) },
-                                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                                        .clickable { sendText(chip.text) },
                                     shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
+                                    color = NavyCard,
+                                    border = BorderStroke(1.dp, Gold.copy(alpha = 0.25f))
                                 ) {
-                                    Text(
-                                        text = q,
-                                        color = TextMain,
-                                        fontSize = 12.sp,
-                                        modifier = Modifier.padding(8.dp)
-                                    )
+                                    Row(
+                                        modifier = Modifier.padding(10.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = chip.icon,
+                                            contentDescription = null,
+                                            tint = Gold,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            text = chip.text,
+                                            color = TextMain,
+                                            fontSize = 11.sp,
+                                            maxLines = 2
+                                        )
+                                    }
                                 }
-                            }
-                            if (rowQuestions.size == 1) {
-                                Spacer(modifier = Modifier.weight(1f))
                             }
                         }
                     }
                 }
             }
 
-            Card(
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    .padding(top = 4.dp),
                 shape = RoundedCornerShape(20.dp),
+                color = NavyCard,
                 border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedTextField(
-                        value = inputText,
-                        onValueChange = { inputText = it },
-                        modifier = Modifier.weight(1f),
+                    TextField(
+                        value = input,
+                        onValueChange = { input = it },
                         placeholder = {
-                            Text("اكتب سؤالك هنا...", color = GoldSoft.copy(alpha = 0.5f), fontSize = 14.sp)
+                            Text(
+                                text = "اكتب سؤالك هنا...",
+                                color = TextMain.copy(alpha = 0.4f),
+                                fontSize = 13.sp
+                            )
                         },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
                             focusedTextColor = TextMain,
                             unfocusedTextColor = TextMain
                         ),
-                        singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                        keyboardActions = KeyboardActions(onSend = { sendMessage(inputText) })
+                        keyboardActions = KeyboardActions(onSend = { sendText(input) }),
+                        modifier = Modifier.weight(1f),
+                        singleLine = true
                     )
 
                     IconButton(
-                        onClick = { sendMessage(inputText) },
-                        enabled = inputText.isNotBlank() && !isLoading,
+                        onClick = { sendText(input) },
+                        enabled = input.isNotBlank() && !loading,
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(if (inputText.isNotBlank() && !isLoading) Gold else Gold.copy(alpha = 0.3f))
+                            .background(
+                                if (input.isNotBlank() && !loading)
+                                    Brush.horizontalGradient(listOf(Gold, GoldSoft))
+                                else
+                                    Brush.horizontalGradient(listOf(Gold.copy(alpha = 0.3f), GoldSoft.copy(alpha = 0.3f)))
+                            )
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "إرسال",
                             tint = Navy,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }

@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 fun NoorTopBar(
+    onCommunity: () -> Unit,
     onDonate: () -> Unit,
     onAssistant: () -> Unit,
     onSettings: () -> Unit
@@ -95,6 +97,7 @@ fun NoorTopBar(
 
                 // Action buttons
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    TopBarAction(icon = { Icon(Icons.Filled.Groups, contentDescription = "المجتمع", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onCommunity)
                     TopBarAction(icon = { Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "واتساب", tint = Gold, modifier = Modifier.size(18.dp)) }) {
                         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/212726626546")))
                     }

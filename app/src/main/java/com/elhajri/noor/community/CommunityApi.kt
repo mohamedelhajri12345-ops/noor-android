@@ -1,39 +1,32 @@
 package com.elhajri.noor.community
 
+import com.elhajri.noor.auth.Base44Auth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.Cookie
-import okhttp3.CookieJar
-import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
+import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
+import java.net.URLEncoder
+
+private const val BASE_URL = "https://app.base44.com"
+private const val APP_ID = "6a833faeb9e42cca9a6576fa"
+private const val ENTITIES_URL = "$BASE_URL/api/apps/$APP_ID/entities"
+private const val UPLOAD_URL = "$BASE_URL/api/apps/$APP_ID/integration-endpoints/Core/UploadFile"
+
+data class User(
+    val email: String,
+    val id: String = ""
+)
 
 data class CommunityProfile(
     val id: String = "",
     val handle: String = "",
     val displayName: String = "",
-    val userEmail: String? = null,
-    val city: String? = null,
-    val bio: String? = null,
-    val avatarUrl: String? = null,
-    val createdDate: String? = null
-)
-
-data class CommunityMsg(
-    val id: String = "",
-    val conversationId: String = "",
-    val nickname: String = "",
-    val text: String = "",
-    val avatarUrl: String? = null,
-    val fileUrl: String? = null,
-    val fileType: String? = null,
-    val createdDate: String? = null,
-    val isMine: Boolean = false
+    val avatarUrl: String = "",
+    val userEmail: String = ""
 )
 
 data class Conversation(
@@ -45,214 +38,383 @@ data class Conversation(
     val memberAvatars: List<String> = emptyList(),
     val lastMessage: String = "",
     val lastSender: String = "",
-    val lastMessageTime: String = ""
+    val lastMessageTime: String = "",
+    val createdDate: String = ""
+)
+
+data class CommunityMessage(
+    val id: String = "",
+    val conversationId: String = "",
+    val nickname: String = "",
+    val text: String = "",
+    val avatarUrl: String = "",
+    val fileUrl: String = "",
+    val fileType: String = "",
+    val createdDate: String = "",
+    val pending: Boolean = false,
+    val failed: Boolean = false
 )
 
 object CommunityApi {
-    private const val BASE_URL = "https://app.base44.com"
-    private const val APP_ID = "6a833faeb9e42cca9a6576fa"
-    private const val ENTITIES_PATH = "/api/apps/$APP_ID/entities"
+    private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
 
-    private val cookieStore = HashMap<String, List<Cookie>>()
-
-    private val okHttpClient = OkHttpClient.Builder()
-        .cookieJar(object : CookieJar {
-            override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-                cookieStore[url.host] = cookies
-            }
-            override fun loadForRequest(url: HttpUrl): List<Cookie> {
-                return cookieStore[url.host] ?: emptyList()
-            }
-        })
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
-        .build()
-
-    private val JSON_MEDIA = "application/json; charset=utf-8".toMediaType()
-
-    suspend fun listProfiles(): List<CommunityProfile> = withContext(Dispatchers.IO) {
-        val url = "$BASE_URL$ENTITIES_PATH/CommunityProfile"
-        val request = Request.Builder().url(url).get().build()
-        try {
-            val response = okHttpClient.newCall(request).execute()
-            val bodyStr = response.body?.string() ?: "[]"
-            if (!response.isSuccessful) return@withContext emptyList()
-            val arr = if (bodyStr.trim().startsWith("[")) JSONArray(bodyStr) else JSONArray()
-            val list = mutableListOf<CommunityProfile>()
-            for (i in 0 until arr.length()) {
-                val obj = arr.getJSONObject(i)
-                list.add(
-                    CommunityProfile(
-                        id = obj.optString("id", obj.optString("_id", "")),
-                        handle = obj.optString("handle", ""),
-                        displayName = obj.optString("display_name", obj.optString("name", "عضو")),
-                        userEmail = obj.optString("user_email", null),
-                        city = obj.optString("city", null),
-                        bio = obj.optString("bio", null),
-                        avatarUrl = obj.optString("avatar_url", null),
-                        createdDate = obj.optString("created_date", null)
-                    )
-                )
-            }
-            list
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
+    private fun checkResponse(code: Int, bodyStr: String?) {
+        if (code == 401 || code == 403) {
+            throw Exception("تحتاج تسجيل الدخول للمشاركة")
+        }
+        if (code !in 200..299) {
+            val msg = try {
+                if (!bodyStr.isNullOrBlank()) JSONObject(bodyStr).optString("message", null) else null
+            } catch (_: Exception) { null }
+            throw Exception(msg ?: "حدث خطأ في الاتصال بالخادم ($code)")
         }
     }
 
-    suspend fun registerProfile(
-        fullName: String,
-        city: String = "",
-        bio: String = "",
-        handle: String = "",
-        userEmail: String = ""
-    ): CommunityProfile = withContext(Dispatchers.IO) {
-        val url = "$BASE_URL$ENTITIES_PATH/CommunityProfile"
-        val cleanHandle = handle.ifBlank { "user_${System.currentTimeMillis().toString().takeLast(6)}" }
-            .lowercase().replace(" ", "_")
-        val json = JSONObject().apply {
-            put("handle", cleanHandle)
-            put("display_name", fullName)
-            put("city", city)
-            put("bio", bio)
-            if (userEmail.isNotBlank()) put("user_email", userEmail)
-        }
-        val request = Request.Builder()
-            .url(url)
-            .post(json.toString().toRequestBody(JSON_MEDIA))
-            .build()
+    suspend fun getCurrentUser(): Result<User> = withContext(Dispatchers.IO) {
         try {
-            val response = okHttpClient.newCall(request).execute()
-            val bodyStr = response.body?.string() ?: "{}"
-            val obj = JSONObject(bodyStr)
-            CommunityProfile(
-                id = obj.optString("id", obj.optString("_id", "")),
-                handle = obj.optString("handle", cleanHandle),
-                displayName = obj.optString("display_name", fullName),
-                userEmail = obj.optString("user_email", userEmail),
-                city = obj.optString("city", city),
-                bio = obj.optString("bio", bio),
-                avatarUrl = obj.optString("avatar_url", null),
-                createdDate = obj.optString("created_date", null)
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            CommunityProfile(
-                id = "temp_${System.currentTimeMillis()}",
-                handle = cleanHandle,
-                displayName = fullName,
-                city = city,
-                bio = bio
-            )
-        }
-    }
+            val request = Request.Builder()
+                .url("$ENTITIES_URL/User/me")
+                .get()
+                .build()
 
-    suspend fun sendMessage(
-        conversationId: String,
-        text: String,
-        nickname: String = "عضو"
-    ): CommunityMsg = withContext(Dispatchers.IO) {
-        val url = "$BASE_URL$ENTITIES_PATH/CommunityMessage"
-        val json = JSONObject().apply {
-            put("conversation_id", conversationId)
-            put("nickname", nickname)
-            put("text", text)
-        }
-        val request = Request.Builder()
-            .url(url)
-            .post(json.toString().toRequestBody(JSON_MEDIA))
-            .build()
-        try {
-            val response = okHttpClient.newCall(request).execute()
-            val bodyStr = response.body?.string() ?: "{}"
-            val obj = JSONObject(bodyStr)
-            CommunityMsg(
-                id = obj.optString("id", "msg_${System.currentTimeMillis()}"),
-                conversationId = conversationId,
-                nickname = nickname,
-                text = text,
-                createdDate = obj.optString("created_date", null),
-                isMine = true
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            CommunityMsg(
-                id = "msg_${System.currentTimeMillis()}",
-                conversationId = conversationId,
-                nickname = nickname,
-                text = text,
-                isMine = true
-            )
-        }
-    }
+            val client = Base44Auth.getClient()
+            val response = client.newCall(request).execute()
+            val bodyStr = response.body?.string()
 
-    suspend fun sendProfileMessage(
-        toProfileId: String,
-        text: String,
-        senderName: String = "عضو"
-    ): CommunityMsg = sendMessage(toProfileId, text, senderName)
-
-    suspend fun listMessages(conversationId: String): List<CommunityMsg> = withContext(Dispatchers.IO) {
-        val url = "$BASE_URL$ENTITIES_PATH/CommunityMessage"
-        val request = Request.Builder().url(url).get().build()
-        try {
-            val response = okHttpClient.newCall(request).execute()
-            val bodyStr = response.body?.string() ?: "[]"
-            if (!response.isSuccessful) return@withContext emptyList()
-            val arr = if (bodyStr.trim().startsWith("[")) JSONArray(bodyStr) else JSONArray()
-            val list = mutableListOf<CommunityMsg>()
-            for (i in 0 until arr.length()) {
-                val obj = arr.getJSONObject(i)
-                val cId = obj.optString("conversation_id", obj.optString("to_profile_id", ""))
-                if (cId == conversationId || conversationId.isEmpty()) {
-                    list.add(
-                        CommunityMsg(
-                            id = obj.optString("id", obj.optString("_id", "")),
-                            conversationId = cId,
-                            nickname = obj.optString("nickname", obj.optString("sender_name", "عضو")),
-                            text = obj.optString("text", ""),
-                            avatarUrl = obj.optString("avatar_url", null),
-                            fileUrl = obj.optString("file_url", null),
-                            fileType = obj.optString("file_type", null),
-                            createdDate = obj.optString("created_date", null)
-                        )
-                    )
-                }
+            if (response.code == 401 || response.code == 403) {
+                return@withContext Result.failure(Exception("تحتاج تسجيل الدخول للمشاركة"))
             }
-            list
+            if (!response.isSuccessful || bodyStr.isNullOrBlank()) {
+                return@withContext Result.failure(Exception("غير مسجّل الدخول"))
+            }
+
+            val json = JSONObject(bodyStr)
+            val email = json.optString("email", "")
+            if (email.isBlank()) {
+                return@withContext Result.failure(Exception("غير مسجّل الدخول"))
+            }
+            val id = json.optString("id", json.optString("_id", ""))
+            Result.success(User(email = email, id = id))
         } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
+            Result.failure(e)
         }
     }
 
-    suspend fun listConversations(): List<Conversation> = withContext(Dispatchers.IO) {
-        val url = "$BASE_URL$ENTITIES_PATH/Conversation"
-        val request = Request.Builder().url(url).get().build()
+    suspend fun getProfileByEmail(email: String): Result<CommunityProfile?> = withContext(Dispatchers.IO) {
         try {
-            val response = okHttpClient.newCall(request).execute()
-            val bodyStr = response.body?.string() ?: "[]"
-            if (!response.isSuccessful) return@withContext emptyList()
-            val arr = if (bodyStr.trim().startsWith("[")) JSONArray(bodyStr) else JSONArray()
+            val q = JSONObject().put("user_email", email).toString()
+            val encodedQ = URLEncoder.encode(q, "UTF-8")
+            val url = "$ENTITIES_URL/CommunityProfile?q=$encodedQ"
+
+            val request = Request.Builder().url(url).get().build()
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            val arr = JSONArray(bodyStr ?: "[]")
+            if (arr.length() == 0) {
+                Result.success(null)
+            } else {
+                val obj = arr.getJSONObject(0)
+                Result.success(parseProfile(obj))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getProfileByHandle(handle: String): Result<CommunityProfile?> = withContext(Dispatchers.IO) {
+        try {
+            val q = JSONObject().put("handle", handle.lowercase().trim()).toString()
+            val encodedQ = URLEncoder.encode(q, "UTF-8")
+            val url = "$ENTITIES_URL/CommunityProfile?q=$encodedQ"
+
+            val request = Request.Builder().url(url).get().build()
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            val arr = JSONArray(bodyStr ?: "[]")
+            if (arr.length() == 0) {
+                Result.success(null)
+            } else {
+                val obj = arr.getJSONObject(0)
+                Result.success(parseProfile(obj))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun checkHandleAvailable(handle: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val res = getProfileByHandle(handle)
+            res.map { profile -> profile == null }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun createProfile(
+        handle: String,
+        displayName: String,
+        avatarUrl: String,
+        userEmail: String
+    ): Result<CommunityProfile> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("handle", handle.lowercase().trim())
+                put("display_name", displayName.trim())
+                put("avatar_url", avatarUrl)
+                put("user_email", userEmail)
+            }
+            val request = Request.Builder()
+                .url("$ENTITIES_URL/CommunityProfile")
+                .post(json.toString().toRequestBody(jsonMediaType))
+                .build()
+
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            val obj = JSONObject(bodyStr ?: "{}")
+            Result.success(parseProfile(obj))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getConversations(myHandle: String): Result<List<Conversation>> = withContext(Dispatchers.IO) {
+        try {
+            val url = "$ENTITIES_URL/Conversation?sort=-created_date&limit=100"
+            val request = Request.Builder().url(url).get().build()
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            val arr = JSONArray(bodyStr ?: "[]")
             val list = mutableListOf<Conversation>()
             for (i in 0 until arr.length()) {
-                val obj = arr.getJSONObject(i)
-                list.add(
-                    Conversation(
-                        id = obj.optString("id", obj.optString("_id", "")),
-                        name = obj.optString("name", "محادثة"),
-                        type = obj.optString("type", "direct"),
-                        lastMessage = obj.optString("last_message", ""),
-                        lastSender = obj.optString("last_sender", ""),
-                        lastMessageTime = obj.optString("last_message_time", "")
-                    )
-                )
+                val conv = parseConversation(arr.getJSONObject(i))
+                if (conv.memberHandles.contains(myHandle)) {
+                    list.add(conv)
+                }
             }
-            list
+            Result.success(list)
         } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
+            Result.failure(e)
         }
+    }
+
+    suspend fun createConversation(
+        name: String,
+        type: String,
+        memberHandles: List<String>,
+        memberNames: List<String>,
+        memberAvatars: List<String>
+    ): Result<Conversation> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("name", name)
+                put("type", type)
+                put("member_handles", JSONArray(memberHandles))
+                put("member_names", JSONArray(memberNames))
+                put("member_avatars", JSONArray(memberAvatars))
+                put("last_message", "")
+                put("last_sender", "")
+            }
+            val request = Request.Builder()
+                .url("$ENTITIES_URL/Conversation")
+                .post(json.toString().toRequestBody(jsonMediaType))
+                .build()
+
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            val obj = JSONObject(bodyStr ?: "{}")
+            Result.success(parseConversation(obj))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateConversation(
+        id: String,
+        lastMessage: String,
+        lastSender: String,
+        lastMessageTime: String
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("last_message", lastMessage)
+                put("last_sender", lastSender)
+                put("last_message_time", lastMessageTime)
+            }
+            val request = Request.Builder()
+                .url("$ENTITIES_URL/Conversation/$id")
+                .put(json.toString().toRequestBody(jsonMediaType))
+                .build()
+
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getMessages(conversationId: String): Result<List<CommunityMessage>> = withContext(Dispatchers.IO) {
+        try {
+            val q = JSONObject().put("conversation_id", conversationId).toString()
+            val encodedQ = URLEncoder.encode(q, "UTF-8")
+            val url = "$ENTITIES_URL/CommunityMessage?q=$encodedQ&sort=-created_date&limit=50"
+
+            val request = Request.Builder().url(url).get().build()
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            val arr = JSONArray(bodyStr ?: "[]")
+            val list = mutableListOf<CommunityMessage>()
+            for (i in 0 until arr.length()) {
+                list.add(parseMessage(arr.getJSONObject(i)))
+            }
+            Result.success(list.reversed())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun createMessage(
+        conversationId: String,
+        nickname: String,
+        text: String,
+        avatarUrl: String = "",
+        fileUrl: String = "",
+        fileType: String = ""
+    ): Result<CommunityMessage> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("conversation_id", conversationId)
+                put("nickname", nickname)
+                put("text", text)
+                put("avatar_url", avatarUrl)
+                if (fileUrl.isNotBlank()) put("file_url", fileUrl)
+                if (fileType.isNotBlank()) put("file_type", fileType)
+            }
+            val request = Request.Builder()
+                .url("$ENTITIES_URL/CommunityMessage")
+                .post(json.toString().toRequestBody(jsonMediaType))
+                .build()
+
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            val obj = JSONObject(bodyStr ?: "{}")
+            Result.success(parseMessage(obj))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteMessage(messageId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder()
+                .url("$ENTITIES_URL/CommunityMessage/$messageId")
+                .delete()
+                .build()
+
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun uploadFile(bytes: ByteArray, fileName: String, mimeType: String): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val mediaType = mimeType.toMediaType()
+            val filePart = bytes.toRequestBody(mediaType)
+            val requestBody = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", fileName, filePart)
+                .build()
+
+            val request = Request.Builder()
+                .url(UPLOAD_URL)
+                .post(requestBody)
+                .build()
+
+            val response = Base44Auth.getClient().newCall(request).execute()
+            val bodyStr = response.body?.string()
+            checkResponse(response.code, bodyStr)
+
+            val json = JSONObject(bodyStr ?: "{}")
+            val fileUrl = json.optString("file_url", "")
+            if (fileUrl.isBlank()) {
+                Result.failure(Exception("فشل تحميل الملف"))
+            } else {
+                Result.success(fileUrl)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private fun parseProfile(obj: JSONObject): CommunityProfile {
+        return CommunityProfile(
+            id = obj.optString("id", obj.optString("_id", "")),
+            handle = obj.optString("handle", ""),
+            displayName = obj.optString("display_name", obj.optString("name", "")),
+            avatarUrl = obj.optString("avatar_url", ""),
+            userEmail = obj.optString("user_email", "")
+        )
+    }
+
+    private fun parseConversation(obj: JSONObject): Conversation {
+        val handlesJson = obj.optJSONArray("member_handles") ?: JSONArray()
+        val namesJson = obj.optJSONArray("member_names") ?: JSONArray()
+        val avatarsJson = obj.optJSONArray("member_avatars") ?: JSONArray()
+
+        val handles = mutableListOf<String>()
+        val names = mutableListOf<String>()
+        val avatars = mutableListOf<String>()
+
+        for (i in 0 until handlesJson.length()) handles.add(handlesJson.optString(i))
+        for (i in 0 until namesJson.length()) names.add(namesJson.optString(i))
+        for (i in 0 until avatarsJson.length()) avatars.add(avatarsJson.optString(i))
+
+        return Conversation(
+            id = obj.optString("id", obj.optString("_id", "")),
+            name = obj.optString("name", ""),
+            type = obj.optString("type", "direct"),
+            memberHandles = handles,
+            memberNames = names,
+            memberAvatars = avatars,
+            lastMessage = obj.optString("last_message", ""),
+            lastSender = obj.optString("last_sender", ""),
+            lastMessageTime = obj.optString("last_message_time", ""),
+            createdDate = obj.optString("created_date", "")
+        )
+    }
+
+    private fun parseMessage(obj: JSONObject): CommunityMessage {
+        return CommunityMessage(
+            id = obj.optString("id", obj.optString("_id", "")),
+            conversationId = obj.optString("conversation_id", ""),
+            nickname = obj.optString("nickname", ""),
+            text = obj.optString("text", ""),
+            avatarUrl = obj.optString("avatar_url", ""),
+            fileUrl = obj.optString("file_url", ""),
+            fileType = obj.optString("file_type", ""),
+            createdDate = obj.optString("created_date", "")
+        )
     }
 }

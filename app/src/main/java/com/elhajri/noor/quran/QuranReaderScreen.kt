@@ -140,17 +140,13 @@ fun QuranReaderScreen(
         )
     }
 
-    // Audio player
-    val player = remember { SurahAudioPlayer() }
-    val isPlaying by player.isPlaying.collectAsState()
-    val isLoadingAudio by player.isLoading.collectAsState()
-    val progress by player.progress.collectAsState()
+    // Audio player — the separate native mushaf player (web audioManager port)
+    val playerState by com.elhajri.noor.audio.player.QuranPlayerManager.state.collectAsState()
+    val isPlaying = playerState.isPlaying
+    val isLoadingAudio = playerState.isLoading && playerState.currentId == "quran-$currentSurahNum"
+    val progress = if (playerState.duration > 0f) (playerState.currentTime / playerState.duration).coerceIn(0f, 1f) else 0f
 
-    DisposableEffect(Unit) {
-        onDispose {
-            player.release()
-        }
-    }
+    LaunchedEffect(Unit) { com.elhajri.noor.audio.player.QuranPlayerManager.ensure(context) }
 
     // Load ayahs text and bookmark
     LaunchedEffect(currentSurahNum) {
@@ -166,22 +162,26 @@ fun QuranReaderScreen(
             .apply()
     }
 
-    // Auto-advance logic
-    LaunchedEffect(currentSurahNum, currentReciter) {
-        player.onAutoAdvance = {
-            if (currentSurahNum < 114) {
-                currentSurahNum += 1
-            }
-        }
-    }
+    // Auto-advance handled natively by the playback queue (current + next 4 surahs)
 
     val playAudio = {
-        val padded = String.format("%03d", currentSurahNum)
-        val servers = currentReciter.servers
-        if (servers.isNotEmpty()) {
-            val primary = "${servers[0]}$padded.mp3"
-            val fallbacks = servers.drop(1).map { "${it}$padded.mp3" }
-            player.prepare(primary, fallbacks)
+        // queue like the web QuranReader.jsx: current surah + next 4
+        val tracks = (currentSurahNum..minOf(114, currentSurahNum + 4)).mapNotNull { n ->
+            val servers = currentReciter.servers
+            val name = allSurahs.find { it.number == n }?.name ?: currentName
+            if (servers.isEmpty()) null
+            else com.elhajri.noor.audio.player.PlayerTrack(
+                id = "quran-$n",
+                url = "${servers[0]}${String.format("%03d", n)}.mp3",
+                title = "سورة $name",
+                artist = currentReciter.name,
+                fallbackUrls = servers.drop(1).map { "${it}${String.format("%03d", n)}.mp3" }
+            )
+        }
+        if (playerState.currentId == "quran-$currentSurahNum") {
+            com.elhajri.noor.audio.player.QuranPlayerManager.toggle()
+        } else {
+            com.elhajri.noor.audio.player.QuranPlayerManager.playQueue(tracks, 0)
         }
     }
 
@@ -258,7 +258,7 @@ fun QuranReaderScreen(
                     // Progress bar / Seek bar
                     Slider(
                         value = progress,
-                        onValueChange = { player.seekTo(it) },
+                        onValueChange = { com.elhajri.noor.audio.player.QuranPlayerManager.seek(it * playerState.duration) },
                         colors = SliderDefaults.colors(
                             thumbColor = Gold,
                             activeTrackColor = Gold,
@@ -286,10 +286,10 @@ fun QuranReaderScreen(
                         IconButton(
                             onClick = {
                                 if (isPlaying) {
-                                    player.pause()
+                                    com.elhajri.noor.audio.player.QuranPlayerManager.toggle()
                                 } else {
-                                    if (player.progress.value > 0f) {
-                                        player.play()
+                                    if (playerState.currentId != null) {
+                                        com.elhajri.noor.audio.player.QuranPlayerManager.toggle()
                                     } else {
                                         playAudio()
                                     }
@@ -393,6 +393,22 @@ fun QuranReaderScreen(
                                 .clickable {
                                     currentReciter = reciter
                                     Prefs.setReciter(context, reciter.id)
+                                    // like the web changeReciter: restart the queue with the new reciter
+                                    if (com.elhajri.noor.audio.player.QuranPlayerManager.state.value.currentId != null) {
+                                        val tracks = (currentSurahNum..minOf(114, currentSurahNum + 4)).mapNotNull { n ->
+                                            val servers = reciter.servers
+                                            val name = allSurahs.find { it.number == n }?.name ?: currentName
+                                            if (servers.isEmpty()) null
+                                            else com.elhajri.noor.audio.player.PlayerTrack(
+                                                id = "quran-$n",
+                                                url = "${servers[0]}${String.format("%03d", n)}.mp3",
+                                                title = "سورة $name",
+                                                artist = reciter.name,
+                                                fallbackUrls = servers.drop(1).map { "${it}${String.format("%03d", n)}.mp3" }
+                                            )
+                                        }
+                                        com.elhajri.noor.audio.player.QuranPlayerManager.playQueue(tracks, 0)
+                                    }
                                     showReciterDialog = false
                                     if (isPlaying) {
                                         playAudio()
