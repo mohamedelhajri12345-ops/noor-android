@@ -1,6 +1,6 @@
-package com.elhajri.noor.ai
-
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
+package com.elhajri.noor.ai
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
