@@ -41,6 +41,7 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -102,8 +103,20 @@ private val okHttpClient by lazy {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+
+private fun getOrCreateAnonymousId(context: android.content.Context): String {
+    val sp = context.getSharedPreferences("noor_ai", android.content.Context.MODE_PRIVATE)
+    var id = sp.getString("anon_id", null)
+    if (id == null) {
+        id = java.util.UUID.randomUUID().toString()
+        sp.edit().putString("anon_id", id).apply()
+    }
+    return id
+}
+
 @Composable
 fun AIAssistantScreen(onBack: () -> Unit = {}) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     var messages by remember {
         mutableStateOf(
             listOf(
@@ -148,6 +161,8 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
                     val request = Request.Builder()
                         .url("https://app.base44.com/api/apps/6a833faeb9e42cca9a6576fa/integration-endpoints/Core/InvokeLLM")
                         .post(body)
+                        .header("X-App-Id", "6a833faeb9e42cca9a6576fa")
+                        .header("X-Base44-Anonymous-Id", getOrCreateAnonymousId(context))
                         .build()
 
                     val response = okHttpClient.newCall(request).execute()
@@ -180,8 +195,15 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
                             loading = false
                         }
                     } else {
+                        // surface the real server error (e.g. credit limit) when present
+                        val serverMsg = try {
+                            val err = JSONObject(responseBody)
+                            err.optString("message", "").ifBlank { err.optString("detail", "") }
+                        } catch (_: Exception) { "" }
+                        val shown = if (serverMsg.isNotBlank()) "عذرًا: $serverMsg"
+                                    else "عذرًا، حدث خطأ. تأكد من اتصالك بالإنترنت وحاول مرة أخرى."
                         withContext(Dispatchers.Main) {
-                            messages = messages + ChatMessage("assistant", "عذرًا، حدث خطأ. تأكد من اتصالك بالإنترنت وحاول مرة أخرى.")
+                            messages = messages + ChatMessage("assistant", shown)
                             loading = false
                         }
                     }

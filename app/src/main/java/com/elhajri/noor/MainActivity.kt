@@ -94,6 +94,24 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         com.elhajri.noor.audio.player.QuranPlayerManager.ensure(applicationContext)
         com.elhajri.noor.audio.player.NasheedPlayerManager.ensure(applicationContext)
+
+        // Android 13+: ask for the notification permission (needed for adhan alerts)
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            androidx.core.app.ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                3001
+            )
+        }
+        // schedule the next adhan alert as soon as the app opens (timings fetch caches itself)
+        Thread {
+            try {
+                kotlinx.coroutines.runBlocking {
+                    com.elhajri.noor.prayer.PrayerRepository.getTimings(this@MainActivity)
+                }
+                com.elhajri.noor.notification.AdhanScheduler.scheduleNextAdhan(this@MainActivity)
+            } catch (_: Exception) {}
+        }.start()
         setContent {
             NoorTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
