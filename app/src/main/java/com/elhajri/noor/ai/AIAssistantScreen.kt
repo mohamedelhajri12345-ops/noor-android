@@ -170,7 +170,18 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
                     val response = okHttpClient.newCall(request).execute()
                     val responseBody = response.body?.string() ?: ""
 
-                    if (response.isSuccessful && responseBody.isNotBlank()) {
+                    // كشف الأخطاء الداخلية (نفاد الرصيد الشهري، أخطاء التحقق، إلخ) حتى لو رجع السيرفر HTTP 200
+                    fun looksLikeInternalError(raw: String): Boolean {
+                        val r = raw.trim()
+                        val errorMarkers = listOf(
+                            "Validation Error", "'error':", "\"error\":", "Field required",
+                            "'message':", "\"message\":", "rate limit", "quota", "credit"
+                        )
+                        val looksLikeRawDict = r.startsWith("{'") || r.startsWith("[{'")
+                        return looksLikeRawDict || errorMarkers.any { r.contains(it, ignoreCase = true) }
+                    }
+
+                    if (response.isSuccessful && responseBody.isNotBlank() && !looksLikeInternalError(responseBody)) {
                         var parsedText = ""
                         try {
                             val token = JSONTokener(responseBody).nextValue()
@@ -190,20 +201,22 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
                             parsedText = responseBody
                         }
 
-                        val reply = if (parsedText.isNotBlank()) parsedText else "عذرًا، لم أتمكن من الرد الآن."
+                        val reply = if (parsedText.isNotBlank() && !looksLikeInternalError(parsedText)) parsedText
+                                    else "🌙 عذرًا، المساعد الذكي غير متاح حالياً (نفاد الرصيد الشهري للمساعد). يرجى المحاولة لاحقاً أو بعد تجديد الرصيد."
                         withContext(Dispatchers.Main) {
                             messages = messages + ChatMessage("assistant", reply)
                             isOffline = false
                             loading = false
                         }
                     } else {
-                        // surface the real server error (e.g. credit limit) when present
+                        // surface the real server error (e.g. credit limit) when present, never raw dict text
                         val serverMsg = try {
                             val err = JSONObject(responseBody)
                             err.optString("message", "").ifBlank { err.optString("detail", "") }
                         } catch (_: Exception) { "" }
-                        val shown = if (serverMsg.isNotBlank()) "عذرًا: $serverMsg"
-                                    else "عذرًا، حدث خطأ. تأكد من اتصالك بالإنترنت وحاول مرة أخرى."
+                        val shown = if (serverMsg.isNotBlank() && !looksLikeInternalError(serverMsg))
+                                        "عذرًا: $serverMsg"
+                                    else "🌙 عذرًا، المساعد الذكي غير متاح حالياً (نفاد الرصيد الشهري للمساعد). يرجى المحاولة لاحقاً أو بعد تجديد الرصيد."
                         withContext(Dispatchers.Main) {
                             messages = messages + ChatMessage("assistant", shown)
                             loading = false
