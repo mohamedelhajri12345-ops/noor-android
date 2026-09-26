@@ -1,8 +1,6 @@
 package com.elhajri.noor.quran
 
 import android.content.Context
-import android.media.AudioAttributes
-import android.media.MediaPlayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -116,55 +114,28 @@ fun LibraryScreen(onBack: () -> Unit) {
         favIdsStr = arr.toString()
     }
 
-    // Audio Player State
+    // Audio Player State — backed by the shared background Media3 service
     var currentlyPlayingId by remember { mutableStateOf<String?>(null) }
     var isPlayingAudio by remember { mutableStateOf(false) }
-    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+    val controller = com.elhajri.noor.audio.NoorAudioController
+    val audioPlaying by controller.isPlaying.collectAsState()
 
-    DisposableEffect(Unit) {
-        onDispose {
-            mediaPlayer?.release()
-            mediaPlayer = null
-        }
+    // keep local flag in sync with the real shared player
+    LaunchedEffect(audioPlaying) {
+        isPlayingAudio = audioPlaying && currentlyPlayingId != null
+        if (!audioPlaying) currentlyPlayingId = null
     }
 
     val playTrack = { track: Nasheed ->
-        if (currentlyPlayingId == track.id && mediaPlayer != null) {
-            mediaPlayer?.let { mp ->
-                if (mp.isPlaying) {
-                    mp.pause()
-                    isPlayingAudio = false
-                } else {
-                    mp.start()
-                    isPlayingAudio = true
-                }
-            }
-        } else {
-            mediaPlayer?.release()
-            try {
-                val mp = MediaPlayer().apply {
-                    setAudioAttributes(
-                        AudioAttributes.Builder()
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .build()
-                    )
-                    setDataSource(track.url)
-                    setOnPreparedListener { player ->
-                        player.start()
-                        isPlayingAudio = true
-                    }
-                    setOnCompletionListener {
-                        isPlayingAudio = false
-                        currentlyPlayingId = null
-                    }
-                }
-                mediaPlayer = mp
+        val ctx = controller.appContext
+        if (ctx != null) {
+            if (currentlyPlayingId == track.id) {
+                controller.toggle()
+                isPlayingAudio = controller.isPlaying.value
+            } else {
                 currentlyPlayingId = track.id
-                mp.prepareAsync()
-            } catch (e: Exception) {
-                currentlyPlayingId = null
-                isPlayingAudio = false
+                isPlayingAudio = true
+                controller.play(ctx, track.url, track.title)
             }
         }
     }

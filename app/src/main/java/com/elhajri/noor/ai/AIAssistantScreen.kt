@@ -120,27 +120,20 @@ fun AIAssistantScreen(onBack: () -> Unit) {
 
             coroutineScope.launch(Dispatchers.IO) {
                 try {
-                    val jsonArray = JSONArray()
-                    val sysObj = JSONObject()
-                    sysObj.put("role", "system")
-                    sysObj.put("content", SYSTEM_PROMPT)
-                    jsonArray.put(sysObj)
-
-                    for (msg in updatedMessages) {
-                        val msgObj = JSONObject()
-                        msgObj.put("role", msg.role)
-                        msgObj.put("content", msg.content)
-                        jsonArray.put(msgObj)
+                    // Same InvokeLLM integration the web app uses (verified public endpoint)
+                    val conversation = updatedMessages.joinToString("\n") { msg ->
+                        if (msg.role == "user") "المستخدم: " + msg.content else "المساعد: " + msg.content
                     }
+                    val prompt = SYSTEM_PROMPT + "\n\n" + conversation + "\n\nالمساعد:"
 
                     val reqBodyJson = JSONObject()
-                    reqBodyJson.put("messages", jsonArray)
+                    reqBodyJson.put("prompt", prompt)
 
                     val mediaType = "application/json; charset=utf-8".toMediaType()
                     val body = reqBodyJson.toString().toRequestBody(mediaType)
 
                     val request = Request.Builder()
-                        .url("https://app.base44.com/api/apps/6a833faeb9e42cca9a6576fa/ai/default/v1/chat/completions")
+                        .url("https://app.base44.com/api/apps/6a833faeb9e42cca9a6576fa/integration-endpoints/Core/InvokeLLM")
                         .post(body)
                         .build()
 
@@ -148,22 +141,22 @@ fun AIAssistantScreen(onBack: () -> Unit) {
                     val responseBody = response.body?.string()
 
                     if (response.isSuccessful && !responseBody.isNullOrBlank()) {
-                        val respObj = JSONObject(responseBody)
-                        val replyText = when {
-                            respObj.has("choices") -> {
-                                val choices = respObj.getJSONArray("choices")
-                                if (choices.length() > 0) {
-                                    val choice0 = choices.getJSONObject(0)
-                                    if (choice0.has("message")) {
-                                        choice0.getJSONObject("message").optString("content", "")
-                                    } else if (choice0.has("text")) {
-                                        choice0.optString("text", "")
-                                    } else ""
-                                } else ""
+                        val replyText: String = try {
+                            when (val parsed = org.json.JSONTokener(responseBody).nextValue()) {
+                                is String -> parsed
+                                is JSONObject -> parsed.optString("reply", parsed.optString("content", parsed.optString("text", "")))
+                                else -> ""
                             }
-                            respObj.has("content") -> respObj.optString("content", "")
-                            respObj.has("text") -> respObj.optString("text", "")
-                            else -> ""
+                        } catch (e: Exception) {
+                            try {
+                                val respObj = JSONObject(responseBody)
+                                when {
+                                    respObj.has("choices") -> respObj.getJSONArray("choices").getJSONObject(0).getJSONObject("message").optString("content", "")
+                                    respObj.has("content") -> respObj.optString("content", "")
+                                    respObj.has("text") -> respObj.optString("text", "")
+                                    else -> ""
+                                }
+                            } catch (e2: Exception) { "" }
                         }
 
                         val finalText = if (replyText.isNotBlank()) replyText else "عذرًا، لم أتمكن من الرد الآن."

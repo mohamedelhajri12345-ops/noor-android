@@ -282,7 +282,12 @@ fun QuizScreen() {
                                         .fillMaxWidth()
                                         .clickable(enabled = !isAnswered) {
                                             selectedAnswer = i
-                                            if (i == q.correct) score++
+                                            if (i == q.correct) {
+                                                score++
+                                                com.elhajri.noor.audio.SoundEffects.success()
+                                            } else {
+                                                com.elhajri.noor.audio.SoundEffects.click()
+                                            }
                                         },
                                     colors = CardDefaults.cardColors(containerColor = containerColor),
                                     shape = RoundedCornerShape(14.dp)

@@ -3,6 +3,9 @@ package com.elhajri.noor
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -66,10 +69,18 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NoorTheme
 import com.elhajri.noor.ui.NoorTopBar
+import com.elhajri.noor.ui.NoorSplash
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.NavigationBarItemDefaults
+import com.elhajri.noor.audio.SoundEffects
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SoundEffects.init(this)
+        com.elhajri.noor.audio.NoorAudioController.appContext = applicationContext
         setContent {
             NoorTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -92,11 +103,13 @@ private val tabs = listOf(
 
 @Composable
 fun NoorApp() {
+    var showSplash by remember { mutableStateOf(true) }
     val navController = rememberNavController()
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
     val showBar = currentRoute in tabs.map { it.route }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
             if (showBar) NoorTopBar(
@@ -107,11 +120,16 @@ fun NoorApp() {
         },
         bottomBar = {
             if (showBar) {
-                NavigationBar(containerColor = NavyCard) {
+                NavigationBar(
+                containerColor = NavyCard,
+                modifier = Modifier.height(58.dp),
+                tonalElevation = 0.dp
+            ) {
                     tabs.forEach { tab ->
                         NavigationBarItem(
                             selected = currentRoute == tab.route,
                             onClick = {
+                                SoundEffects.click()
                                 navController.navigate(tab.route) {
                                     popUpTo("home") { saveState = true }
                                     launchSingleTop = true
@@ -197,5 +215,9 @@ fun NoorApp() {
             composable("hajj") { HajjGuideScreen(onBack = { navController.popBackStack() }) }
             composable("zakat") { ZakatScreen() }
         }
+    }
+    if (showSplash) {
+        NoorSplash(onFinished = { showSplash = false })
+    }
     }
 }
