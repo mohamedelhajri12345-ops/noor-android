@@ -284,10 +284,8 @@ fun QuizScreen() {
                                             selectedAnswer = i
                                             if (i == q.correct) {
                                                 score++
-                                                com.elhajri.noor.audio.
-                                            } else {
-                                                com.elhajri.noor.audio.
-                                            }
+                                                                                            } else {
+                                                                                            }
                                         },
                                     colors = CardDefaults.cardColors(containerColor = containerColor),
                                     shape = RoundedCornerShape(14.dp)

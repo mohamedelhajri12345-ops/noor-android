@@ -7,9 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Repeat
-import androidx.compose.material.icons.automirrored.filled.RepeatOne
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Loop
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -78,7 +77,7 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    fun manager() = if (active.isQuran) QuranPlayerManager else NasheedPlayerManager
+    fun manager(): com.elhajri.noor.audio.player.PlayerEngine = if (active.isQuran) QuranPlayerManager.engine else NasheedPlayerManager.engine
 
     Column(modifier = modifier.fillMaxWidth()) {
         // MINI BAR — like the web: [play] title/artist + progress + expand
@@ -105,7 +104,7 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
                                 Brush.linearGradient(listOf(Gold, Color(0xFFB8941F)))
                             )
                             .clickable {
-                                context.let { manager().ensure(it) }
+                                manager().ensurePlayer(context)
                                 manager().toggle()
                             }
                     ) {
@@ -186,10 +185,11 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    fun manager() = if (active.isQuran) QuranPlayerManager else NasheedPlayerManager
+    fun manager(): com.elhajri.noor.audio.player.PlayerEngine = if (active.isQuran) QuranPlayerManager.engine else NasheedPlayerManager.engine
     var showSleep by remember { mutableStateOf(false) }
 
     ModalBottomSheet(
@@ -247,7 +247,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                 value = if (dragging) dragValue else (s.duration - s.currentTime).coerceIn(0f, s.duration),
                 onValueChange = { dragging = true; dragValue = it },
                 onValueChangeFinished = {
-                    context.let { manager().ensure(it) }
+                    manager().ensurePlayer(context)
                     manager().seek((s.duration - dragValue).coerceIn(0f, s.duration))
                     dragging = false
                 },
@@ -326,16 +326,27 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                         .padding(13.dp)
                 )
                 Spacer(Modifier.width(14.dp))
-                Icon(
-                    if (s.repeatMode == "one") Icons.AutoMirrored.Filled.RepeatOne else Icons.AutoMirrored.Filled.Repeat,
-                    contentDescription = "تكرار",
-                    tint = if (s.repeatMode != "none") Gold else Color(0xFF6B7594),
-                    modifier = Modifier
-                        .size(22.dp)
-                        .clip(CircleShape)
-                        .clickable { manager().toggleRepeat() }
-                        .padding(4.dp)
-                )
+                Box {
+                    Icon(
+                        Icons.Filled.Loop,
+                        contentDescription = "تكرار",
+                        tint = if (s.repeatMode != "none") Gold else Color(0xFF6B7594),
+                        modifier = Modifier
+                            .size(22.dp)
+                            .clip(CircleShape)
+                            .clickable { manager().toggleRepeat() }
+                            .padding(4.dp)
+                    )
+                    if (s.repeatMode == "one") {
+                        Text(
+                            "١",
+                            color = Gold,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.align(Alignment.TopEnd)
+                        )
+                    }
+                }
             }
 
             Spacer(Modifier.height(18.dp))

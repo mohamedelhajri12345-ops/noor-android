@@ -119,6 +119,24 @@ fun LibraryScreen(onBack: () -> Unit) {
     val currentlyPlayingId = playerState.currentId
     val isPlayingAudio = playerState.isPlaying
 
+    // Category Visuals Mapping
+    val categoryVisuals = mapOf(
+        "prophet" to Pair("⭐", "عن النبي ﷺ"),
+        "religious" to Pair("🤲", "دينية"),
+        "arabic" to Pair("🌙", "عربية"),
+        "english" to Pair("🌍", "إنجليزية"),
+        "occasions" to Pair("💒", "مناسبات")
+    )
+
+    val filteredNasheeds = remember(selectedCategory, searchQuery, nasheeds) {
+        nasheeds.filter { n ->
+            val matchesCategory = selectedCategory == "all" || n.category == selectedCategory
+            val matchesSearch = searchQuery.isBlank() ||
+                    n.title.contains(searchQuery, ignoreCase = true) ||
+                    n.artist.contains(searchQuery, ignoreCase = true)
+            matchesCategory && matchesSearch
+        }
+    }
     val playTrack = { track: Nasheed ->
         com.elhajri.noor.audio.player.NasheedPlayerManager.ensure(context)
         // like the web Library.jsx playTrack: queue = all filtered tracks
@@ -138,24 +156,6 @@ fun LibraryScreen(onBack: () -> Unit) {
         }
     }
 
-    // Category Visuals Mapping
-    val categoryVisuals = mapOf(
-        "prophet" to Pair("⭐", "عن النبي ﷺ"),
-        "religious" to Pair("🤲", "دينية"),
-        "arabic" to Pair("🌙", "عربية"),
-        "english" to Pair("🌍", "إنجليزية"),
-        "occasions" to Pair("💒", "مناسبات")
-    )
-
-    val filteredNasheeds = remember(selectedCategory, searchQuery, nasheeds) {
-        nasheeds.filter { n ->
-            val matchesCategory = selectedCategory == "all" || n.category == selectedCategory
-            val matchesSearch = searchQuery.isBlank() ||
-                    n.title.contains(searchQuery, ignoreCase = true) ||
-                    n.artist.contains(searchQuery, ignoreCase = true)
-            matchesCategory && matchesSearch
-        }
-    }
 
     Scaffold(
         topBar = {

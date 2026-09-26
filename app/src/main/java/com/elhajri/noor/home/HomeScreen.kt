@@ -220,8 +220,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     modifier = Modifier
                         .aspectRatio(0.95f)
                         .clickable {
-                            com.elhajri.noor.audio.
-                            onNavigate(item.route)
+                                                        onNavigate(item.route)
                         },
                     colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(14.dp)
