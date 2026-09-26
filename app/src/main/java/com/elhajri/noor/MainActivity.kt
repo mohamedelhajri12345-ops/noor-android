@@ -65,6 +65,7 @@ import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NoorTheme
+import com.elhajri.noor.ui.NoorTopBar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,6 +98,13 @@ fun NoorApp() {
     val showBar = currentRoute in tabs.map { it.route }
 
     Scaffold(
+        topBar = {
+            if (showBar) NoorTopBar(
+                onDonate = { navController.navigate("donation") },
+                onAssistant = { navController.navigate("ai") },
+                onSettings = { navController.navigate("settings") }
+            )
+        },
         bottomBar = {
             if (showBar) {
                 NavigationBar(containerColor = NavyCard) {
