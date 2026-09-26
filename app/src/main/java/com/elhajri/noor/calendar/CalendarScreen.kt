@@ -9,8 +9,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ChevronLeft
-import androidx.compose.material.icons.automirrored.filled.ChevronRight
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -300,7 +300,7 @@ fun CalendarScreen() {
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ChevronRight,
+                            imageVector = Icons.Filled.KeyboardArrowRight,
                             contentDescription = "الشهر السابق",
                             tint = Gold
                         )
@@ -320,7 +320,7 @@ fun CalendarScreen() {
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ChevronLeft,
+                            imageVector = Icons.Filled.KeyboardArrowLeft,
                             contentDescription = "الشهر التالي",
                             tint = Gold
                         )

@@ -12,8 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.ChevronDown
-import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.AccountBalance
@@ -318,7 +318,7 @@ private fun StepCard(index: Int, step: Step, isUnderstood: Boolean, onUnderstand
                 }
 
                 Icon(
-                    imageVector = Icons.Default.ChevronDown,
+                    imageVector = Icons.Filled.KeyboardArrowDown,
                     contentDescription = null,
                     tint = GoldSoft,
                     modifier = Modifier.size(20.dp)

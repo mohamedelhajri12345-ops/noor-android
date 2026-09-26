@@ -15,7 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Sparkles
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -275,7 +275,7 @@ fun TasbihScreen() {
             containerColor = NavyCard,
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Sparkles,
+                    imageVector = Icons.Filled.AutoAwesome,
                     contentDescription = null,
                     tint = Gold,
                     modifier = Modifier.size(36.dp)
