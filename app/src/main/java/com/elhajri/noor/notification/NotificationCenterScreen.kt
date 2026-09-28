@@ -192,7 +192,7 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
                         prayerList.forEach { (name, time) ->
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
+                                colors = CardDefaults.cardColors(containerColor = NavyLight),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
                                 Row(
@@ -220,7 +220,7 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
                     } else {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
+                            colors = CardDefaults.cardColors(containerColor = NavyLight),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Column(

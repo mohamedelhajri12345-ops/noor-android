@@ -221,7 +221,7 @@ private fun MemorizationTrackerView(context: Context) {
 private fun StatBox(label: String, count: Int, color: Color, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
+        colors = CardDefaults.cardColors(containerColor = NavyLight),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(

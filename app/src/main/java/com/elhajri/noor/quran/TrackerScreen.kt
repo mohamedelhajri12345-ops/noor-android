@@ -279,7 +279,7 @@ fun TrackerScreen() {
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
                                     Card(
-                                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
+                                        colors = CardDefaults.cardColors(containerColor = NavyLight),
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
                                         Column(
@@ -291,7 +291,7 @@ fun TrackerScreen() {
                                         }
                                     }
                                     Card(
-                                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
+                                        colors = CardDefaults.cardColors(containerColor = NavyLight),
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
                                         Column(
@@ -610,7 +610,7 @@ private fun BadgeCard(badge: BadgeItem, modifier: Modifier = Modifier) {
 @Composable
 private fun ReportItem(label: String, value: String) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
+        colors = CardDefaults.cardColors(containerColor = NavyLight),
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier.fillMaxWidth()
     ) {

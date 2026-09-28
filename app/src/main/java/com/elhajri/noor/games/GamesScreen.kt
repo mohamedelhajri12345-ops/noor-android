@@ -275,7 +275,7 @@ private fun OrderProphetsGame(onBack: () -> Unit) {
         if (selected.size == prophetsOrder.size) {
             Spacer(Modifier.height(16.dp))
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
+                colors = CardDefaults.cardColors(containerColor = NavyLight),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {

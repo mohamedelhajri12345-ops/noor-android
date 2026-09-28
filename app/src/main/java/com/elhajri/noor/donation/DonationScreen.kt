@@ -272,7 +272,7 @@ fun DonationScreen(onBack: () -> Unit) {
                     bankFields.forEach { (label, value, copyLabel) ->
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
+                            colors = CardDefaults.cardColors(containerColor = NavyLight),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Row(
