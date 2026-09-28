@@ -77,7 +77,7 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    fun manager(): com.elhajri.noor.audio.player.PlayerEngine = if (active.isQuran) QuranPlayerManager.engine else NasheedPlayerManager.engine
+    fun manager(): com.elhajri.noor.audio.player.PlayerFacade = if (active.isQuran) QuranPlayerManager else NasheedPlayerManager
 
     Column(modifier = modifier.fillMaxWidth()) {
         // MINI BAR — like the web: [play] title/artist + progress + expand
@@ -189,7 +189,7 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
 @Composable
 private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    fun manager(): com.elhajri.noor.audio.player.PlayerEngine = if (active.isQuran) QuranPlayerManager.engine else NasheedPlayerManager.engine
+    fun manager(): com.elhajri.noor.audio.player.PlayerFacade = if (active.isQuran) QuranPlayerManager else NasheedPlayerManager
     var showSleep by remember { mutableStateOf(false) }
 
     ModalBottomSheet(

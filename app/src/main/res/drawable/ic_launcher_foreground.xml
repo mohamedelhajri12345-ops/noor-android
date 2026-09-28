@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- هلال ذهبي فوق المصحف -->
+    <path
+        android:fillColor="#E5C158"
+        android:pathData="M54,22 A7.2,7.2 0 1 1 53.99,22 Z M58,20.4 A6,6 0 1 0 57.99,20.4 Z"
+        android:fillType="evenOdd"/>
+    <!-- المصحف المفتوح -->
+    <path
+        android:fillColor="#E5C158"
+        android:pathData="M54,45 c-6.6,-5.4 -15.9,-7.8 -25.3,-6.6 v46 c9.4,-1.2 18.7,1.2 25.3,6.6 c6.6,-5.4 15.9,-7.8 25.3,-6.6 v-46 c-9.4,-1.2 -18.7,1.2 -25.3,6.6 Z"/>
+    <path
+        android:fillColor="#0A1428"
+        android:pathData="M54,45 c-2.2,1.9 -4.9,3.4 -8,4.4 v41.2 c2.8,-0.9 5.4,-0.6 8,0.9 c2.6,-1.5 5.2,-1.8 8,-0.9 v-41.2 c-3.1,-1 -5.8,-2.5 -8,-4.4 Z"/>
+    <!-- خطا نص المصحف -->
+    <path android:fillColor="#0A1428" android:pathData="M34,46.5 h13.5 v2.6 h-13.5 Z M34,52 h13.5 v2.6 h-13.5 Z M34,57.5 h10.5 v2.6 h-10.5 Z"/>
+    <path android:fillColor="#0A1428" android:pathData="M60.5,46.5 h13.5 v2.6 h-13.5 Z M60.5,52 h13.5 v2.6 h-13.5 Z M60.5,57.5 h10.5 v2.6 h-10.5 Z"/>
+    <!-- شعار النور أسفل المصحف -->
+    <path android:fillColor="#D4AF37" android:pathData="M40,84 h28 v2.4 h-28 Z"/>
+</vector>

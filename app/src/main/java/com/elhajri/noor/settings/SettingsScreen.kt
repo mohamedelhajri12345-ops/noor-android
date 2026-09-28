@@ -135,7 +135,7 @@ fun SettingsScreen() {
             }
 
             Spacer(Modifier.height(24.dp))
-            Text("NOOR — نسخة أندرويد الأصلية", color = GoldSoft.copy(alpha = 0.5f), fontSize = 12.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
+            Text("القرآن الكريم — الإصدار 2.0", color = GoldSoft.copy(alpha = 0.5f), fontSize = 12.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
         }
     }
 }
