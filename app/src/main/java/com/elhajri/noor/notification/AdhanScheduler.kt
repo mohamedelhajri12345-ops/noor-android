@@ -11,6 +11,7 @@ import java.util.Calendar
 object AdhanScheduler {
     private const val REQUEST_CODE = 1001
 
+    /** أسماء الصلوات الخمس بالترتيب مع مواقيتها — يُستخدم الأذون في إشعار وتشغيل الأذان */
     fun scheduleNextAdhan(context: Context) {
         val timings = PrayerRepository.getCachedTimings(context) ?: return
 
@@ -18,20 +19,21 @@ object AdhanScheduler {
         val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
 
         val prayerTimes = listOf(
-            timings.fajr,
-            timings.dhuhr,
-            timings.asr,
-            timings.maghrib,
-            timings.isha
+            Pair("الفجر", timings.fajr),
+            Pair("الظهر", timings.dhuhr),
+            Pair("العصر", timings.asr),
+            Pair("المغرب", timings.maghrib),
+            Pair("العشاء", timings.isha)
         )
 
         var nextCal: Calendar? = null
+        var nextPrayerName = "الفجر"
 
-        for (timeStr in prayerTimes) {
+        for ((name, timeStr) in prayerTimes) {
             val parts = timeStr.split(":")
             if (parts.size >= 2) {
                 val h = parts[0].trim().toIntOrNull() ?: continue
-                val m = parts[1].trim().toIntOrNull() ?: continue
+                val m = parts[1].trim()?.toIntOrNull() ?: continue
                 val pMinutes = h * 60 + m
 
                 if (pMinutes > currentMinutes) {
@@ -42,6 +44,7 @@ object AdhanScheduler {
                         set(Calendar.MILLISECOND, 0)
                     }
                     nextCal = cal
+                    nextPrayerName = name
                     break
                 }
             }
@@ -58,11 +61,14 @@ object AdhanScheduler {
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }
+            nextPrayerName = "الفجر"
         }
 
         val triggerAtMillis = (nextCal ?: Calendar.getInstance().apply { add(Calendar.MINUTE, 60) }).timeInMillis
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AdhanReceiver::class.java)
+            .putExtra("prayer_name", nextPrayerName)
+            .putExtra("prayer_time", prayerTimes.firstOrNull { it.first == nextPrayerName }?.second ?: "")
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         val pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, intent, flags)
 

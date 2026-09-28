@@ -149,12 +149,12 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
 
             coroutineScope.launch(Dispatchers.IO) {
                 try {
-                    // المحادثة كاملة تُرسل مباشرة إلى Google Gemini —
+                    // المحادثة تُرسل إلى خدمة ذكاء اصطناعي مجانية 100% بدون مفتاح (Pollinations) —
                     // بلا أي اعتماد على رصيد تكاملات Base44 (استهلاك صفر)
                     val history = updatedMessages.map { m ->
                         (if (m.role == "user") "user" else "model") to m.text
                     }
-                    val reply = GeminiClient.ask(SYSTEM_PROMPT, history)
+                    val reply = AssistantClient.ask(SYSTEM_PROMPT, history)
 
                     withContext(Dispatchers.Main) {
                         messages = messages + ChatMessage("assistant", reply)
@@ -162,7 +162,7 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
                         loading = false
                     }
                 } catch (e: IOException) {
-                    // رسائل GeminiClient كلها عربية جاهزة؛ رسائل الشبكة تحمل كلمة الإنترنت
+                    // رسائل AssistantClient كلها عربية جاهزة؛ رسائل الشبكة تحمل كلمة الإنترنت
                     val m = e.message ?: ""
                     val offline = m.contains("الإنترنت") || m.contains("اتصال")
                     withContext(Dispatchers.Main) {
