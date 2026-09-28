@@ -421,7 +421,7 @@ private fun LevelPlayView(
             Spacer(Modifier.height(16.dp))
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {

@@ -101,7 +101,7 @@ private fun GamesHub(onSelect: (String) -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onSelect(g.id) },
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
@@ -196,7 +196,7 @@ private fun OrderProphetsGame(onBack: () -> Unit) {
         Spacer(Modifier.height(16.dp))
 
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+            colors = CardDefaults.cardColors(containerColor = NavyCard),
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -399,7 +399,7 @@ private fun TrueFalseGame(onBack: () -> Unit) {
             Spacer(Modifier.height(16.dp))
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -588,7 +588,7 @@ private fun NumbersGame(onBack: () -> Unit) {
             Spacer(Modifier.height(16.dp))
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()

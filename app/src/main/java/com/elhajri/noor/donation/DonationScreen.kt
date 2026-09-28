@@ -105,7 +105,7 @@ fun DonationScreen(onBack: () -> Unit) {
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(24.dp),
                 border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
             ) {
@@ -149,7 +149,7 @@ fun DonationScreen(onBack: () -> Unit) {
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -253,7 +253,7 @@ fun DonationScreen(onBack: () -> Unit) {
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -318,7 +318,7 @@ fun DonationScreen(onBack: () -> Unit) {
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(

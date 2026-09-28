@@ -154,7 +154,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit = {}) {
             items(sections) { s ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(

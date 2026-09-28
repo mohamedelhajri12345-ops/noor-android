@@ -207,7 +207,7 @@ fun TrackerScreen() {
                     // Ring Progress Card
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                            colors = CardDefaults.cardColors(containerColor = NavyCard),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -349,7 +349,7 @@ fun TrackerScreen() {
                     // Goal Selector
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                            colors = CardDefaults.cardColors(containerColor = NavyCard),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -382,7 +382,7 @@ fun TrackerScreen() {
                     // Badges Section
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                            colors = CardDefaults.cardColors(containerColor = NavyCard),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -424,7 +424,7 @@ fun TrackerScreen() {
                     // Khatma Progress
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                            colors = CardDefaults.cardColors(containerColor = NavyCard),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -478,7 +478,7 @@ fun TrackerScreen() {
                     // Surah Completed count
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                            colors = CardDefaults.cardColors(containerColor = NavyCard),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {

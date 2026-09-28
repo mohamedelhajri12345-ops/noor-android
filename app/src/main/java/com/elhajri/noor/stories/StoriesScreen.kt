@@ -85,7 +85,7 @@ private fun StoryCard(story: Story, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+        colors = CardDefaults.cardColors(containerColor = NavyCard),
         shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {

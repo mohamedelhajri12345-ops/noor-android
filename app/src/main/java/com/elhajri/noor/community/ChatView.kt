@@ -622,7 +622,7 @@ fun ChatView(
                     contentScale = ContentScale.Fit
                 )
             },
-            containerColor = Color(0xFF070B14)Card
+            containerColor = NavyCard
         )
     }
 
@@ -651,7 +651,7 @@ fun ChatView(
                     Text("إلغاء", color = TextMain)
                 }
             },
-            containerColor = Color(0xFF070B14)Card
+            containerColor = NavyCard
         )
     }
 }

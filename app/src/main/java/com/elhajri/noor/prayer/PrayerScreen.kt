@@ -36,6 +36,7 @@ import kotlinx.coroutines.delay
 import java.util.Calendar
 import java.util.Locale
 import com.elhajri.noor.ui.NoorGradients
+import androidx.compose.ui.graphics.Color
 
 data class PrayerItem(
     val name: String,
@@ -245,7 +246,7 @@ fun PrayerScreen() {
                     .fillMaxWidth()
                     .height(180.dp),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
             ) {
                 Box(

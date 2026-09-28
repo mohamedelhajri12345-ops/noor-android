@@ -241,7 +241,7 @@ fun CalendarScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -278,7 +278,7 @@ fun CalendarScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+            colors = CardDefaults.cardColors(containerColor = NavyCard),
             shape = RoundedCornerShape(20.dp)
         ) {
             Column(
@@ -415,7 +415,7 @@ fun CalendarScreen() {
             items(displayOccasions) { occ ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Row(

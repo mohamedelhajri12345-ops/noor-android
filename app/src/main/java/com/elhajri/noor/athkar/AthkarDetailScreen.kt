@@ -304,7 +304,7 @@ fun AthkarDetailScreen(
     if (showCelebrationDialog) {
         AlertDialog(
             onDismissRequest = { showCelebrationDialog = false },
-            containerColor = Color(0xFF070B14)Card,
+            containerColor = NavyCard,
             icon = {
                 Icon(
                     imageVector = Icons.Default.AutoAwesome,

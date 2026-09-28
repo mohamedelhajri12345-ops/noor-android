@@ -151,7 +151,7 @@ fun TasbihScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+            colors = CardDefaults.cardColors(containerColor = NavyCard),
             shape = RoundedCornerShape(24.dp)
         ) {
             Column(
@@ -273,7 +273,7 @@ fun TasbihScreen() {
     if (showCelebration) {
         AlertDialog(
             onDismissRequest = { showCelebration = false },
-            containerColor = Color(0xFF070B14)Card,
+            containerColor = NavyCard,
             icon = {
                 Icon(
                     imageVector = Icons.Filled.AutoAwesome,

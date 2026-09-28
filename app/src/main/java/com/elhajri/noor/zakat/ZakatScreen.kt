@@ -200,7 +200,7 @@ fun ZakatScreen() {
                                 selectedCategory = c.id
                                 result = null
                             },
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                        colors = CardDefaults.cardColors(containerColor = NavyCard),
                         shape = RoundedCornerShape(18.dp)
                     ) {
                         Row(
@@ -271,7 +271,7 @@ fun ZakatScreen() {
             if (cat == "gold" || cat == "mixed") {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -341,7 +341,7 @@ fun ZakatScreen() {
             if (cat == "silver" || cat == "mixed") {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -390,7 +390,7 @@ fun ZakatScreen() {
             if (cat == "cash" || cat == "mixed") {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -419,7 +419,7 @@ fun ZakatScreen() {
             if (cat == "merch" || cat == "mixed") {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -463,7 +463,7 @@ fun ZakatScreen() {
             result?.let { res ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {

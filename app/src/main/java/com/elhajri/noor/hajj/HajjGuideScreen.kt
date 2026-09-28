@@ -275,7 +275,7 @@ private fun StepCard(index: Int, step: Step, isUnderstood: Boolean, onUnderstand
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+        colors = CardDefaults.cardColors(containerColor = NavyCard),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
@@ -358,7 +358,7 @@ private fun StepCard(index: Int, step: Step, isUnderstood: Boolean, onUnderstand
 private fun DuaCard(dua: Dua) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+        colors = CardDefaults.cardColors(containerColor = NavyCard),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
@@ -470,7 +470,7 @@ private fun HajjQuizView(context: Context, onFinish: () -> Unit) {
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+            colors = CardDefaults.cardColors(containerColor = NavyCard),
             shape = RoundedCornerShape(20.dp)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {

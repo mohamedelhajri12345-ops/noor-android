@@ -245,7 +245,7 @@ fun QiblaScreen() {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 border = androidx.compose.foundation.BorderStroke(
                     1.dp,
                     if (isAligned) Color(0xFF4CAF50) else Gold.copy(alpha = 0.3f)

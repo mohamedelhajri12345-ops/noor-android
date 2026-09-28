@@ -223,7 +223,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         .clickable {
                                                         onNavigate(item.route)
                         },
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Column(
@@ -243,7 +243,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
         // Verse of the day card
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+            colors = CardDefaults.cardColors(containerColor = NavyCard),
             shape = RoundedCornerShape(22.dp),
             modifier = Modifier.fillMaxWidth()
         ) {

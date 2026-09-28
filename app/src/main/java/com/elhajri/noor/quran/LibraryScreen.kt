@@ -166,7 +166,7 @@ fun LibraryScreen(onBack: () -> Unit) {
                         Icon(Icons.Default.ChevronRight, contentDescription = "رجوع", tint = Gold)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF070B14)Card)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = NavyCard)
             )
         },
         containerColor = Color(0xFF070B14)
@@ -222,7 +222,7 @@ fun LibraryScreen(onBack: () -> Unit) {
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = Gold,
                             selectedLabelColor = Navy,
-                            containerColor = Color(0xFF070B14)Card,
+                            containerColor = NavyCard,
                             labelColor = GoldSoft
                         )
                     )

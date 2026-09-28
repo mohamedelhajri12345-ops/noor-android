@@ -62,7 +62,7 @@ fun FavoritesScreen(onOpenSurah: (Surah) -> Unit, onOpenStory: (Int) -> Unit) {
             if (favSurahs.isNotEmpty()) {
                 item { Text("السور المفضلة", color = Gold, fontWeight = FontWeight.Bold) }
                 items(favSurahs) { s ->
-                    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card), shape = RoundedCornerShape(12.dp),
+                    Card(colors = CardDefaults.cardColors(containerColor = NavyCard), shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth().clickable { onOpenSurah(s) }) {
                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text("﴿ ${s.name} ﴾", color = GoldSoft, fontSize = 16.sp, modifier = Modifier.weight(1f))
@@ -74,7 +74,7 @@ fun FavoritesScreen(onOpenSurah: (Surah) -> Unit, onOpenStory: (Int) -> Unit) {
             if (favStories.isNotEmpty()) {
                 item { Text("القصص المفضلة", color = Gold, fontWeight = FontWeight.Bold) }
                 items(favStories) { st ->
-                    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card), shape = RoundedCornerShape(12.dp),
+                    Card(colors = CardDefaults.cardColors(containerColor = NavyCard), shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth().clickable { onOpenStory(st.id) }) {
                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text(st.title, color = GoldSoft, fontSize = 16.sp, modifier = Modifier.weight(1f))

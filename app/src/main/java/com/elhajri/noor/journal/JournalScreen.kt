@@ -201,7 +201,7 @@ fun JournalScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                colors = CardDefaults.cardColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -343,7 +343,7 @@ fun JournalScreen() {
                 items(entries, key = { it.id }) { entry ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                        colors = CardDefaults.cardColors(containerColor = NavyCard),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(
@@ -435,7 +435,7 @@ fun JournalScreen() {
     deletingEntry?.let { entry ->
         AlertDialog(
             onDismissRequest = { deletingEntry = null },
-            containerColor = Color(0xFF070B14)Card,
+            containerColor = NavyCard,
             title = {
                 Text(
                     text = "حذف الخاطرة",

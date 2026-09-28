@@ -86,7 +86,7 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
                                 onOpenCategory(cat.id, cat.name)
                                 selectedCategory = Pair(cat.id, cat.name)
                             },
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                        colors = CardDefaults.cardColors(containerColor = NavyCard),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Row(

@@ -128,7 +128,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Gold,
                     selectedLabelColor = Navy,
-                    containerColor = Color(0xFF070B14)Card,
+                    containerColor = NavyCard,
                     labelColor = GoldSoft
                 )
             )
@@ -149,7 +149,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Gold,
                     selectedLabelColor = Navy,
-                    containerColor = Color(0xFF070B14)Card,
+                    containerColor = NavyCard,
                     labelColor = GoldSoft
                 )
             )
@@ -183,7 +183,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { onSurahClick(surah) },
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                        colors = CardDefaults.cardColors(containerColor = NavyCard),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Row(

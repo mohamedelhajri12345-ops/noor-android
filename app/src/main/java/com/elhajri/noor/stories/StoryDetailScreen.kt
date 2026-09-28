@@ -97,7 +97,7 @@ fun StoryDetailScreen(storyId: Int, onBack: () -> Unit) {
                 Column {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                        colors = CardDefaults.cardColors(containerColor = NavyCard),
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         Column(

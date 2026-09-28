@@ -55,7 +55,7 @@ fun NamesOfAllahScreen() {
             items(filtered) { name ->
                 Card(
                     modifier = Modifier.aspectRatio(1f).clickable { selected = name },
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
+                    colors = CardDefaults.cardColors(containerColor = NavyCard),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Box(
@@ -81,7 +81,7 @@ fun NamesOfAllahScreen() {
             },
             title = { Text(name.name, color = Gold, fontSize = 28.sp, fontFamily = AmiriFamily) },
             text = { Text(name.meaning, color = GoldSoft, fontSize = 16.sp, lineHeight = 26.sp) },
-            containerColor = Color(0xFF070B14)Card
+            containerColor = NavyCard
         )
     }
 }
