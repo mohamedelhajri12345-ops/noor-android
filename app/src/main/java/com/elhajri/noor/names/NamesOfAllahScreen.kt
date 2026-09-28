@@ -25,6 +25,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
+import com.elhajri.noor.ui.NoorGradients
 
 @Composable
 fun NamesOfAllahScreen() {
@@ -33,7 +34,7 @@ fun NamesOfAllahScreen() {
     var search by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf<NameOfAllah?>(null) }
 
-    Column(modifier = Modifier.fillMaxSize().background(Navy).padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().background(NoorGradients.ScreenBackground).padding(16.dp)) {
         Text("أسماء الله الحسنى", color = Gold, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Text("﴿وَلِلَّهِ الْأَسْمَاءُ الْحُسْنَىٰ فَادْعُوهُ بِهَا﴾", color = GoldSoft, fontSize = 14.sp, fontFamily = AmiriFamily)
         Spacer(Modifier.height(12.dp))
@@ -54,7 +55,7 @@ fun NamesOfAllahScreen() {
             items(filtered) { name ->
                 Card(
                     modifier = Modifier.aspectRatio(1f).clickable { selected = name },
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Box(
@@ -80,7 +81,7 @@ fun NamesOfAllahScreen() {
             },
             title = { Text(name.name, color = Gold, fontSize = 28.sp, fontFamily = AmiriFamily) },
             text = { Text(name.meaning, color = GoldSoft, fontSize = 16.sp, lineHeight = 26.sp) },
-            containerColor = NavyCard
+            containerColor = Color(0xFF070B14)Card
         )
     }
 }

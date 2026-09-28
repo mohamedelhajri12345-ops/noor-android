@@ -25,6 +25,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import kotlinx.coroutines.launch
+import com.elhajri.noor.ui.NoorGradients
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +41,7 @@ fun ResetPasswordScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Scaffold(
-        containerColor = Navy,
+        containerColor = Color(0xFF070B14),
         topBar = {
             TopAppBar(
                 title = {},
@@ -53,7 +54,7 @@ fun ResetPasswordScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Navy)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF070B14))
             )
         }
     ) { padding ->
@@ -61,7 +62,7 @@ fun ResetPasswordScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Navy),
+                .background(NoorGradients.ScreenBackground),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -105,7 +106,7 @@ fun ResetPasswordScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     Column(

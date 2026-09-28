@@ -23,6 +23,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
+import com.elhajri.noor.ui.NoorGradients
 
 data class PrivacySection(val num: String, val title: String, val body: String)
 
@@ -79,7 +80,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         // Top Back Row
@@ -153,7 +154,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit = {}) {
             items(sections) { s ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(

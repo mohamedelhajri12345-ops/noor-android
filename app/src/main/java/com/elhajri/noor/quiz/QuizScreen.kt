@@ -30,6 +30,7 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import kotlinx.coroutines.delay
+import com.elhajri.noor.ui.NoorGradients
 
 private fun toArabicDigits(number: Any): String {
     val str = number.toString()
@@ -63,7 +64,7 @@ fun QuizScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         if (!isStarted) {
@@ -249,7 +250,7 @@ fun QuizScreen() {
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {

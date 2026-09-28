@@ -36,6 +36,7 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import kotlinx.coroutines.delay
 import org.json.JSONObject
+import com.elhajri.noor.ui.NoorGradients
 
 private fun toArabicDigits(number: Any): String {
     val str = number.toString()
@@ -58,7 +59,7 @@ fun QuranMemorizationScreen(onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
     ) {
         // Top Bar
         Row(
@@ -161,7 +162,7 @@ private fun MemorizationTrackerView(context: Context) {
         item {
             // Header stats
             Card(
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -220,7 +221,7 @@ private fun MemorizationTrackerView(context: Context) {
 private fun StatBox(label: String, count: Int, color: Color, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = NavyLight),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -440,7 +441,7 @@ private fun QuizGameView(context: Context) {
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = NavyCard),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
             shape = RoundedCornerShape(20.dp)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {

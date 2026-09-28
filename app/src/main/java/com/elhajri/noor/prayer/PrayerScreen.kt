@@ -35,6 +35,7 @@ import com.elhajri.noor.ui.NavyLight
 import kotlinx.coroutines.delay
 import java.util.Calendar
 import java.util.Locale
+import com.elhajri.noor.ui.NoorGradients
 
 data class PrayerItem(
     val name: String,
@@ -179,13 +180,13 @@ fun PrayerScreen() {
     }
 
     Scaffold(
-        containerColor = Navy
+        containerColor = Color(0xFF070B14)
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Navy)
+                .background(NoorGradients.ScreenBackground)
                 .padding(16.dp)
         ) {
             Row(
@@ -244,7 +245,7 @@ fun PrayerScreen() {
                     .fillMaxWidth()
                     .height(180.dp),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
             ) {
                 Box(

@@ -25,6 +25,7 @@ import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
+import com.elhajri.noor.ui.NoorGradients
 
 private fun toArabicDigits(number: Any): String {
     val str = number.toString()
@@ -42,7 +43,7 @@ fun StoriesScreen(onOpenStory: (Int) -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         Column(
@@ -84,7 +85,7 @@ private fun StoryCard(story: Story, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = NavyCard),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
         shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {

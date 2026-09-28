@@ -47,6 +47,7 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
 import kotlinx.coroutines.launch
+import com.elhajri.noor.ui.NoorGradients
 
 @Composable
 fun AthkarDetailScreen(
@@ -134,7 +135,7 @@ fun AthkarDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         // Header
@@ -303,7 +304,7 @@ fun AthkarDetailScreen(
     if (showCelebrationDialog) {
         AlertDialog(
             onDismissRequest = { showCelebrationDialog = false },
-            containerColor = NavyCard,
+            containerColor = Color(0xFF070B14)Card,
             icon = {
                 Icon(
                     imageVector = Icons.Default.AutoAwesome,

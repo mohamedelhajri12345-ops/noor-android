@@ -352,7 +352,7 @@ fun ChatView(
     }
 
     Scaffold(
-        containerColor = Color(0xFF0A0F1A),
+        containerColor = Color(0xFF070B14),
         topBar = {
             TopAppBar(
                 title = {
@@ -391,7 +391,7 @@ fun ChatView(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF0A0F1A))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF070B14))
             )
         }
     ) { padding ->
@@ -622,7 +622,7 @@ fun ChatView(
                     contentScale = ContentScale.Fit
                 )
             },
-            containerColor = NavyCard
+            containerColor = Color(0xFF070B14)Card
         )
     }
 
@@ -651,7 +651,7 @@ fun ChatView(
                     Text("إلغاء", color = TextMain)
                 }
             },
-            containerColor = NavyCard
+            containerColor = Color(0xFF070B14)Card
         )
     }
 }

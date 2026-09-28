@@ -90,10 +90,10 @@ fun DonationScreen(onBack: () -> Unit) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Navy)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF070B14))
             )
         },
-        containerColor = Navy
+        containerColor = Color(0xFF070B14)
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -105,7 +105,7 @@ fun DonationScreen(onBack: () -> Unit) {
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(24.dp),
                 border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
             ) {
@@ -149,7 +149,7 @@ fun DonationScreen(onBack: () -> Unit) {
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -253,7 +253,7 @@ fun DonationScreen(onBack: () -> Unit) {
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -272,7 +272,7 @@ fun DonationScreen(onBack: () -> Unit) {
                     bankFields.forEach { (label, value, copyLabel) ->
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = NavyLight),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Row(
@@ -318,7 +318,7 @@ fun DonationScreen(onBack: () -> Unit) {
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(

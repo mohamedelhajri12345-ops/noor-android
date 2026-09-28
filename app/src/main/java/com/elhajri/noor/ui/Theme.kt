@@ -23,12 +23,24 @@ val AmiriFamily = FontFamily(
 )
 
 
-val Navy = Color(0xFF0B1B3A)
-val NavyLight = Color(0xFF16294D)
-val NavyCard = Color(0xFF13234A)
-val Gold = Color(0xFFD4AF37)
-val GoldSoft = Color(0xFFE8C96A)
-val TextMain = Color(0xFFF5F0E6)
+// ============================================================================
+// لوحة "الأبنوس والذهب الإمبراطوري" الفاخرة — تحديث فريق التصميم
+// الأسماء نفسها حتى تتجدد كل الشاشات تلقائياً
+// ============================================================================
+val Navy = Color(0xFF070B14)              // أبنوس مخملي عميق (كان 0B1B3A)
+val NavyLight = Color(0xFF121B2E)         // كحلي ملكي راقٍ
+val NavyCard = Color(0xFF16233C)          // سطح البطاقات الملكي الجديد
+val Gold = Color(0xFFE5C158)              // ذهب إمبراطوري مشرق (كان D4AF37)
+val GoldSoft = Color(0xFFF3E5AB)          // ذهب شمباني فاتح
+val TextMain = Color(0xFFFAF8F5)          // أبيض لؤلؤي دافئ
+val ChampagneGold = Color(0xFFF3E5AB)
+val ImperialGold = Color(0xFFE5C158)
+val AntiqueGoldDeep = Color(0xFF997A15)
+val GoldHighlight = Color(0xFFFFF2A1)
+val RoseGoldAccent = Color(0xFFE5A983)
+val TextSecondaryLinen = Color(0xFFC5BAA8)
+val EmeraldSuccess = Color(0xFF10B981)
+val RubyError = Color(0xFFEF4444)
 
 val NoorColors = darkColorScheme(
     primary = Gold,

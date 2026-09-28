@@ -35,6 +35,7 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.elhajri.noor.ui.NoorGradients
 
 data class JournalEntry(
     val id: Long,
@@ -155,7 +156,7 @@ fun JournalScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         // Header
@@ -200,7 +201,7 @@ fun JournalScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -342,7 +343,7 @@ fun JournalScreen() {
                 items(entries, key = { it.id }) { entry ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = NavyCard),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(
@@ -434,7 +435,7 @@ fun JournalScreen() {
     deletingEntry?.let { entry ->
         AlertDialog(
             onDismissRequest = { deletingEntry = null },
-            containerColor = NavyCard,
+            containerColor = Color(0xFF070B14)Card,
             title = {
                 Text(
                     text = "حذف الخاطرة",

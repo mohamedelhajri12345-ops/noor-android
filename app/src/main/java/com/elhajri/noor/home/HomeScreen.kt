@@ -49,6 +49,7 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import java.util.Calendar
 import kotlinx.coroutines.delay
+import com.elhajri.noor.ui.NoorGradients
 
 private const val MOSQUE_IMAGE = "https://media.base44.com/images/public/6a9ec57e3a8cd5ed957a8641/8bf461ac2_generated_image.png"
 
@@ -141,7 +142,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
@@ -222,7 +223,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         .clickable {
                                                         onNavigate(item.route)
                         },
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Column(
@@ -242,7 +243,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
         // Verse of the day card
         Card(
-            colors = CardDefaults.cardColors(containerColor = NavyCard),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
             shape = RoundedCornerShape(22.dp),
             modifier = Modifier.fillMaxWidth()
         ) {

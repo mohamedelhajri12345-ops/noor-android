@@ -34,6 +34,7 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import kotlinx.coroutines.delay
 import org.json.JSONArray
+import com.elhajri.noor.ui.NoorGradients
 
 private const val PREFS_KEY = "nur_names_learned"
 
@@ -107,7 +108,7 @@ private fun NamesBrowseMode(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         Row(
@@ -129,7 +130,7 @@ private fun NamesBrowseMode(
 
         // Progress card
         Card(
-            colors = CardDefaults.cardColors(containerColor = NavyCard),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -261,7 +262,7 @@ private fun NamesQuizMode(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         Row(
@@ -311,7 +312,7 @@ private fun NamesQuizMode(
             Spacer(Modifier.height(16.dp))
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {

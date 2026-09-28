@@ -35,6 +35,7 @@ import org.json.JSONObject
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import com.elhajri.noor.ui.NoorGradients
 
 private fun toArabicNumber(number: Any): String {
     val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
@@ -220,7 +221,7 @@ fun CalendarScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         Text(
@@ -240,7 +241,7 @@ fun CalendarScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -277,7 +278,7 @@ fun CalendarScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = NavyCard),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
             shape = RoundedCornerShape(20.dp)
         ) {
             Column(
@@ -414,7 +415,7 @@ fun CalendarScreen() {
             items(displayOccasions) { occ ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Row(

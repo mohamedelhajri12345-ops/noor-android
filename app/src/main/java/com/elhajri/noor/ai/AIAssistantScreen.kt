@@ -190,7 +190,7 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
     }
 
     Scaffold(
-        containerColor = Color(0xFF0A0F1A),
+        containerColor = Color(0xFF070B14),
         topBar = {
             TopAppBar(
                 title = {
@@ -238,7 +238,7 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0A0F1A)
+                    containerColor = Color(0xFF070B14)
                 )
             )
         }

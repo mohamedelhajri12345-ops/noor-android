@@ -22,6 +22,7 @@ import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
+import com.elhajri.noor.ui.NoorGradients
 
 object StoryFavorites {
     private const val KEY = "favorite_stories"
@@ -46,7 +47,7 @@ fun FavoritesScreen(onOpenSurah: (Surah) -> Unit, onOpenStory: (Int) -> Unit) {
     var favStoryIds by remember { mutableStateOf(StoryFavorites.get(context)) }
     LaunchedEffect(Unit) { FavoritesStore.favorites.collect { favSurahIds = it } }
 
-    Column(modifier = Modifier.fillMaxSize().background(Navy).padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().background(NoorGradients.ScreenBackground).padding(16.dp)) {
         Text("المفضلة", color = Gold, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Text("السور والقصص التي تتابعها", color = GoldSoft, fontSize = 13.sp)
         Spacer(Modifier.height(12.dp))
@@ -61,7 +62,7 @@ fun FavoritesScreen(onOpenSurah: (Surah) -> Unit, onOpenStory: (Int) -> Unit) {
             if (favSurahs.isNotEmpty()) {
                 item { Text("السور المفضلة", color = Gold, fontWeight = FontWeight.Bold) }
                 items(favSurahs) { s ->
-                    Card(colors = CardDefaults.cardColors(containerColor = NavyCard), shape = RoundedCornerShape(12.dp),
+                    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card), shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth().clickable { onOpenSurah(s) }) {
                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text("﴿ ${s.name} ﴾", color = GoldSoft, fontSize = 16.sp, modifier = Modifier.weight(1f))
@@ -73,7 +74,7 @@ fun FavoritesScreen(onOpenSurah: (Surah) -> Unit, onOpenStory: (Int) -> Unit) {
             if (favStories.isNotEmpty()) {
                 item { Text("القصص المفضلة", color = Gold, fontWeight = FontWeight.Bold) }
                 items(favStories) { st ->
-                    Card(colors = CardDefaults.cardColors(containerColor = NavyCard), shape = RoundedCornerShape(12.dp),
+                    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card), shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth().clickable { onOpenStory(st.id) }) {
                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text(st.title, color = GoldSoft, fontSize = 16.sp, modifier = Modifier.weight(1f))

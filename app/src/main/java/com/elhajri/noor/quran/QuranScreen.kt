@@ -33,6 +33,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
+import com.elhajri.noor.ui.NoorGradients
 
 fun toArabicNumber(number: Int): String {
     val arabicDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
@@ -68,7 +69,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(horizontal = 16.dp)
     ) {
         Spacer(modifier = Modifier.height(12.dp))
@@ -127,7 +128,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Gold,
                     selectedLabelColor = Navy,
-                    containerColor = NavyCard,
+                    containerColor = Color(0xFF070B14)Card,
                     labelColor = GoldSoft
                 )
             )
@@ -148,7 +149,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Gold,
                     selectedLabelColor = Navy,
-                    containerColor = NavyCard,
+                    containerColor = Color(0xFF070B14)Card,
                     labelColor = GoldSoft
                 )
             )
@@ -182,7 +183,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { onSurahClick(surah) },
-                        colors = CardDefaults.cardColors(containerColor = NavyCard),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Row(

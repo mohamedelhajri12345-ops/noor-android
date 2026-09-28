@@ -37,6 +37,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.tan
+import com.elhajri.noor.ui.NoorGradients
 
 private const val MECCA_LAT = 21.4225
 private const val MECCA_LNG = 39.8262
@@ -114,13 +115,13 @@ fun QiblaScreen() {
     val isAligned = abs((qiblaBearing - animatedAzimuth + 360) % 360) < 5f || abs((animatedAzimuth - qiblaBearing + 360) % 360) < 5f
 
     Scaffold(
-        containerColor = Navy
+        containerColor = Color(0xFF070B14)
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(Navy)
+                .background(NoorGradients.ScreenBackground)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
@@ -244,7 +245,7 @@ fun QiblaScreen() {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 border = androidx.compose.foundation.BorderStroke(
                     1.dp,
                     if (isAligned) Color(0xFF4CAF50) else Gold.copy(alpha = 0.3f)

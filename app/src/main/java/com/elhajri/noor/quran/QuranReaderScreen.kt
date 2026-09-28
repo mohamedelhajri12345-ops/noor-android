@@ -256,7 +256,7 @@ fun QuranReaderScreen(
     if (showCopySheet) {
         ModalBottomSheet(
             onDismissRequest = { showCopySheet = false },
-            containerColor = NavyCard
+            containerColor = Color(0xFF070B14)Card
         ) {
             Column(
                 modifier = Modifier
@@ -419,7 +419,7 @@ fun QuranReaderScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = NavyCard
+                    containerColor = Color(0xFF070B14)Card
                 )
             )
         },
@@ -614,7 +614,7 @@ fun QuranReaderScreen(
                     Text("إلغاء", color = GoldSoft)
                 }
             },
-            containerColor = NavyCard
+            containerColor = Color(0xFF070B14)Card
         )
     }
 }

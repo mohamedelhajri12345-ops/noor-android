@@ -35,6 +35,7 @@ import com.elhajri.noor.ui.NavyLight
 import kotlinx.coroutines.delay
 import org.json.JSONArray
 import org.json.JSONObject
+import com.elhajri.noor.ui.NoorGradients
 
 private const val PREFS_KEY = "nur_prophets_journey"
 
@@ -225,7 +226,7 @@ private fun LevelSelectView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         Row(
@@ -340,7 +341,7 @@ private fun LevelPlayView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         Row(
@@ -420,7 +421,7 @@ private fun LevelPlayView(
             Spacer(Modifier.height(16.dp))
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {

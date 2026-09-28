@@ -34,6 +34,7 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import kotlinx.coroutines.delay
 import org.json.JSONObject
+import com.elhajri.noor.ui.NoorGradients
 
 private fun toArabicDigits(number: Any): String {
     val str = number.toString()
@@ -82,7 +83,7 @@ private fun GamesHub(onSelect: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         Text(
@@ -100,7 +101,7 @@ private fun GamesHub(onSelect: (String) -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onSelect(g.id) },
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                     shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
@@ -170,7 +171,7 @@ private fun OrderProphetsGame(onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         IconButton(onClick = onBack) {
@@ -195,7 +196,7 @@ private fun OrderProphetsGame(onBack: () -> Unit) {
         Spacer(Modifier.height(16.dp))
 
         Card(
-            colors = CardDefaults.cardColors(containerColor = NavyCard),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -274,7 +275,7 @@ private fun OrderProphetsGame(onBack: () -> Unit) {
         if (selected.size == prophetsOrder.size) {
             Spacer(Modifier.height(16.dp))
             Card(
-                colors = CardDefaults.cardColors(containerColor = NavyLight),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -327,7 +328,7 @@ private fun TrueFalseGame(onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         Row(
@@ -398,7 +399,7 @@ private fun TrueFalseGame(onBack: () -> Unit) {
             Spacer(Modifier.height(16.dp))
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -515,7 +516,7 @@ private fun NumbersGame(onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         Row(
@@ -587,7 +588,7 @@ private fun NumbersGame(onBack: () -> Unit) {
             Spacer(Modifier.height(16.dp))
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()

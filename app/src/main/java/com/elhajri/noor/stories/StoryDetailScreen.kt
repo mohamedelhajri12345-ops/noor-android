@@ -27,6 +27,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import org.json.JSONObject
+import com.elhajri.noor.ui.NoorGradients
 
 private data class StoryDetail(
     val id: Int,
@@ -49,7 +50,7 @@ fun StoryDetailScreen(storyId: Int, onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
     ) {
         // Top Bar
         Row(
@@ -96,7 +97,7 @@ fun StoryDetailScreen(storyId: Int, onBack: () -> Unit) {
                 Column {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = NavyCard),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         Column(

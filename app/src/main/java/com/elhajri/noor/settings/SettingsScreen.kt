@@ -19,6 +19,7 @@ import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
+import com.elhajri.noor.ui.NoorGradients
 
 @Composable
 fun SettingsScreen() {
@@ -29,11 +30,11 @@ fun SettingsScreen() {
     var search by remember { mutableStateOf("") }
     val cities = remember { DataLoader.cities(context).filter { it.name.isNotEmpty() }.distinctBy { it.name + it.country } }
 
-    Column(modifier = Modifier.fillMaxSize().background(Navy).padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().background(NoorGradients.ScreenBackground).padding(16.dp)) {
         Text("الإعدادات", color = Gold, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(16.dp))
 
-        Card(colors = CardDefaults.cardColors(containerColor = NavyCard), shape = RoundedCornerShape(14.dp),
+        Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card), shape = RoundedCornerShape(14.dp),
             modifier = Modifier.fillMaxWidth().clickable { showCityPicker = !showCityPicker }) {
             Column(Modifier.padding(16.dp)) {
                 Text("الموقع لتحديد مواقيت الصلاة", color = GoldSoft, fontSize = 14.sp)
@@ -60,7 +61,7 @@ fun SettingsScreen() {
             LazyColumn(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 val filtered = cities.filter { it.name.contains(search) || it.country.contains(search) }
                 items(filtered.size) { i ->
-                    Card(colors = CardDefaults.cardColors(containerColor = NavyCard), shape = RoundedCornerShape(10.dp),
+                    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card), shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.fillMaxWidth().clickable {
                             Prefs.setCity(context, filtered[i])
                             city = filtered[i]

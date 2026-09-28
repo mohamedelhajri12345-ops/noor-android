@@ -48,6 +48,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
+import com.elhajri.noor.ui.NoorGradients
 
 private const val TRACKER_PREFS = "nur_quran_tracker_prefs"
 private const val KEY_TRACKER = "tracker_json"
@@ -163,7 +164,7 @@ fun TrackerScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
         // Top Header Tabs
@@ -206,7 +207,7 @@ fun TrackerScreen() {
                     // Ring Progress Card
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -278,7 +279,7 @@ fun TrackerScreen() {
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
                                     Card(
-                                        colors = CardDefaults.cardColors(containerColor = NavyLight),
+                                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
                                         Column(
@@ -290,7 +291,7 @@ fun TrackerScreen() {
                                         }
                                     }
                                     Card(
-                                        colors = CardDefaults.cardColors(containerColor = NavyLight),
+                                        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
                                         Column(
@@ -348,7 +349,7 @@ fun TrackerScreen() {
                     // Goal Selector
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -381,7 +382,7 @@ fun TrackerScreen() {
                     // Badges Section
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -423,7 +424,7 @@ fun TrackerScreen() {
                     // Khatma Progress
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -477,7 +478,7 @@ fun TrackerScreen() {
                     // Surah Completed count
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Card),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
@@ -609,7 +610,7 @@ private fun BadgeCard(badge: BadgeItem, modifier: Modifier = Modifier) {
 @Composable
 private fun ReportItem(label: String, value: String) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = NavyLight),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF070B14)Light),
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
