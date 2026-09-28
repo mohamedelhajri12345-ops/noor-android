@@ -149,84 +149,28 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
 
             coroutineScope.launch(Dispatchers.IO) {
                 try {
-                    val conversation = updatedMessages.joinToString("\n") { m ->
-                        if (m.role == "user") "المستخدم: ${m.text}" else "المساعد: ${m.text}"
+                    // المحادثة كاملة تُرسل مباشرة إلى Google Gemini —
+                    // بلا أي اعتماد على رصيد تكاملات Base44 (استهلاك صفر)
+                    val history = updatedMessages.map { m ->
+                        (if (m.role == "user") "user" else "model") to m.text
                     }
-                    val fullPrompt = "$SYSTEM_PROMPT\n\n$conversation\n\nالمساعد:"
+                    val reply = GeminiClient.ask(SYSTEM_PROMPT, history)
 
-                    val reqBodyJson = JSONObject()
-                    reqBodyJson.put("prompt", fullPrompt)
-
-                    val mediaType = "application/json; charset=utf-8".toMediaType()
-                    val body = reqBodyJson.toString().toRequestBody(mediaType)
-
-                    val request = Request.Builder()
-                        .url("https://app.base44.com/api/apps/6a833faeb9e42cca9a6576fa/integration-endpoints/Core/InvokeLLM")
-                        .post(body)
-                        .header("X-App-Id", "6a833faeb9e42cca9a6576fa")
-                        .header("X-Base44-Anonymous-Id", getOrCreateAnonymousId(context))
-                        .build()
-
-                    val response = okHttpClient.newCall(request).execute()
-                    val responseBody = response.body?.string() ?: ""
-
-                    // كشف الأخطاء الداخلية (نفاد الرصيد الشهري، أخطاء التحقق، إلخ) حتى لو رجع السيرفر HTTP 200
-                    fun looksLikeInternalError(raw: String): Boolean {
-                        val r = raw.trim()
-                        val errorMarkers = listOf(
-                            "Validation Error", "'error':", "\"error\":", "Field required",
-                            "'message':", "\"message\":", "rate limit", "quota", "credit"
-                        )
-                        val looksLikeRawDict = r.startsWith("{'") || r.startsWith("[{'")
-                        return looksLikeRawDict || errorMarkers.any { r.contains(it, ignoreCase = true) }
-                    }
-
-                    if (response.isSuccessful && responseBody.isNotBlank() && !looksLikeInternalError(responseBody)) {
-                        var parsedText = ""
-                        try {
-                            val token = JSONTokener(responseBody).nextValue()
-                            if (token is String) {
-                                parsedText = token
-                            } else if (token is JSONObject) {
-                                parsedText = when {
-                                    token.has("text") -> token.optString("text", "")
-                                    token.has("response") -> token.optString("response", "")
-                                    token.has("content") -> token.optString("content", "")
-                                    token.has("message") -> token.optString("message", "")
-                                    token.has("reply") -> token.optString("reply", "")
-                                    else -> token.toString()
-                                }
-                            }
-                        } catch (e: Exception) {
-                            parsedText = responseBody
-                        }
-
-                        val reply = if (parsedText.isNotBlank() && !looksLikeInternalError(parsedText)) parsedText
-                                    else "🌙 عذرًا، المساعد الذكي غير متاح حالياً (نفاد الرصيد الشهري للمساعد). يرجى المحاولة لاحقاً أو بعد تجديد الرصيد."
-                        withContext(Dispatchers.Main) {
-                            messages = messages + ChatMessage("assistant", reply)
-                            isOffline = false
-                            loading = false
-                        }
-                    } else {
-                        // surface the real server error (e.g. credit limit) when present, never raw dict text
-                        val serverMsg = try {
-                            val err = JSONObject(responseBody)
-                            err.optString("message", "").ifBlank { err.optString("detail", "") }
-                        } catch (_: Exception) { "" }
-                        val shown = if (serverMsg.isNotBlank() && !looksLikeInternalError(serverMsg))
-                                        "عذرًا: $serverMsg"
-                                    else "🌙 عذرًا، المساعد الذكي غير متاح حالياً (نفاد الرصيد الشهري للمساعد). يرجى المحاولة لاحقاً أو بعد تجديد الرصيد."
-                        withContext(Dispatchers.Main) {
-                            messages = messages + ChatMessage("assistant", shown)
-                            loading = false
-                        }
+                    withContext(Dispatchers.Main) {
+                        messages = messages + ChatMessage("assistant", reply)
+                        isOffline = false
+                        loading = false
                     }
                 } catch (e: IOException) {
+                    // رسائل GeminiClient كلها عربية جاهزة؛ رسائل الشبكة تحمل كلمة الإنترنت
+                    val m = e.message ?: ""
+                    val offline = m.contains("الإنترنت") || m.contains("اتصال")
                     withContext(Dispatchers.Main) {
-                        isOffline = true
-                        val offlineMsg = "🌙 عذرًا، المساعد الذكي يحتاج إلى اتصال بالإنترنت. باقي خصائص التطبيق (القرآن، الأذكار، القبلة...) تعمل بدون إنترنت."
-                        messages = messages + ChatMessage("assistant", offlineMsg)
+                        if (offline) isOffline = true
+                        messages = messages + ChatMessage(
+                            "assistant",
+                            m.ifBlank { "🌙 عذرًا، المساعد الذكي غير متاح حالياً. جرّب مرة أخرى بعد قليل." }
+                        )
                         loading = false
                     }
                 } catch (e: Exception) {

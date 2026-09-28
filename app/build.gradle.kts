@@ -18,6 +18,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // مفتاح Gemini يأتي من سرّ GitHub Actions (لا يُخزن في الكود أبداً لأن المستودع عام)
+        val geminiKey = (project.findProperty("GEMINI_API_KEY") as String?)
+            ?: System.getenv("GEMINI_API_KEY") ?: ""
+        buildConfigField("String", "GEMINI_API_KEY", "\"\"+\"$geminiKey\"")
     }
 
     buildTypes {
@@ -41,6 +46,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
