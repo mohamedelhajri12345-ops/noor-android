@@ -213,7 +213,7 @@ object PlayerCore : PlayerFacade {
             return
         }
         // نفس فجوة الـ 300ms في الويب بين المقاطع
-        gapRunnable = Runnable { next() }.also { handler.postDelayed(it, 300) }
+        gapRunnable = Runnable { next() }.also { handler.postDelayed(it, 300L) }
     }
 
     // ==================== next (الويب) ====================
@@ -350,7 +350,7 @@ object PlayerCore : PlayerFacade {
             override fun run() {
                 val playing = try { player?.isPlaying == true } catch (_: Exception) { false }
                 publish()
-                if (playing) handler.postDelayed(this, 300)
+                if (playing) handler.postDelayed(this, 300L)
             }
         }.also { handler.postDelayed(it, 100L) }
     }
