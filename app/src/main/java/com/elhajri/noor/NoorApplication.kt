@@ -8,7 +8,7 @@ import java.io.File
  * يسجل أي انهيار مستقبلي في ملف crash_log.txt داخل مجلد التطبيق
  * حتى نشخّص المشكلة بدقة بدل التخمين.
  */
-class NoorApp : Application() {
+class NoorApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()

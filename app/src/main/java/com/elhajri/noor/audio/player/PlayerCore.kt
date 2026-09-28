@@ -135,7 +135,7 @@ object PlayerCore : PlayerFacade {
             )
             mp.setDataSource(track.url)
             mp.prepareAsync()
-            startService(ctx)
+            PlaybackService.start(ctx)
             startTicking()
         } catch (_: Exception) {
             // رابط ميت أو تهيئة فاشلة → جرب الروابط البديلة كما في الويب
@@ -352,7 +352,7 @@ object PlayerCore : PlayerFacade {
                 publish()
                 if (playing) handler.postDelayed(this, 300)
             }
-        }.also { handler.postDelayed(it, 100) }
+        }.also { handler.postDelayed(it, 100L) }
     }
 
     private fun publish(clearTrack: Boolean = false, error: String? = null) {
