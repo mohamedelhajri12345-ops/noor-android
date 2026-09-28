@@ -53,8 +53,13 @@ class PlayerEngine(
      * درع حماية: أي استثناء داخل المشغّل يُبتلع بدل إسقاط التطبيق كله.
      * (المستخدم تأكد أن الخروج المفاجئ بسبب المشغل — لن يحدث مجدداً.)
      */
-    private inline fun safe(default: Unit = Unit, block: () -> Unit) {
+    private inline fun safe(block: () -> Unit) {
         try { block() } catch (_: Exception) {}
+    }
+
+    /** نسخة ترجع قيمة أو null عند الفشل — لا ينهار التطبيق أبداً */
+    private inline fun <T : Any> safeOrNull(block: () -> T?): T? {
+        return try { block() } catch (_: Exception) { null }
     }
     private val handler = Handler(Looper.getMainLooper())
     private var appContext: Context? = null
@@ -130,7 +135,7 @@ class PlayerEngine(
         if (tracks.isEmpty()) return
         val ctx = appContext ?: return
         PlayerInterop.pauseOthers(this)
-        val p = safe { ensurePlayer(ctx) } ?: return
+        val p = safeOrNull { ensurePlayer(ctx) } ?: return
         queue = tracks
         fallbackIndex = 0
         val items = tracks.map { t ->

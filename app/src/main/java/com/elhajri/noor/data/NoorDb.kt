@@ -1,4 +1,4 @@
-package com.elhajri.noor.ai
+package com.elhajri.noor.data
 
 import android.content.ContentValues
 import android.content.Context

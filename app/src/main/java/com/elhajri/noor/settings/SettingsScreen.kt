@@ -3,7 +3,9 @@ package com.elhajri.noor.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -46,7 +48,7 @@ fun SettingsScreen() {
 
         Column(modifier = Modifier
             .weight(1f)
-            .verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+            .verticalScroll(rememberScrollState())) {
 
             // ================= 1) الصوت والأذان =================
             SectionTitle("الصوت والأذان")
@@ -84,10 +86,6 @@ fun SettingsScreen() {
                                     containerColor = Navy,
                                     selectedContainerColor = Gold
                                 ),
-                                border = FilterChipDefaults.filterChipBorder(
-                                    borderColor = GoldSoft.copy(alpha = 0.4f),
-                                    selectedBorderColor = Gold
-                                )
                             )
                         }
                     }
