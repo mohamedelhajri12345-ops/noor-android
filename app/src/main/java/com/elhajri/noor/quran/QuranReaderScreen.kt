@@ -66,6 +66,8 @@ import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 
 data class AyahItem(val number: Int, val text: String)
 
@@ -545,7 +547,10 @@ fun QuranReaderScreen(
                         Text(
                             text = annotatedAyahsText,
                             style = TextStyle(
-                                fontSize = 22.sp,
+                                // حجم خط المصحف قابل للتعديل من الإعدادات (صغير/متوسط/كبير)
+                                fontSize = when (com.elhajri.noor.data.Prefs.getReaderFontSize(context)) {
+                                    "S" -> 18.sp; "L" -> 26.sp; else -> 22.sp
+                                },
                                 lineHeight = 42.sp,
                                 color = if (isLightMode) Color(0xFF1C1917) else TextMain,
                                 textAlign = TextAlign.Justify
@@ -599,12 +604,26 @@ fun QuranReaderScreen(
                             ),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text(
-                                text = reciter.name,
-                                color = if (isSelected) Navy else Color.White,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(14.dp)
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                // صورة حية بجانب كل قارئ (ناقلات ذهبية SVG مرسومة يدوياً)
+                                val resId = context.resources.getIdentifier(reciter.image, "drawable", context.packageName)
+                                if (resId != 0) {
+                                    Image(
+                                        painter = painterResource(id = resId),
+                                        contentDescription = reciter.name,
+                                        modifier = Modifier.size(44.dp)
+                                    )
+                                }
+                                Text(
+                                    text = reciter.name,
+                                    color = if (isSelected) Navy else Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }

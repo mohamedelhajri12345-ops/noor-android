@@ -119,15 +119,12 @@ private fun getOrCreateAnonymousId(context: android.content.Context): String {
 @Composable
 fun AIAssistantScreen(onBack: () -> Unit = {}) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    // قاعدة بيانات محلية: المحادثة تُستأنف من حيث توقفت ولا تُرسل كلها للمخدم
+    val db = remember { com.elhajri.noor.data.NoorDb.get(context) }
+    val WELCOME = "السلام عليكم ورحمة الله 🌙\nأنا مساعدك الذكي في تطبيق \"القرآن الكريم\"، مساعدك في الأمور الإسلامية. كيف يمكنني مساعدتك اليوم؟"
     var messages by remember {
-        mutableStateOf(
-            listOf(
-                ChatMessage(
-                    role = "assistant",
-                    text = "السلام عليكم ورحمة الله 🌙\nأنا مساعدك الذكي في تطبيق \"القرآن الكريم\"، مساعدك في الأمور الإسلامية. كيف يمكنني مساعدتك اليوم؟"
-                )
-            )
-        )
+        val saved = db.allAiMessages().map { (role, text) -> ChatMessage(role, text) }
+        mutableStateOf(if (saved.isEmpty()) listOf(ChatMessage("assistant", WELCOME)) else saved)
     }
     var input by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
@@ -151,11 +148,14 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
                 try {
                     // المحادثة تُرسل إلى خدمة ذكاء اصطناعي مجانية 100% بدون مفتاح (Pollinations) —
                     // بلا أي اعتماد على رصيد تكاملات Base44 (استهلاك صفر)
-                    val history = updatedMessages.map { m ->
+                    // نرسل آخر 10 رسائل فقط (سياق كافٍ وحمل أخف) والباقي محفوظ في القاعدة
+                    val history = updatedMessages.takeLast(10).map { m ->
                         (if (m.role == "user") "user" else "model") to m.text
                     }
                     val reply = AssistantClient.ask(SYSTEM_PROMPT, history)
 
+                    db.addAiMessage("user", trimmed)
+                    db.addAiMessage("assistant", reply)
                     withContext(Dispatchers.Main) {
                         messages = messages + ChatMessage("assistant", reply)
                         isOffline = false

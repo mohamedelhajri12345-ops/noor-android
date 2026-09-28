@@ -49,6 +49,13 @@ data class PlayerState(
 class PlayerEngine(
     private val serviceClass: Class<*>
 ) {
+    /**
+     * درع حماية: أي استثناء داخل المشغّل يُبتلع بدل إسقاط التطبيق كله.
+     * (المستخدم تأكد أن الخروج المفاجئ بسبب المشغل — لن يحدث مجدداً.)
+     */
+    private inline fun safe(default: Unit = Unit, block: () -> Unit) {
+        try { block() } catch (_: Exception) {}
+    }
     private val handler = Handler(Looper.getMainLooper())
     private var appContext: Context? = null
     private var player: ExoPlayer? = null
@@ -123,7 +130,7 @@ class PlayerEngine(
         if (tracks.isEmpty()) return
         val ctx = appContext ?: return
         PlayerInterop.pauseOthers(this)
-        val p = ensurePlayer(ctx)
+        val p = safe { ensurePlayer(ctx) } ?: return
         queue = tracks
         fallbackIndex = 0
         val items = tracks.map { t ->
@@ -155,8 +162,8 @@ class PlayerEngine(
 
     fun toggle() {
         val p = player ?: return
-        if (p.isPlaying) p.pause() else p.play()
-        publish()
+        safe { if (p.isPlaying) p.pause() else p.play() }
+        safe { publish() }
     }
 
     fun stop() {
@@ -171,7 +178,7 @@ class PlayerEngine(
 
     fun next() {
         val p = player ?: return
-        if (p.hasNextMediaItem()) p.seekToNextMediaItem()
+        safe { if (p.hasNextMediaItem()) p.seekToNextMediaItem() }
     }
 
     fun prev() {
@@ -187,9 +194,11 @@ class PlayerEngine(
 
     fun seek(seconds: Float) {
         val p = player ?: return
-        val durMs = p.duration
-        if (durMs > 0) p.seekTo((seconds.coerceIn(0f, durMs / 1000f) * 1000).toLong())
-        publish()
+        safe {
+            val durMs = p.duration
+            if (durMs > 0) p.seekTo((seconds.coerceIn(0f, durMs / 1000f) * 1000).toLong())
+        }
+        safe { publish() }
     }
 
     fun setRate(rate: Float) {
@@ -292,8 +301,10 @@ class PlayerEngine(
     }
 
     private fun startService(context: Context) {
-        val intent = Intent(context, serviceClass)
-        ContextCompat.startForegroundService(context, intent)
+        safe {
+            val intent = Intent(context, serviceClass)
+            ContextCompat.startForegroundService(context, intent)
+        }
     }
 
     private fun stopService() {
@@ -327,9 +338,11 @@ class PlayerEngine(
 
     fun positionLoop() {
         val p = player ?: return
-        if (p.isPlaying) {
-            publish()
-            handler.postDelayed({ positionLoop() }, 300)
+        safe {
+            if (p.isPlaying) {
+                publish()
+                handler.postDelayed({ positionLoop() }, 300)
+            }
         }
     }
 }

@@ -89,6 +89,20 @@ class AdhanReceiver : BroadcastReceiver() {
 
     /** يشغّل الأذان من الأصول المدمجة — أذان الفجر له ملفه الخاص كما في السنة */
     private fun playAdhan(context: Context, prayerName: String) {
+        // إعدادات المستخدم: الاهتزاز مع الأذان، والصوت قابل للإطفاء
+        if (com.elhajri.noor.data.Prefs.getAdhanVibrate(context)) {
+            try {
+                val vib = context.getSystemService(Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+                if (vib?.hasVibrator() == true) {
+                    val pattern = longArrayOf(0, 500, 300, 500, 300, 800)
+                    @Suppress("DEPRECATION")
+                    if (android.os.Build.VERSION.SDK_INT >= 26)
+                        vib.vibrate(android.os.VibrationEffect.createWaveform(pattern, -1))
+                    else vib.vibrate(pattern, -1)
+                }
+            } catch (_: Exception) {}
+        }
+        if (!com.elhajri.noor.data.Prefs.getAdhanSound(context)) return
         try {
             stopAdhan()
             val fileName = if (prayerName == "الفجر") "audio/adhan_fajr.mp3" else "audio/adhan.mp3"

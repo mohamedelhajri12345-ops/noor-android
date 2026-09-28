@@ -3,7 +3,7 @@ package com.elhajri.noor.data
 import org.json.JSONObject
 
 data class Surah(val number: Int, val name: String, val englishName: String, val type: String, val ayahs: Int)
-data class Reciter(val id: String, val name: String, val servers: List<String>)
+data class Reciter(val id: String, val name: String, val servers: List<String>, val image: String = "")
 data class AthkarCategory(val id: String, val name: String, val subtitle: String, val icon: String, val count: Int)
 data class Dhikr(val text: String, val count: Int, val ref: String)
 data class TasbihPreset(val text: String, val target: Int)
@@ -33,7 +33,7 @@ object DataLoader {
         val arr = read(context, "surahs.json").getJSONArray("reciters")
         return List(arr.length()) { i ->
             val o = arr.getJSONObject(i)
-            Reciter(o.getString("id"), o.getString("name"), List(o.getJSONArray("servers").length()) { j -> o.getJSONArray("servers").getString(j) })
+            Reciter(o.getString("id"), o.getString("name"), List(o.getJSONArray("servers").length()) { j -> o.getJSONArray("servers").getString(j) }, o.optString("image", ""))
         }
     }
 

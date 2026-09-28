@@ -31,4 +31,16 @@ object Prefs {
     fun getAdhanEnabled(context: Context): Boolean = sp(context).getBoolean("adhan_enabled", true)
 
     fun setAdhanEnabled(context: Context, v: Boolean) = sp(context).edit().putBoolean("adhan_enabled", v).apply()
+
+    // صوت الأذان (إن أُطفئ تظهر الإشارة فقط بلا صوت)
+    fun getAdhanSound(context: Context): Boolean = sp(context).getBoolean("adhan_sound", true)
+    fun setAdhanSound(context: Context, v: Boolean) = sp(context).edit().putBoolean("adhan_sound", v).apply()
+
+    // اهتزاز الجهاز مع الأذان
+    fun getAdhanVibrate(context: Context): Boolean = sp(context).getBoolean("adhan_vibrate", true)
+    fun setAdhanVibrate(context: Context, v: Boolean) = sp(context).edit().putBoolean("adhan_vibrate", v).apply()
+
+    // حجم خط المصحف: S / M / L
+    fun getReaderFontSize(context: Context): String = sp(context).getString("reader_font_size", "M") ?: "M"
+    fun setReaderFontSize(context: Context, v: String) = sp(context).edit().putString("reader_font_size", v).apply()
 }

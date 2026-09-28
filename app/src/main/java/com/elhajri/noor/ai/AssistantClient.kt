@@ -31,7 +31,28 @@ object AssistantClient {
      * @return نص الرد
      * @throws IOException برسالة عربية واضحة عند كل خطأ (لا اتصال، خدمة مشغولة...)
      */
+    /**
+     * نداء واحد مع إعادة محاولة تلقائية: الخدمة المجانية قد "تستيقظ ببطء"
+     * في أول نداء (وهذا سبب خطأ الرسالة الأولى) — نجرب حتى 3 مرات
+     * مع مهلة متزايدة قبل الاستسلام.
+     */
     fun ask(systemPrompt: String, history: List<Pair<String, String>>): String {
+        var lastError: IOException? = null
+        for (attempt in 1..3) {
+            try {
+                return askOnce(systemPrompt, history)
+            } catch (e: IOException) {
+                lastError = e
+                // لا نعيد المحاولة في أخطاء "لا إنترنت" الحتمية
+                val msg = e.message ?: ""
+                if (msg.contains("الإنترنت")) throw e
+                if (attempt < 3) Thread.sleep(if (attempt == 1) 1200L else 3000L)
+            }
+        }
+        throw lastError ?: IOException("🌙 تعذّر الوصول إلى المساعد الذكي. جرّب مرة أخرى بعد قليل.")
+    }
+
+    private fun askOnce(systemPrompt: String, history: List<Pair<String, String>>): String {
         val messages = JSONArray()
         messages.put(JSONObject().put("role", "system").put("content", systemPrompt))
         for ((role, text) in history) {
