@@ -72,6 +72,22 @@ import androidx.compose.ui.res.painterResource
 data class AyahItem(val number: Int, val text: String)
 
 private suspend fun fetchOrLoadSurahAyahs(context: Context, surahNumber: Int): List<AyahItem> = withContext(Dispatchers.IO) {
+    // ===== المصحف الكامل مدمج داخل التطبيق — يعمل بدون إنترنت من أول فتحة =====
+    try {
+        val full = JSONObject(context.assets.open("data/quran_full.json").bufferedReader().use { it.readText() })
+        val surahs = full.getJSONArray("surahs")
+        for (i in 0 until surahs.length()) {
+            val s = surahs.getJSONObject(i)
+            if (s.getInt("number") == surahNumber) {
+                val ayahs = s.getJSONArray("ayahs")
+                val list = List(ayahs.length()) { j ->
+                    val a = ayahs.getJSONObject(j)
+                    AyahItem(a.getInt("n"), a.getString("t"))
+                }
+                if (list.isNotEmpty()) return@withContext list
+            }
+        }
+    } catch (_: Exception) {}
     val file = File(context.filesDir, "quran_$surahNumber.json")
     if (file.exists() && file.length() > 0) {
         try {
