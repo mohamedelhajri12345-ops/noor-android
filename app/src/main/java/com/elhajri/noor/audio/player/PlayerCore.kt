@@ -289,7 +289,7 @@ object PlayerCore : PlayerFacade {
         val mp = player ?: return
         try {
             val durMs = mp.duration
-            if (durMs > 0) mp.seekTo((seconds.coerceIn(0f, durMs / 1000f) * 1000).toLong())
+            if (durMs > 0) mp.seekTo((seconds.coerceIn(0f, durMs / 1000f) * 1000).toInt())
         } catch (_: Exception) {}
         publish()
     }
