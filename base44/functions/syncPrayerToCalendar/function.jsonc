@@ -1,0 +1,4 @@
+{
+  "name": "syncPrayerToCalendar",
+  "entry": "entry.ts"
+}

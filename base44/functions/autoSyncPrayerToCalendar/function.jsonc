@@ -1,0 +1,14 @@
+{
+  "name": "autoSyncPrayerToCalendar",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "name": "daily_prayer_sync",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "hours",
+      "repeat_interval": 6
+    }
+  ]
+}

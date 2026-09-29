@@ -1,0 +1,14 @@
+{
+  "name": "scheduledAdhanNotifier",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "name": "adhan_every_5_minutes",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 5
+    }
+  ]
+}
