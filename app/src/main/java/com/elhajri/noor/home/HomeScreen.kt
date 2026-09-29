@@ -278,11 +278,11 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         }
                         Spacer(Modifier.height(6.dp))
                         Text(
-                            feature.title, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                            feature.title, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center, maxLines = 1
                         )
                         Text(
-                            feature.subtitle, color = GoldSoft.copy(alpha = 0.55f), fontSize = 8.sp,
+                            feature.subtitle, color = GoldSoft.copy(alpha = 0.55f), fontSize = 9.sp,
                             textAlign = TextAlign.Center, maxLines = 1
                         )
                     }

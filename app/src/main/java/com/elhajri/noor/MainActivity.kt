@@ -207,7 +207,7 @@ fun NoorApp() {
                                     selectedTextColor = Gold,
                                     unselectedIconColor = GoldSoft.copy(alpha = 0.45f),
                                     unselectedTextColor = GoldSoft.copy(alpha = 0.45f),
-                                    indicatorColor = Color.Transparent
+                                    indicatorColor = Gold.copy(alpha = 0.14f)
                                 )
                             )
                         }

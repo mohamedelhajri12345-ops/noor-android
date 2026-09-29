@@ -53,6 +53,7 @@ import androidx.compose.material3.OutlinedButton
 import com.elhajri.noor.data.DataLoader
 import com.elhajri.noor.data.Prefs
 import com.elhajri.noor.data.Reciter
+import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
@@ -580,7 +581,8 @@ fun QuranReaderScreen(
                                 fontSize = when (com.elhajri.noor.data.Prefs.getReaderFontSize(context)) {
                                     "S" -> 18.sp; "L" -> 26.sp; else -> 22.sp
                                 },
-                                lineHeight = 42.sp,
+                                lineHeight = 46.sp,
+                                fontFamily = AmiriFamily,
                                 color = if (isLightMode) Color(0xFF1C1917) else TextMain,
                                 textAlign = TextAlign.Justify
                             ),

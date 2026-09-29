@@ -1,6 +1,7 @@
 package com.elhajri.noor.ui
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
@@ -9,6 +10,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.R
 
@@ -72,6 +74,13 @@ fun NoorTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = NoorColors,
         typography = NoorTypography,
+        shapes = Shapes(
+            extraSmall = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+            small = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+            medium = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+            large = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+            extraLarge = androidx.compose.foundation.shape.RoundedCornerShape(28.dp)
+        ),
         content = content
     )
 }
