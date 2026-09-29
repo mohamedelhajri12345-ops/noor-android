@@ -3,10 +3,10 @@ package com.elhajri.noor.audio.player
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.Build
@@ -15,15 +15,16 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.elhajri.noor.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 /**
- * نقل حرفي 1:1 لـ src/lib/audioManager.js من الكود المصدري:
- * مشغّل واحد (MediaPlayer) يخدم المصحف والأناشيد معاً، بصف واحد،
- * مع خلط/تكرار (none|all|one)/سرعة/مؤقت نوم/روابط بديلة عند فشل السيرفر.
- * لا ExoPlayer ولا MediaSession — نفس سلوك الويب حرفياً وبثبات تام.
+ * محرك تشغيل صوتي مستقل بالكامل (MediaPlayer خاص به + صف تشغيل خاص + إشعار خاص).
+ * كل من "مشغّل القرآن" و "مشغّل الأناشيد" له نسخة مستقلة تماماً من هذا المحرك —
+ * لا يتشاركان أي حالة، ولا أي MediaPlayer. عند تشغيل أحدهما يتوقف الآخر تلقائياً
+ * (تجربة طبيعية كباقي التطبيقات الاحترافية، بلا تصادم صوت).
  */
 
 data class PlayerTrack(
@@ -69,10 +70,25 @@ interface PlayerFacade {
     fun clearSleepTimer()
 }
 
-object PlayerCore : PlayerFacade {
+/** يبقي مشغلاً واحداً فقط يعزف صوتاً في نفس اللحظة — يوقف الآخر تلقائياً عند بدء أحدهما */
+private object AudioFocusCoordinator {
+    private val engines = mutableListOf<BasePlayerEngine>()
+    fun register(e: BasePlayerEngine) { if (!engines.contains(e)) engines.add(e) }
+    fun pauseOthers(current: BasePlayerEngine) {
+        engines.forEach { if (it !== current) it.pauseIfPlaying() }
+    }
+}
+
+/**
+ * المحرك الأساسي: نقل حرفي لسلوك src/lib/audioManager.js (خلط/تكرار/سرعة/مؤقت نوم/روابط بديلة)
+ * لكن كنسخة قابلة للتكرار — كل استدعاء "BasePlayerEngine()" ينشئ محركاً مستقلاً تماماً.
+ */
+abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade {
+
+    init { AudioFocusCoordinator.register(this) }
 
     private val handler = Handler(Looper.getMainLooper())
-    private var appContext: Context? = null
+    protected var appContext: Context? = null
     private var player: MediaPlayer? = null
 
     private var queue: List<PlayerTrack> = emptyList()
@@ -91,11 +107,13 @@ object PlayerCore : PlayerFacade {
     private val _state = MutableStateFlow(PlayerState())
     override val state: StateFlow<PlayerState> = _state.asStateFlow()
 
+    protected abstract fun startForegroundService(context: Context)
+    protected abstract fun stopForegroundService(context: Context)
+
     override fun ensure(context: Context) {
         if (appContext == null) appContext = context.applicationContext
     }
 
-    // ==================== playQueue (الويب: playQueue) ====================
     override fun playQueue(tracks: List<PlayerTrack>, startIndex: Int) {
         if (tracks.isEmpty()) return
         queue = tracks
@@ -103,7 +121,6 @@ object PlayerCore : PlayerFacade {
         playCurrent()
     }
 
-    // ==================== play (الويب: play — نفس المعرف = تبديل) ====================
     override fun play(track: PlayerTrack) {
         if (state.value.currentId == track.id) {
             toggle()
@@ -114,10 +131,10 @@ object PlayerCore : PlayerFacade {
         playCurrent()
     }
 
-    // ==================== _playCurrent (الويب) ====================
     private fun playCurrent() {
         val track = queue.getOrNull(currentIndex) ?: return
         val ctx = appContext ?: return
+        AudioFocusCoordinator.pauseOthers(this)
         gapRunnable?.let { handler.removeCallbacks(it) }; gapRunnable = null
 
         isLoading = true
@@ -135,9 +152,8 @@ object PlayerCore : PlayerFacade {
             )
             mp.setDataSource(track.url)
             mp.prepareAsync()
-            PlaybackService.start(ctx)
+            startForegroundService(ctx)
         } catch (_: Exception) {
-            // رابط ميت أو تهيئة فاشلة → جرب الروابط البديلة كما في الويب
             if (!retryWithFallback()) {
                 isLoading = false
                 isBuffering = false
@@ -146,12 +162,9 @@ object PlayerCore : PlayerFacade {
         }
     }
 
-    /** ربط أحداث MediaPlayer — مقابل مستمعات audio.addEventListener في الويب */
     private fun wire(mp: MediaPlayer) {
         mp.setOnPreparedListener { p ->
-            // درع الإلغاء: لو ضغط المستخدم إيقافاً أو تخطى المقطع أثناء التحضير — لا عزف أشباح
             if (!isLoading && !isBuffering) return@setOnPreparedListener
-            // مقابل حدث 'playing' في الويب: ابدأ التشغيل وأوقف حالة التحميل
             isBuffering = false
             isLoading = false
             try {
@@ -163,10 +176,7 @@ object PlayerCore : PlayerFacade {
             } catch (_: Exception) {}
             publish()
         }
-        mp.setOnCompletionListener {
-            // مقابل حدث 'ended' → _onTrackEnd
-            onTrackEnd()
-        }
+        mp.setOnCompletionListener { onTrackEnd() }
         mp.setOnErrorListener { p, _, _ ->
             try { p.reset() } catch (_: Exception) {}
             if (!retryWithFallback()) {
@@ -177,13 +187,11 @@ object PlayerCore : PlayerFacade {
             true
         }
         mp.setOnBufferingUpdateListener { _, percent ->
-            // مقابل 'waiting'/'stalled' في الويب
             isBuffering = percent < 95
             publish()
         }
     }
 
-    // ==================== _retryWithFallback (الويب) ====================
     private fun retryWithFallback(): Boolean {
         val track = queue.getOrNull(currentIndex) ?: return false
         if (fallbackIndex >= track.fallbackUrls.size) return false
@@ -194,7 +202,6 @@ object PlayerCore : PlayerFacade {
         return try {
             val mp = player ?: return false
             mp.reset()
-            // reset يمسح خصائص الصوت — أعد تطبيقها كما في التشغيل الأولي
             mp.setAudioAttributes(
                 AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -209,7 +216,6 @@ object PlayerCore : PlayerFacade {
         }
     }
 
-    // ==================== _onTrackEnd (الويب) ====================
     private fun onTrackEnd() {
         if (sleepUntilEnd) {
             sleepUntilEnd = false
@@ -221,11 +227,9 @@ object PlayerCore : PlayerFacade {
             playCurrent()
             return
         }
-        // نفس فجوة الـ 300ms في الويب بين المقاطع
         gapRunnable = Runnable { next() }.also { handler.postDelayed(it, 300L) }
     }
 
-    // ==================== next (الويب) ====================
     override fun next() {
         if (queue.isEmpty()) return
         if (shuffle) {
@@ -246,7 +250,6 @@ object PlayerCore : PlayerFacade {
         playCurrent()
     }
 
-    // ==================== prev (الويب: >3 ثوان → أعد المقطع) ====================
     override fun prev() {
         if (queue.isEmpty()) return
         val pos = try { (player?.currentPosition ?: 0) / 1000f } catch (_: Exception) { 0f }
@@ -259,7 +262,6 @@ object PlayerCore : PlayerFacade {
         playCurrent()
     }
 
-    // ==================== toggle (الويب) ====================
     override fun toggle() {
         val mp = player ?: return
         if (state.value.currentId == null) return
@@ -270,19 +272,27 @@ object PlayerCore : PlayerFacade {
                 }
                 mp.start()
                 startTicking()
+                AudioFocusCoordinator.pauseOthers(this)
             }
         } catch (_: Exception) {}
         publish()
     }
 
-    // ==================== stop / _stopAudio (الويب) ====================
+    /** يستدعى من المنسّق فقط: أوقف مؤقتاً إن كان هذا المحرك يعزف الآن (لا يمسح الصف) */
+    fun pauseIfPlaying() {
+        try {
+            player?.let { if (it.isPlaying) it.pause() }
+        } catch (_: Exception) {}
+        publish()
+    }
+
     override fun stop() {
         stopAudio()
         clearSleepTimer()
         queue = emptyList()
         currentIndex = -1
         publish(clearTrack = true)
-        appContext?.let { PlaybackService.stop(it) }
+        appContext?.let { stopForegroundService(it) }
     }
 
     private fun stopAudio() {
@@ -294,7 +304,6 @@ object PlayerCore : PlayerFacade {
         isLoading = false
     }
 
-    // ==================== seek (الويب: داخل مدة الملف) ====================
     override fun seek(seconds: Float) {
         val mp = player ?: return
         try {
@@ -304,7 +313,6 @@ object PlayerCore : PlayerFacade {
         publish()
     }
 
-    // ==================== setRate (الويب: playbackRate) ====================
     override fun setRate(newRate: Float) {
         rate = newRate
         try {
@@ -321,7 +329,6 @@ object PlayerCore : PlayerFacade {
         publish()
     }
 
-    // all → one → none (نفس دورة الويب: none → all → one)
     override fun toggleRepeat() {
         repeatMode = when (repeatMode) {
             "none" -> "all"; "all" -> "one"; else -> "none"
@@ -329,7 +336,6 @@ object PlayerCore : PlayerFacade {
         publish()
     }
 
-    // ==================== مؤقت النوم (الويب: -1 = حتى نهاية المقطع) ====================
     override fun setSleepTimer(minutes: Int) {
         clearSleepTimer()
         if (minutes == -1) {
@@ -342,7 +348,7 @@ object PlayerCore : PlayerFacade {
                 stopAudio()
                 sleepRunnable = null
                 publish(clearTrack = true)
-                appContext?.let { PlaybackService.stop(it) }
+                appContext?.let { stopForegroundService(it) }
             }.also { handler.postDelayed(it, minutes * 60_000L) }
             publish()
         }
@@ -353,7 +359,6 @@ object PlayerCore : PlayerFacade {
         sleepUntilEnd = false
     }
 
-    // ==================== التحديث الدوري (الويب: timeupdate كل إطار) ====================
     private fun startTicking() {
         tickRunnable?.let { handler.removeCallbacks(it) }
         tickRunnable = object : Runnable {
@@ -365,10 +370,12 @@ object PlayerCore : PlayerFacade {
         }.also { handler.postDelayed(it, 100L) }
     }
 
+    fun isPlayingNow(): Boolean = try { player?.isPlaying == true } catch (_: Exception) { false }
+
     private fun publish(clearTrack: Boolean = false, error: String? = null) {
         val track = if (clearTrack) null else queue.getOrNull(currentIndex)
         val mp = player
-        val playing = try { mp?.isPlaying == true && mp.isPlaying } catch (_: Exception) { false }
+        val playing = try { mp?.isPlaying == true } catch (_: Exception) { false }
         val cur = try { (mp?.currentPosition ?: 0) / 1000f } catch (_: Exception) { 0f }
         val dur = try { (mp?.duration ?: 0).let { if (it > 0) it / 1000f else 0f } } catch (_: Exception) { 0f }
         _state.value = PlayerState(
@@ -376,8 +383,8 @@ object PlayerCore : PlayerFacade {
             currentId = if (clearTrack) null else track?.id ?: _state.value.currentId,
             currentTime = cur,
             duration = dur,
-            title = track?.title ?: "",
-            artist = track?.artist ?: "",
+            title = track?.title ?: (if (clearTrack) "" else _state.value.title),
+            artist = track?.artist ?: (if (clearTrack) "" else _state.value.artist),
             queueLength = queue.size,
             shuffle = shuffle,
             repeatMode = repeatMode,
@@ -390,18 +397,131 @@ object PlayerCore : PlayerFacade {
     }
 }
 
-/**
- * خدمة أمامية بسيطة تحافظ على التشغيل والصوت في شريط الإشعارات —
- * بدون أي مكتبة media3 (مصدر الانهيار السابق). تشبه سلوك الويب:
- * تُطلق عند بدء التشغيل وتتوقف عند الإيقاف.
- */
-class PlaybackService : Service() {
+/** مشغّل الأناشيد — محرك مستقل تماماً بذاكرته وإشعاره الخاص */
+object PlayerCore : BasePlayerEngine("الأناشيد") {
+    override fun startForegroundService(context: Context) = NasheedPlaybackService.start(context)
+    override fun stopForegroundService(context: Context) = NasheedPlaybackService.stop(context)
+}
 
+/** مشغّل القرآن الكريم — محرك مستقل تماماً بذاكرته وإشعاره الخاص، منفصل كلياً عن مشغل الأناشيد */
+object QuranPlayerManager : BasePlayerEngine("القرآن الكريم") {
+    override fun startForegroundService(context: Context) = QuranPlaybackService.start(context)
+    override fun stopForegroundService(context: Context) = QuranPlaybackService.stop(context)
+}
+
+object NasheedPlayerManager : PlayerFacade by PlayerCore
+
+/** إشعار احترافي بأزرار حقيقية (سابق/تشغيل-إيقاف/تالي/إيقاف كامل) بأسلوب MediaStyle */
+private object NotificationActions {
+    const val ACTION_TOGGLE = "com.elhajri.noor.action.TOGGLE"
+    const val ACTION_NEXT = "com.elhajri.noor.action.NEXT"
+    const val ACTION_PREV = "com.elhajri.noor.action.PREV"
+    const val ACTION_STOP = "com.elhajri.noor.action.STOP"
+    const val EXTRA_TARGET = "target"
+    const val TARGET_QURAN = "quran"
+    const val TARGET_NASHEED = "nasheed"
+}
+
+private fun buildPlaybackNotification(
+    context: Context,
+    channelId: String,
+    notifId: Int,
+    engine: PlayerFacade,
+    target: String,
+    serviceClass: Class<*>,
+    fallbackTitle: String
+): Notification {
+    val s = engine.state.value
+    fun actionIntent(action: String): PendingIntent {
+        val i = Intent(context, serviceClass).apply {
+            this.action = action
+            putExtra(NotificationActions.EXTRA_TARGET, target)
+        }
+        return PendingIntent.getService(
+            context, action.hashCode(), i,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+    val openAppIntent = PendingIntent.getActivity(
+        context, 0,
+        context.packageManager.getLaunchIntentForPackage(context.packageName),
+        PendingIntent.FLAG_IMMUTABLE
+    )
+    val playPauseIcon = if (s.isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
+    val builder = NotificationCompat.Builder(context, channelId)
+        .setContentTitle(s.title.ifBlank { fallbackTitle })
+        .setContentText(s.artist.ifBlank { "تطبيق القرآن الكريم" })
+        .setSmallIcon(R.drawable.ic_notification)
+        .setContentIntent(openAppIntent)
+        .setOngoing(s.isPlaying)
+        .setOnlyAlertOnce(true)
+        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .addAction(android.R.drawable.ic_media_previous, "السابق", actionIntent(NotificationActions.ACTION_PREV))
+        .addAction(playPauseIcon, if (s.isPlaying) "إيقاف" else "تشغيل", actionIntent(NotificationActions.ACTION_TOGGLE))
+        .addAction(android.R.drawable.ic_media_next, "التالي", actionIntent(NotificationActions.ACTION_NEXT))
+        .addAction(android.R.drawable.ic_menu_close_clear_cancel, "إغلاق", actionIntent(NotificationActions.ACTION_STOP))
+        .setStyle(
+            androidx.media.app.NotificationCompat.MediaStyle()
+                .setShowActionsInCompactView(0, 1, 2)
+        )
+    return builder.build()
+}
+
+/** خدمة إشعار مستقلة لمشغّل القرآن فقط */
+class QuranPlaybackService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val s = PlayerCore.state.value
-        startForeground(NOTIF_ID, buildNotification(this, s.title, s.artist))
+        when (intent?.action) {
+            NotificationActions.ACTION_TOGGLE -> QuranPlayerManager.toggle()
+            NotificationActions.ACTION_NEXT -> QuranPlayerManager.next()
+            NotificationActions.ACTION_PREV -> QuranPlayerManager.prev()
+            NotificationActions.ACTION_STOP -> { QuranPlayerManager.stop(); stopSelf(); return START_NOT_STICKY }
+        }
+        startForeground(NOTIF_ID, buildPlaybackNotification(this, CHANNEL, NOTIF_ID, QuranPlayerManager, "quran", QuranPlaybackService::class.java, "القرآن الكريم"))
+        return START_NOT_STICKY
+    }
+
+    override fun onDestroy() {
+        try { QuranPlayerManager.stop() } catch (_: Exception) {}
+        super.onDestroy()
+    }
+
+    companion object {
+        private const val NOTIF_ID = 3002
+        private const val CHANNEL = "noor_quran_playback"
+
+        fun start(context: Context) {
+            val ctx = context.applicationContext
+            try {
+                if (Build.VERSION.SDK_INT >= 26) {
+                    val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    nm.createNotificationChannel(
+                        NotificationChannel(CHANNEL, "تشغيل القرآن الكريم", NotificationManager.IMPORTANCE_LOW)
+                    )
+                }
+                ContextCompat.startForegroundService(ctx, Intent(ctx, QuranPlaybackService::class.java))
+            } catch (_: Exception) {}
+        }
+
+        fun stop(context: Context) {
+            try { context.applicationContext.stopService(Intent(context, QuranPlaybackService::class.java)) } catch (_: Exception) {}
+        }
+    }
+}
+
+/** خدمة إشعار مستقلة لمشغّل الأناشيد فقط */
+class NasheedPlaybackService : Service() {
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.action) {
+            NotificationActions.ACTION_TOGGLE -> PlayerCore.toggle()
+            NotificationActions.ACTION_NEXT -> PlayerCore.next()
+            NotificationActions.ACTION_PREV -> PlayerCore.prev()
+            NotificationActions.ACTION_STOP -> { PlayerCore.stop(); stopSelf(); return START_NOT_STICKY }
+        }
+        startForeground(NOTIF_ID, buildPlaybackNotification(this, CHANNEL, NOTIF_ID, PlayerCore, "nasheed", NasheedPlaybackService::class.java, "الأناشيد الإسلامية"))
         return START_NOT_STICKY
     }
 
@@ -412,7 +532,7 @@ class PlaybackService : Service() {
 
     companion object {
         private const val NOTIF_ID = 3001
-        private const val CHANNEL = "noor_playback"
+        private const val CHANNEL = "noor_nasheed_playback"
 
         fun start(context: Context) {
             val ctx = context.applicationContext
@@ -420,39 +540,15 @@ class PlaybackService : Service() {
                 if (Build.VERSION.SDK_INT >= 26) {
                     val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                     nm.createNotificationChannel(
-                        NotificationChannel(CHANNEL, "تشغيل التلاوات والأناشيد", NotificationManager.IMPORTANCE_LOW)
+                        NotificationChannel(CHANNEL, "تشغيل الأناشيد", NotificationManager.IMPORTANCE_LOW)
                     )
                 }
-                ContextCompat.startForegroundService(ctx, Intent(ctx, PlaybackService::class.java))
-            } catch (_: Exception) {
-                // حتى لو تعذّرت الخدمة يستمر التشغيل داخل التطبيق
-            }
+                ContextCompat.startForegroundService(ctx, Intent(ctx, NasheedPlaybackService::class.java))
+            } catch (_: Exception) {}
         }
 
         fun stop(context: Context) {
-            try { context.applicationContext.stopService(Intent(context, PlaybackService::class.java)) } catch (_: Exception) {}
-        }
-
-        private fun buildNotification(context: Context, title: String, artist: String): Notification {
-            val pi = android.app.PendingIntent.getActivity(
-                context, 0,
-                context.packageManager.getLaunchIntentForPackage(context.packageName),
-                android.app.PendingIntent.FLAG_IMMUTABLE
-            )
-            return NotificationCompat.Builder(context, CHANNEL)
-                .setContentTitle(title.ifBlank { "القرآن الكريم" })
-                .setContentText(artist.ifBlank { "تطبيق القرآن الكريم" })
-                .setSmallIcon(android.R.drawable.ic_media_play)
-                .setContentIntent(pi)
-                .setOngoing(true)
-                .build()
+            try { context.applicationContext.stopService(Intent(context, NasheedPlaybackService::class.java)) } catch (_: Exception) {}
         }
     }
 }
-
-/**
- * نفس الواجهة التي تستعملها الشاشات — كلا المديرين يصبان في مشغّل واحد
- * كما في الويب (audioManager واحد للمصحف والأناشيد معاً).
- */
-object QuranPlayerManager : PlayerFacade by PlayerCore
-object NasheedPlayerManager : PlayerFacade by PlayerCore

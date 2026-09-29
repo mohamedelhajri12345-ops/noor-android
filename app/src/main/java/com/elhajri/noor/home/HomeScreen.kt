@@ -69,6 +69,17 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
     var nextPrayerName by remember { mutableStateOf("...") }
     var nextPrayerTimeLabel by remember { mutableStateOf("") }
     var countdown by remember { mutableStateOf("٠٠:٠٠:٠٠") }
+    var khatmaPercent by remember { mutableStateOf(0) }
+    var streakCount by remember { mutableStateOf(0) }
+    var lastReadName by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        val sp = context.getSharedPreferences("noor_prefs", android.content.Context.MODE_PRIVATE)
+        val readCount = (sp.getStringSet("khatma_read_surahs", emptySet()) ?: emptySet()).size
+        khatmaPercent = ((readCount / 114f) * 100).toInt().coerceIn(0, 100)
+        streakCount = sp.getInt("streak_count", 0)
+        lastReadName = sp.getString("last_read_surah_name", "") ?: ""
+    }
 
     LaunchedEffect(Unit) {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
@@ -236,6 +247,55 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         Text(item.title, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                     }
                 }
+            }
+        }
+
+        Spacer(Modifier.height(22.dp))
+
+        // بطاقة استمرار التلاوة: نسبة الختمة + متابعة آخر قراءة + سلسلة الأيام
+        Card(
+            colors = CardDefaults.cardColors(containerColor = NavyCard),
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.fillMaxWidth().clickable { onNavigate("quran") }
+        ) {
+            Column(modifier = Modifier.fillMaxWidth().padding(18.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("استمرار التلاوة", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    if (streakCount > 0) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("🔥", fontSize = 13.sp)
+                            Spacer(Modifier.width(4.dp))
+                            Text(toArabicDigits(streakCount) + " يوم متتالي", color = GoldSoft, fontSize = 11.sp)
+                        }
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    if (lastReadName.isNotBlank()) "آخر قراءة: سورة $lastReadName" else "لم تبدأ القراءة بعد — ابدأ الآن",
+                    color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium
+                )
+                Spacer(Modifier.height(10.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Navy)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(khatmaPercent / 100f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Brush.horizontalGradient(listOf(Gold, GoldSoft)))
+                    )
+                }
+                Spacer(Modifier.height(6.dp))
+                Text("أكملت " + toArabicDigits(khatmaPercent) + "٪ من ختمة القرآن", color = GoldSoft, fontSize = 11.sp)
             }
         }
 

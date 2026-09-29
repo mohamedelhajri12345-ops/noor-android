@@ -43,6 +43,8 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.TimeoutCancellationException
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -152,13 +154,22 @@ fun AIAssistantScreen(onBack: () -> Unit = {}) {
                     val history = updatedMessages.takeLast(10).map { m ->
                         (if (m.role == "user") "user" else "model") to m.text
                     }
-                    val reply = AssistantClient.ask(SYSTEM_PROMPT, history)
+                    // سقف صارم 20 ثانية — بلا أي تعطل أو انتظار طويل مهما حدث في الشبكة
+                    val reply = withTimeout(20_000L) { AssistantClient.ask(SYSTEM_PROMPT, history) }
 
                     db.addAiMessage("user", trimmed)
                     db.addAiMessage("assistant", reply)
                     withContext(Dispatchers.Main) {
                         messages = messages + ChatMessage("assistant", reply)
                         isOffline = false
+                        loading = false
+                    }
+                } catch (e: TimeoutCancellationException) {
+                    withContext(Dispatchers.Main) {
+                        messages = messages + ChatMessage(
+                            "assistant",
+                            "🌙 استغرق الرد وقتاً طويلاً. جرّب مرة أخرى — الاتصال الآن أسرع وأكثر ثباتاً."
+                        )
                         loading = false
                     }
                 } catch (e: IOException) {

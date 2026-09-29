@@ -24,8 +24,9 @@ object AssistantClient {
 
     private val json = "application/json; charset=utf-8".toMediaType()
     private val http = OkHttpClient.Builder()
-        .connectTimeout(20, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
+        .connectTimeout(6, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .callTimeout(14, TimeUnit.SECONDS)
         .build()
 
     /** مفتاح Gemini صالح فقط إن بدأ بـ AIza (مفتاح Google AI Studio) */
@@ -47,14 +48,14 @@ object AssistantClient {
             }
         }
         var lastError: IOException? = null
-        for (attempt in 1..3) {
+        for (attempt in 1..2) {
             try {
                 return askPollinations(systemPrompt, history)
             } catch (e: IOException) {
                 lastError = e
                 val msg = e.message ?: ""
                 if (msg.contains("الإنترنت")) throw e
-                if (attempt < 3) Thread.sleep(if (attempt == 1) 1200L else 3000L)
+                if (attempt < 2) Thread.sleep(500L)
             }
         }
         throw lastError ?: IOException("🌙 تعذّر الوصول إلى المساعد الذكي. جرّب مرة أخرى بعد قليل.")

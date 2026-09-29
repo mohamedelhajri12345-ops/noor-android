@@ -189,11 +189,24 @@ fun QuranReaderScreen(
         ayahs = fetchOrLoadSurahAyahs(context, currentSurahNum)
         isLoadingText = false
 
-        // Bookmark last read
+        // Bookmark last read + تتبّع الختمة والسلسلة اليومية (خصائص مقترحة سابقاً)
         val sp = context.getSharedPreferences("noor_prefs", Context.MODE_PRIVATE)
+        val readSet = (sp.getStringSet("khatma_read_surahs", emptySet()) ?: emptySet()).toMutableSet()
+        readSet.add(currentSurahNum.toString())
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+        val lastDate = sp.getString("streak_last_date", null)
+        var streak = sp.getInt("streak_count", 0)
+        if (lastDate != today) {
+            val yesterday = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                .format(java.util.Date(System.currentTimeMillis() - 86_400_000L))
+            streak = if (lastDate == yesterday) streak + 1 else 1
+        }
         sp.edit()
             .putInt("last_read_surah", currentSurahNum)
             .putString("last_read_surah_name", currentName)
+            .putStringSet("khatma_read_surahs", readSet)
+            .putString("streak_last_date", today)
+            .putInt("streak_count", streak)
             .apply()
     }
 

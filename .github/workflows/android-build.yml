@@ -40,10 +40,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="v2.2"
-          cp app/build/outputs/apk/debug/app-debug.apk noor-v2.2.apk
+          TAG="v2.3"
+          cp app/build/outputs/apk/debug/app-debug.apk noor-v2.3.apk
           if gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            gh release upload "$TAG" noor-v2.2.apk --clobber -R "$GITHUB_REPOSITORY"
+            gh release upload "$TAG" noor-v2.3.apk --clobber -R "$GITHUB_REPOSITORY"
           else
-            gh release create "$TAG" noor-v2.2.apk --title "القرآن الكريم — نسخة 2.2" --notes "نسخة أندرويد أصلية 100% (بلا WebView)" -R "$GITHUB_REPOSITORY"
+            gh release create "$TAG" noor-v2.3.apk --title "القرآن الكريم — نسخة 2.2" --notes "نسخة أندرويد أصلية 100% (بلا WebView)" -R "$GITHUB_REPOSITORY"
           fi

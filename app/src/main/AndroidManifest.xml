@@ -43,7 +43,11 @@
             </intent-filter>
         </receiver>
         <service
-            android:name=".audio.player.PlaybackService"
+            android:name=".audio.player.QuranPlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+        <service
+            android:name=".audio.player.NasheedPlaybackService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
     </application>
