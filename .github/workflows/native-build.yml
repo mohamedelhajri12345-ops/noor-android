@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
       - uses: actions/setup-node@v4
-        with: { node-version: '20', cache: npm }
+        with: { node-version: '20' }
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Build web assets (vite)
