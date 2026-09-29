@@ -1,1 +1,822 @@
-{"surahs":[{"number":1,"name":"الفاتحة","englishName":"Al-Fatihah","type":"مكية","ayahs":7},{"number":2,"name":"البقرة","englishName":"Al-Baqarah","type":"مدنية","ayahs":286},{"number":3,"name":"آل عمران","englishName":"Ali 'Imran","type":"مدنية","ayahs":200},{"number":4,"name":"النساء","englishName":"An-Nisa","type":"مدنية","ayahs":176},{"number":5,"name":"المائدة","englishName":"Al-Ma'idah","type":"مدنية","ayahs":120},{"number":6,"name":"الأنعام","englishName":"Al-An'am","type":"مكية","ayahs":165},{"number":7,"name":"الأعراف","englishName":"Al-A'raf","type":"مكية","ayahs":206},{"number":8,"name":"الأنفال","englishName":"Al-Anfal","type":"مدنية","ayahs":75},{"number":9,"name":"التوبة","englishName":"At-Tawbah","type":"مدنية","ayahs":129},{"number":10,"name":"يونس","englishName":"Yunus","type":"مكية","ayahs":109},{"number":11,"name":"هود","englishName":"Hud","type":"مكية","ayahs":123},{"number":12,"name":"يوسف","englishName":"Yusuf","type":"مكية","ayahs":111},{"number":13,"name":"الرعد","englishName":"Ar-Ra'd","type":"مدنية","ayahs":43},{"number":14,"name":"إبراهيم","englishName":"Ibrahim","type":"مكية","ayahs":52},{"number":15,"name":"الحجر","englishName":"Al-Hijr","type":"مكية","ayahs":99},{"number":16,"name":"النحل","englishName":"An-Nahl","type":"مكية","ayahs":128},{"number":17,"name":"الإسراء","englishName":"Al-Isra","type":"مكية","ayahs":111},{"number":18,"name":"الكهف","englishName":"Al-Kahf","type":"مكية","ayahs":110},{"number":19,"name":"مريم","englishName":"Maryam","type":"مكية","ayahs":98},{"number":20,"name":"طه","englishName":"Taha","type":"مكية","ayahs":135},{"number":21,"name":"الأنبياء","englishName":"Al-Anbya","type":"مكية","ayahs":112},{"number":22,"name":"الحج","englishName":"Al-Hajj","type":"مدنية","ayahs":78},{"number":23,"name":"المؤمنون","englishName":"Al-Mu'minun","type":"مكية","ayahs":118},{"number":24,"name":"النور","englishName":"An-Nur","type":"مدنية","ayahs":64},{"number":25,"name":"الفرقان","englishName":"Al-Furqan","type":"مكية","ayahs":77},{"number":26,"name":"الشعراء","englishName":"Ash-Shu'ara","type":"مكية","ayahs":227},{"number":27,"name":"النمل","englishName":"An-Naml","type":"مكية","ayahs":93},{"number":28,"name":"القصص","englishName":"Al-Qasas","type":"مكية","ayahs":88},{"number":29,"name":"العنكبوت","englishName":"Al-'Ankabut","type":"مكية","ayahs":69},{"number":30,"name":"الروم","englishName":"Ar-Rum","type":"مكية","ayahs":60},{"number":31,"name":"لقمان","englishName":"Luqman","type":"مكية","ayahs":34},{"number":32,"name":"السجدة","englishName":"As-Sajdah","type":"مكية","ayahs":30},{"number":33,"name":"الأحزاب","englishName":"Al-Ahzab","type":"مدنية","ayahs":73},{"number":34,"name":"سبأ","englishName":"Saba","type":"مكية","ayahs":54},{"number":35,"name":"فاطر","englishName":"Fatir","type":"مكية","ayahs":45},{"number":36,"name":"يس","englishName":"Ya-Sin","type":"مكية","ayahs":83},{"number":37,"name":"الصافات","englishName":"As-Saffat","type":"مكية","ayahs":182},{"number":38,"name":"ص","englishName":"Sad","type":"مكية","ayahs":88},{"number":39,"name":"الزمر","englishName":"Az-Zumar","type":"مكية","ayahs":75},{"number":40,"name":"غافر","englishName":"Ghafir","type":"مكية","ayahs":85},{"number":41,"name":"فصلت","englishName":"Fussilat","type":"مكية","ayahs":54},{"number":42,"name":"الشورى","englishName":"Ash-Shuraa","type":"مكية","ayahs":53},{"number":43,"name":"الزخرف","englishName":"Az-Zukhruf","type":"مكية","ayahs":89},{"number":44,"name":"الدخان","englishName":"Ad-Dukhan","type":"مكية","ayahs":59},{"number":45,"name":"الجاثية","englishName":"Al-Jathiyah","type":"مكية","ayahs":37},{"number":46,"name":"الأحقاف","englishName":"Al-Ahqaf","type":"مكية","ayahs":35},{"number":47,"name":"محمد","englishName":"Muhammad","type":"مدنية","ayahs":38},{"number":48,"name":"الفتح","englishName":"Al-Fath","type":"مدنية","ayahs":29},{"number":49,"name":"الحجرات","englishName":"Al-Hujurat","type":"مدنية","ayahs":18},{"number":50,"name":"ق","englishName":"Qaf","type":"مكية","ayahs":45},{"number":51,"name":"الذاريات","englishName":"Adh-Dhariyat","type":"مكية","ayahs":60},{"number":52,"name":"الطور","englishName":"At-Tur","type":"مكية","ayahs":49},{"number":53,"name":"النجم","englishName":"An-Najm","type":"مكية","ayahs":62},{"number":54,"name":"القمر","englishName":"Al-Qamar","type":"مكية","ayahs":55},{"number":55,"name":"الرحمن","englishName":"Ar-Rahman","type":"مدنية","ayahs":78},{"number":56,"name":"الواقعة","englishName":"Al-Waqi'ah","type":"مكية","ayahs":96},{"number":57,"name":"الحديد","englishName":"Al-Hadid","type":"مدنية","ayahs":29},{"number":58,"name":"المجادلة","englishName":"Al-Mujadila","type":"مدنية","ayahs":22},{"number":59,"name":"الحشر","englishName":"Al-Hashr","type":"مدنية","ayahs":24},{"number":60,"name":"الممتحنة","englishName":"Al-Mumtahanah","type":"مدنية","ayahs":13},{"number":61,"name":"الصف","englishName":"As-Saf","type":"مدنية","ayahs":14},{"number":62,"name":"الجمعة","englishName":"Al-Jumu'ah","type":"مدنية","ayahs":11},{"number":63,"name":"المنافقون","englishName":"Al-Munafiqun","type":"مدنية","ayahs":11},{"number":64,"name":"التغابن","englishName":"At-Taghabun","type":"مدنية","ayahs":18},{"number":65,"name":"الطلاق","englishName":"At-Talaq","type":"مدنية","ayahs":12},{"number":66,"name":"التحريم","englishName":"At-Tahrim","type":"مدنية","ayahs":12},{"number":67,"name":"الملك","englishName":"Al-Mulk","type":"مكية","ayahs":30},{"number":68,"name":"القلم","englishName":"Al-Qalam","type":"مكية","ayahs":52},{"number":69,"name":"الحاقة","englishName":"Al-Haqqah","type":"مكية","ayahs":52},{"number":70,"name":"المعارج","englishName":"Al-Ma'arij","type":"مكية","ayahs":44},{"number":71,"name":"نوح","englishName":"Nuh","type":"مكية","ayahs":28},{"number":72,"name":"الجن","englishName":"Al-Jinn","type":"مكية","ayahs":28},{"number":73,"name":"المزمل","englishName":"Al-Muzzammil","type":"مكية","ayahs":20},{"number":74,"name":"المدثر","englishName":"Al-Muddaththir","type":"مكية","ayahs":56},{"number":75,"name":"القيامة","englishName":"Al-Qiyamah","type":"مكية","ayahs":40},{"number":76,"name":"الإنسان","englishName":"Al-Insan","type":"مدنية","ayahs":31},{"number":77,"name":"المرسلات","englishName":"Al-Mursalat","type":"مكية","ayahs":50},{"number":78,"name":"النبأ","englishName":"An-Naba","type":"مكية","ayahs":40},{"number":79,"name":"النازعات","englishName":"An-Nazi'at","type":"مكية","ayahs":46},{"number":80,"name":"عبس","englishName":"'Abasa","type":"مكية","ayahs":42},{"number":81,"name":"التكوير","englishName":"At-Takwir","type":"مكية","ayahs":29},{"number":82,"name":"الإنفطار","englishName":"Al-Infitar","type":"مكية","ayahs":19},{"number":83,"name":"المطففين","englishName":"Al-Mutaffifin","type":"مكية","ayahs":36},{"number":84,"name":"الإنشقاق","englishName":"Al-Inshiqaq","type":"مكية","ayahs":25},{"number":85,"name":"البروج","englishName":"Al-Buruj","type":"مكية","ayahs":22},{"number":86,"name":"الطارق","englishName":"At-Tariq","type":"مكية","ayahs":17},{"number":87,"name":"الأعلى","englishName":"Al-A'la","type":"مكية","ayahs":19},{"number":88,"name":"الغاشية","englishName":"Al-Ghashiyah","type":"مكية","ayahs":26},{"number":89,"name":"الفجر","englishName":"Al-Fajr","type":"مكية","ayahs":30},{"number":90,"name":"البلد","englishName":"Al-Balad","type":"مكية","ayahs":20},{"number":91,"name":"الشمس","englishName":"Ash-Shams","type":"مكية","ayahs":15},{"number":92,"name":"الليل","englishName":"Al-Layl","type":"مكية","ayahs":21},{"number":93,"name":"الضحى","englishName":"Ad-Duhaa","type":"مكية","ayahs":11},{"number":94,"name":"الشرح","englishName":"Ash-Sharh","type":"مكية","ayahs":8},{"number":95,"name":"التين","englishName":"At-Tin","type":"مكية","ayahs":8},{"number":96,"name":"العلق","englishName":"Al-'Alaq","type":"مكية","ayahs":19},{"number":97,"name":"القدر","englishName":"Al-Qadr","type":"مكية","ayahs":5},{"number":98,"name":"البينة","englishName":"Al-Bayyinah","type":"مدنية","ayahs":8},{"number":99,"name":"الزلزلة","englishName":"Az-Zalzalah","type":"مدنية","ayahs":8},{"number":100,"name":"العاديات","englishName":"Al-'Adiyat","type":"مكية","ayahs":11},{"number":101,"name":"القارعة","englishName":"Al-Qari'ah","type":"مكية","ayahs":11},{"number":102,"name":"التكاثر","englishName":"At-Takathur","type":"مكية","ayahs":8},{"number":103,"name":"العصر","englishName":"Al-'Asr","type":"مكية","ayahs":3},{"number":104,"name":"الهمزة","englishName":"Al-Humazah","type":"مكية","ayahs":9},{"number":105,"name":"الفيل","englishName":"Al-Fil","type":"مكية","ayahs":5},{"number":106,"name":"قريش","englishName":"Quraysh","type":"مكية","ayahs":4},{"number":107,"name":"الماعون","englishName":"Al-Ma'un","type":"مكية","ayahs":7},{"number":108,"name":"الكوثر","englishName":"Al-Kawthar","type":"مكية","ayahs":3},{"number":109,"name":"الكافرون","englishName":"Al-Kafirun","type":"مكية","ayahs":6},{"number":110,"name":"النصر","englishName":"An-Nasr","type":"مدنية","ayahs":3},{"number":111,"name":"المسد","englishName":"Al-Masad","type":"مكية","ayahs":5},{"number":112,"name":"الإخلاص","englishName":"Al-Ikhlas","type":"مكية","ayahs":4},{"number":113,"name":"الفلق","englishName":"Al-Falaq","type":"مكية","ayahs":5},{"number":114,"name":"الناس","englishName":"An-Nas","type":"مكية","ayahs":6}],"reciters":[{"id":"alafasy","name":"مشاري العفاسي","image":"rec_mic","servers":["https://server8.mp3quran.net/afs/"]},{"id":"dossari","name":"ياسر الدوسري","image":"rec_book","servers":["https://server11.mp3quran.net/yasser/"]},{"id":"maher","name":"ماهر المعيقلي","image":"rec_dome","servers":["https://server12.mp3quran.net/maher/"]},{"id":"sds","name":"عبد الرحمن السديس","image":"rec_star","servers":["https://server11.mp3quran.net/sds/"]},{"id":"husr","name":"محمود خليل الحصري","image":"rec_lantern","servers":["https://server13.mp3quran.net/husr/"]},{"id":"minsh","name":"محمد صديق المنشاوي","image":"rec_note","servers":["https://server10.mp3quran.net/minsh/"]},{"id":"hani","name":"هاني الرفاعي","image":"rec_star","servers":["https://server8.mp3quran.net/hani/"]},{"id":"abdulbasit","name":"عبد الباسط عبد الصمد","servers":["https://server7.mp3quran.net/basit/"]},{"id":"ghamdi","name":"سعد الغامدي","servers":["https://server7.mp3quran.net/s_gmd/"]},{"id":"ajmy","name":"أحمد العجمي","servers":["https://server10.mp3quran.net/ajm/"]},{"id":"shatri","name":"أبو بكر الشاطري","servers":["https://server11.mp3quran.net/shatri/"]},{"id":"qtan","name":"ناصر القطامي","servers":["https://server6.mp3quran.net/qtm/"]},{"id":"abkr","name":"إدريس أبكر","servers":["https://server6.mp3quran.net/abkr/"]},{"id":"jbrl","name":"علي جابر","servers":["https://server11.mp3quran.net/jbrl/"]}]}
+{
+ "surahs": [
+  {
+   "number": 1,
+   "name": "الفاتحة",
+   "englishName": "Al-Fatihah",
+   "type": "مكية",
+   "ayahs": 7
+  },
+  {
+   "number": 2,
+   "name": "البقرة",
+   "englishName": "Al-Baqarah",
+   "type": "مدنية",
+   "ayahs": 286
+  },
+  {
+   "number": 3,
+   "name": "آل عمران",
+   "englishName": "Ali 'Imran",
+   "type": "مدنية",
+   "ayahs": 200
+  },
+  {
+   "number": 4,
+   "name": "النساء",
+   "englishName": "An-Nisa",
+   "type": "مدنية",
+   "ayahs": 176
+  },
+  {
+   "number": 5,
+   "name": "المائدة",
+   "englishName": "Al-Ma'idah",
+   "type": "مدنية",
+   "ayahs": 120
+  },
+  {
+   "number": 6,
+   "name": "الأنعام",
+   "englishName": "Al-An'am",
+   "type": "مكية",
+   "ayahs": 165
+  },
+  {
+   "number": 7,
+   "name": "الأعراف",
+   "englishName": "Al-A'raf",
+   "type": "مكية",
+   "ayahs": 206
+  },
+  {
+   "number": 8,
+   "name": "الأنفال",
+   "englishName": "Al-Anfal",
+   "type": "مدنية",
+   "ayahs": 75
+  },
+  {
+   "number": 9,
+   "name": "التوبة",
+   "englishName": "At-Tawbah",
+   "type": "مدنية",
+   "ayahs": 129
+  },
+  {
+   "number": 10,
+   "name": "يونس",
+   "englishName": "Yunus",
+   "type": "مكية",
+   "ayahs": 109
+  },
+  {
+   "number": 11,
+   "name": "هود",
+   "englishName": "Hud",
+   "type": "مكية",
+   "ayahs": 123
+  },
+  {
+   "number": 12,
+   "name": "يوسف",
+   "englishName": "Yusuf",
+   "type": "مكية",
+   "ayahs": 111
+  },
+  {
+   "number": 13,
+   "name": "الرعد",
+   "englishName": "Ar-Ra'd",
+   "type": "مدنية",
+   "ayahs": 43
+  },
+  {
+   "number": 14,
+   "name": "إبراهيم",
+   "englishName": "Ibrahim",
+   "type": "مكية",
+   "ayahs": 52
+  },
+  {
+   "number": 15,
+   "name": "الحجر",
+   "englishName": "Al-Hijr",
+   "type": "مكية",
+   "ayahs": 99
+  },
+  {
+   "number": 16,
+   "name": "النحل",
+   "englishName": "An-Nahl",
+   "type": "مكية",
+   "ayahs": 128
+  },
+  {
+   "number": 17,
+   "name": "الإسراء",
+   "englishName": "Al-Isra",
+   "type": "مكية",
+   "ayahs": 111
+  },
+  {
+   "number": 18,
+   "name": "الكهف",
+   "englishName": "Al-Kahf",
+   "type": "مكية",
+   "ayahs": 110
+  },
+  {
+   "number": 19,
+   "name": "مريم",
+   "englishName": "Maryam",
+   "type": "مكية",
+   "ayahs": 98
+  },
+  {
+   "number": 20,
+   "name": "طه",
+   "englishName": "Taha",
+   "type": "مكية",
+   "ayahs": 135
+  },
+  {
+   "number": 21,
+   "name": "الأنبياء",
+   "englishName": "Al-Anbya",
+   "type": "مكية",
+   "ayahs": 112
+  },
+  {
+   "number": 22,
+   "name": "الحج",
+   "englishName": "Al-Hajj",
+   "type": "مدنية",
+   "ayahs": 78
+  },
+  {
+   "number": 23,
+   "name": "المؤمنون",
+   "englishName": "Al-Mu'minun",
+   "type": "مكية",
+   "ayahs": 118
+  },
+  {
+   "number": 24,
+   "name": "النور",
+   "englishName": "An-Nur",
+   "type": "مدنية",
+   "ayahs": 64
+  },
+  {
+   "number": 25,
+   "name": "الفرقان",
+   "englishName": "Al-Furqan",
+   "type": "مكية",
+   "ayahs": 77
+  },
+  {
+   "number": 26,
+   "name": "الشعراء",
+   "englishName": "Ash-Shu'ara",
+   "type": "مكية",
+   "ayahs": 227
+  },
+  {
+   "number": 27,
+   "name": "النمل",
+   "englishName": "An-Naml",
+   "type": "مكية",
+   "ayahs": 93
+  },
+  {
+   "number": 28,
+   "name": "القصص",
+   "englishName": "Al-Qasas",
+   "type": "مكية",
+   "ayahs": 88
+  },
+  {
+   "number": 29,
+   "name": "العنكبوت",
+   "englishName": "Al-'Ankabut",
+   "type": "مكية",
+   "ayahs": 69
+  },
+  {
+   "number": 30,
+   "name": "الروم",
+   "englishName": "Ar-Rum",
+   "type": "مكية",
+   "ayahs": 60
+  },
+  {
+   "number": 31,
+   "name": "لقمان",
+   "englishName": "Luqman",
+   "type": "مكية",
+   "ayahs": 34
+  },
+  {
+   "number": 32,
+   "name": "السجدة",
+   "englishName": "As-Sajdah",
+   "type": "مكية",
+   "ayahs": 30
+  },
+  {
+   "number": 33,
+   "name": "الأحزاب",
+   "englishName": "Al-Ahzab",
+   "type": "مدنية",
+   "ayahs": 73
+  },
+  {
+   "number": 34,
+   "name": "سبأ",
+   "englishName": "Saba",
+   "type": "مكية",
+   "ayahs": 54
+  },
+  {
+   "number": 35,
+   "name": "فاطر",
+   "englishName": "Fatir",
+   "type": "مكية",
+   "ayahs": 45
+  },
+  {
+   "number": 36,
+   "name": "يس",
+   "englishName": "Ya-Sin",
+   "type": "مكية",
+   "ayahs": 83
+  },
+  {
+   "number": 37,
+   "name": "الصافات",
+   "englishName": "As-Saffat",
+   "type": "مكية",
+   "ayahs": 182
+  },
+  {
+   "number": 38,
+   "name": "ص",
+   "englishName": "Sad",
+   "type": "مكية",
+   "ayahs": 88
+  },
+  {
+   "number": 39,
+   "name": "الزمر",
+   "englishName": "Az-Zumar",
+   "type": "مكية",
+   "ayahs": 75
+  },
+  {
+   "number": 40,
+   "name": "غافر",
+   "englishName": "Ghafir",
+   "type": "مكية",
+   "ayahs": 85
+  },
+  {
+   "number": 41,
+   "name": "فصلت",
+   "englishName": "Fussilat",
+   "type": "مكية",
+   "ayahs": 54
+  },
+  {
+   "number": 42,
+   "name": "الشورى",
+   "englishName": "Ash-Shuraa",
+   "type": "مكية",
+   "ayahs": 53
+  },
+  {
+   "number": 43,
+   "name": "الزخرف",
+   "englishName": "Az-Zukhruf",
+   "type": "مكية",
+   "ayahs": 89
+  },
+  {
+   "number": 44,
+   "name": "الدخان",
+   "englishName": "Ad-Dukhan",
+   "type": "مكية",
+   "ayahs": 59
+  },
+  {
+   "number": 45,
+   "name": "الجاثية",
+   "englishName": "Al-Jathiyah",
+   "type": "مكية",
+   "ayahs": 37
+  },
+  {
+   "number": 46,
+   "name": "الأحقاف",
+   "englishName": "Al-Ahqaf",
+   "type": "مكية",
+   "ayahs": 35
+  },
+  {
+   "number": 47,
+   "name": "محمد",
+   "englishName": "Muhammad",
+   "type": "مدنية",
+   "ayahs": 38
+  },
+  {
+   "number": 48,
+   "name": "الفتح",
+   "englishName": "Al-Fath",
+   "type": "مدنية",
+   "ayahs": 29
+  },
+  {
+   "number": 49,
+   "name": "الحجرات",
+   "englishName": "Al-Hujurat",
+   "type": "مدنية",
+   "ayahs": 18
+  },
+  {
+   "number": 50,
+   "name": "ق",
+   "englishName": "Qaf",
+   "type": "مكية",
+   "ayahs": 45
+  },
+  {
+   "number": 51,
+   "name": "الذاريات",
+   "englishName": "Adh-Dhariyat",
+   "type": "مكية",
+   "ayahs": 60
+  },
+  {
+   "number": 52,
+   "name": "الطور",
+   "englishName": "At-Tur",
+   "type": "مكية",
+   "ayahs": 49
+  },
+  {
+   "number": 53,
+   "name": "النجم",
+   "englishName": "An-Najm",
+   "type": "مكية",
+   "ayahs": 62
+  },
+  {
+   "number": 54,
+   "name": "القمر",
+   "englishName": "Al-Qamar",
+   "type": "مكية",
+   "ayahs": 55
+  },
+  {
+   "number": 55,
+   "name": "الرحمن",
+   "englishName": "Ar-Rahman",
+   "type": "مدنية",
+   "ayahs": 78
+  },
+  {
+   "number": 56,
+   "name": "الواقعة",
+   "englishName": "Al-Waqi'ah",
+   "type": "مكية",
+   "ayahs": 96
+  },
+  {
+   "number": 57,
+   "name": "الحديد",
+   "englishName": "Al-Hadid",
+   "type": "مدنية",
+   "ayahs": 29
+  },
+  {
+   "number": 58,
+   "name": "المجادلة",
+   "englishName": "Al-Mujadila",
+   "type": "مدنية",
+   "ayahs": 22
+  },
+  {
+   "number": 59,
+   "name": "الحشر",
+   "englishName": "Al-Hashr",
+   "type": "مدنية",
+   "ayahs": 24
+  },
+  {
+   "number": 60,
+   "name": "الممتحنة",
+   "englishName": "Al-Mumtahanah",
+   "type": "مدنية",
+   "ayahs": 13
+  },
+  {
+   "number": 61,
+   "name": "الصف",
+   "englishName": "As-Saf",
+   "type": "مدنية",
+   "ayahs": 14
+  },
+  {
+   "number": 62,
+   "name": "الجمعة",
+   "englishName": "Al-Jumu'ah",
+   "type": "مدنية",
+   "ayahs": 11
+  },
+  {
+   "number": 63,
+   "name": "المنافقون",
+   "englishName": "Al-Munafiqun",
+   "type": "مدنية",
+   "ayahs": 11
+  },
+  {
+   "number": 64,
+   "name": "التغابن",
+   "englishName": "At-Taghabun",
+   "type": "مدنية",
+   "ayahs": 18
+  },
+  {
+   "number": 65,
+   "name": "الطلاق",
+   "englishName": "At-Talaq",
+   "type": "مدنية",
+   "ayahs": 12
+  },
+  {
+   "number": 66,
+   "name": "التحريم",
+   "englishName": "At-Tahrim",
+   "type": "مدنية",
+   "ayahs": 12
+  },
+  {
+   "number": 67,
+   "name": "الملك",
+   "englishName": "Al-Mulk",
+   "type": "مكية",
+   "ayahs": 30
+  },
+  {
+   "number": 68,
+   "name": "القلم",
+   "englishName": "Al-Qalam",
+   "type": "مكية",
+   "ayahs": 52
+  },
+  {
+   "number": 69,
+   "name": "الحاقة",
+   "englishName": "Al-Haqqah",
+   "type": "مكية",
+   "ayahs": 52
+  },
+  {
+   "number": 70,
+   "name": "المعارج",
+   "englishName": "Al-Ma'arij",
+   "type": "مكية",
+   "ayahs": 44
+  },
+  {
+   "number": 71,
+   "name": "نوح",
+   "englishName": "Nuh",
+   "type": "مكية",
+   "ayahs": 28
+  },
+  {
+   "number": 72,
+   "name": "الجن",
+   "englishName": "Al-Jinn",
+   "type": "مكية",
+   "ayahs": 28
+  },
+  {
+   "number": 73,
+   "name": "المزمل",
+   "englishName": "Al-Muzzammil",
+   "type": "مكية",
+   "ayahs": 20
+  },
+  {
+   "number": 74,
+   "name": "المدثر",
+   "englishName": "Al-Muddaththir",
+   "type": "مكية",
+   "ayahs": 56
+  },
+  {
+   "number": 75,
+   "name": "القيامة",
+   "englishName": "Al-Qiyamah",
+   "type": "مكية",
+   "ayahs": 40
+  },
+  {
+   "number": 76,
+   "name": "الإنسان",
+   "englishName": "Al-Insan",
+   "type": "مدنية",
+   "ayahs": 31
+  },
+  {
+   "number": 77,
+   "name": "المرسلات",
+   "englishName": "Al-Mursalat",
+   "type": "مكية",
+   "ayahs": 50
+  },
+  {
+   "number": 78,
+   "name": "النبأ",
+   "englishName": "An-Naba",
+   "type": "مكية",
+   "ayahs": 40
+  },
+  {
+   "number": 79,
+   "name": "النازعات",
+   "englishName": "An-Nazi'at",
+   "type": "مكية",
+   "ayahs": 46
+  },
+  {
+   "number": 80,
+   "name": "عبس",
+   "englishName": "'Abasa",
+   "type": "مكية",
+   "ayahs": 42
+  },
+  {
+   "number": 81,
+   "name": "التكوير",
+   "englishName": "At-Takwir",
+   "type": "مكية",
+   "ayahs": 29
+  },
+  {
+   "number": 82,
+   "name": "الإنفطار",
+   "englishName": "Al-Infitar",
+   "type": "مكية",
+   "ayahs": 19
+  },
+  {
+   "number": 83,
+   "name": "المطففين",
+   "englishName": "Al-Mutaffifin",
+   "type": "مكية",
+   "ayahs": 36
+  },
+  {
+   "number": 84,
+   "name": "الإنشقاق",
+   "englishName": "Al-Inshiqaq",
+   "type": "مكية",
+   "ayahs": 25
+  },
+  {
+   "number": 85,
+   "name": "البروج",
+   "englishName": "Al-Buruj",
+   "type": "مكية",
+   "ayahs": 22
+  },
+  {
+   "number": 86,
+   "name": "الطارق",
+   "englishName": "At-Tariq",
+   "type": "مكية",
+   "ayahs": 17
+  },
+  {
+   "number": 87,
+   "name": "الأعلى",
+   "englishName": "Al-A'la",
+   "type": "مكية",
+   "ayahs": 19
+  },
+  {
+   "number": 88,
+   "name": "الغاشية",
+   "englishName": "Al-Ghashiyah",
+   "type": "مكية",
+   "ayahs": 26
+  },
+  {
+   "number": 89,
+   "name": "الفجر",
+   "englishName": "Al-Fajr",
+   "type": "مكية",
+   "ayahs": 30
+  },
+  {
+   "number": 90,
+   "name": "البلد",
+   "englishName": "Al-Balad",
+   "type": "مكية",
+   "ayahs": 20
+  },
+  {
+   "number": 91,
+   "name": "الشمس",
+   "englishName": "Ash-Shams",
+   "type": "مكية",
+   "ayahs": 15
+  },
+  {
+   "number": 92,
+   "name": "الليل",
+   "englishName": "Al-Layl",
+   "type": "مكية",
+   "ayahs": 21
+  },
+  {
+   "number": 93,
+   "name": "الضحى",
+   "englishName": "Ad-Duhaa",
+   "type": "مكية",
+   "ayahs": 11
+  },
+  {
+   "number": 94,
+   "name": "الشرح",
+   "englishName": "Ash-Sharh",
+   "type": "مكية",
+   "ayahs": 8
+  },
+  {
+   "number": 95,
+   "name": "التين",
+   "englishName": "At-Tin",
+   "type": "مكية",
+   "ayahs": 8
+  },
+  {
+   "number": 96,
+   "name": "العلق",
+   "englishName": "Al-'Alaq",
+   "type": "مكية",
+   "ayahs": 19
+  },
+  {
+   "number": 97,
+   "name": "القدر",
+   "englishName": "Al-Qadr",
+   "type": "مكية",
+   "ayahs": 5
+  },
+  {
+   "number": 98,
+   "name": "البينة",
+   "englishName": "Al-Bayyinah",
+   "type": "مدنية",
+   "ayahs": 8
+  },
+  {
+   "number": 99,
+   "name": "الزلزلة",
+   "englishName": "Az-Zalzalah",
+   "type": "مدنية",
+   "ayahs": 8
+  },
+  {
+   "number": 100,
+   "name": "العاديات",
+   "englishName": "Al-'Adiyat",
+   "type": "مكية",
+   "ayahs": 11
+  },
+  {
+   "number": 101,
+   "name": "القارعة",
+   "englishName": "Al-Qari'ah",
+   "type": "مكية",
+   "ayahs": 11
+  },
+  {
+   "number": 102,
+   "name": "التكاثر",
+   "englishName": "At-Takathur",
+   "type": "مكية",
+   "ayahs": 8
+  },
+  {
+   "number": 103,
+   "name": "العصر",
+   "englishName": "Al-'Asr",
+   "type": "مكية",
+   "ayahs": 3
+  },
+  {
+   "number": 104,
+   "name": "الهمزة",
+   "englishName": "Al-Humazah",
+   "type": "مكية",
+   "ayahs": 9
+  },
+  {
+   "number": 105,
+   "name": "الفيل",
+   "englishName": "Al-Fil",
+   "type": "مكية",
+   "ayahs": 5
+  },
+  {
+   "number": 106,
+   "name": "قريش",
+   "englishName": "Quraysh",
+   "type": "مكية",
+   "ayahs": 4
+  },
+  {
+   "number": 107,
+   "name": "الماعون",
+   "englishName": "Al-Ma'un",
+   "type": "مكية",
+   "ayahs": 7
+  },
+  {
+   "number": 108,
+   "name": "الكوثر",
+   "englishName": "Al-Kawthar",
+   "type": "مكية",
+   "ayahs": 3
+  },
+  {
+   "number": 109,
+   "name": "الكافرون",
+   "englishName": "Al-Kafirun",
+   "type": "مكية",
+   "ayahs": 6
+  },
+  {
+   "number": 110,
+   "name": "النصر",
+   "englishName": "An-Nasr",
+   "type": "مدنية",
+   "ayahs": 3
+  },
+  {
+   "number": 111,
+   "name": "المسد",
+   "englishName": "Al-Masad",
+   "type": "مكية",
+   "ayahs": 5
+  },
+  {
+   "number": 112,
+   "name": "الإخلاص",
+   "englishName": "Al-Ikhlas",
+   "type": "مكية",
+   "ayahs": 4
+  },
+  {
+   "number": 113,
+   "name": "الفلق",
+   "englishName": "Al-Falaq",
+   "type": "مكية",
+   "ayahs": 5
+  },
+  {
+   "number": 114,
+   "name": "الناس",
+   "englishName": "An-Nas",
+   "type": "مكية",
+   "ayahs": 6
+  }
+ ],
+ "reciters": [
+  {
+   "id": "alafasy",
+   "name": "مشاري العفاسي",
+   "servers": [
+    "https://server11.mp3quran.net/afs/",
+    "https://server8.mp3quran.net/afs/",
+    "https://server12.mp3quran.net/afs/"
+   ]
+  },
+  {
+   "id": "dossari",
+   "name": "ياسر الدوسري",
+   "servers": [
+    "https://server11.mp3quran.net/yasser/",
+    "https://server8.mp3quran.net/yasser/",
+    "https://server12.mp3quran.net/yasser/"
+   ]
+  }
+ ]
+}

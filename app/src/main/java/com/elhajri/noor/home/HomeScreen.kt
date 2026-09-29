@@ -5,9 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,14 +44,18 @@ import java.util.Calendar
 import kotlinx.coroutines.delay
 import com.elhajri.noor.ui.NoorGradients
 
-private const val MOSQUE_IMAGE = "https://media.base44.com/images/public/6a9ec57e3a8cd5ed957a8641/8bf461ac2_generated_image.png"
+// صور إسلامية حقيقية من الويب (Wikimedia Commons — صورة كما هي، بلا توليد)
+private const val BANNER_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Night_Lights_In_Esfahan_%28110640535%29.jpeg/1280px-Night_Lights_In_Esfahan_%28110640535%29.jpeg"
+private const val LANTERN_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Ramadan_Lantern_in_the_Rain_Near_the_Ur_Ziggurat.jpg/1280px-Ramadan_Lantern_in_the_Rain_Near_the_Ur_Ziggurat.jpg"
+private const val QURAN_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/The_Holy_Qur%27an_placed_on_a_Rehal_at_the_Abuja_National_Mosque.jpg/1280px-The_Holy_Qur%27an_placed_on_a_Rehal_at_the_Abuja_National_Mosque.jpg"
+private const val MOSQUE_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Mosque_Sidi_Mtir_in_Mahdia.jpg/1280px-Mosque_Sidi_Mtir_in_Mahdia.jpg"
 
 private fun toArabicDigits(value: Any): String {
     val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
     return value.toString().map { map[it] ?: it }.joinToString("")
 }
 
-/** بطاقة الوصول السريع — أيقونة ملوّنة مميزة (على نمط تطبيقات إسلامية عصرية) + عنوان + وصف */
+/** بطاقة الوصول السريع — أيقونة بلون هادئ أنيق (لا ألوان صارخة) */
 private data class GridFeature(
     val route: String,
     val title: String,
@@ -63,8 +64,8 @@ private data class GridFeature(
     val accent: Color
 )
 
-/** محتوى مقترح — بطاقة أفقية بصورة/تدرج + تسمية سفلية */
-private data class ContentSpot(val route: String, val label: String, val gradient: List<Color>, val icon: ImageVector)
+/** محتوى مقترح — صورة إسلامية حقيقية + تسمية سفلية */
+private data class ContentSpot(val route: String, val label: String, val imageUrl: String)
 
 @Composable
 fun HomeScreen(onNavigate: (String) -> Unit) {
@@ -125,26 +126,26 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         }
     }
 
-    // شبكة الوصول السريع — 12 خاصية بأيقونات ملوّنة مميّزة (نمط تطبيقات إسلامية عصرية عالمية)
+    // شبكة الوصول السريع — 12 خاصية بألوان هادئة راقية
     val grid = listOf(
-        GridFeature("quran", "القرآن الكريم", "تلاوة . قراءة . تفسير", Icons.Filled.MenuBook, Color(0xFF4A90E2)),
-        GridFeature("athkar", "الأذكار", "أذكار الصباح والمساء", Icons.Filled.Spa, Color(0xFF3FBF7F)),
-        GridFeature("tasbih", "السبحة", "عدّاد التسبيح", Icons.Filled.RadioButtonUnchecked, Color(0xFF16A5A5)),
-        GridFeature("tracker", "ورد القرآن", "متتبع الختمة", Icons.Filled.TaskAlt, Color(0xFFD9A441)),
-        GridFeature("community", "المجتمع", "تواصل ومشاركة", Icons.Filled.Groups, Color(0xFFE0607E)),
-        GridFeature("ai", "الذكاء الاصطناعي", "اسأل عن دينك", Icons.Filled.AutoAwesome, Color(0xFF7B6FE0)),
-        GridFeature("calendar", "التقويم", "المناسبات الإسلامية", Icons.Filled.EditCalendar, Color(0xFFE0954E)),
-        GridFeature("library", "الأناشيد", "موسيقى إسلامية", Icons.Filled.MusicNote, Color(0xFFB05FD9)),
-        GridFeature("stories", "قصص الأنبياء", "عبر ودروس", Icons.Filled.HistoryEdu, Color(0xFF4EACD9)),
-        GridFeature("quiz", "الاختبار الديني", "أسئلة وأجوبة", Icons.Filled.EmojiEvents, Color(0xFFD9C24E)),
-        GridFeature("qibla", "القبلة", "اتجاه القبلة", Icons.Filled.Explore, Color(0xFF52C97A)),
-        GridFeature("more", "المزيد", "خيارات أخرى", Icons.Filled.GridView, Color(0xFF9AA5B8))
+        GridFeature("quran", "القرآن الكريم", "تلاوة . قراءة", Icons.Filled.MenuBook, Color(0xFF5C7DAF)),
+        GridFeature("athkar", "الأذكار", "أذكار وأدعية", Icons.Filled.Spa, Color(0xFF5C9F7E)),
+        GridFeature("tasbih", "السبحة", "عدّاد التسبيح", Icons.Filled.RadioButtonUnchecked, Color(0xFF4E8F8F)),
+        GridFeature("tracker", "ورد القرآن", "متتبع الختمة", Icons.Filled.TaskAlt, Color(0xFFB89C52)),
+        GridFeature("community", "المجتمع", "تواصل ومشاركة", Icons.Filled.Groups, Color(0xFFB27386)),
+        GridFeature("ai", "المساعد الذكي", "اسأل عن دينك", Icons.Filled.AutoAwesome, Color(0xFF8B7FBF)),
+        GridFeature("calendar", "التقويم", "المناسبات الإسلامية", Icons.Filled.EditCalendar, Color(0xFFB5854E)),
+        GridFeature("library", "الأناشيد", "إسلامية هادئة", Icons.Filled.MusicNote, Color(0xFF9A70B8)),
+        GridFeature("stories", "قصص الأنبياء", "عبر ودروس", Icons.Filled.HistoryEdu, Color(0xFF6E93B8)),
+        GridFeature("quiz", "الاختبار", "أسئلة وأجوبة", Icons.Filled.EmojiEvents, Color(0xFFBFA45C)),
+        GridFeature("qibla", "القبلة", "اتجاه القبلة", Icons.Filled.Explore, Color(0xFF6FA086)),
+        GridFeature("more", "المزيد", "خيارات أخرى", Icons.Filled.GridView, Color(0xFF7C8899))
     )
 
     val contentSpots = listOf(
-        ContentSpot("athkar", "فضل الأذكار", listOf(Color(0xFF1B2B4B), Color(0xFF0B1424)), Icons.Filled.NightsStay),
-        ContentSpot("ai", "كيف تكون أقرب إلى الله؟", listOf(Color(0xFF2B1B4B), Color(0xFF120B24)), Icons.Filled.AutoAwesome),
-        ContentSpot("quran", "تفسير سورة الفاتحة", listOf(Color(0xFF1B3B3B), Color(0xFF0B1F1F)), Icons.Filled.MenuBook)
+        ContentSpot("quran", "القرآن الكريم", QURAN_IMAGE),
+        ContentSpot("athkar", "فضل الأذكار", LANTERN_IMAGE),
+        ContentSpot("stories", "قصص الأنبياء", MOSQUE_IMAGE)
     )
 
     Column(
@@ -154,7 +155,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        // ============= البانر الرئيسي: المسجد + العنوان + آية + جرس =============
+        // ============= البانر: صورة مسجد حقيقية + العنوان + آية =============
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -162,7 +163,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 .clip(RoundedCornerShape(24.dp))
         ) {
             AsyncImage(
-                model = MOSQUE_IMAGE,
+                model = BANNER_IMAGE,
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -176,7 +177,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         )
                     )
             )
-            // جرس الإشعارات
             Box(
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -232,7 +232,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     Spacer(Modifier.width(8.dp))
                     Column {
                         Text("مواقيت الصلاة", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        Text("المغرب ⚲", color = GoldSoft.copy(alpha = 0.7f), fontSize = 10.sp)
+                        Text("الصلاة القادمة", color = GoldSoft.copy(alpha = 0.7f), fontSize = 10.sp)
                     }
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -249,48 +249,49 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
         Spacer(Modifier.height(20.dp))
 
-        // ============= شبكة الوصول السريع 4×3 بأيقونات ملوّنة =============
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
-            modifier = Modifier.fillMaxWidth().height(320.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            gridItems(grid) { feature ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(NavyCard)
-                        .clickable { onNavigate(feature.route) }
-                        .padding(vertical = 12.dp, horizontal = 4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
+        // ============= شبكة الوصول السريع: صفوف ثابتة 4×3 (شبكة يدوية بلا تضمين متداخل) =============
+        grid.chunked(4).forEach { rowFeatures ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                rowFeatures.forEach { feature ->
+                    Column(
                         modifier = Modifier
-                            .size(42.dp)
-                            .clip(RoundedCornerShape(13.dp))
-                            .background(
-                                Brush.verticalGradient(listOf(feature.accent, feature.accent.copy(alpha = 0.65f)))
-                            ),
-                        contentAlignment = Alignment.Center
+                            .weight(1f)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(NavyCard)
+                            .clickable { onNavigate(feature.route) }
+                            .padding(vertical = 12.dp, horizontal = 2.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(feature.icon, contentDescription = feature.title, tint = Color.White, modifier = Modifier.size(20.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(RoundedCornerShape(13.dp))
+                                .background(
+                                    Brush.verticalGradient(listOf(feature.accent, feature.accent.copy(alpha = 0.65f)))
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(feature.icon, contentDescription = feature.title, tint = Color.White, modifier = Modifier.size(20.dp))
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            feature.title, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center, maxLines = 1
+                        )
+                        Text(
+                            feature.subtitle, color = GoldSoft.copy(alpha = 0.55f), fontSize = 8.sp,
+                            textAlign = TextAlign.Center, maxLines = 1
+                        )
                     }
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        feature.title, color = Color.White, fontSize = 10.5.sp, fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center, maxLines = 1
-                    )
-                    Text(
-                        feature.subtitle, color = GoldSoft.copy(alpha = 0.55f), fontSize = 8.5.sp,
-                        textAlign = TextAlign.Center, maxLines = 1
-                    )
                 }
             }
+            Spacer(Modifier.height(10.dp))
         }
 
-        Spacer(Modifier.height(18.dp))
+        Spacer(Modifier.height(10.dp))
 
         // ============= بطاقة استمرار التلاوة =============
         Card(
@@ -344,7 +345,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
         Spacer(Modifier.height(20.dp))
 
-        // ============= أحدث المحتويات — شريط أفقي =============
+        // ============= أحدث المحتويات — صور حقيقية =============
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
             Box(modifier = Modifier.width(3.dp).height(16.dp).background(Gold, RoundedCornerShape(2.dp)))
             Spacer(Modifier.width(8.dp))
@@ -358,12 +359,18 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         .width(150.dp)
                         .height(96.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Brush.verticalGradient(spot.gradient))
                         .clickable { onNavigate(spot.route) }
                 ) {
-                    Icon(
-                        spot.icon, contentDescription = null, tint = Gold.copy(alpha = 0.35f),
-                        modifier = Modifier.align(Alignment.TopEnd).padding(10.dp).size(28.dp)
+                    AsyncImage(
+                        model = spot.imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        modifier = Modifier.fillMaxSize().background(
+                            Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.65f)))
+                        )
                     )
                     Text(
                         spot.label, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold,

@@ -42,6 +42,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.elhajri.noor.ai.AIAssistantScreen
 import com.elhajri.noor.athkar.AthkarDetailScreen
 import com.elhajri.noor.athkar.AthkarScreen
@@ -170,7 +171,7 @@ fun NoorApp() {
                                 selected = selected,
                                 onClick = {
                                     navController.navigate(tab.route) {
-                                        popUpTo("home") { saveState = true }
+                                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                                         launchSingleTop = true
                                         restoreState = true
                                     }
