@@ -12,63 +12,57 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
- * المساعد الذكي — نفس فكرة الكود المصدري (InvokeLLM مع prompt واحد)،
- * مبنية على Google AI Studio (Gemini) بمفتاح المستخدم المجاني:
- * موثوقة وسريعة ولا تعتمد على أي رصيد تكاملات.
+ * المساعد الذكي — نفس أسلوب الكود المصدري (InvokeLLM بسجل المحادثة كاملاً).
+ * مزوّد مجاني بلا مفتاح ولا يستهلك أي رصيد، مع إعادة محاولة عبر نماذج متعددة.
+ * إن أُضيف مفتاح Gemini صالح (AIza...) لاحقاً فهو المسار الأول تلقائياً.
  */
 object AssistantClient {
 
-    private val effectiveKey: String
-        get() = if (com.elhajri.noor.BuildConfig.GEMINI_API_KEY.startsWith("AIza")) com.elhajri.noor.BuildConfig.GEMINI_API_KEY else "Ab8RN6IN0mGQrY0c9iTSyTZ_1Vrh6tjXHbu7z1I4ktosOMTEUw"
-    private const val MODEL = "gemini-2.0-flash"
+    private val geminiKey: String
+        get() {
+            val k = com.elhajri.noor.BuildConfig.GEMINI_API_KEY
+            return if (k != null && k.startsWith("AIza") && k.length > 30) k else ""
+        }
+    private const val GEMINI_MODEL = "gemini-2.0-flash"
+
+    // نماذج مجانية بالترتيب الأفضل أولاً — بلا مفتاح إطلاقاً
+    private val FREE_MODELS = listOf("openai", "openai-fast", "mistral")
 
     private val json = "application/json; charset=utf-8".toMediaType()
     private val http = OkHttpClient.Builder()
-        .connectTimeout(6, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .callTimeout(14, TimeUnit.SECONDS)
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(40, TimeUnit.SECONDS)
+        .callTimeout(45, TimeUnit.SECONDS)
         .build()
 
-    /** مفتاح Gemini صالح فقط إن بدأ بـ AIza (مفتاح Google AI Studio) */
-    private fun hasValidKey() = effectiveKey.startsWith("AIza") && effectiveKey.length > 30
-
-    /**
-     * نفس توقيع الواجهة: systemPrompt + سجل المحادثة (user/model, نص).
-     * المزوّد الأول: Gemini (إن توفر مفتاح صالح) — موثوق وفوري.
-     * المزوّد الاحتياطي: خدمة مجانية بلا مفتاح مع 3 محاولات.
-     */
     fun ask(systemPrompt: String, history: List<Pair<String, String>>): String {
-        if (hasValidKey()) {
-            try {
-                return askGemini(systemPrompt, history)
-            } catch (e: IOException) {
-                if ((e.message ?: "").contains("غير صالح")) {
-                    // مفتاح خاطئ — لا نكرر، انتقل للمزوّد الاحتياطي
-                } else if ((e.message ?: "").contains("الإنترنت")) throw e
-            }
+        // المسار الأول: Gemini إن وُجد مفتاح صالح
+        if (geminiKey.isNotEmpty()) {
+            try { return askGemini(systemPrompt, history) } catch (_: IOException) {}
         }
+        // المسار المجاني: عدة نماذج × جولتان — تحمّل ازدحام الخدمة
         var lastError: IOException? = null
-        for (attempt in 1..2) {
-            try {
-                return askPollinations(systemPrompt, history)
-            } catch (e: IOException) {
-                lastError = e
-                val msg = e.message ?: ""
-                if (msg.contains("الإنترنت")) throw e
-                if (attempt < 2) Thread.sleep(500L)
+        for (round in 1..2) {
+            for (model in FREE_MODELS) {
+                try {
+                    return askPollinations(model, systemPrompt, history)
+                } catch (e: IOException) {
+                    lastError = e
+                    val msg = e.message ?: ""
+                    if (msg.contains("الإنترنت")) throw e
+                }
             }
         }
         throw lastError ?: IOException("🌙 تعذّر الوصول إلى المساعد الذكي. جرّب مرة أخرى بعد قليل.")
     }
 
-    /** خدمة مجانية بلا مفتاح — نفس أسلوب الكود المصدري: prompt واحد بالسجل كاملاً */
-    private fun askPollinations(systemPrompt: String, history: List<Pair<String, String>>): String {
+    /** نموذج مجاني بلا مفتاح — بلا أي ترويسة تصريح (الترويسة الخاطئة تعطّل الخدمة) */
+    private fun askPollinations(model: String, systemPrompt: String, history: List<Pair<String, String>>): String {
         val conversation = history.joinToString("\n") { (role, text) ->
             (if (role == "user") "المستخدم: " else "المساعد: ") + text
         }
-        val prompt = systemPrompt + "\n\n" + conversation + "\n\nالمساعد:"
         val body = JSONObject().apply {
-            put("model", "openai")
+            put("model", model)
             put("messages", JSONArray().apply {
                 put(JSONObject().put("role", "system").put("content", systemPrompt))
                 put(JSONObject().put("role", "user").put("content", conversation + "\n\nالمساعد:"))
@@ -78,20 +72,15 @@ object AssistantClient {
             .url("https://text.pollinations.ai/openai")
             .post(body.toString().toRequestBody(json))
             .build()
-        try {
-            http.newCall(request).execute().use { res ->
-                val text = res.body?.string() ?: throw IOException("استجابة فارغة")
-                if (!res.isSuccessful) throw IOException("الخدمة مشغولة (رمز ${res.code})")
-                val parsed = try { JSONObject(text) } catch (e: org.json.JSONException) {
-                    throw IOException("تنسيق استجابة غير صالح — أعد المحاولة")
-                }.optJSONArray("choices")?.optJSONObject(0)
-                    ?.optJSONObject("message")?.optString("content", "") ?: ""
-                val out = parsed.trim()
-                if (out.isEmpty()) throw IOException("رد فارغ — أعد المحاولة")
-                return out
-            }
-        } catch (e: java.net.UnknownHostException) {
-            throw IOException("🌙 عذرًا، المساعد الذكي يحتاج إلى اتصال بالإنترنت.")
+        http.newCall(request).execute().use { res ->
+            val text = res.body?.string() ?: throw IOException("استجابة فارغة")
+            if (!res.isSuccessful) throw IOException("الخدمة مشغولة (رمز ${res.code})")
+            val parsed = try { JSONObject(text) } catch (_: org.json.JSONException) {
+                throw IOException("تنسيق استجابة غير صالح")
+            }.optJSONArray("choices")?.optJSONObject(0)?.optJSONObject("message")?.optString("content", "") ?: ""
+            val out = parsed.trim()
+            if (out.isEmpty()) throw IOException("رد فارغ من النموذج")
+            return out
         }
     }
 
@@ -106,47 +95,22 @@ object AssistantClient {
                     })
                 }
             })
-            put("generationConfig", JSONObject().apply {
-                put("temperature", 0.7)
-                put("maxOutputTokens", 1024)
-            })
+            put("generationConfig", JSONObject().apply { put("temperature", 0.7); put("maxOutputTokens", 1024) })
         }
-
         val request = Request.Builder()
-            .url("https://generativelanguage.googleapis.com/v1beta/models/$MODEL:generateContent?key=$effectiveKey")
+            .url("https://generativelanguage.googleapis.com/v1beta/models/$GEMINI_MODEL:generateContent?key=$geminiKey")
             .post(body.toString().toRequestBody(json))
             .header("Content-Type", "application/json")
             .build()
-
-        val response = try { http.newCall(request).execute() } catch (e: java.net.UnknownHostException) {
-            throw IOException("🌙 عذرًا، المساعد الذكي يحتاج إلى اتصال بالإنترنت.")
-        } catch (e: IOException) {
-            throw e
-        }
-
-        response.use { res ->
-            val text = res.body?.string() ?: throw IOException("🌙 استجابة فارغة من الخدمة.")
-            if (!res.isSuccessful) {
-                when (res.code) {
-                    400, 403 -> throw IOException("مفتاح المساعد الذكي غير صالح — أعد توليده من Google AI Studio.")
-                    429 -> throw IOException("تم تجاوز حد الطلبات المجانية مؤقتاً — انتظر دقيقة وحاول مجدداً.")
-                    in 500..599 -> throw IOException("الخدمة مشغولة حالياً — أعد المحاولة.")
-                    else -> throw IOException("تعذر الوصول إلى المساعد الذكي (رمز ${res.code}).")
-                }
-            }
-            val root = try { JSONObject(text) } catch (e: org.json.JSONException) {
-                throw IOException("تنسيق استجابة غير صالح من المساعد")
-            }
-            val out = root.optJSONArray("candidates")?.optJSONObject(0)
-                ?.optJSONObject("content")?.optJSONArray("parts")
+        http.newCall(request).execute().use { res ->
+            val text = res.body?.string() ?: throw IOException("استجابة فارغة")
+            if (!res.isSuccessful) throw IOException("مفتاح Gemini غير صالح (رمز ${res.code})")
+            val parts = try { JSONObject(text) } catch (_: org.json.JSONException) { throw IOException("تنسيق غير صالح") }
+                .optJSONArray("candidates")?.optJSONObject(0)?.optJSONObject("content")?.optJSONArray("parts")
             val reply = StringBuilder()
-            out?.let { parts ->
-                for (i in 0 until parts.length()) {
-                    reply.append(parts.optJSONObject(i)?.optString("text", "") ?: "")
-                }
-            }
+            parts?.let { ps -> for (i in 0 until ps.length()) reply.append(ps.optJSONObject(i)?.optString("text", "") ?: "") }
             val result = reply.toString().trim()
-            if (result.isEmpty()) throw IOException("لم يصل رد من المساعد الذكي — أعد المحاولة.")
+            if (result.isEmpty()) throw IOException("لم يصل رد من Gemini")
             return result
         }
     }

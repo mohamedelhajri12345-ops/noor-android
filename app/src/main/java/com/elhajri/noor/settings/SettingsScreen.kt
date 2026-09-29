@@ -44,7 +44,7 @@ fun SettingsScreen() {
 
     Column(modifier = Modifier.fillMaxSize().background(NoorGradients.ScreenBackground).padding(16.dp)) {
         Text("الإعدادات", color = Gold, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Text("النسخة 2.4", color = GoldSoft, fontSize = 12.sp)
+        Text("النسخة 2.5", color = GoldSoft, fontSize = 12.sp)
         Spacer(Modifier.height(16.dp))
 
         Column(modifier = Modifier

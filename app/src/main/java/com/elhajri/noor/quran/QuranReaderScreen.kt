@@ -638,15 +638,6 @@ fun QuranReaderScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                // صورة حية بجانب كل قارئ (ناقلات ذهبية SVG مرسومة يدوياً)
-                                val resId = context.resources.getIdentifier(reciter.image, "drawable", context.packageName)
-                                if (resId != 0) {
-                                    Image(
-                                        painter = painterResource(id = resId),
-                                        contentDescription = reciter.name,
-                                        modifier = Modifier.size(44.dp)
-                                    )
-                                }
                                 Text(
                                     text = reciter.name,
                                     color = if (isSelected) Navy else Color.White,
