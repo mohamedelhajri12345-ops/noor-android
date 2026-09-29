@@ -81,8 +81,9 @@ object AssistantClient {
             http.newCall(request).execute().use { res ->
                 val text = res.body?.string() ?: throw IOException("استجابة فارغة")
                 if (!res.isSuccessful) throw IOException("الخدمة مشغولة (رمز ${res.code})")
-                val parsed = JSONObject(text)
-                    .optJSONArray("choices")?.optJSONObject(0)
+                val parsed = try { JSONObject(text) } catch (e: org.json.JSONException) {
+                    throw IOException("تنسيق استجابة غير صالح — أعد المحاولة")
+                }.optJSONArray("choices")?.optJSONObject(0)
                     ?.optJSONObject("message")?.optString("content", "") ?: ""
                 val out = parsed.trim()
                 if (out.isEmpty()) throw IOException("رد فارغ — أعد المحاولة")
@@ -132,8 +133,10 @@ object AssistantClient {
                     else -> throw IOException("تعذر الوصول إلى المساعد الذكي (رمز ${res.code}).")
                 }
             }
-            val out = JSONObject(text)
-                .optJSONArray("candidates")?.optJSONObject(0)
+            val root = try { JSONObject(text) } catch (e: org.json.JSONException) {
+                throw IOException("تنسيق استجابة غير صالح من المساعد")
+            }
+            val out = root.optJSONArray("candidates")?.optJSONObject(0)
                 ?.optJSONObject("content")?.optJSONArray("parts")
             val reply = StringBuilder()
             out?.let { parts ->

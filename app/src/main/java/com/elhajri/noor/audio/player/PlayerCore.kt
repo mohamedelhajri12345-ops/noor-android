@@ -136,7 +136,6 @@ object PlayerCore : PlayerFacade {
             mp.setDataSource(track.url)
             mp.prepareAsync()
             PlaybackService.start(ctx)
-            startTicking()
         } catch (_: Exception) {
             // رابط ميت أو تهيئة فاشلة → جرب الروابط البديلة كما في الويب
             if (!retryWithFallback()) {
@@ -150,6 +149,8 @@ object PlayerCore : PlayerFacade {
     /** ربط أحداث MediaPlayer — مقابل مستمعات audio.addEventListener في الويب */
     private fun wire(mp: MediaPlayer) {
         mp.setOnPreparedListener { p ->
+            // درع الإلغاء: لو ضغط المستخدم إيقافاً أو تخطى المقطع أثناء التحضير — لا عزف أشباح
+            if (!isLoading && !isBuffering) return@setOnPreparedListener
             // مقابل حدث 'playing' في الويب: ابدأ التشغيل وأوقف حالة التحميل
             isBuffering = false
             isLoading = false
@@ -158,6 +159,7 @@ object PlayerCore : PlayerFacade {
                     p.playbackParams = p.playbackParams.setSpeed(rate)
                 }
                 p.start()
+                startTicking()
             } catch (_: Exception) {}
             publish()
         }
@@ -192,6 +194,13 @@ object PlayerCore : PlayerFacade {
         return try {
             val mp = player ?: return false
             mp.reset()
+            // reset يمسح خصائص الصوت — أعد تطبيقها كما في التشغيل الأولي
+            mp.setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
             mp.setDataSource(url)
             mp.prepareAsync()
             true
@@ -260,6 +269,7 @@ object PlayerCore : PlayerFacade {
                     mp.playbackParams = mp.playbackParams.setSpeed(rate)
                 }
                 mp.start()
+                startTicking()
             }
         } catch (_: Exception) {}
         publish()
@@ -375,7 +385,7 @@ object PlayerCore : PlayerFacade {
             isBuffering = isBuffering,
             isLoading = isLoading,
             sleepTimerActive = sleepRunnable != null || sleepUntilEnd,
-            lastError = error ?: _state.value.lastError
+            lastError = error
         )
     }
 }
