@@ -1,0 +1,382 @@
+{
+ "nasheedCategories": [
+  {
+   "id": "all",
+   "name": "الكل"
+  },
+  {
+   "id": "prophet",
+   "name": "عن النبي ﷺ"
+  },
+  {
+   "id": "religious",
+   "name": "دينية"
+  },
+  {
+   "id": "arabic",
+   "name": "عربية"
+  },
+  {
+   "id": "english",
+   "name": "إنجليزية"
+  },
+  {
+   "id": "occasions",
+   "name": "مناسبات"
+  }
+ ],
+ "nasheeds": [
+  {
+   "id": "p1",
+   "title": "يا نبي سلام عليك",
+   "artist": "بصوت فقط",
+   "duration": "4:00",
+   "category": "prophet",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Ya%20Nabi%20Salam%20Alayka%20(Arabic%20-%20Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "p2",
+   "title": "يا نبي سلام عليك",
+   "artist": "بصوت فقط",
+   "duration": "3:30",
+   "category": "prophet",
+   "url": "https://archive.org/download/mixvocalonlynasheeds/Ya%20Nabi%20Salam%20Alayka%20(Arabic%20-%20Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "p3",
+   "title": "المصطفى",
+   "artist": "Maher Zain",
+   "duration": "3:45",
+   "category": "prophet",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/The%20Chosen%20One%20(Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "p4",
+   "title": "محمد ﷺ",
+   "artist": "بصوت فقط",
+   "duration": "4:20",
+   "category": "prophet",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Muhammad(pbuh)%20-%20Vocal.mp3"
+  },
+  {
+   "id": "p5",
+   "title": "الحبيب",
+   "artist": "بصوت فقط",
+   "duration": "7:24",
+   "category": "prophet",
+   "url": "https://archive.org/download/mixvocalonlynasheeds/Al-Habib.mp3"
+  },
+  {
+   "id": "p6",
+   "title": "يا نبي سلام عليك",
+   "artist": "منشد",
+   "duration": "3:00",
+   "category": "prophet",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/10__Ya_nabi_salam_Alayka.mp3"
+  },
+  {
+   "id": "r1",
+   "title": "يا الله",
+   "artist": "منشد",
+   "duration": "4:10",
+   "category": "religious",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/04__Arabic__01__Ya_Allah.mp3"
+  },
+  {
+   "id": "r2",
+   "title": "سبحان الله",
+   "artist": "Maher Zain",
+   "duration": "3:20",
+   "category": "religious",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Subhana%20Allah%20(Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "r3",
+   "title": "اشكر الله",
+   "artist": "Maher Zain",
+   "duration": "3:50",
+   "category": "religious",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Thank%20You%20Allah%20(Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "r4",
+   "title": "إن شاء الله",
+   "artist": "Maher Zain",
+   "duration": "4:00",
+   "category": "religious",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Insha%20Allah%20(Arabic%20-%20Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "r5",
+   "title": "الله الله",
+   "artist": "بصوت فقط",
+   "duration": "3:30",
+   "category": "religious",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Allahi%20Allah%20Kiya%20Karo%20(Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "r6",
+   "title": "اللهم",
+   "artist": "منشد",
+   "duration": "1:10",
+   "category": "religious",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/Allahumma.mp3"
+  },
+  {
+   "id": "r7",
+   "title": "افتح عينيك",
+   "artist": "Maher Zain",
+   "duration": "3:40",
+   "category": "religious",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Open%20Your%20Eyes%20(Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "r8",
+   "title": "كن دائماً هناك",
+   "artist": "Maher Zain",
+   "duration": "3:25",
+   "category": "religious",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Always%20Be%20There%20(Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "r9",
+   "title": "ادعُ الله",
+   "artist": "Muhabbat",
+   "duration": "3:15",
+   "category": "religious",
+   "url": "https://archive.org/download/nasheeds2021/Call%20on%20Allah%20by%20Muhabbat%20(Vocal%20Only%20Nasheed).mp3"
+  },
+  {
+   "id": "r10",
+   "title": "يا إلهي",
+   "artist": "Muad",
+   "duration": "3:45",
+   "category": "religious",
+   "url": "https://archive.org/download/nasheeds2021/MUAD%20-%20YA%20ILAHI%20(VOCALS%20ONLY)(1).mp3"
+  },
+  {
+   "id": "r11",
+   "title": "نبض القلب",
+   "artist": "Muad",
+   "duration": "3:00",
+   "category": "religious",
+   "url": "https://archive.org/download/nasheeds2021/MUAD%20-%20HEARTBEAT%20(VOCALS%20ONLY).mp3"
+  },
+  {
+   "id": "r12",
+   "title": "الله أعنّي",
+   "artist": "Omar Esa",
+   "duration": "3:30",
+   "category": "religious",
+   "url": "https://archive.org/download/nasheeds2021/Omar%20Esa%20-%20Allah%20Help%20Me%20(Official%20Nasheed%20Video)%20-%20Vocals%20Only.mp3"
+  },
+  {
+   "id": "r13",
+   "title": "سبحان الله",
+   "artist": "منشد",
+   "duration": "2:45",
+   "category": "religious",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/Ad3ook__01__Sob7aan_Allah.mp3"
+  },
+  {
+   "id": "r14",
+   "title": "اشكر الله",
+   "artist": "Muhabbat",
+   "duration": "3:20",
+   "category": "religious",
+   "url": "https://archive.org/download/nasheeds2021/Thank%20you%20Allah%20by%20Muhabbat%20(Vocal%20Only%20Nasheed).mp3"
+  },
+  {
+   "id": "a1",
+   "title": "القدس",
+   "artist": "منشد",
+   "duration": "1:45",
+   "category": "arabic",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/Alquods.mp3"
+  },
+  {
+   "id": "a2",
+   "title": "الأنصار",
+   "artist": "منشد",
+   "duration": "1:30",
+   "category": "arabic",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/Ansaar.MP3"
+  },
+  {
+   "id": "a3",
+   "title": "أأثروني",
+   "artist": "منشد",
+   "duration": "5:00",
+   "category": "arabic",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/Aetheroeny.mp3"
+  },
+  {
+   "id": "a4",
+   "title": "النصر الطوالي",
+   "artist": "منشد",
+   "duration": "6:20",
+   "category": "arabic",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/Alnasar%20Ul%20Tuwali.mp3"
+  },
+  {
+   "id": "a5",
+   "title": "أسد الأقصى",
+   "artist": "منشد",
+   "duration": "3:40",
+   "category": "arabic",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/Asad%20Ul%20Aqsa.mp3"
+  },
+  {
+   "id": "a6",
+   "title": "زيد الوفاء",
+   "artist": "منشد",
+   "duration": "2:15",
+   "category": "arabic",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/1zayed_al_wafaa2.mp3"
+  },
+  {
+   "id": "a7",
+   "title": "الله أكبر",
+   "artist": "منشد",
+   "duration": "4:20",
+   "category": "arabic",
+   "url": "https://archive.org/download/arabia-nasheeds-karisik/Allah%20Allahu%20Akbar.mp3"
+  },
+  {
+   "id": "e1",
+   "title": "أمتي",
+   "artist": "Maher Zain",
+   "duration": "4:10",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Maher%20Zain%20-%20Ummati%20(English)%20-%20%D9%85%D8%A7%D9%87%D8%B1%20%D8%B2%D9%8A%D9%86%20-%20(Vocals%20Only%20-%20%D8%A8%D8%AF%D9%88%D9%86%20%D9%85%D9%88%D8%B3%D9%8A%D9%82%D9%89)%20-%20Official%20Lyric%20Video.mp3"
+  },
+  {
+   "id": "e2",
+   "title": "المدينة",
+   "artist": "Maher Zain",
+   "duration": "3:50",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Maher%20Zain%20-%20Medina%20-%20%D9%85%D8%A7%D9%87%D8%B1%20%D8%B2%D9%8A%D9%86%20-%20(Vocals%20Only%20-%20%D8%A8%D8%AF%D9%88%D9%86%20%D9%85%D9%88%D8%B3%D9%8A%D9%82%D9%89)%20-%20Official%20Lyric%20Video.mp3"
+  },
+  {
+   "id": "e3",
+   "title": "أنا حي",
+   "artist": "Maher Zain & Atif Aslam",
+   "duration": "3:30",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Maher%20Zain%20%26%20Atif%20Aslam%20-%20I'm%20Alive%20-%20(Vocals%20Only%20-%20%D8%A8%D8%AF%D9%88%D9%86%20%D9%85%D9%88%D8%B3%D9%8A%D9%82%D9%89)%20-%20Official%20Music%20Video.mp3"
+  },
+  {
+   "id": "e4",
+   "title": "تجرؤ على الإيمان",
+   "artist": "Zain Bhikha",
+   "duration": "4:00",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Dare%20To%20Believe%20(Voice-Only)%20-%20Zain%20Bhikha%20ft.%20Taariq%20Uwais%20Malinga%2C%20Aaliyah%20Kara%2C%20Islamic%20Relif.mp3"
+  },
+  {
+   "id": "e5",
+   "title": "استيقظ",
+   "artist": "Maher Zain",
+   "duration": "3:20",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Awaken%20(Vocals%20Only%20Version).mp3"
+  },
+  {
+   "id": "e6",
+   "title": "مبارك",
+   "artist": "Ilyas Mao",
+   "duration": "3:15",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Ilyas%20Mao%20-%20Blessed%20(Vocals-Only%20Nasheed).mp3"
+  },
+  {
+   "id": "e7",
+   "title": "أنت الجديد",
+   "artist": "Ilyas Mao",
+   "duration": "3:00",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Ilyas%20Mao%20-%20New%20You%20(Vocals-Only%20Nasheed).mp3"
+  },
+  {
+   "id": "e8",
+   "title": "العالم مشتعل",
+   "artist": "Siedd",
+   "duration": "3:25",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Siedd%20-%20World%20On%20Fire%20%5BOfficial%20Nasheed%20Video%5D%20-%20Vocals%20Only.mp3"
+  },
+  {
+   "id": "e9",
+   "title": "شخصٌ مثلك",
+   "artist": "Siedd",
+   "duration": "3:10",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Siedd%20-%20Someone%20Just%20Like%20This%20(Official%20Nasheed%20Video)%20Vocals%20Only%20(2).mp3"
+  },
+  {
+   "id": "e10",
+   "title": "حين تَصعُب الأوقات",
+   "artist": "Native Deen",
+   "duration": "3:40",
+   "category": "english",
+   "url": "https://archive.org/download/mixvocalonlynasheeds/When%20Times%20Are%20Rough%20%E2%80%93%20Voice%20Only%20%E2%80%93%20Native%20Deen%20(A.%20Malik).mp3"
+  },
+  {
+   "id": "e11",
+   "title": "لنصلِّ",
+   "artist": "Omar Esa",
+   "duration": "3:36",
+   "category": "english",
+   "url": "https://archive.org/download/mixvocalonlynasheeds/'Lets%20Pray'%20by%20Omar%20Esa%20(%401omaresa).mp3"
+  },
+  {
+   "id": "e12",
+   "title": "أغنية لأخي",
+   "artist": "بصوت فقط",
+   "duration": "3:06",
+   "category": "english",
+   "url": "https://archive.org/download/mixvocalonlynasheeds/A%20Song%20For%20My%20Brother%20Fouseytube.mp3"
+  },
+  {
+   "id": "e13",
+   "title": "إن شاء الله",
+   "artist": "Maher Zain",
+   "duration": "4:00",
+   "category": "english",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Insha%20Allah%20(English%20-%20Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "o1",
+   "title": "بارك الله لكما",
+   "artist": "Maher Zain",
+   "duration": "3:30",
+   "category": "occasions",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Baraka%20Allahu%20Lakuma%20(Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "o2",
+   "title": "نشيد الزفاف",
+   "artist": "Omar Esa",
+   "duration": "3:45",
+   "category": "occasions",
+   "url": "https://archive.org/download/mixvocalonlynasheeds/'The%20Wedding%20Nasheed'%20Official%20Video%20-%20Omar%20Esa%20(%401omaresa).mp3"
+  },
+  {
+   "id": "o3",
+   "title": "لِبقية حياتي",
+   "artist": "Maher Zain",
+   "duration": "4:00",
+   "category": "occasions",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/For%20the%20Rest%20of%20My%20Life%20(Vocals%20Only%20Versio).mp3"
+  },
+  {
+   "id": "o4",
+   "title": "أمسك يدي",
+   "artist": "Maher Zain",
+   "duration": "3:20",
+   "category": "occasions",
+   "url": "https://archive.org/download/NASHEEDNEW_201803/Hold%20My%20Hand%20(Vocals%20Only%20Version).mp3"
+  }
+ ]
+}
