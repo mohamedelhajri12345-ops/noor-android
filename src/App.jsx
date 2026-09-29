@@ -42,7 +42,6 @@ const Login = React.lazy(() => import('@/pages/Login'));
 const Register = React.lazy(() => import('@/pages/Register'));
 const ForgotPassword = React.lazy(() => import('@/pages/ForgotPassword'));
 const ResetPassword = React.lazy(() => import('@/pages/ResetPassword'));
-const SourceExport = React.lazy(() =>
 
 function App() {
   const [showSplash, setShowSplash] = useState(() => !sessionStorage.getItem('nur_splash_shown'));
