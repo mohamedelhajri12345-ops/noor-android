@@ -28,10 +28,10 @@ val AmiriFamily = FontFamily(
 // الأسماء نفسها حتى تتجدد كل الشاشات تلقائياً
 // ============================================================================
 val Navy = Color(0xFF070B14)              // أبنوس مخملي عميق (كان 0B1B3A)
-val NavyLight = Color(0xFF121B2E)         // كحلي ملكي راقٍ
-val NavyCard = Color(0xFF16233C)          // سطح البطاقات الملكي الجديد
-val Gold = Color(0xFFE5C158)              // ذهب إمبراطوري مشرق (كان D4AF37)
-val GoldSoft = Color(0xFFF3E5AB)          // ذهب شمباني فاتح
+val NavyLight = Color(0xFF152238)         // كحلي ملكي أدفأ
+val NavyCard = Color(0xFF1B2B4B)          // بطاقات أفتح وضوحاً
+val Gold = Color(0xFFF0C75E)              // ذهب شمبانيا متوهج — تباين أعلى
+val GoldSoft = Color(0xFFFFE9B8)          // ذهب فاتح مشع
 val TextMain = Color(0xFFFAF8F5)          // أبيض لؤلؤي دافئ
 val ChampagneGold = Color(0xFFF3E5AB)
 val ImperialGold = Color(0xFFE5C158)

@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit
  */
 object AssistantClient {
 
-    private const val API_KEY = "__GEMINI_KEY__"
+    private val effectiveKey: String
+        get() = if (com.elhajri.noor.BuildConfig.GEMINI_API_KEY.startsWith("AIza")) com.elhajri.noor.BuildConfig.GEMINI_API_KEY else "Ab8RN6IN0mGQrY0c9iTSyTZ_1Vrh6tjXHbu7z1I4ktosOMTEUw"
     private const val MODEL = "gemini-2.0-flash"
 
     private val json = "application/json; charset=utf-8".toMediaType()
@@ -28,7 +29,7 @@ object AssistantClient {
         .build()
 
     /** مفتاح Gemini صالح فقط إن بدأ بـ AIza (مفتاح Google AI Studio) */
-    private fun hasValidKey() = API_KEY.startsWith("AIza") && API_KEY.length > 30
+    private fun hasValidKey() = effectiveKey.startsWith("AIza") && effectiveKey.length > 30
 
     /**
      * نفس توقيع الواجهة: systemPrompt + سجل المحادثة (user/model, نص).
@@ -110,7 +111,7 @@ object AssistantClient {
         }
 
         val request = Request.Builder()
-            .url("https://generativelanguage.googleapis.com/v1beta/models/$MODEL:generateContent?key=$API_KEY")
+            .url("https://generativelanguage.googleapis.com/v1beta/models/$MODEL:generateContent?key=$effectiveKey")
             .post(body.toString().toRequestBody(json))
             .header("Content-Type", "application/json")
             .build()
