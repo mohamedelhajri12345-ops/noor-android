@@ -268,12 +268,13 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
         // ============= شريط مواقيت الصلاة =============
         val prayerInteraction = remember { MutableInteractionSource() }
+        val prayerScale = pressScale(prayerInteraction)
         Card(
             colors = CardDefaults.cardColors(containerColor = NavyCard),
             shape = RoundedCornerShape(18.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .graphicsLayer { scaleX = pressScale(prayerInteraction); scaleY = pressScale(prayerInteraction) }
+                .graphicsLayer { scaleX = prayerScale; scaleY = prayerScale }
                 .clickable(interactionSource = prayerInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate("prayer") }
         ) {
             Row(
@@ -311,10 +312,11 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             ) {
                 rowFeatures.forEach { feature ->
                     val tileInteraction = remember(feature.route) { MutableInteractionSource() }
+                    val tileScale = pressScale(tileInteraction)
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .graphicsLayer { scaleX = pressScale(tileInteraction); scaleY = pressScale(tileInteraction) }
+                            .graphicsLayer { scaleX = tileScale; scaleY = tileScale }
                             .clip(RoundedCornerShape(16.dp))
                             .background(NavyCard)
                             .clickable(interactionSource = tileInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate(feature.route) }
@@ -351,12 +353,13 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
         // ============= بطاقة استمرار التلاوة =============
         val continueInteraction = remember { MutableInteractionSource() }
+        val continueScale = pressScale(continueInteraction)
         Card(
             colors = CardDefaults.cardColors(containerColor = NavyCard),
             shape = RoundedCornerShape(22.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .graphicsLayer { scaleX = pressScale(continueInteraction); scaleY = pressScale(continueInteraction) }
+                .graphicsLayer { scaleX = continueScale; scaleY = continueScale }
                 .clickable(interactionSource = continueInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate("quran") }
         ) {
             Row(
@@ -415,11 +418,12 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(contentSpots) { spot ->
                 val spotInteraction = remember(spot.route) { MutableInteractionSource() }
+                val spotScale = pressScale(spotInteraction)
                 Box(
                     modifier = Modifier
                         .width(150.dp)
                         .height(96.dp)
-                        .graphicsLayer { scaleX = pressScale(spotInteraction); scaleY = pressScale(spotInteraction) }
+                        .graphicsLayer { scaleX = spotScale; scaleY = spotScale }
                         .clip(RoundedCornerShape(16.dp))
                         .clickable(interactionSource = spotInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate(spot.route) }
                 ) {

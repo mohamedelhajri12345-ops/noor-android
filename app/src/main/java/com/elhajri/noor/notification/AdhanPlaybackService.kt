@@ -82,16 +82,16 @@ class AdhanPlaybackService : Service() {
                         afd.close()
                         setOnPreparedListener { player ->
                             player.start()
-                            isPlaying = true
+                            AdhanPlaybackService.isPlaying = true
                             startForeground(NOTIF_ID, buildNotification())
                         }
                         setOnCompletionListener {
-                            isPlaying = false
+                            AdhanPlaybackService.isPlaying = false
                             stopForeground(STOP_FOREGROUND_REMOVE)
                             stopSelf()
                         }
                         setOnErrorListener { _, _, _ ->
-                            isPlaying = false
+                            AdhanPlaybackService.isPlaying = false
                             stopForeground(STOP_FOREGROUND_REMOVE)
                             stopSelf()
                             true
@@ -100,7 +100,7 @@ class AdhanPlaybackService : Service() {
                     }
                     mediaPlayer = mp
                 } catch (_: Exception) {
-                    isPlaying = false
+                    AdhanPlaybackService.isPlaying = false
                     stopSelf()
                 }
                 // إن تأخر التجهيز: التزام شرط startForegroundService
