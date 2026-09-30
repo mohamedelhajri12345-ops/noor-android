@@ -1,13 +1,15 @@
 package com.elhajri.noor.web
 
 import android.annotation.SuppressLint
+import android.graphics.Color as AndroidColor
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,35 +30,38 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.draw.alpha
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
+import kotlinx.coroutines.delay
 
 /**
  * NoorWebView — نافذة ويب احترافية لصفحات الموقع الأصلي (holyquran2).
  *
- * تقنياً: تعرض صفحة الموقع كما هي حرفياً (نفس ديزاين الكود المصدري) داخل التطبيق،
- * مع إخفاء "الشريط العلوي" و"شريط التنقل السفلي" الخاصين بالموقع عبر حقن CSS،
- * لأن التطبيق يوفر شريطه الخاص في الأعلى والأسفل — فتبقى الواجهة نظيفة غير مزدوجة.
+ * تُعرض صفحة الموقع كما هي حرفياً (نفس ديزاين الكود المصدري) داخل التطبيق،
+ * لكن بطريقة "جزء من التطبيق" وليس متصفحاً:
  *
- * المزايا الاحترافية:
- * 1. مؤشر تحميل ذهبي أنيق أثناء جلب الصفحة.
- * 2. شاشة خطأ مع زر إعادة المحاولة عند انقطاع الاتصال.
- * 3. زر الرجوع في شريط عنوان اختياري أنيق (للصفحات غير الرئيسية).
- * 4. زر الرجوع في النظام يتنقل داخل تاريخ الويب بدل الخروج من الشاشة.
- * 5. حفظ حالة التمرير والحفظ المؤقت بين التنقلات.
+ * 1. تُقطع لحظة صفحة الهبوط/السبلاش الخاصة بالموقع كلياً: غطاء تحميل أصلي معتم
+ *    يغطي الشاشة حتى يكتمل التحميل ويُطبَّق إخفاء السبلاش، ثم يتلاشى بنعمة.
+ * 2. تُخفى واجهة الموقع العلوية والسفلية وأشرطته عبر حقن CSS، لأن التطبيق
+ *    يوفر شريطه الخاص — فلا توجد أشرطة مزدوجة.
+ * 3. تُخفى عناصر "الموقع-في-المتصفح": إشعار "تفعيل الإشعارات"، إعلان حالة
+ *    الاتصال، أشرطة التمرير، وهالة لمس الروابط — فيبدو محتوى الويب أصيلاً.
+ * 4. زر الرجوع في النظام يتنقل داخل تاريخ الصفحات كأي تطبيق محترم.
+ * 5. شاشة خطأ أنيقة مع زر إعادة المحاولة عند انقطاع الاتصال.
  */
 object NoorWeb {
     const val BASE = "https://holyquran2.base44.app"
@@ -65,18 +70,25 @@ object NoorWeb {
     const val ASSISTANT = "$BASE/assistant"
 
     /**
-     * حقن CSS يخفي واجهة الموقع العلوية والسفلية بشرط واحد:
-     * يُنفَّذ عدة مرات (عند البدء والانتهاء من التحميل) لأن الموقع تطبيق صفحة واحدة
-     * يعيد بناء عناصره ديناميكياً.
+     * حقن CSS: يُطبَّق مرات عدة (عند أول ظهور للصفحة وعند اكتمال التحميل)
+     * لأن الموقع تطبيق صفحة واحدة يعيد بناء عناصره ديناميكياً.
      */
     val hideSiteChromeJs: String = """
         (function(){
             function apply(){
+                if(document.getElementById('noor-native-chrome')) return;
                 var css = 'header.sticky.top-0.z-40{display:none!important}'
                         + 'nav.fixed.bottom-0.z-40{display:none!important}'
                         + 'main.pb-28{padding-bottom:8px!important}'
-                        + 'body{overscroll-behavior-y:contain!important}';
-                if(document.getElementById('noor-native-chrome')) return;
+                        // سبلاش الموقع — تُقطع كلياً: التطبيق يعرض شاشة تحميله الخاصة
+                        + 'div.fixed.inset-0.z-50.flex.flex-col.items-center.justify-center{display:none!important}'
+                        // عناصر "الموقع-في-المتصفح" التي لا معنى لها داخل التطبيق
+                        + 'div.fixed.bottom-20.z-50{display:none!important}'
+                        + 'div.fixed.top-16.z-50{display:none!important}'
+                        // مظهر أصيل: بدون أشرطة تمرير ولا هالة لمس
+                        + '::-webkit-scrollbar{display:none!important}'
+                        + 'html{overscroll-behavior:none;-webkit-tap-highlight-color:transparent!important}'
+                        + 'body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent!important}';
                 var s = document.createElement('style');
                 s.id = 'noor-native-chrome';
                 s.textContent = css;
@@ -100,14 +112,30 @@ fun NoorWebView(
     modifier: Modifier = Modifier
 ) {
     var isLoading by remember { mutableStateOf(true) }
+    var settling by remember { mutableStateOf(false) }
     var hasError by remember { mutableStateOf(false) }
     val webView = remember { mutableStateOf<WebView?>(null) }
 
-    // الرجوع داخل تاريخ الويب أولاً — كأي متصفح محترم
+    // الرجوع داخل تاريخ الويب أولاً — كأي تطبيق محترم
     BackHandler(enabled = true) {
         val wv = webView.value
         if (wv != null && wv.canGoBack()) wv.goBack() else onBack?.invoke()
     }
+
+    // بعد اكتمال التحميل: مهلة قصيرة ليرتّب SPA صفحته ويُطبَّق إخفاء السبلاش،
+    // ثم يتلاشى غطاء التحميل بنعمة — فلا تظهر لحظة صفحة هبوط أبداً
+    LaunchedEffect(settling) {
+        if (settling) {
+            delay(700)
+            settling = false
+        }
+    }
+
+    val overlayAlpha by animateFloatAsState(
+        targetValue = if (isLoading || settling) 1f else 0f,
+        animationSpec = tween(350),
+        label = "overlayFade"
+    )
 
     Column(modifier = modifier.fillMaxSize().background(Navy)) {
         // شريط عنوان اختياري رفيع وأنيق — فقط للصفحات غير الرئيسية (مثل المساعد الذكي)
@@ -141,12 +169,18 @@ fun NoorWebView(
                 modifier = Modifier.fillMaxSize(),
                 factory = { ctx ->
                     WebView(ctx).apply {
+                        // خلفية بحريّة مطابقة لمظهر التطبيق — لا وميض أبيض عند الفتح
+                        setBackgroundColor(AndroidColor.parseColor("#0A0F1A"))
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
                         settings.loadWithOverviewMode = true
                         settings.useWideViewPort = true
                         settings.setSupportZoom(false)
                         settings.mediaPlaybackRequiresUserGesture = false
+                        // مظهر أصيل: لا أشرطة تمرير ولا مرونة سحب متصفح
+                        isVerticalScrollBarEnabled = false
+                        isHorizontalScrollBarEnabled = false
+                        overScrollMode = android.view.View.OVER_SCROLL_NEVER
                         webViewClient = object : WebViewClient() {
                             override fun onPageStarted(
                                 view: WebView?, url: String?,
@@ -154,11 +188,17 @@ fun NoorWebView(
                             ) {
                                 isLoading = true
                                 hasError = false
+                                settling = false
+                            }
+
+                            // أول لحظة ظهور للصفحة: احقن الإخفاء مبكراً قدر الإمكان
+                            override fun onPageCommitVisible(view: WebView?, url: String?) {
+                                view?.evaluateJavascript(NoorWeb.hideSiteChromeJs, null)
                             }
 
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 isLoading = false
-                                // إخفاء واجهة الموقع العلوية/السفلية فور اكتمال التحميل
+                                settling = true
                                 view?.evaluateJavascript(NoorWeb.hideSiteChromeJs, null)
                             }
 
@@ -171,21 +211,23 @@ fun NoorWebView(
                                 if (request?.isForMainFrame == true) {
                                     hasError = true
                                     isLoading = false
+                                    settling = false
                                 }
                             }
                         }
                         webView.value = this
                         loadUrl(url)
                     }
-                },
+                }
             )
 
-            // مؤشر تحميل ذهبي أنيق
-            if (isLoading && !hasError) {
+            // غطاء التحميل الأصلي المعتم — يقطع صفحة الهبوط الخاصة بالموقع كلياً
+            if (overlayAlpha > 0.01f) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Navy.copy(alpha = 0.85f)),
+                        .alpha(overlayAlpha)
+                        .background(Navy),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -206,7 +248,7 @@ fun NoorWebView(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
                     ) {
                         Icon(
                             Icons.Filled.WifiOff,
@@ -232,6 +274,7 @@ fun NoorWebView(
                             onClick = {
                                 hasError = false
                                 isLoading = true
+                                settling = false
                                 webView.value?.reload()
                             },
                             colors = ButtonDefaults.buttonColors(
