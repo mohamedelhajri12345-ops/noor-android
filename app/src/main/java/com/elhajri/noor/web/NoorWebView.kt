@@ -149,13 +149,14 @@ fun NoorWebView(
                         settings.mediaPlaybackRequiresUserGesture = false
                         webViewClient = object : WebViewClient() {
                             override fun onPageStarted(
-                                view: WebView?, request: WebResourceRequest?
+                                view: WebView?, url: String?,
+                                favicon: android.graphics.Bitmap?
                             ) {
                                 isLoading = true
                                 hasError = false
                             }
 
-                            override fun onPageFinished(view: WebView?, request: WebResourceRequest?) {
+                            override fun onPageFinished(view: WebView?, url: String?) {
                                 isLoading = false
                                 // إخفاء واجهة الموقع العلوية/السفلية فور اكتمال التحميل
                                 view?.evaluateJavascript(NoorWeb.hideSiteChromeJs, null)
