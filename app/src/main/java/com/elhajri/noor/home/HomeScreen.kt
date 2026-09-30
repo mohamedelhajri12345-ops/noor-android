@@ -43,6 +43,14 @@ import com.elhajri.noor.ui.NavyLight
 import java.util.Calendar
 import kotlinx.coroutines.delay
 import com.elhajri.noor.ui.NoorGradients
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 
 // صور إسلامية حقيقية من الويب (Wikimedia Commons — صورة كما هي، بلا توليد)
 private const val BANNER_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Night_Lights_In_Esfahan_%28110640535%29.jpeg/1280px-Night_Lights_In_Esfahan_%28110640535%29.jpeg"
@@ -67,10 +75,35 @@ private data class GridFeature(
 /** محتوى مقترح — صورة إسلامية حقيقية + تسمية سفلية */
 private data class ContentSpot(val route: String, val label: String, val imageUrl: String)
 
+
+/** تغغير حجم لطيف عند الضغط — إحساس لمس احترافي */
+@Composable
+private fun pressScale(interactionSource: MutableInteractionSource): Float {
+    val pressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (pressed) 0.95f else 1f,
+        animationSpec = tween(120, easing = FastOutSlowInEasing),
+        label = "pressScale"
+    )
+    return scale
+}
+
 @Composable
 fun HomeScreen(onNavigate: (String) -> Unit) {
     val context = LocalContext.current
     val timings = remember { PrayerRepository.getCachedTimings(context) }
+    val entrance = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        entrance.animateTo(1f, tween(650, easing = FastOutSlowInEasing))
+    }
+    // تحية دافئة حسب وقت اليوم — لمسة إنسانية
+    val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
+    val greeting = when {
+        hour < 5 -> "أسعد الله ليلك"
+        hour < 12 -> "صباح الخير، صباح النور"
+        hour < 17 -> "طاب نهارك"
+        else -> "مساء الخير، مساء النور"
+    }
 
     var nextPrayerName by remember { mutableStateOf("...") }
     var nextPrayerTimeLabel by remember { mutableStateOf("") }
@@ -153,8 +186,25 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             .fillMaxSize()
             .background(NoorGradients.ScreenBackground)
             .verticalScroll(rememberScrollState())
+            .graphicsLayer {
+                alpha = entrance.value
+                translationY = (1f - entrance.value) * 44f
+            }
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
+        // ============= تحية دافئة حسب وقت اليوم =============
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text("السلام عليكم ورحمة الله", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = com.elhajri.noor.ui.AmiriFamily)
+                Text(greeting, color = GoldSoft, fontSize = 12.sp)
+            }
+            Icon(Icons.Filled.WbSunny, contentDescription = null, tint = Gold.copy(alpha = 0.75f), modifier = Modifier.size(22.dp))
+        }
+
         // ============= البانر: صورة مسجد حقيقية + العنوان + آية =============
         Box(
             modifier = Modifier
@@ -217,10 +267,14 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         Spacer(Modifier.height(14.dp))
 
         // ============= شريط مواقيت الصلاة =============
+        val prayerInteraction = remember { MutableInteractionSource() }
         Card(
             colors = CardDefaults.cardColors(containerColor = NavyCard),
             shape = RoundedCornerShape(18.dp),
-            modifier = Modifier.fillMaxWidth().clickable { onNavigate("prayer") }
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer { scaleX = pressScale(prayerInteraction); scaleY = pressScale(prayerInteraction) }
+                .clickable(interactionSource = prayerInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate("prayer") }
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
@@ -256,12 +310,14 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 rowFeatures.forEach { feature ->
+                    val tileInteraction = remember(feature.route) { MutableInteractionSource() }
                     Column(
                         modifier = Modifier
                             .weight(1f)
+                            .graphicsLayer { scaleX = pressScale(tileInteraction); scaleY = pressScale(tileInteraction) }
                             .clip(RoundedCornerShape(16.dp))
                             .background(NavyCard)
-                            .clickable { onNavigate(feature.route) }
+                            .clickable(interactionSource = tileInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate(feature.route) }
                             .padding(vertical = 12.dp, horizontal = 2.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -294,10 +350,14 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         Spacer(Modifier.height(10.dp))
 
         // ============= بطاقة استمرار التلاوة =============
+        val continueInteraction = remember { MutableInteractionSource() }
         Card(
             colors = CardDefaults.cardColors(containerColor = NavyCard),
             shape = RoundedCornerShape(22.dp),
-            modifier = Modifier.fillMaxWidth().clickable { onNavigate("quran") }
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer { scaleX = pressScale(continueInteraction); scaleY = pressScale(continueInteraction) }
+                .clickable(interactionSource = continueInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate("quran") }
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -354,12 +414,14 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         Spacer(Modifier.height(10.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             items(contentSpots) { spot ->
+                val spotInteraction = remember(spot.route) { MutableInteractionSource() }
                 Box(
                     modifier = Modifier
                         .width(150.dp)
                         .height(96.dp)
+                        .graphicsLayer { scaleX = pressScale(spotInteraction); scaleY = pressScale(spotInteraction) }
                         .clip(RoundedCornerShape(16.dp))
-                        .clickable { onNavigate(spot.route) }
+                        .clickable(interactionSource = spotInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate(spot.route) }
                 ) {
                     AsyncImage(
                         model = spot.imageUrl,

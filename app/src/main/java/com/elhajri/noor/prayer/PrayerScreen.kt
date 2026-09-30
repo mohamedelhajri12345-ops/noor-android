@@ -1,7 +1,6 @@
 package com.elhajri.noor.prayer
 
 import android.media.AudioAttributes
-import android.media.MediaPlayer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -55,7 +54,6 @@ fun PrayerScreen() {
     var timings by remember { mutableStateOf<PrayerTimings?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var isAdhanPlaying by remember { mutableStateOf(false) }
-    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
     var isAdhanEnabled by remember { mutableStateOf(Prefs.getAdhanEnabled(context)) }
 
     var nextPrayerName by remember { mutableStateOf("...") }
@@ -69,14 +67,15 @@ fun PrayerScreen() {
     }
 
     DisposableEffect(Unit) {
-        onDispose {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-        }
+        onDispose { }
     }
 
     LaunchedEffect(timings) {
         while (true) {
+            // مزامنة الواجهة مع الخدمة: اكتمل الأذان في الخلفية → يعود الزر لطبيعته
+            if (isAdhanPlaying && !com.elhajri.noor.notification.AdhanPlaybackService.isPlaying) {
+                isAdhanPlaying = false
+            }
             timings?.let { t ->
                 val now = Calendar.getInstance()
                 val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
@@ -144,39 +143,15 @@ fun PrayerScreen() {
         }
     }
 
-    val playAdhanUrl = "https://cdn.islamic.network/cdn/azan/audio/adhan_makkah.mp3"
-
+    // الأذان الآن عبر خدمة أمامية احترافية: ملف محلي = تشغيل فوري،
+    // إشعار أنيق بأيقونة التطبيق وزر إيقاف، ويستمر حتى لو خرج المستخدم من التطبيق
     fun toggleAdhanAudio() {
         if (isAdhanPlaying) {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
+            com.elhajri.noor.notification.AdhanPlaybackService.stop(context)
             isAdhanPlaying = false
         } else {
-            try {
-                val mp = MediaPlayer().apply {
-                    setAudioAttributes(
-                        AudioAttributes.Builder()
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .build()
-                    )
-                    setDataSource(playAdhanUrl)
-                    setOnPreparedListener {
-                        start()
-                        isAdhanPlaying = true
-                    }
-                    setOnCompletionListener {
-                        isAdhanPlaying = false
-                        release()
-                        mediaPlayer = null
-                    }
-                    prepareAsync()
-                }
-                mediaPlayer = mp
-            } catch (_: Exception) {
-                isAdhanPlaying = false
-            }
+            com.elhajri.noor.notification.AdhanPlaybackService.play(context)
+            isAdhanPlaying = true
         }
     }
 

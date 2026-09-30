@@ -68,6 +68,57 @@ object NoorWeb {
     const val HOME = "$BASE/"
     const val QURAN = "$BASE/quran"
     const val ASSISTANT = "$BASE/assistant"
+    const val LIBRARY = "$BASE/library"
+
+    /**
+     * تعليق مشغّل الصوت: يستمع لأحداث عناصر <audio>/<video> داخل صفحة الموقع
+     * ويرسلها إلى الجسر الأصيل (NoorAudioBridge) لكي تظهر الإشعارات
+     * وتُستكمل التلاوة أصلياً عند إغلاق التطبيق.
+     * يعمل مع أي عنصر صوتي جديد يُنشأ ديناميكياً (مشغل القرآن والأناشيد).
+     */
+    val audioHooksJs: String = """
+        (function(){
+            if(window.__noorAudioHooked) return;
+            window.__noorAudioHooked = true;
+            function safe(f){ try{ f(); }catch(e){} }
+            function pageAudio(){ return document.querySelector('audio,video'); }
+            function hook(el){
+                if(!el || el.__noorHooked) return;
+                el.__noorHooked = true;
+                var last = 0;
+                el.addEventListener('play', function(){
+                    safe(function(){
+                        var a = pageAudio() || el;
+                        if(window.NoorAudio) window.NoorAudio.onPlay(
+                            a.currentSrc || a.src || '', a.currentTime,
+                            (document.title || 'القرآن الكريم').substring(0, 60)
+                        );
+                    });
+                });
+                el.addEventListener('timeupdate', function(){
+                    var now = Date.now();
+                    if(now - last > 800){
+                        last = now;
+                        safe(function(){
+                            var a = pageAudio() || el;
+                            if(window.NoorAudio) window.NoorAudio.onTime(a.currentTime);
+                        });
+                    }
+                });
+                el.addEventListener('pause', function(){
+                    safe(function(){ if(window.NoorAudio) window.NoorAudio.onPause(); });
+                });
+                el.addEventListener('ended', function(){
+                    safe(function(){ if(window.NoorAudio) window.NoorAudio.onEnded(); });
+                });
+            }
+            function scan(){ safe(function(){
+                document.querySelectorAll('audio,video').forEach(hook);
+            }); }
+            scan();
+            setInterval(scan, 1500);
+        })();
+    """.trimIndent()
 
     /**
      * حقن CSS: يُطبَّق مرات عدة (عند أول ظهور للصفحة وعند اكتمال التحميل)
@@ -122,6 +173,19 @@ fun NoorWebView(
         if (wv != null && wv.canGoBack()) wv.goBack() else onBack?.invoke()
     }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val urlForCleanup = url
+    androidx.compose.runtime.DisposableEffect(urlForCleanup) {
+        onDispose {
+            // أُغلقت الشاشة: إن كانت التلاوة تعمل داخل الويب فيو فالتقطها أصلياً
+            // لكي تستمر حتى بعد إغلاق التطبيق كاملاً — بإذن الله
+            webView.value?.let { WebPlayerBus.unbind(it) }
+            if (WebPlayerBus.isPlaying && !WebPlayerBus.url.isNullOrBlank()) {
+                WebPlayerService.takeover(context)
+            }
+        }
+    }
+
     // بعد اكتمال التحميل: مهلة قصيرة ليرتّب SPA صفحته ويُطبَّق إخفاء السبلاش،
     // ثم يتلاشى غطاء التحميل بنعمة — فلا تظهر لحظة صفحة هبوط أبداً
     LaunchedEffect(settling) {
@@ -171,6 +235,9 @@ fun NoorWebView(
                     WebView(ctx).apply {
                         // خلفية بحريّة مطابقة لمظهر التطبيق — لا وميض أبيض عند الفتح
                         setBackgroundColor(AndroidColor.parseColor("#0A0F1A"))
+                        // جسر مشغّل الصوت: أحداث الموقع ← إشعارات واستكمال أصيل
+                        addJavascriptInterface(NoorAudioBridge(ctx), "NoorAudio")
+                        WebPlayerBus.bind(this)
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
                         settings.loadWithOverviewMode = true
@@ -194,12 +261,14 @@ fun NoorWebView(
                             // أول لحظة ظهور للصفحة: احقن الإخفاء مبكراً قدر الإمكان
                             override fun onPageCommitVisible(view: WebView?, url: String?) {
                                 view?.evaluateJavascript(NoorWeb.hideSiteChromeJs, null)
+                                view?.evaluateJavascript(NoorWeb.audioHooksJs, null)
                             }
 
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 isLoading = false
                                 settling = true
                                 view?.evaluateJavascript(NoorWeb.hideSiteChromeJs, null)
+                                view?.evaluateJavascript(NoorWeb.audioHooksJs, null)
                             }
 
                             override fun onReceivedError(
@@ -289,5 +358,41 @@ fun NoorWebView(
                 }
             }
         }
+    }
+}
+
+/**
+ * NoorAudioBridge — جسر JS→أصيل: يستقبل أحداث مشغّل الموقع
+ * ويحدّث حالة WebPlayerBus ويشغّل خدمة الإشعارات.
+ * تُستدعى دواله من صفحة الموقع عبر window.NoorAudio.
+ */
+class NoorAudioBridge(
+    private val context: android.content.Context
+) {
+    @android.webkit.JavascriptInterface
+    fun onPlay(url: String, positionSec: Float, title: String) {
+        WebPlayerBus.url = url
+        WebPlayerBus.positionSec = positionSec
+        WebPlayerBus.title = title
+        WebPlayerBus.isPlaying = true
+        WebPlayerService.sync(context)
+    }
+
+    @android.webkit.JavascriptInterface
+    fun onTime(positionSec: Float) {
+        WebPlayerBus.positionSec = positionSec
+    }
+
+    @android.webkit.JavascriptInterface
+    fun onPause() {
+        WebPlayerBus.isPlaying = false
+        WebPlayerService.sync(context)
+    }
+
+    @android.webkit.JavascriptInterface
+    fun onEnded() {
+        WebPlayerBus.isPlaying = false
+        WebPlayerBus.positionSec = 0f
+        WebPlayerService.stop(context)
     }
 }

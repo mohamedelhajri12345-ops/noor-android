@@ -448,10 +448,15 @@ private fun buildPlaybackNotification(
         PendingIntent.FLAG_IMMUTABLE
     )
     val playPauseIcon = if (s.isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
+    // أيقونة التطبيق الرسمية عريضة في الإشعار — مظهر احترافي موحد
+    val largeIcon = try {
+        android.graphics.BitmapFactory.decodeResource(context.resources, com.elhajri.noor.R.mipmap.ic_launcher)
+    } catch (_: Exception) { null }
     val builder = NotificationCompat.Builder(context, channelId)
         .setContentTitle(s.title.ifBlank { fallbackTitle })
         .setContentText(s.artist.ifBlank { "تطبيق القرآن الكريم" })
         .setSmallIcon(R.drawable.ic_notification)
+        .setLargeIcon(largeIcon)
         .setContentIntent(openAppIntent)
         .setOngoing(s.isPlaying)
         .setOnlyAlertOnce(true)

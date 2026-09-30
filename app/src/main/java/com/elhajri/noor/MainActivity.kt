@@ -66,7 +66,6 @@ import com.elhajri.noor.notification.NotificationCenterScreen
 import com.elhajri.noor.prayer.PrayerScreen
 import com.elhajri.noor.privacy.PrivacyPolicyScreen
 import com.elhajri.noor.qibla.QiblaScreen
-import com.elhajri.noor.quran.LibraryScreen
 import com.elhajri.noor.quran.QuranReaderScreen
 import com.elhajri.noor.quran.TrackerScreen
 import com.elhajri.noor.quiz.QuizScreen
@@ -77,6 +76,7 @@ import com.elhajri.noor.tasbih.TasbihScreen
 import com.elhajri.noor.zakat.ZakatScreen
 import com.elhajri.noor.web.NoorWebView
 import com.elhajri.noor.web.NoorWeb
+import com.elhajri.noor.home.HomeScreen
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
@@ -219,9 +219,24 @@ fun NoorApp() {
         NavHost(
             navController = navController,
             startDestination = "home",
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
+            // انتقال ناعم موحّد: ظهور بتلاشٍ ورفعٍ خفيف — هوية بصرية راقية
+            enterTransition = {
+                androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(240)) +
+                    androidx.compose.animation.slideInVertically(
+                        animationSpec = androidx.compose.animation.core.tween(240)
+                    ) { it / 24 }
+            },
+            exitTransition = { androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(180)) },
+            popEnterTransition = { androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(240)) },
+            popExitTransition = {
+                androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(180)) +
+                    androidx.compose.animation.slideOutVertically(
+                        animationSpec = androidx.compose.animation.core.tween(200)
+                    ) { it / 24 }
+            }
         ) {
-            composable("home") { NoorWebView(url = NoorWeb.HOME) }
+            composable("home") { HomeScreen(onNavigate = { navController.navigate(it) }) }
             composable("prayer") { PrayerScreen() }
             composable("quran") { NoorWebView(url = NoorWeb.QURAN) }
             composable("athkar") { AthkarScreen(onOpenCategory = { cat, title -> navController.navigate("athkarDetail/$cat/$title") }) }
@@ -278,7 +293,7 @@ fun NoorApp() {
             ) }
             composable("donation") { DonationScreen(onBack = { navController.popBackStack() }) }
             composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
-            composable("library") { LibraryScreen(onBack = { navController.popBackStack() }) }
+            composable("library") { NoorWebView(url = NoorWeb.LIBRARY, title = "مكتبة الأناشيد", onBack = { navController.popBackStack() }) }
             composable("tracker") { TrackerScreen() }
             composable("games") { GamesScreen(onNavigate = { navController.navigate(it) }) }
             composable("names_game") { NamesGameScreen(onBack = { navController.popBackStack() }) }

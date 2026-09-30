@@ -2,7 +2,6 @@ package com.elhajri.noor.ui
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -65,26 +63,15 @@ fun NoorTopBar(
             ) {
                 // Logo: crescent moon + title
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
+                    // أيقونة التطبيق الرسمية الحالية — بنفس هوية المشغّل
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(com.elhajri.noor.R.mipmap.ic_launcher),
+                        contentDescription = "أيقونة التطبيق",
                         modifier = Modifier
                             .size(34.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(NavyCard)
-                            .border(1.dp, Gold.copy(alpha = 0.4f), RoundedCornerShape(10.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Canvas(modifier = Modifier.size(20.dp)) {
-                            drawCircle(color = Gold, radius = size.minDimension / 2f)
-                            drawCircle(
-                                color = NavyCard,
-                                radius = size.minDimension / 2f,
-                                center = Offset(
-                                    x = size.width * 0.70f,
-                                    y = size.height * 0.30f
-                                )
-                            )
-                        }
-                    }
+                            .border(1.dp, Gold.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                    )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = "القرآن الكريم",
