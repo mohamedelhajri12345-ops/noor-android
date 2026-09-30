@@ -20,15 +20,43 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # ═══ مفتاح توقيع ثابت — يُولَّد مرة واحدة فقط، ثم يُحفظ في المستودع ═══
+      # هذا يضمن أن كل نسخة قادمة موقّعة بنفس المفتاح، فلا يفشل التثبيت أبداً
+      # عند تحديث التطبيق فوق نسخة قديمة (خطأ "signatures do not match").
+      - name: Ensure signing keystore exists
+        run: |
+          if [ ! -f app/noor-release.keystore ]; then
+            echo "لا يوجد مفتاح توقيع — يتم توليد مفتاح ثابت جديد الآن..."
+            keytool -genkeypair -v \
+              -keystore app/noor-release.keystore \
+              -alias noorkey \
+              -keyalg RSA -keysize 2048 -validity 36500 \
+              -storepass NoorSecure2026 -keypass NoorSecure2026 \
+              -dname "CN=NOOR, OU=NOOR, O=ElHajri, L=Casablanca, S=Casablanca, C=MA"
+            git config user.name "NOOR CI"
+            git config user.email "ci@noor.local"
+            git add app/noor-release.keystore
+            git commit -m "إضافة مفتاح التوقيع الثابت (يُستعمل في كل الإصدارات القادمة)"
+            git push
+          else
+            echo "مفتاح التوقيع موجود — سيُستعمل لتوقيع هذا الإصدار."
+          fi
+
       - name: Set up Gradle 8.4
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.4'
 
-      - name: Build Debug APK
+      - name: Build Debug APK (signed with the stable key)
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: gradle assembleDebug --no-daemon --stacktrace -PGEMINI_API_KEY="$GEMINI_API_KEY"
+
+      - name: Read version name
+        id: ver
+        run: |
+          VNAME=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
+          echo "name=v$VNAME" >> "$GITHUB_OUTPUT"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -40,10 +68,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="v2.6"
-          cp app/build/outputs/apk/debug/app-debug.apk noor-v2.6.apk
+          TAG="${{ steps.ver.outputs.name }}"
+          APK_NAME="noor-${TAG}.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "$APK_NAME"
           if gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            gh release upload "$TAG" noor-v2.6.apk --clobber -R "$GITHUB_REPOSITORY"
+            gh release upload "$TAG" "$APK_NAME" --clobber -R "$GITHUB_REPOSITORY"
           else
-            gh release create "$TAG" noor-v2.6.apk --title "القرآن الكريم — نسخة 2.6" --notes "نسخة أندرويد أصلية 100% (بلا WebView)" -R "$GITHUB_REPOSITORY"
+            gh release create "$TAG" "$APK_NAME" --title "القرآن الكريم — نسخة $TAG" --notes "نسخة أندرويد أصلية 100% (بلا WebView للميزات الأساسية) — موقّعة بمفتاح ثابت." -R "$GITHUB_REPOSITORY"
           fi

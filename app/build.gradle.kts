@@ -11,8 +11,8 @@ android {
         applicationId = "com.elhajri.noor"
         minSdk = 24
         targetSdk = 34
-        versionCode = 28
-        versionName = "2.8"
+        versionCode = 29
+        versionName = "2.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -25,13 +25,35 @@ android {
         buildConfigField("String", "GEMINI_API_KEY", "\"\"+\"$geminiKey\"")
     }
 
+
+    signingConfigs {
+        create("noor") {
+            // مفتاح توقيع ثابت وموحّد لكل الإصدارات — يُولَّد مرة واحدة فقط
+            // في CI عبر خطوة "Ensure signing keystore" ثم يُحفظ في المستودع.
+            // هذا يمنع خطأ "فشل التثبيت" الذي يحدث عندما يختلف توقيع كل نسخة.
+            val ksFile = file("noor-release.keystore")
+            if (ksFile.exists()) {
+                storeFile = ksFile
+                storePassword = "NoorSecure2026"
+                keyAlias = "noorkey"
+                keyPassword = "NoorSecure2026"
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("noor")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            // بناء التصحيح يستعمل نفس المفتاح الثابت أيضاً — كي تبقى كل الإصدارات
+            // (تصحيح أو إصدار) متوافقة التوقيع فيما بينها ويمكن تحديثها فوق بعضها.
+            signingConfig = signingConfigs.getByName("noor")
         }
     }
 

@@ -179,11 +179,11 @@ fun LibraryScreen(onBack: () -> Unit) {
         ) {
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Subtitle
-            Text(
-                text = "أناشيد إسلامية بدون موسيقى — ${toArabicNumber(nasheeds.size)} نشيد",
-                fontSize = 12.sp,
-                color = GoldSoft.copy(alpha = 0.7f),
+            // البانر العلوي
+            com.elhajri.noor.ui.NoorHeroBanner(
+                imageUrl = com.elhajri.noor.ui.NoorHeroImages.LANTERNS,
+                title = "الأناشيد",
+                subtitle = "أناشيد إسلامية بدون موسيقى — ${toArabicNumber(nasheeds.size)} نشيد",
                 modifier = Modifier.padding(bottom = 10.dp)
             )
 

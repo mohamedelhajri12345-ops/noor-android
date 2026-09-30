@@ -29,6 +29,8 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
 import com.elhajri.noor.ui.NoorGradients
+import com.elhajri.noor.ui.NoorHeroBanner
+import com.elhajri.noor.ui.NoorHeroImages
 
 internal fun toArabicNumber(number: Any): String {
     val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
@@ -56,11 +58,10 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
                 .background(NoorGradients.ScreenBackground)
                 .padding(16.dp)
         ) {
-            Text(
-                text = "الأذكار",
-                color = Gold,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+            NoorHeroBanner(
+                imageUrl = NoorHeroImages.LANTERNS,
+                title = "الأذكار",
+                subtitle = "حصنك من كل شر بإذن الله",
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 

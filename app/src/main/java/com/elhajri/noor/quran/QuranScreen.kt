@@ -75,23 +75,11 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
         Spacer(modifier = Modifier.height(12.dp))
 
         // Title
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "القرآن الكريم",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = Gold
-            )
-            Text(
-                text = "١١٤ سورة · ٦٢٣٦ آية",
-                fontSize = 12.sp,
-                color = GoldSoft.copy(alpha = 0.7f),
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        }
+        com.elhajri.noor.ui.NoorHeroBanner(
+            imageUrl = com.elhajri.noor.ui.NoorHeroImages.QURAN_REHAL,
+            title = "القرآن الكريم",
+            subtitle = "١١٤ سورة · ٦٢٣٦ آية"
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 

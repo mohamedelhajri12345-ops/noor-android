@@ -46,25 +46,11 @@ fun StoriesScreen(onOpenStory: (Int) -> Unit = {}) {
             .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "قصص الأنبياء",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Gold,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "${toArabicDigits(stories.size)} قصة ملهمة",
-                style = MaterialTheme.typography.bodyMedium,
-                color = GoldSoft
-            )
-        }
+        com.elhajri.noor.ui.NoorHeroBanner(
+            imageUrl = com.elhajri.noor.ui.NoorHeroImages.MINARET,
+            title = "قصص الأنبياء",
+            subtitle = "${toArabicDigits(stories.size)} قصة ملهمة"
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
