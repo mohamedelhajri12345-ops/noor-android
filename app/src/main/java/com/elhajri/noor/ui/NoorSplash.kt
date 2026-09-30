@@ -1,5 +1,7 @@
 package com.elhajri.noor.ui
 
+import com.elhajri.noor.R
+
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -8,6 +10,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -116,27 +120,15 @@ fun NoorSplash(onFinished: () -> Unit) {
                         radius = size.minDimension / 2f
                     )
                 }
-                // crescent: gold circle with navy cut-out
-                Box(
+                // أيقونة التطبيق الرسمية — نفس أيقونة المشغّل الحالية
+                Image(
+                    painter = painterResource(R.mipmap.ic_launcher),
+                    contentDescription = "أيقونة التطبيق",
                     modifier = Modifier
                         .size(112.dp)
                         .align(Alignment.Center)
                         .clip(RoundedCornerShape(28.dp))
-                        .background(NavyCard),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Canvas(modifier = Modifier.size(64.dp)) {
-                        drawCircle(color = Gold, radius = size.minDimension / 2f)
-                        drawCircle(
-                            color = NavyCard,
-                            radius = size.minDimension / 2f,
-                            center = androidx.compose.ui.geometry.Offset(
-                                x = size.width * 0.68f,
-                                y = size.height * 0.32f
-                            )
-                        )
-                    }
-                }
+                )
             }
 
             Spacer(Modifier.height(36.dp))

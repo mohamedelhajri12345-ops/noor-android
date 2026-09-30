@@ -43,7 +43,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.elhajri.noor.ai.AIAssistantScreen
+
 import com.elhajri.noor.athkar.AthkarDetailScreen
 import com.elhajri.noor.athkar.AthkarScreen
 import com.elhajri.noor.auth.ForgotPasswordScreen
@@ -59,7 +59,6 @@ import com.elhajri.noor.games.NamesGameScreen
 import com.elhajri.noor.games.ProphetsJourneyScreen
 import com.elhajri.noor.games.QuranMemorizationScreen
 import com.elhajri.noor.hajj.HajjGuideScreen
-import com.elhajri.noor.home.HomeScreen
 import com.elhajri.noor.journal.JournalScreen
 import com.elhajri.noor.more.MoreScreen
 import com.elhajri.noor.names.NamesOfAllahScreen
@@ -69,7 +68,6 @@ import com.elhajri.noor.privacy.PrivacyPolicyScreen
 import com.elhajri.noor.qibla.QiblaScreen
 import com.elhajri.noor.quran.LibraryScreen
 import com.elhajri.noor.quran.QuranReaderScreen
-import com.elhajri.noor.quran.QuranScreen
 import com.elhajri.noor.quran.TrackerScreen
 import com.elhajri.noor.quiz.QuizScreen
 import com.elhajri.noor.settings.SettingsScreen
@@ -77,6 +75,8 @@ import com.elhajri.noor.stories.StoriesScreen
 import com.elhajri.noor.stories.StoryDetailScreen
 import com.elhajri.noor.tasbih.TasbihScreen
 import com.elhajri.noor.zakat.ZakatScreen
+import com.elhajri.noor.web.NoorWebView
+import com.elhajri.noor.web.NoorWeb
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
@@ -221,9 +221,9 @@ fun NoorApp() {
             startDestination = "home",
             modifier = Modifier.padding(padding)
         ) {
-            composable("home") { HomeScreen(onNavigate = { navController.navigate(it) }) }
+            composable("home") { NoorWebView(url = NoorWeb.HOME) }
             composable("prayer") { PrayerScreen() }
-            composable("quran") { QuranScreen(onSurahClick = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") }) }
+            composable("quran") { NoorWebView(url = NoorWeb.QURAN) }
             composable("athkar") { AthkarScreen(onOpenCategory = { cat, title -> navController.navigate("athkarDetail/$cat/$title") }) }
             composable("more") { MoreScreen(onNavigate = { navController.navigate(it) }) }
 
@@ -271,7 +271,7 @@ fun NoorApp() {
                 // هذا كان ناقصاً بالكامل: زر "تسجيل الدخول" في المجتمع لم يكن مرتبطاً بأي تنقّل فعلي
                 onNavigateToLogin = { navController.navigate("login") }
             ) }
-            composable("ai") { AIAssistantScreen(onBack = { navController.popBackStack() }) }
+            composable("ai") { NoorWebView(url = NoorWeb.ASSISTANT, title = "المساعد الذكي", onBack = { navController.popBackStack() }) }
             composable("favorites") { FavoritesScreen(
                 onOpenSurah = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") },
                 onOpenStory = { id -> navController.navigate("story/$id") }
