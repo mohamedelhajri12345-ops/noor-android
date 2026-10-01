@@ -11,10 +11,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Equalizer
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Languages
-import androidx.compose.material.icons.filled.RotateCcw
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.Volume2
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -84,7 +84,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
         Spacer(Modifier.height(12.dp))
 
         // ============ اللغة ============
-        SettingsSection(icon = Icons.Filled.Languages, title = "اللغة") {
+        SettingsSection(icon = Icons.Filled.Language, title = "اللغة") {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                 Text("اختر لغة التطبيق", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
@@ -114,7 +114,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
         Spacer(Modifier.height(12.dp))
 
         // ============ القرآن الكريم — القارئ الافتراضي ============
-        SettingsSection(icon = Icons.Filled.Volume2, title = "القرآن الكريم") {
+        SettingsSection(icon = Icons.Filled.VolumeUp, title = "القرآن الكريم") {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                 Text("القارئ الافتراضي", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
@@ -241,7 +241,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Filled.RotateCcw, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp))
+            Icon(Icons.Filled.Refresh, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(8.dp))
             Text("إعادة الإعدادات الافتراضية", color = Color(0xFFEF4444), fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
