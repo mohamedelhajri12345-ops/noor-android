@@ -94,7 +94,7 @@ fun MoreScreen(onNavigate: (String) -> Unit) {
             columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.weight(1f)
         ) {
             items(features) { f ->
                 Column(
@@ -138,5 +138,9 @@ fun MoreScreen(onNavigate: (String) -> Unit) {
                 }
             }
         }
+
+        // إعلان سفلي آمن — تحت الشبكة داخل التخطيط، لا يغطي أي زر أو محتوى
+        com.elhajri.noor.ui.NoorBannerAd()
+        Spacer(Modifier.height(10.dp))
     }
 }

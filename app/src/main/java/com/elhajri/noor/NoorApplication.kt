@@ -12,6 +12,23 @@ class NoorApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // إعلانات AdMob — تهيئة مرة واحدة في خيط خلفي (لا تعيق الإقلاع)
+        Thread {
+            try {
+                com.google.android.gms.ads.MobileAds.initialize(this)
+            } catch (_: Exception) {}
+        }.start()
+
+        // حجم الخط من الإعدادات — ينعكس على كامل التطبيق فور الإقلاع
+        try {
+            com.elhajri.noor.settings.FontScaleHolder.scale =
+                com.elhajri.noor.settings.NoorSettings.fontScale(this)
+        } catch (_: Exception) {}
+
+        // تسخين صفحات الموقع: القرآن والأناشيد جاهزتان قبل أن يضغط المستخدم
+        // فتفتحان فوراً كأنهما جزء أصيل من التطبيق
+        com.elhajri.noor.web.WebViewPool.warmUp(this)
         val previous = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             try {

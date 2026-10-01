@@ -47,10 +47,9 @@ jobs:
         with:
           gradle-version: '8.4'
 
-      - name: Build Debug APK (signed with the stable key)
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: gradle assembleDebug --no-daemon --stacktrace -PGEMINI_API_KEY="$GEMINI_API_KEY"
+      # ═══ إصدار الإنتاج: نسخة Release موقّعة بالمفتاح الثابت ═══
+      - name: Build Release APK + AAB
+        run: gradle assembleRelease bundleRelease --no-daemon --stacktrace
 
       - name: Read version name
         id: ver
@@ -61,18 +60,26 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: NOOR-debug-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: NOOR-release-APK
+          path: app/build/outputs/apk/release/app-release.apk
 
-      - name: Publish APK as Release
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NOOR-release-AAB
+          path: app/build/outputs/bundle/release/app-release.aab
+
+      - name: Publish APK + AAB as Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ steps.ver.outputs.name }}"
           APK_NAME="noor-${TAG}.apk"
-          cp app/build/outputs/apk/debug/app-debug.apk "$APK_NAME"
+          AAB_NAME="noor-${TAG}.aab"
+          cp app/build/outputs/apk/release/app-release.apk "$APK_NAME"
+          cp app/build/outputs/bundle/release/app-release.aab "$AAB_NAME"
           if gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            gh release upload "$TAG" "$APK_NAME" --clobber -R "$GITHUB_REPOSITORY"
+            gh release upload "$TAG" "$APK_NAME" "$AAB_NAME" --clobber -R "$GITHUB_REPOSITORY"
           else
-            gh release create "$TAG" "$APK_NAME" --title "القرآن الكريم — نسخة $TAG" --notes "نسخة أندرويد أصلية 100% (بلا WebView للميزات الأساسية) — موقّعة بمفتاح ثابت." -R "$GITHUB_REPOSITORY"
+            gh release create "$TAG" "$APK_NAME" "$AAB_NAME" --title "القرآن الكريم — نسخة $TAG" --notes "نسخة إنتاج Release موقّعة بمفتاح ثابت: ناتيف كامل + ذكاء اصطناعي محلي + ويب فيو فوري يعمل دون إنترنت. AAB مرفق لنشر Google Play." -R "$GITHUB_REPOSITORY"
           fi

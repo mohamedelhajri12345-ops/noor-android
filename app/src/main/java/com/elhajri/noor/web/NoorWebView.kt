@@ -183,6 +183,8 @@ fun NoorWebView(
             if (WebPlayerBus.isPlaying && !WebPlayerBus.url.isNullOrBlank()) {
                 WebPlayerService.takeover(context)
             }
+            // إعادة الصفحة إلى المجمع — فتح لحظي في المرة القادمة
+            WebViewPool.release(urlForCleanup, webView.value)
         }
     }
 
@@ -229,64 +231,26 @@ fun NoorWebView(
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
+            val loadListener = remember { object : WebViewPool.LoadListener {
+                override fun onStarted() { isLoading = true; hasError = false; settling = false }
+                override fun onFinished() { isLoading = false; settling = true }
+                override fun onError() { hasError = true; isLoading = false; settling = false }
+            } }
             AndroidView(
                 modifier = Modifier.fillMaxSize(),
                 factory = { ctx ->
-                    WebView(ctx).apply {
-                        // خلفية بحريّة مطابقة لمظهر التطبيق — لا وميض أبيض عند الفتح
-                        setBackgroundColor(AndroidColor.parseColor("#0A0F1A"))
-                        // جسر مشغّل الصوت: أحداث الموقع ← إشعارات واستكمال أصيل
-                        addJavascriptInterface(NoorAudioBridge(ctx), "NoorAudio")
-                        WebPlayerBus.bind(this)
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true
-                        settings.loadWithOverviewMode = true
-                        settings.useWideViewPort = true
-                        settings.setSupportZoom(false)
-                        settings.mediaPlaybackRequiresUserGesture = false
-                        // مظهر أصيل: لا أشرطة تمرير ولا مرونة سحب متصفح
-                        isVerticalScrollBarEnabled = false
-                        isHorizontalScrollBarEnabled = false
-                        overScrollMode = android.view.View.OVER_SCROLL_NEVER
-                        webViewClient = object : WebViewClient() {
-                            override fun onPageStarted(
-                                view: WebView?, url: String?,
-                                favicon: android.graphics.Bitmap?
-                            ) {
-                                isLoading = true
-                                hasError = false
-                                settling = false
-                            }
-
-                            // أول لحظة ظهور للصفحة: احقن الإخفاء مبكراً قدر الإمكان
-                            override fun onPageCommitVisible(view: WebView?, url: String?) {
-                                view?.evaluateJavascript(NoorWeb.hideSiteChromeJs, null)
-                                view?.evaluateJavascript(NoorWeb.audioHooksJs, null)
-                            }
-
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                isLoading = false
-                                settling = true
-                                view?.evaluateJavascript(NoorWeb.hideSiteChromeJs, null)
-                                view?.evaluateJavascript(NoorWeb.audioHooksJs, null)
-                            }
-
-                            override fun onReceivedError(
-                                view: WebView?,
-                                request: WebResourceRequest?,
-                                error: WebResourceError?
-                            ) {
-                                // نتخطى أخطاء الموارد الفرعية (صور/خطوط) ونُظهر الخطأ للإطار الرئيسي فقط
-                                if (request?.isForMainFrame == true) {
-                                    hasError = true
-                                    isLoading = false
-                                    settling = false
-                                }
-                            }
-                        }
-                        webView.value = this
-                        loadUrl(url)
+                    // فتح لحظي: صفحة مجهزة مسبقاً من المجمع إن وُجدت
+                    val (wv, complete) = WebViewPool.acquire(ctx, url, loadListener)
+                    webView.value = wv
+                    if (complete) {
+                        isLoading = false; settling = false
+                    } else if (!WebViewPool.isOnline(ctx) && WebViewPool.loadOffline(ctx, wv, url)) {
+                        // دون إنترنت: تفتح اللقطة المحفوظة للصفحة فوراً
+                        isLoading = true
+                    } else {
+                        isLoading = true
                     }
+                    wv
                 }
             )
 

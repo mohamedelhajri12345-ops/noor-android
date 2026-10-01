@@ -117,7 +117,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             NoorTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                    NoorApp()
+                    // حجم الخط من الإعدادات — يتغير فوراً عند اختياره
+                    val density = androidx.compose.ui.platform.LocalDensity.current
+                    val fontScale = com.elhajri.noor.settings.FontScaleHolder.scale
+                    androidx.compose.runtime.CompositionLocalProvider(
+                        androidx.compose.ui.platform.LocalDensity provides
+                            androidx.compose.ui.unit.Density(density.density, density.fontScale * fontScale)
+                    ) {
+                        NoorApp()
+                    }
                 }
             }
         }
@@ -247,7 +255,7 @@ fun NoorApp() {
             composable("names") { NamesOfAllahScreen() }
             composable("quiz") { QuizScreen() }
             composable("stories") { StoriesScreen(onOpenStory = { id -> navController.navigate("story/$id") }) }
-            composable("settings") { SettingsScreen() }
+            composable("settings") { SettingsScreen(onOpenPrivacy = { navController.navigate("privacy") }) }
 
             composable("reader/{number}/{name}") { entry ->
                 val number = entry.arguments?.getString("number")?.toIntOrNull() ?: 1
@@ -286,7 +294,7 @@ fun NoorApp() {
                 // هذا كان ناقصاً بالكامل: زر "تسجيل الدخول" في المجتمع لم يكن مرتبطاً بأي تنقّل فعلي
                 onNavigateToLogin = { navController.navigate("login") }
             ) }
-            composable("ai") { NoorWebView(url = NoorWeb.ASSISTANT, title = "المساعد الذكي", onBack = { navController.popBackStack() }) }
+            composable("ai") { com.elhajri.noor.ai.AiChatScreen(onBack = { navController.popBackStack() }) }
             composable("favorites") { FavoritesScreen(
                 onOpenSurah = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") },
                 onOpenStory = { id -> navController.navigate("story/$id") }

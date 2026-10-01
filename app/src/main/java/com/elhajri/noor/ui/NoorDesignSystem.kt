@@ -26,9 +26,8 @@ object NoorGradients {
     /** خلفية الشاشات: من الأعلى بلمسة ليلية فاخرة إلى القاع الأبنيسي الداكن */
     val ScreenBackground = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF0F182A),
-            Color(0xFF090E19),
-            Color(0xFF05080F)
+            Color(0xFF0A0E14),
+            Color(0xFF0A0E14)
         )
     )
 

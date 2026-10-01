@@ -29,16 +29,16 @@ val AmiriFamily = FontFamily(
 // لوحة "الأبنوس والذهب الإمبراطوري" الفاخرة — تحديث فريق التصميم
 // الأسماء نفسها حتى تتجدد كل الشاشات تلقائياً
 // ============================================================================
-val Navy = Color(0xFF070B14)              // أبنوس مخملي عميق (كان 0B1B3A)
-val NavyLight = Color(0xFF152238)         // كحلي ملكي أدفأ
-val NavyCard = Color(0xFF1B2B4B)          // بطاقات أفتح وضوحاً
-val Gold = Color(0xFFF0C75E)              // ذهب شمبانيا متوهج — تباين أعلى
-val GoldSoft = Color(0xFFFFE9B8)          // ذهب فاتح مشع
+val Navy = Color(0xFF0A0E14)              // أبنوس مخملي عميق (كان 0B1B3A)
+val NavyLight = Color(0xFF1A1F29)         // كحلي ملكي أدفأ
+val NavyCard = Color(0xFF15181E)          // بطاقات أفتح وضوحاً
+val Gold = Color(0xFFD4AF35)              // ذهب شمبانيا متوهج — تباين أعلى
+val GoldSoft = Color(0xFFF7D56E)          // ذهب فاتح مشع
 val TextMain = Color(0xFFFAF8F5)          // أبيض لؤلؤي دافئ
-val ChampagneGold = Color(0xFFF3E5AB)
-val ImperialGold = Color(0xFFE5C158)
-val AntiqueGoldDeep = Color(0xFF997A15)
-val GoldHighlight = Color(0xFFFFF2A1)
+val ChampagneGold = Color(0xFFF7D56E)
+val ImperialGold = Color(0xFFD4AF35)
+val AntiqueGoldDeep = Color(0xFF9E7C2E)
+val GoldHighlight = Color(0xFFF7D56E)
 val RoseGoldAccent = Color(0xFFE5A983)
 val TextSecondaryLinen = Color(0xFFC5BAA8)
 val EmeraldSuccess = Color(0xFF10B981)
