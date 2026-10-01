@@ -9,6 +9,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.elhajri.noor.settings.NoorSettings
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.thread
 
@@ -34,7 +35,7 @@ object WebViewPool {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
         val net = cm.activeNetwork
         val caps = cm.getNetworkCapabilities(net)
-        caps != null && caps.hasCapability(android.net.NetCapabilities.NET_CAPABILITY_INTERNET)
+        caps != null && caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
     } catch (_: Exception) { false }
 
     /** مسار الأرشيف المحلي للصفحة — لفتحها دون إنترنت */
