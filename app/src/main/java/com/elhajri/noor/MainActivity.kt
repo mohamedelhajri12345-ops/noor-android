@@ -150,14 +150,26 @@ fun NoorApp() {
     val currentRoute = backStack?.destination?.route
     val showBar = currentRoute in tabs.map { it.route }
 
+    // حماية من النقر المتسارع/المتكرر — سبب تعطل الشريط السفلي عند الاستخدام الكثيف:
+    // النقرات السريعة المتتالية كانت تكدّس وجهات في حزمة الرجوع حتى تتجمّد القناة
+    var lastNavAtMs by remember { mutableStateOf(0L) }
+    val navigateSafe: (String) -> Unit = { route ->
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - lastNavAtMs >= 350L) {
+            lastNavAtMs = now
+            navController.navigate(route) { launchSingleTop = true }
+        }
+        Unit
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
             if (showBar) NoorTopBar(
-                onCommunity = { navController.navigate("community") },
-                onDonate = { navController.navigate("donation") },
-                onAssistant = { navController.navigate("ai") },
-                onSettings = { navController.navigate("settings") }
+                onCommunity = { navigateSafe("community") },
+                onDonate = { navigateSafe("donation") },
+                onAssistant = { navigateSafe("ai") },
+                onSettings = { navigateSafe("settings") }
             )
         },
         bottomBar = {
@@ -178,6 +190,10 @@ fun NoorApp() {
                             NavigationBarItem(
                                 selected = selected,
                                 onClick = {
+                                    if (currentRoute == tab.route) return@NavigationBarItem
+                                    val now = android.os.SystemClock.elapsedRealtime()
+                                    if (now - lastNavAtMs < 350L) return@NavigationBarItem
+                                    lastNavAtMs = now
                                     navController.navigate(tab.route) {
                                         popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                                         launchSingleTop = true
@@ -244,11 +260,11 @@ fun NoorApp() {
                     ) { it / 24 }
             }
         ) {
-            composable("home") { HomeScreen(onNavigate = { navController.navigate(it) }) }
+            composable("home") { HomeScreen(onNavigate = { navigateSafe(it) }) }
             composable("prayer") { PrayerScreen() }
             composable("quran") { com.elhajri.noor.quran.QuranScreen(onSurahClick = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") }) }
             composable("athkar") { AthkarScreen(onOpenCategory = { cat, title -> navController.navigate("athkarDetail/$cat/$title") }) }
-            composable("more") { MoreScreen(onNavigate = { navController.navigate(it) }) }
+            composable("more") { MoreScreen(onNavigate = { navigateSafe(it) }) }
 
             composable("qibla") { QiblaScreen() }
             composable("tasbih") { TasbihScreen() }
