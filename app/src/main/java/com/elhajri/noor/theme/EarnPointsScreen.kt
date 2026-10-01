@@ -264,7 +264,7 @@ fun EarnPointsScreen(onBack: () -> Unit) {
                 .clip(RoundedCornerShape(14.dp))
                 .background(
                     if (enabled) Brush.horizontalGradient(listOf(GoldSoft, Gold))
-                    else NavyLight.copy(alpha = 0.6f)
+                    else Brush.horizontalGradient(listOf(NavyLight.copy(alpha = 0.6f), NavyLight.copy(alpha = 0.6f)))
                 )
                 .clickable(enabled = enabled) { watchAd() }
                 .padding(vertical = 13.dp),
