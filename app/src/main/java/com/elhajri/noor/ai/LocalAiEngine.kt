@@ -9,18 +9,62 @@ import java.io.File
 import java.io.IOException
 
 /**
+ * تعريف نموذج ذكاء اصطناعي محلي — قابل للتوسع: إضافة نموذج جديد = عنصر واحد.
+ */
+data class AiModelDef(
+    val id: String,
+    val name: String,
+    val description: String,
+    val url: String,
+    val file: String,
+    val sizeBytes: Long,
+    /** قالب المحادثة الرسمي للنموذج */
+    val promptTemplate: String // GEMMA / QWEN
+) {
+    fun sizeLabel(): String =
+        if (sizeBytes >= 1_000_000_000) String.format("%.1f جيجابايت", sizeBytes / 1_000_000_000.0)
+        else "${sizeBytes / 1_048_576} ميجابايت"
+}
+
+/**
+ * سجل النماذج المحلية المتاحة — نموذجان من Google/ LiteRT المجتمعية:
+ * كامل (Gemma 4 E2B — الأقوى) وخفيف (Bonsai 1.7B ثلاثي الأوزان — أخف وأسرع).
+ */
+object AiModels {
+    val FULL = AiModelDef(
+        id = "full",
+        name = "النموذج الكامل",
+        description = "Gemma 4 E2B — الأقوى والأشمل للأجوبة المعمّقة",
+        url = "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-web.task",
+        file = "gemma-4-e2b-it.task",
+        sizeBytes = 2003697664L,
+        promptTemplate = "GEMMA"
+    )
+
+    val LIGHT = AiModelDef(
+        id = "light",
+        name = "النموذج الخفيف",
+        description = "Bonsai 1.7B — أخف وأسرع للأسئلة اليومية (~750 ميجابايت)",
+        url = "https://huggingface.co/litert-community/Ternary-Bonsai-1.7B/resolve/main/bonsai-1.7b-int2pc-32k-mp-crashfix.litertlm",
+        file = "bonsai-1.7b.litertlm",
+        sizeBytes = 786313170L,
+        promptTemplate = "QWEN"
+    )
+
+    val all = listOf(FULL, LIGHT)
+
+    fun byId(id: String): AiModelDef = all.find { it.id == id } ?: FULL
+}
+
+/**
  * محرك الذكاء الاصطناعي المحلي — يعمل بالكامل على هاتف المستخدم.
- *
- * نموذج Gemma 4 E2B الرسمي من Google (LiteRT/MediaPipe) بحجم ~٢ جيجابايت:
- * يُنزَّل مرة واحدة داخل التطبيق، ثم يعمل بلا إنترنت وبلا حدود وبلا أي مفتاح API.
- * الأسئلة والأجوبة لا ت leave هاتف المستخدم إطلاقاً.
+ * يُنزَّل النموذج المختار مرة واحدة، ثم يعمل بلا إنترنت وبلا حدود وبلا أي مفتاح API.
+ * الأسئلة والأجوبة لا تترك هاتف المستخدم إطلاقاً.
  */
 object LocalAiEngine {
 
-    private const val MODEL_URL =
-        "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-web.task"
-    private const val MODEL_SIZE = 2003697664L
-    private const val MODEL_FILE = "gemma-4-e2b-it.task"
+    private const val PREFS = "noor_ai_prefs"
+    private const val KEY_MODEL = "selected_model"
 
     // سجل المحادثة — يُحفظ في الذاكرة ويعاد بناء السياق لكل سؤال
     private val history = mutableListOf<Pair<String, String>>() // user, model
@@ -29,20 +73,36 @@ object LocalAiEngine {
     @Volatile
     private var cancelRequested = false
 
-    fun modelFile(context: Context): File = File(context.filesDir, MODEL_FILE)
+    // ───────────────── اختيار النموذج ─────────────────
 
-    /** هل اكتمل تنزيل النموذج؟ */
-    fun isReady(context: Context): Boolean {
-        val f = modelFile(context)
-        return f.exists() && f.length() >= MODEL_SIZE - 4096
+    fun getSelectedModel(context: Context): AiModelDef =
+        AiModels.byId(
+            context.applicationContext
+                .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getString(KEY_MODEL, AiModels.FULL.id) ?: AiModels.FULL.id
+        )
+
+    fun setSelectedModel(context: Context, id: String) {
+        context.applicationContext
+            .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().putString(KEY_MODEL, id).apply()
+        // تبديل النموذج يتطلب إعادة تهيئة المحرك
+        close()
+    }
+
+    fun modelFile(context: Context, model: AiModelDef = getSelectedModel(context)): File =
+        File(context.filesDir, model.file)
+
+    /** هل اكتمل تنزيل النموذج المحدد؟ */
+    fun isReady(context: Context, model: AiModelDef = getSelectedModel(context)): Boolean {
+        val f = modelFile(context, model)
+        return f.exists() && f.length() >= model.sizeBytes - 4096
     }
 
     /** المساحة الحرة المتاحة للتخزين الداخلي */
     fun freeBytes(context: Context): Long = try {
         android.os.StatFs(context.filesDir.absolutePath).availableBytes
     } catch (_: Exception) { 0L }
-
-    fun modelSizeLabel(): String = "٢ جيجابايت تقريباً"
 
     class DownloadException(message: String) : IOException(message)
 
@@ -52,19 +112,20 @@ object LocalAiEngine {
      */
     suspend fun download(
         context: Context,
+        model: AiModelDef = getSelectedModel(context),
         onProgress: (downloadedBytes: Long, totalBytes: Long) -> Unit
     ): Boolean = withContext(Dispatchers.IO) {
         cancelRequested = false
-        val partFile = File(context.filesDir, "$MODEL_FILE.part")
+        val partFile = File(context.filesDir, "${model.file}.part")
         var downloaded = if (partFile.exists()) partFile.length() else 0L
-        if (downloaded >= MODEL_SIZE) {
-            partFile.renameTo(modelFile(context))
+        if (downloaded >= model.sizeBytes) {
+            partFile.renameTo(modelFile(context, model))
             return@withContext true
         }
 
         val client = OkHttpClient.Builder().build()
         val request = Request.Builder()
-            .url(MODEL_URL)
+            .url(model.url)
             .apply { if (downloaded > 0) header("Range", "bytes=$downloaded-") }
             .build()
 
@@ -79,7 +140,9 @@ object LocalAiEngine {
                 throw DownloadException("تعذّر بدء التنزيل (رمز ${response.code})")
             }
             val body = response.body ?: throw DownloadException("استجابة تنزيل فارغة")
-            val total = if (downloaded > 0) MODEL_SIZE else (body.contentLength().takeIf { it > 0 } ?: MODEL_SIZE)
+            val total =
+                if (downloaded > 0) model.sizeBytes
+                else (body.contentLength().takeIf { it > 0 } ?: model.sizeBytes)
 
             val input = body.byteStream()
             val output: java.io.FileOutputStream =
@@ -104,8 +167,8 @@ object LocalAiEngine {
             }
             output.flush(); output.close(); input.close(); response.close()
 
-            if (downloaded >= MODEL_SIZE - 4096) {
-                partFile.renameTo(modelFile(context))
+            if (downloaded >= model.sizeBytes - 4096) {
+                partFile.renameTo(modelFile(context, model))
                 true
             } else {
                 // اكتمل الاتصال قبل اكتمال الملف — سيُستأنف في المحاولة التالية
@@ -118,51 +181,69 @@ object LocalAiEngine {
 
     fun cancelDownload() { cancelRequested = true }
 
-    fun deleteModel(context: Context) {
+    fun deleteModel(context: Context, model: AiModelDef = getSelectedModel(context)) {
         close()
-        modelFile(context).delete()
-        File(context.filesDir, "$MODEL_FILE.part").delete()
+        modelFile(context, model).delete()
+        File(context.filesDir, "${model.file}.part").delete()
     }
 
     // ===================== محرك الاستدلال (MediaPipe GenAI) =====================
 
     private var llm: com.google.mediapipe.tasks.genai.llminference.LlmInference? = null
     private var initialized = false
+    private var initializedModelId: String? = null
 
     /**
-     * تهيئة المحرك — تحميل النموذج إلى الذاكرة (قد يستغرق ثواني).
+     * تهيئة المحرك — تحميل النموذج المختار إلى الذاكرة (قد يستغرق ثواني).
      */
     suspend fun ensureInitialized(context: Context) = withContext(Dispatchers.IO) {
-        if (initialized) return@withContext
+        val model = getSelectedModel(context)
+        if (initialized && initializedModelId == model.id) return@withContext
+        close()
         val options = com.google.mediapipe.tasks.genai.llminference.LlmInference.LlmInferenceOptions.builder()
-            .setModelPath(modelFile(context).absolutePath)
+            .setModelPath(modelFile(context, model).absolutePath)
             .setMaxTokens(1024)
             .build()
         llm = com.google.mediapipe.tasks.genai.llminference.LlmInference.createFromOptions(
             context, options
         )
         initialized = true
+        initializedModelId = model.id
     }
+
+    private const val SYSTEM_PROMPT = "أنت «نور»، مساعد إسلامي لطيف ومحترم على هاتف المستخدم. " +
+        "أجب بالعربية الفصحى الواضحة باختصار وعناية، مستنداً إلى القرآن الكريم والسنة النبوية الصحيحة، " +
+        "وإن جهلت شيئاً فقل بصراحة إنك لا تعرفه ولا تختلق أحاديث ولا نصوصاً."
 
     /**
      * إرسال سؤال والحصول على الإجابة — تشغيل محلي كامل على معالج الهاتف.
-     * يحمل سياق المحادثة بتنسيق Gemma الرسمي.
+     * يحمل سياق المحادثة بقالب النموذج المختار.
      */
     suspend fun ask(context: Context, question: String): String = withContext(Dispatchers.IO) {
         val engine = llm ?: throw IllegalStateException("المحرك غير مهيأ")
-        val systemPrompt = "أنت «نور»، مساعد إسلامي لطيف ومحترم على هاتف المستخدم. " +
-            "أجب بالعربية الفصحى الواضحة باختصار وعناية، مستنداً إلى القرآن الكريم والسنة النبوية الصحيحة، " +
-            "وإن جهلت شيئاً فقل بصراحة إنك لا تعرفه ولا تختلق أحاديث ولا نصوصاً."
+        val model = getSelectedModel(context)
 
         val sb = StringBuilder()
-        sb.append(systemPrompt).append("\n\n")
-        val recent = history.takeLast(MAX_TURNS)
-        for ((u, m) in recent) {
-            sb.append("<start_of_turn>user\n").append(u).append("<end_of_turn>\n")
-            sb.append("<start_of_turn>model\n").append(m).append("<end_of_turn>\n")
+        when (model.promptTemplate) {
+            "QWEN" -> {
+                sb.append("<|im_start|>system\n").append(SYSTEM_PROMPT).append("<|im_end|>\n")
+                for ((u, m) in history.takeLast(MAX_TURNS)) {
+                    sb.append("<|im_start|>user\n").append(u).append("<|im_end|>\n")
+                    sb.append("<|im_start|>assistant\n").append(m).append("<|im_end|>\n")
+                }
+                sb.append("<|im_start|>user\n").append(question).append("<|im_end|>\n")
+                sb.append("<|im_start|>assistant\n")
+            }
+            else -> { // GEMMA
+                sb.append(SYSTEM_PROMPT).append("\n\n")
+                for ((u, m) in history.takeLast(MAX_TURNS)) {
+                    sb.append("<start_of_turn>user\n").append(u).append("<end_of_turn>\n")
+                    sb.append("<start_of_turn>model\n").append(m).append("<end_of_turn>\n")
+                }
+                sb.append("<start_of_turn>user\n").append(question).append("<end_of_turn>\n")
+                sb.append("<start_of_turn>model\n")
+            }
         }
-        sb.append("<start_of_turn>user\n").append(question).append("<end_of_turn>\n")
-        sb.append("<start_of_turn>model\n")
 
         val answer = engine.generateResponse(sb.toString())
         history.add(question to answer)
@@ -175,5 +256,6 @@ object LocalAiEngine {
         try { llm?.close() } catch (_: Exception) {}
         llm = null
         initialized = false
+        initializedModelId = null
     }
 }

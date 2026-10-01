@@ -19,6 +19,14 @@ private const val LOGIN_PATH = "/api/apps/$APP_ID/auth/login"
 private const val REGISTER_PATH = "/api/apps/$APP_ID/auth/register"
 private const val FORGOT_PASSWORD_PATH = "/api/apps/$APP_ID/auth/forgot-password"
 private const val RESET_PASSWORD_PATH = "/api/apps/$APP_ID/auth/reset-password"
+private const val VERIFY_OTP_PATH = "/api/apps/$APP_ID/auth/verify-otp"
+private const val RESEND_OTP_PATH = "/api/apps/$APP_ID/auth/resend-otp"
+
+/** جسر مؤقت لبيانات التحقق بين شاشة التسجيل وشاشة الرمز — في الذاكرة فقط */
+object OtpFlow {
+    var pendingEmail: String = ""
+    var pendingPassword: String = ""
+}
 
 object Base44Auth {
     private const val PREFS_NAME = "noor_auth_prefs"
@@ -156,6 +164,74 @@ object Base44Auth {
             } else {
                 val errBody = response.body?.string()
                 val message = parseErrorMessage(errBody) ?: "فشل إنشاء الحساب (${response.code})"
+                Result.failure(Exception(message))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * التحقق من رمز OTP المرسل إلى البريد الإلكتروني بعد إنشاء الحساب.
+     * إذا أعاد الخادم access_token خُزّن واستُخدم تلقائياً.
+     */
+    suspend fun verifyOtp(context: Context?, email: String, otpCode: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply {
+                put("email", email)
+                put("otpCode", otpCode)
+            }
+            val requestBody = json.toString().toRequestBody(jsonMediaType)
+            val request = Request.Builder()
+                .url(BASE_URL + VERIFY_OTP_PATH)
+                .post(requestBody)
+                .build()
+
+            val response = httpClient.newCall(request).execute()
+            if (response.isSuccessful) {
+                val bodyStr = response.body?.string() ?: ""
+                if (bodyStr.isNotEmpty()) {
+                    try {
+                        val respObj = JSONObject(bodyStr)
+                        val token = respObj.optString("access_token", respObj.optString("token", ""))
+                        if (token.isNotBlank()) authToken = token
+                    } catch (_: Exception) {}
+                }
+                inMemoryLoggedIn = true
+                context?.let { ctx ->
+                    val sp = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                    sp.edit()
+                        .putBoolean(KEY_IS_LOGGED_IN, true)
+                        .putString(KEY_AUTH_TOKEN, authToken)
+                        .apply()
+                }
+                Result.success(Unit)
+            } else {
+                val errBody = response.body?.string()
+                val message = parseErrorMessage(errBody) ?: "رمز التحقق غير صحيح أو منتهي (${response.code})"
+                Result.failure(Exception(message))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /** إعادة إرسال رمز التحقق إلى البريد الإلكتروني */
+    suspend fun resendOtp(email: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val json = JSONObject().apply { put("email", email) }
+            val requestBody = json.toString().toRequestBody(jsonMediaType)
+            val request = Request.Builder()
+                .url(BASE_URL + RESEND_OTP_PATH)
+                .post(requestBody)
+                .build()
+
+            val response = httpClient.newCall(request).execute()
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                val errBody = response.body?.string()
+                val message = parseErrorMessage(errBody) ?: "فشل إعادة إرسال الرمز (${response.code})"
                 Result.failure(Exception(message))
             }
         } catch (e: Exception) {

@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.elhajri.noor.theme.NoorThemeState
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.R
 
@@ -26,25 +27,27 @@ val AmiriFamily = FontFamily(
 
 
 // ============================================================================
-// لوحة "الأبنوس والذهب الإمبراطوري" الفاخرة — تحديث فريق التصميم
-// الأسماء نفسها حتى تتجدد كل الشاشات تلقائياً
+// نظام الثيمات الديناميكي — الأسماء نفسها حتى تتجدد كل الشاشات تلقائياً
+// عند تبديل الثيم من متجر الثيمات دون إعادة إنشاء أي نشاط.
+// قيم البداية = ثيم "نور الأساسي" (الأبنوس والذهب الإمبراطوري).
 // ============================================================================
-val Navy = Color(0xFF0A0E14)              // أبنوس مخملي عميق (كان 0B1B3A)
-val NavyLight = Color(0xFF1A1F29)         // كحلي ملكي أدفأ
-val NavyCard = Color(0xFF15181E)          // بطاقات أفتح وضوحاً
-val Gold = Color(0xFFD4AF35)              // ذهب شمبانيا متوهج — تباين أعلى
-val GoldSoft = Color(0xFFF7D56E)          // ذهب فاتح مشع
-val TextMain = Color(0xFFFAF8F5)          // أبيض لؤلؤي دافئ
-val ChampagneGold = Color(0xFFF7D56E)
-val ImperialGold = Color(0xFFD4AF35)
-val AntiqueGoldDeep = Color(0xFF9E7C2E)
-val GoldHighlight = Color(0xFFF7D56E)
-val RoseGoldAccent = Color(0xFFE5A983)
-val TextSecondaryLinen = Color(0xFFC5BAA8)
-val EmeraldSuccess = Color(0xFF10B981)
-val RubyError = Color(0xFFEF4444)
 
-val NoorColors = darkColorScheme(
+val Navy get() = NoorThemeState.active.background
+val NavyLight get() = NoorThemeState.active.surfaceVariant
+val NavyCard get() = NoorThemeState.active.surface
+val Gold get() = NoorThemeState.active.accent
+val GoldSoft get() = NoorThemeState.active.accentSoft
+val TextMain get() = NoorThemeState.active.textPrimary
+val ChampagneGold get() = NoorThemeState.active.accentSoft
+val ImperialGold get() = NoorThemeState.active.accent
+val AntiqueGoldDeep get() = NoorThemeState.active.accentDeep
+val GoldHighlight get() = NoorThemeState.active.accentSoft
+val RoseGoldAccent get() = NoorThemeState.active.accentDeep
+val TextSecondaryLinen get() = NoorThemeState.active.textSecondary
+val EmeraldSuccess get() = NoorThemeState.active.success
+val RubyError get() = NoorThemeState.active.error
+
+val NoorColors get() = darkColorScheme(
     primary = Gold,
     onPrimary = Navy,
     secondary = GoldSoft,

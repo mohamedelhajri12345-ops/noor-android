@@ -28,7 +28,10 @@ class NoorApplication : Application() {
 
         // تسخين صفحات الموقع: القرآن والأناشيد جاهزتان قبل أن يضغط المستخدم
         // فتفتحان فوراً كأنهما جزء أصيل من التطبيق
-        com.elhajri.noor.web.WebViewPool.warmUp(this)
+        // استعادة الثيم المحفوظ من متجر الثيمات قبل عرض أي واجهة
+        try {
+            com.elhajri.noor.theme.ThemeStore.restoreAtStartup(this)
+        } catch (_: Exception) {}
         val previous = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             try {

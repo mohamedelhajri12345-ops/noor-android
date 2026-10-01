@@ -12,6 +12,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.Image
+import com.elhajri.noor.R
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -237,6 +241,16 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // أيقونة التطبيق الرسمية
+                    Image(
+                        painter = androidx.compose.ui.res.painterResource(R.mipmap.ic_launcher),
+                        contentDescription = "القرآن الكريم",
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clip(RoundedCornerShape(18.dp))
+                            .border(1.dp, Gold.copy(alpha = 0.45f), RoundedCornerShape(18.dp))
+                    )
+                    Spacer(Modifier.height(10.dp))
                     Text(greeting, color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
                     if (hijri.isNotEmpty()) {
                         Text(hijri, color = Gold.copy(alpha = 0.8f), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)

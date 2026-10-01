@@ -60,6 +60,8 @@ fun AiChatScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    var selectedModelId by remember { mutableStateOf(LocalAiEngine.getSelectedModel(context).id) }
+    val selectedModel = com.elhajri.noor.ai.AiModels.byId(selectedModelId)
     var downloaded by remember { mutableStateOf(LocalAiEngine.isReady(context)) }
     var downloading by remember { mutableStateOf(false) }
     var progressCurrent by remember { mutableStateOf(0L) }
@@ -75,6 +77,12 @@ fun AiChatScreen(onBack: () -> Unit) {
     fun toArabicDigits(v: Any): String {
         val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
         return v.toString().map { map[it] ?: it }.joinToString("")
+    }
+
+    // عند تبديل النموذج المختار: أعد فحص جهوزيته
+    LaunchedEffect(selectedModelId) {
+        LocalAiEngine.setSelectedModel(context, selectedModelId)
+        downloaded = LocalAiEngine.isReady(context)
     }
 
     // تهيئة النموذج عند أول فتح بعد التنزيل
@@ -157,7 +165,7 @@ fun AiChatScreen(onBack: () -> Unit) {
                     Text("ذكاء اصطناعي على هاتفك", color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(10.dp))
                     Text(
-                        "مساعد إسلامي ذكي يعمل محلياً بالكامل بنموذج Gemma من Google.\n" +
+                        "مساعد إسلامي ذكي يعمل محلياً بالكامل بنموذج مجاني مفتوح من Google LiteRT.\n" +
                             "اسأل ما تشاء عن دينك بلا حدود:\n" +
                             "• بدون إنترنت بعد التحميل\n" +
                             "• بدون حسابات ولا مفاتيح API\n" +
@@ -165,16 +173,52 @@ fun AiChatScreen(onBack: () -> Unit) {
                         color = TextMain.copy(alpha = 0.75f), fontSize = 13.sp, lineHeight = 20.sp, textAlign = TextAlign.Center
                     )
                     Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
+
+                    // ============ اختيار النموذج: كامل أو خفيف ============
+                    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        com.elhajri.noor.ai.AiModels.all.forEach { m ->
+                            val isSelected = m.id == selectedModelId
+                            val isDownloadedModel = LocalAiEngine.isReady(context, m)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(14.dp))
+                                    .background(if (isSelected) Gold.copy(alpha = 0.12f) else NavyCard)
+                                    .border(
+                                        1.dp,
+                                        if (isSelected) Gold else Gold.copy(alpha = 0.12f),
+                                        RoundedCornerShape(14.dp)
+                                    )
+                                    .clickable(enabled = !downloading) { selectedModelId = m.id }
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(m.name, color = if (isSelected) Gold else TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                    Spacer(Modifier.height(2.dp))
+                                    Text(m.description, color = TextMain.copy(alpha = 0.55f), fontSize = 10.sp)
+                                }
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    m.sizeLabel() + if (isDownloadedModel) " ✓" else "",
+                                    color = GoldSoft, fontSize = 10.sp, fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(20.dp))
                     Text(
-                        "حجم النموذج: ${LocalAiEngine.modelSizeLabel()} — يُنزَّل مرة واحدة فقط",
+                        "حجم النموذج المختار: ${selectedModel.sizeLabel()} — يُنزَّل مرة واحدة فقط",
                         color = GoldSoft, fontSize = 12.sp
                     )
                     Spacer(Modifier.height(24.dp))
-                    if (LocalAiEngine.freeBytes(context) < 2400000000L) {
+                    if (LocalAiEngine.freeBytes(context) < selectedModel.sizeBytes + 200_000_000L) {
                         Icon(Icons.Filled.ErrorOutline, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(32.dp))
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "المساحة المتاحة على جهازك لا تكفي للنموذج (~٢ جيجابايت).\nحرّر بعض المساحة ثم عُد.",
+                            "المساحة المتاحة على جهازك لا تكفي للنموذج (${selectedModel.sizeLabel()}).\nحرّر بعض المساحة ثم عُد.",
                             color = TextMain.copy(alpha = 0.6f), fontSize = 12.sp, textAlign = TextAlign.Center
                         )
                     } else {
@@ -199,7 +243,7 @@ fun AiChatScreen(onBack: () -> Unit) {
             downloading -> {
                 LaunchedEffect(Unit) {
                     try {
-                        val ok = LocalAiEngine.download(context) { c, t ->
+                        val ok = LocalAiEngine.download(context, selectedModel) { c, t ->
                             progressCurrent = c; progressTotal = t
                         }
                         if (ok) { downloaded = true; downloading = false }

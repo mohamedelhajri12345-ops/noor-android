@@ -246,7 +246,7 @@ fun NoorApp() {
         ) {
             composable("home") { HomeScreen(onNavigate = { navController.navigate(it) }) }
             composable("prayer") { PrayerScreen() }
-            composable("quran") { NoorWebView(url = NoorWeb.QURAN) }
+            composable("quran") { com.elhajri.noor.quran.QuranScreen(onSurahClick = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") }) }
             composable("athkar") { AthkarScreen(onOpenCategory = { cat, title -> navController.navigate("athkarDetail/$cat/$title") }) }
             composable("more") { MoreScreen(onNavigate = { navController.navigate(it) }) }
 
@@ -256,6 +256,8 @@ fun NoorApp() {
             composable("quiz") { QuizScreen() }
             composable("stories") { StoriesScreen(onOpenStory = { id -> navController.navigate("story/$id") }) }
             composable("settings") { SettingsScreen(onOpenPrivacy = { navController.navigate("privacy") }) }
+            composable("themes") { com.elhajri.noor.theme.ThemeStoreScreen(onOpenEarnPoints = { navController.navigate("earn") }) }
+            composable("earn") { com.elhajri.noor.theme.EarnPointsScreen(onBack = { navController.popBackStack() }) }
 
             composable("reader/{number}/{name}") { entry ->
                 val number = entry.arguments?.getString("number")?.toIntOrNull() ?: 1
@@ -280,8 +282,16 @@ fun NoorApp() {
                 onForgot = { navController.navigate("forgot") }
             ) }
             composable("register") { RegisterScreen(
-                onSuccess = { navController.popBackStack("login", inclusive = true) },
+                // بعد إنشاء الحساب: شاشة إدخال رمز التحقق الذي وصله على البريد
+                onSuccess = { navController.navigate("verifyOtp") },
                 onLogin = { navController.popBackStack() }
+            ) }
+            composable("verifyOtp") { com.elhajri.noor.auth.VerifyOtpScreen(
+                onVerified = {
+                    navController.popBackStack("login", inclusive = true)
+                    navController.navigate("community")
+                },
+                onBack = { navController.popBackStack() }
             ) }
             composable("forgot") { ForgotPasswordScreen(onBack = { navController.popBackStack() }) }
             composable("reset") { ResetPasswordScreen(onBack = { navController.popBackStack() }) }
@@ -301,7 +311,7 @@ fun NoorApp() {
             ) }
             composable("donation") { DonationScreen(onBack = { navController.popBackStack() }) }
             composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
-            composable("library") { NoorWebView(url = NoorWeb.LIBRARY, title = "مكتبة الأناشيد", onBack = { navController.popBackStack() }) }
+            composable("library") { com.elhajri.noor.quran.LibraryScreen(onBack = { navController.popBackStack() }) }
             composable("tracker") { TrackerScreen() }
             composable("games") { GamesScreen(onNavigate = { navController.navigate(it) }) }
             composable("names_game") { NamesGameScreen(onBack = { navController.popBackStack() }) }

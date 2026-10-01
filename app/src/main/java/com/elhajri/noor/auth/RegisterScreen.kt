@@ -244,7 +244,12 @@ fun RegisterScreen(
                                     val res = Base44Auth.register(context, email, password, fullName)
                                     isLoading = false
                                     res.fold(
-                                        onSuccess = { onSuccess() },
+                                        onSuccess = {
+                                            // أرسل الخادم رمز تحقق إلى البريد — انتقل لشاشة إدخال الرمز
+                                            OtpFlow.pendingEmail = email
+                                            OtpFlow.pendingPassword = password
+                                            onSuccess()
+                                        },
                                         onFailure = { err ->
                                             errorMessage = err.message ?: "فشل إنشاء الحساب"
                                             snackbarHostState.showSnackbar(errorMessage!!)

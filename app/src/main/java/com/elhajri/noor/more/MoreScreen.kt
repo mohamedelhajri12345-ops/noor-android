@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Bookmark
@@ -72,6 +73,7 @@ private val features = listOf(
     MoreFeature("zakat", "حاسبة الزكاة", "احسب زكاتك", Icons.Filled.Paid),
     MoreFeature("hajj", "الحج والعمرة", "دليل المصطافين", Icons.Filled.Bookmark),
     MoreFeature("tracker", "ورد القرآن", "متتبع التلاوة", Icons.Filled.TaskAlt),
+    MoreFeature("themes", "متجر الثيمات", "ثيمات إسلامية بالنقاط", Icons.Filled.Palette),
     MoreFeature("settings", "الإعدادات", "إعدادات التطبيق", Icons.Filled.Settings)
 )
 

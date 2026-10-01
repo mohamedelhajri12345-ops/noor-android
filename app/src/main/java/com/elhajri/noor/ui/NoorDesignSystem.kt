@@ -23,47 +23,37 @@ import androidx.compose.ui.unit.dp
  */
 object NoorGradients {
 
-    /** خلفية الشاشات: من الأعلى بلمسة ليلية فاخرة إلى القاع الأبنيسي الداكن */
-    val ScreenBackground = Brush.verticalGradient(
+    private val T get() = com.elhajri.noor.theme.NoorThemeState.active
+
+    /** خلفية الشاشات: تدرّج الثيم الحالي */
+    val ScreenBackground get() = Brush.verticalGradient(
+        colors = listOf(T.background, T.backgroundEnd)
+    )
+
+    /** اللون المعدني للأزرار والعناوين الكبرى — ألوان الثيم */
+    val ImperialGoldMetallic get() = Brush.linearGradient(
+        colors = listOf(T.accentSoft, T.accent, T.accent, T.accentDeep)
+    )
+
+    /** تدرّج الأزرار الناعم — ألوان الثيم */
+    val GoldButton get() = Brush.horizontalGradient(
+        colors = listOf(T.accentSoft, T.accent, T.accentDeep)
+    )
+
+    /** حدود البطاقات الزجاجية بألوان الثيم */
+    val GlassBorderGold get() = Brush.linearGradient(
         colors = listOf(
-            Color(0xFF0A0E14),
-            Color(0xFF0A0E14)
+            T.accentSoft.copy(alpha = 0.50f),
+            T.accent.copy(alpha = 0.15f),
+            T.accentSoft.copy(alpha = 0.35f)
         )
     )
 
-    /** الذهب المعدني الإمبراطوري للأزرار والعناوين الكبرى */
-    val ImperialGoldMetallic = Brush.linearGradient(
+    /** تعبئة البطاقات الزجاجية شبه الشفافة — سطح الثيم */
+    val GlassSurface get() = Brush.linearGradient(
         colors = listOf(
-            GoldHighlight,
-            ImperialGold,
-            Gold,
-            AntiqueGoldDeep
-        )
-    )
-
-    /** تدرّج أزرار الذهب الناعم */
-    val GoldButton = Brush.horizontalGradient(
-        colors = listOf(
-            Color(0xFFE8C96A),
-            Color(0xFFD4AF37),
-            Color(0xFFB8941F)
-        )
-    )
-
-    /** حدود البطاقات الزجاجية الذهبية */
-    val GlassBorderGold = Brush.linearGradient(
-        colors = listOf(
-            ChampagneGold.copy(alpha = 0.50f),
-            Gold.copy(alpha = 0.15f),
-            ChampagneGold.copy(alpha = 0.35f)
-        )
-    )
-
-    /** تعبئة البطاقات الزجاجية شبه الشفافة */
-    val GlassSurface = Brush.linearGradient(
-        colors = listOf(
-            Color(0x2B24334C),
-            Color(0x1A141F33)
+            T.surfaceVariant.copy(alpha = 0.17f),
+            T.surface.copy(alpha = 0.10f)
         )
     )
 
