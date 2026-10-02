@@ -208,6 +208,8 @@ object LocalAiEngine {
                     }
                 }
             }
+            // الحلقة لا تنتهي طبيعياً — هذا خط دفاعي لرضا المترجم النوعي فقط
+            return@withContext false
         } catch (e: DownloadException) {
             throw e
         } catch (e: Exception) {
