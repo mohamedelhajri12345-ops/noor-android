@@ -50,7 +50,31 @@ jobs:
 
       # ═══ إصدار الإنتاج: نسخة Release موقّعة بالمفتاح الثابت ═══
       - name: Build Release APK + AAB
-        run: gradle assembleRelease bundleRelease --no-daemon --stacktrace
+        run: |
+          set -o pipefail
+          gradle assembleRelease bundleRelease --no-daemon --stacktrace 2>&1 | tee build-output.log
+      # عند الفشل: انشر سجل الأخطاء في فرع ci-errors كي يمكن قراءته بدون صلاحيات إدارية
+      - name: Publish build errors (on failure)
+        if: failure()
+        run: |
+          mkdir -p err
+          grep -B2 -A8 "error:\|e: \|FAILURE\|Unresolved" build-output.log | tail -n 200 > err/build-error.txt || tail -n 100 build-output.log > err/build-error.txt
+          echo "Build failed at $(date -u)" >> err/build-error.txt
+          git config user.name "NOOR CI"
+          git config user.email "ci@noor.local"
+          git checkout --orphan ci-errors 2>/dev/null || git checkout ci-errors
+          git rm -rf --cached . -q 2>/dev/null || true
+          cp err/build-error.txt /tmp/build-error.txt
+          git checkout main -- .github 2>/dev/null || true
+          git checkout --orphan ci-errors2 2>/dev/null
+          cd /tmp && mkdir -p cierr && cp build-error.txt cierr/
+          cd cierr && git init -q && git checkout -q -b main 2>/dev/null
+          git -C /tmp/cierr remote add origin "https://x-access-token:${GH_TOKEN}@github.com/$GITHUB_REPOSITORY.git" 2>/dev/null || git -C /tmp/cierr remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/$GITHUB_REPOSITORY.git"
+          git -C /tmp/cierr add build-error.txt
+          git -C /tmp/cierr -c user.name="NOOR CI" -c user.email="ci@noor.local" commit -q -m "build errors $(date -u +%Y%m%d%H%M%S)"
+          git -C /tmp/cierr push -q -f origin main:ci-errors
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Read version name
         id: ver
