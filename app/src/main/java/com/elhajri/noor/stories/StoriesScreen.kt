@@ -46,8 +46,7 @@ fun StoriesScreen(onOpenStory: (Int) -> Unit = {}) {
             .background(NoorGradients.ScreenBackground)
             .padding(16.dp)
     ) {
-        com.elhajri.noor.ui.NoorHeroBanner(
-            imageUrl = com.elhajri.noor.ui.NoorHeroImages.MINARET,
+        com.elhajri.noor.ui.NoorSectionTitle(
             title = "قصص الأنبياء",
             subtitle = "${toArabicDigits(stories.size)} قصة ملهمة"
         )

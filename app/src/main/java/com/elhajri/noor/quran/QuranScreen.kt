@@ -75,8 +75,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
         Spacer(modifier = Modifier.height(12.dp))
 
         // Title
-        com.elhajri.noor.ui.NoorHeroBanner(
-            imageUrl = com.elhajri.noor.ui.NoorHeroImages.QURAN_REHAL,
+        com.elhajri.noor.ui.NoorSectionTitle(
             title = "القرآن الكريم",
             subtitle = "١١٤ سورة · ٦٢٣٦ آية"
         )

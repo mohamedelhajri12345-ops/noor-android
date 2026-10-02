@@ -447,7 +447,7 @@ private fun buildPlaybackNotification(
         context.packageManager.getLaunchIntentForPackage(context.packageName),
         PendingIntent.FLAG_IMMUTABLE
     )
-    val playPauseIcon = if (s.isPlaying) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play
+    val playPauseIcon = if (s.isPlaying) R.drawable.ic_notif_pause else R.drawable.ic_notif_play
     // أيقونة التطبيق الرسمية عريضة في الإشعار — مظهر احترافي موحد
     val largeIcon = try {
         android.graphics.BitmapFactory.decodeResource(context.resources, com.elhajri.noor.R.mipmap.ic_launcher)
@@ -461,10 +461,12 @@ private fun buildPlaybackNotification(
         .setOngoing(s.isPlaying)
         .setOnlyAlertOnce(true)
         .setPriority(NotificationCompat.PRIORITY_LOW)
-        .addAction(android.R.drawable.ic_media_previous, "السابق", actionIntent(NotificationActions.ACTION_PREV))
+        .setColor(0xFFD4AF37.toInt())      // لمسة ذهبية تناسب هوية التطبيق
+        .setColorized(true)
+        .addAction(R.drawable.ic_notif_prev, "السابق", actionIntent(NotificationActions.ACTION_PREV))
         .addAction(playPauseIcon, if (s.isPlaying) "إيقاف" else "تشغيل", actionIntent(NotificationActions.ACTION_TOGGLE))
-        .addAction(android.R.drawable.ic_media_next, "التالي", actionIntent(NotificationActions.ACTION_NEXT))
-        .addAction(android.R.drawable.ic_menu_close_clear_cancel, "إغلاق", actionIntent(NotificationActions.ACTION_STOP))
+        .addAction(R.drawable.ic_notif_next, "التالي", actionIntent(NotificationActions.ACTION_NEXT))
+        .addAction(R.drawable.ic_notif_close, "إغلاق", actionIntent(NotificationActions.ACTION_STOP))
         .setStyle(
             androidx.media.app.NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2)

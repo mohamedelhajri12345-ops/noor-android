@@ -204,35 +204,40 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         Quick("stories", "القصص", Icons.Filled.Book),
     )
 
+    Box(modifier = Modifier.fillMaxSize()) {
+        // ============ الخلفية الجديدة: سماء ليلية ومسجد — خلفية كامل الشاشة ============
+        Image(
+            painter = androidx.compose.ui.res.painterResource(R.drawable.mosque_night_bg),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    0f to Navy.copy(alpha = 0.60f),
+                    0.45f to Navy.copy(alpha = 0.74f),
+                    1f to Navy.copy(alpha = 0.92f)
+                )
+            )
+        )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        // ============ ودجت الصلاة — بطاقة الصورة الرئيسية كما بالموقع ============
+        // ============ ودجت الصلاة — نص فوق خلفية الشاشة، بلا صورة محلية ولا إطار ============
         val heroInteraction = remember { MutableInteractionSource() }
         val heroScale = pressScale(heroInteraction)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(224.dp)
+                .height(190.dp)
                 .graphicsLayer { scaleX = heroScale; scaleY = heroScale }
-                .clip(RoundedCornerShape(16.dp))
                 .clickable(interactionSource = heroInteraction, indication = null) { onNavigate("prayer") }
         ) {
-            AsyncImage(HERO_IMG, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-            // تدرج الموقع نفسه: داكن أعلى وأسفل، شفاف بالوسط
-            Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(
-                        0f to Navy.copy(alpha = 0.78f),
-                        0.38f to Navy.copy(alpha = 0.25f),
-                        1f to Navy.copy(alpha = 0.72f)
-                    )
-                )
-            )
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 verticalArrangement = Arrangement.SpaceBetween
@@ -241,16 +246,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // أيقونة التطبيق الرسمية
-                    Image(
-                        painter = androidx.compose.ui.res.painterResource(R.mipmap.ic_launcher),
-                        contentDescription = "القرآن الكريم",
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(RoundedCornerShape(18.dp))
-                            .border(1.dp, Gold.copy(alpha = 0.45f), RoundedCornerShape(18.dp))
-                    )
-                    Spacer(Modifier.height(10.dp))
                     Text(greeting, color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
                     if (hijri.isNotEmpty()) {
                         Text(hijri, color = Gold.copy(alpha = 0.8f), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
@@ -376,9 +371,13 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 Text(hadith.ref, color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
             }
             Spacer(Modifier.width(12.dp))
-            AsyncImage(
-                EMBLEM_IMG, contentDescription = "القرآن الكريم",
-                modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp)),
+            Image(
+                painter = androidx.compose.ui.res.painterResource(R.mipmap.ic_launcher),
+                contentDescription = "أيقونة التطبيق",
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(1.dp, Gold.copy(alpha = 0.35f), RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.Crop
             )
         }
@@ -430,5 +429,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         }
 
         Spacer(Modifier.height(16.dp))
+    }
     }
 }

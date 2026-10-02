@@ -1,5 +1,7 @@
 package com.elhajri.noor.ui
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -185,24 +187,70 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+/**
+ * ورقة المشغل الكامل — طبق الأصل عن الموقع: شريحة ثابتة تنزلق من الأسفل بحركة
+ * واحدة منتظمة (slide-up) فوق ستار معتم، تُغلق بالنقر على الستار أو زر "إيقاف"،
+ * بلا فيزياء سحب عشوائية الاستقرار (كانت سبب شعور المشغل بأنه "يتحرك عشوائياً").
+ * تُحسب حشوة شريط تنقّل النظام أسفلها كي لا تُغطّى أزرار الهاتف صفوف التحكم السفلية.
+ */
 @Composable
 private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
     val context = LocalContext.current
     fun manager(): com.elhajri.noor.audio.player.PlayerFacade = if (active.isQuran) QuranPlayerManager else NasheedPlayerManager
     var showSleep by remember { mutableStateOf(false) }
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = PlayerBarBg,
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+
+    fun requestClose() { visible = false }
+
+    LaunchedEffect(visible) {
+        if (!visible) {
+            kotlinx.coroutines.delay(260)
+            onDismiss()
+        }
+    }
+
+    androidx.activity.compose.BackHandler(enabled = true) { requestClose() }
+
+    val scrimAlpha by animateFloatAsState(
+        targetValue = if (visible) 0.55f else 0f,
+        animationSpec = tween(260),
+        label = "scrim"
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = scrimAlpha))
+            .clickable(
+                indication = null,
+                interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+            ) { requestClose() }
     ) {
+        androidx.compose.animation.AnimatedVisibility(
+            visible = visible,
+            enter = androidx.compose.animation.slideInVertically(
+                animationSpec = tween(280, easing = androidx.compose.animation.core.FastOutSlowInEasing)
+            ) { it } + androidx.compose.animation.fadeIn(tween(220)),
+            exit = androidx.compose.animation.slideOutVertically(
+                animationSpec = tween(220, easing = androidx.compose.animation.core.FastOutSlowInEasing)
+            ) { it } + androidx.compose.animation.fadeOut(tween(180)),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                .background(PlayerBarBg)
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                ) { /* يمتص النقر — لا يُغلق المشغل عند النقر داخل الورقة */ }
+                .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.navigationBars)
                 .padding(horizontal = 20.dp)
-                .padding(bottom = 28.dp)
+                .padding(top = 14.dp, bottom = 20.dp)
         ) {
             // drag handle
             Box(
@@ -407,7 +455,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                     border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFB04050).copy(alpha = 0.5f)),
                     modifier = Modifier.clickable {
                         manager().stop()
-                        onDismiss()
+                        requestClose()
                     }
                 ) {
                     Row(
@@ -458,6 +506,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                     }
                 }
             }
+        }
         }
     }
 }

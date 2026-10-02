@@ -1,10 +1,11 @@
 package com.elhajri.noor.ai
 
+import android.app.DownloadManager
 import android.content.Context
+import android.net.Uri
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.io.File
 import java.io.IOException
 
@@ -73,6 +74,20 @@ object LocalAiEngine {
     @Volatile
     private var cancelRequested = false
 
+    // تنزيل النظام (DownloadManager) — يبقى جارياً حتى لو أُغلق التطبيق أو قُفل الشاشة
+    private const val KEY_DM_ID_PREFIX = "dm_download_id_"
+
+    private fun dmPrefs(context: Context) = context.applicationContext.getSharedPreferences("noor_dm_prefs", Context.MODE_PRIVATE)
+
+    private fun dmId(context: Context, model: AiModelDef): Long =
+        dmPrefs(context).getLong(KEY_DM_ID_PREFIX + model.id, -1L)
+
+    private fun saveDmId(context: Context, model: AiModelDef, id: Long) =
+        dmPrefs(context).edit().putLong(KEY_DM_ID_PREFIX + model.id, id).apply()
+
+    private fun clearDmId(context: Context, model: AiModelDef) =
+        dmPrefs(context).edit().remove(KEY_DM_ID_PREFIX + model.id).apply()
+
     // ───────────────── اختيار النموذج ─────────────────
 
     fun getSelectedModel(context: Context): AiModelDef =
@@ -107,8 +122,9 @@ object LocalAiEngine {
     class DownloadException(message: String) : IOException(message)
 
     /**
-     * تنزيل النموذج مع استئناف تلقائي إن وُجد جزء سابق، وتقرير تقدم دوري.
-     * يُنفَّذ على خيط الإدخال/الإخراج. يعيد true عند اكتمال التنزيل.
+     * تنزيل النموذج عبر DownloadManager الخاص بالنظام:
+     * يستمر التنزيل حتى لو أُغلق التطبيق أو قُفل الشاشة أو انطفأ الهاتف مؤقتاً،
+     * ويُستأنف تلقائياً عند عودة الشبكة، مع إشعار تقدم يعرضه النظام.
      */
     suspend fun download(
         context: Context,
@@ -116,70 +132,138 @@ object LocalAiEngine {
         onProgress: (downloadedBytes: Long, totalBytes: Long) -> Unit
     ): Boolean = withContext(Dispatchers.IO) {
         cancelRequested = false
-        val partFile = File(context.filesDir, "${model.file}.part")
-        var downloaded = if (partFile.exists()) partFile.length() else 0L
-        if (downloaded >= model.sizeBytes) {
-            partFile.renameTo(modelFile(context, model))
+        val app = context.applicationContext
+        val dm = app.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+
+        // اكتمل ملف جزئي سابقاً؟ أنجزه فوراً
+        val partFile = File(app.filesDir, "${model.file}.part")
+        if (partFile.exists() && partFile.length() >= model.sizeBytes - 4096) {
+            partFile.renameTo(modelFile(app, model))
             return@withContext true
         }
+        if (isReady(app, model)) return@withContext true
 
-        val client = OkHttpClient.Builder().build()
-        val request = Request.Builder()
-            .url(model.url)
-            .apply { if (downloaded > 0) header("Range", "bytes=$downloaded-") }
-            .build()
-
-        val response = try {
-            client.newCall(request).execute()
-        } catch (e: Exception) {
-            throw DownloadException("تعذّر الاتصال بالشبكة — تأكد من الإنترنت وحاول مجدداً")
+        // تنزيل جارٍ من جلسة سابقة؟ تابع مراقبته (استئناف بعد إعادة فتح التطبيق)
+        var id = dmId(app, model)
+        if (id != -1L) {
+            val q = DownloadManager.Query().setFilterById(id)
+            dm.query(q)?.use { c ->
+                if (!c.moveToFirst()) {
+                    id = -1L
+                    clearDmId(app, model)
+                } else {
+                    val status = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+                    if (status == DownloadManager.STATUS_FAILED || status == DownloadManager.STATUS_PAUSED && cancelRequested) {
+                        // لا شيء — نتابع المراقبة
+                    }
+                }
+            }
         }
 
+        if (id == -1L) {
+            val req = DownloadManager.Request(Uri.parse(model.url))
+                .setTitle("تنزيل ${model.name}")
+                .setDescription("نور — نموذج الذكاء الاصطناعي المحلي")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                .setAllowedOverMetered(true)
+                .setAllowedOverRoaming(true)
+                .setDestinationInExternalFilesDir(app, null, model.file + ".dm")
+            id = dm.enqueue(req)
+            saveDmId(app, model, id)
+        }
+
+        // مراقبة التقدم — التنزيل نفسه في عملية النظام، والمراقبة هنا فقط
+        val target = model.sizeBytes
         try {
-            if (!response.isSuccessful) {
-                throw DownloadException("تعذّر بدء التنزيل (رمز ${response.code})")
-            }
-            val body = response.body ?: throw DownloadException("استجابة تنزيل فارغة")
-            val total =
-                if (downloaded > 0) model.sizeBytes
-                else (body.contentLength().takeIf { it > 0 } ?: model.sizeBytes)
-
-            val input = body.byteStream()
-            val output: java.io.FileOutputStream =
-                if (downloaded > 0) java.io.FileOutputStream(partFile, true)
-                else java.io.FileOutputStream(partFile)
-            val buffer = ByteArray(64 * 1024)
-            var sinceLastReport = 0L
             while (true) {
-                if (cancelRequested) {
-                    output.close(); input.close(); response.close()
-                    return@withContext false
-                }
-                val read = input.read(buffer)
-                if (read == -1) break
-                output.write(buffer, 0, read)
-                downloaded += read
-                sinceLastReport += read
-                if (sinceLastReport >= 512 * 1024 || read < buffer.size) {
-                    sinceLastReport = 0
-                    onProgress(downloaded, total)
+                val done = queryStatus(dm, id)
+                when (done.first) {
+                    DownloadManager.STATUS_SUCCESSFUL -> {
+                        // انقل الملف من مخزن التطبيق الخارجي إلى الداخلي
+                        val externalPart = File(app.getExternalFilesDir(null), model.file + ".dm")
+                        val finalFile = modelFile(app, model)
+                        if (externalPart.exists()) {
+                            externalPart.copyTo(finalFile, overwrite = true)
+                            externalPart.delete()
+                        } else if (partFile.exists()) {
+                            partFile.renameTo(finalFile)
+                        }
+                        clearDmId(app, model)
+                        onProgress(target, target)
+                        return@withContext true
+                    }
+                    DownloadManager.STATUS_FAILED -> {
+                        dm.remove(id)
+                        clearDmId(app, model)
+                        throw DownloadException("فشل التنزيل — تحقق من الإنترنت وأعد المحاولة (سيُستأنف من حيث توقف)")
+                    }
+                    else -> {
+                        if (cancelRequested) {
+                            // إلغاء المستخدم: نوقف التنزيل ونحفظ ما نُزّل
+                            onProgress(done.second, target)
+                            return@withContext false
+                        }
+                        onProgress(done.second, target)
+                        delay(600)
+                    }
                 }
             }
-            output.flush(); output.close(); input.close(); response.close()
-
-            if (downloaded >= model.sizeBytes - 4096) {
-                partFile.renameTo(modelFile(context, model))
-                true
-            } else {
-                // اكتمل الاتصال قبل اكتمال الملف — سيُستأنف في المحاولة التالية
-                throw DownloadException("انقطع التنزيل قبل الاكتمال — أعد المحاولة")
-            }
-        } finally {
-            response.close()
+        } catch (e: DownloadException) {
+            throw e
+        } catch (e: Exception) {
+            // انقطعت المراقبة (مثلاً أُغلق التطبيق) — التنزيل نفسه مستمر في النظام
+            throw DownloadException("التنزيل مستمر في الخلفية — أعد فتح التطبيق لمتابعة التقدم")
         }
     }
 
-    fun cancelDownload() { cancelRequested = true }
+    private fun queryStatus(dm: DownloadManager, id: Long): Pair<Int, Long> {
+        val q = DownloadManager.Query().setFilterById(id)
+        dm.query(q)?.use { c ->
+            if (c.moveToFirst()) {
+                val status = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+                val sofar = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+                return Pair(status, sofar)
+            }
+        }
+        return Pair(DownloadManager.STATUS_FAILED, 0L)
+    }
+
+    /**
+     * عند إعادة فتح التطبيق: إن كان هناك تنزيل اكتمل أثناء الإغلاق، أنجز نقله.
+     */
+    fun finalizePendingDownload(context: Context, model: AiModelDef = getSelectedModel(context)) {
+        val app = context.applicationContext
+        val id = dmId(app, model)
+        if (id == -1L) return
+        val dm = app.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val (status, _) = queryStatus(dm, id)
+        if (status == DownloadManager.STATUS_SUCCESSFUL) {
+            val externalPart = File(app.getExternalFilesDir(null), model.file + ".dm")
+            val finalFile = modelFile(app, model)
+            if (externalPart.exists()) {
+                externalPart.copyTo(finalFile, overwrite = true)
+                externalPart.delete()
+                clearDmId(app, model)
+            }
+        } else if (status == DownloadManager.STATUS_FAILED) {
+            dm.remove(id)
+            clearDmId(app, model)
+        }
+    }
+
+    /** إلغاء المستخدم الصريح: يوقف مراقبة التقدم وينهي تنزيل النظام */
+    fun cancelDownload(context: Context, model: AiModelDef = getSelectedModel(context)) {
+        cancelRequested = true
+        val app = context.applicationContext
+        val id = dmId(app, model)
+        if (id != -1L) {
+            try {
+                val dm = app.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                dm.remove(id)
+            } catch (_: Exception) { }
+            clearDmId(app, model)
+        }
+    }
 
     fun deleteModel(context: Context, model: AiModelDef = getSelectedModel(context)) {
         close()

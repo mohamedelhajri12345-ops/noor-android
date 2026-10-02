@@ -58,11 +58,10 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
                 .background(NoorGradients.ScreenBackground)
                 .padding(16.dp)
         ) {
-            NoorHeroBanner(
-                imageUrl = NoorHeroImages.LANTERNS,
+            com.elhajri.noor.ui.NoorSectionTitle(
                 title = "الأذكار",
                 subtitle = "حصنك من كل شر بإذن الله",
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 10.dp)
             )
 
             LazyColumn(

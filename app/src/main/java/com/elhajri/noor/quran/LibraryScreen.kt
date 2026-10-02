@@ -180,11 +180,10 @@ fun LibraryScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(10.dp))
 
             // البانر العلوي
-            com.elhajri.noor.ui.NoorHeroBanner(
-                imageUrl = com.elhajri.noor.ui.NoorHeroImages.LANTERNS,
+            com.elhajri.noor.ui.NoorSectionTitle(
                 title = "الأناشيد",
                 subtitle = "أناشيد إسلامية بدون موسيقى — ${toArabicNumber(nasheeds.size)} نشيد",
-                modifier = Modifier.padding(bottom = 10.dp)
+                modifier = Modifier.padding(bottom = 6.dp)
             )
 
             // Search box

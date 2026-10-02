@@ -61,7 +61,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: NOOR-release-APK
-          path: app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/apk/release/*arm64*.apk
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
@@ -76,7 +76,7 @@ jobs:
           TAG="${{ steps.ver.outputs.name }}"
           APK_NAME="noor-${TAG}.apk"
           AAB_NAME="noor-${TAG}.aab"
-          cp app/build/outputs/apk/release/app-release.apk "$APK_NAME"
+          cp app/build/outputs/apk/release/*arm64*-release.apk "$APK_NAME"
           cp app/build/outputs/bundle/release/app-release.aab "$AAB_NAME"
           if gh release view "$TAG" -R "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release upload "$TAG" "$APK_NAME" "$AAB_NAME" --clobber -R "$GITHUB_REPOSITORY"

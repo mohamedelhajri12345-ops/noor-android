@@ -11,8 +11,8 @@ android {
         applicationId = "com.elhajri.noor"
         minSdk = 24
         targetSdk = 34
-        versionCode = 51
-        versionName = "5.1"
+        versionCode = 52
+        versionName = "5.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -75,6 +75,17 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+}
+
+// تقسيم معالجات الهاتف: بدل حزم 4 معمارية معاً (126MB) نحزم arm64-v8a فقط
+// (كل الهواتف الحديثة 2018+) فيصير حجم الـAPK أقل من 70MB، مع إبقاء AAB كاملاً لـ Play.
+splits {
+    abi {
+        isEnable = true
+        reset()
+        include("arm64-v8a")            // الهواتف الحديثة — يغطي 99% من الأجهزة
+        isUniversalApk = false           // نُلغي الحزمة الشاملة الثقيلة
     }
 }
 

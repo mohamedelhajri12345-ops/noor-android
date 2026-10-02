@@ -83,6 +83,8 @@ fun AiChatScreen(onBack: () -> Unit) {
     // عند تبديل النموذج المختار: أعد فحص جهوزيته
     LaunchedEffect(selectedModelId) {
         LocalAiEngine.setSelectedModel(context, selectedModelId)
+        // إن اكتمل تنزيلٌ كان جارياً في الخلفية (والتطبيق مغلق) أنجز نقله الآن
+        LocalAiEngine.finalizePendingDownload(context)
         downloaded = LocalAiEngine.isReady(context)
     }
 
@@ -278,7 +280,7 @@ fun AiChatScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(24.dp))
                     Text("أرسل التطبيق للخلفية بأمان — التنزيل مستمر", color = GoldSoft, fontSize = 11.sp)
                     Spacer(Modifier.height(16.dp))
-                    TextButton(onClick = { LocalAiEngine.cancelDownload() }) {
+                    TextButton(onClick = { LocalAiEngine.cancelDownload(context, selectedModel) }) {
                         Text("إلغاء", color = Color(0xFFEF4444), fontSize = 13.sp)
                     }
                 }

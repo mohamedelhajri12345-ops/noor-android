@@ -11,7 +11,7 @@ import android.content.SharedPreferences
  */
 object ThemeStore {
 
-    const val THEME_PRICE = 1000
+    const val THEME_PRICE = 0  // مؤقتاً مجاني للتجربة — يُعاد لـ1000 بعد ربط معرفات الإعلانات
     const val POINTS_PER_AD = 100
     const val ADS_PER_SESSION = 3
 
