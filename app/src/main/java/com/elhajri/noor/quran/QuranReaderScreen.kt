@@ -70,8 +70,8 @@ import java.io.File
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.text.InlineTextContent
-import androidx.compose.foundation.text.Placeholder
-import androidx.compose.foundation.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.border
 import androidx.compose.foundation.text.appendInlineContent

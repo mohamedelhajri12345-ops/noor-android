@@ -285,6 +285,63 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
 
         Spacer(Modifier.height(24.dp))
     }
+    // ═══ اختيار المدينة ═══
+    if (showCityPicker) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showCityPicker = false },
+            title = { Text("اختر مدينتك", color = Gold, fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = citySearch,
+                        onValueChange = { citySearch = it },
+                        placeholder = { Text("ابحث عن مدينة...", fontSize = 13.sp) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = androidx.compose.ui.graphics.Color.White,
+                            unfocusedTextColor = androidx.compose.ui.graphics.Color.White,
+                            cursorColor = Gold,
+                            focusedBorderColor = Gold,
+                            unfocusedBorderColor = NavyLight
+                        )
+                    )
+                    Column(Modifier.verticalScroll(rememberScrollState()).height(320.dp)) {
+                        val q = citySearch.trim()
+                        val filtered = if (q.isBlank()) allCities else allCities.filter { it.name.contains(q) || it.country.contains(q) }
+                        filtered.forEach { c ->
+                            val selected = c.name == city.name && c.country == city.country
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (selected) Gold else androidx.compose.ui.graphics.Color.Transparent)
+                                    .clickable {
+                                        city = c
+                                        com.elhajri.noor.data.Prefs.setCity(context, c)
+                                        com.elhajri.noor.notification.AdhanScheduler.scheduleNextAdhan(context)
+                                        showCityPicker = false
+                                    }
+                                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Filled.LocationOn, contentDescription = null, tint = if (selected) Navy else Gold, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text(c.name, color = if (selected) Navy else androidx.compose.ui.graphics.Color.White, fontSize = 14.sp)
+                                Spacer(Modifier.width(6.dp))
+                                Text(c.country, color = if (selected) Navy.copy(alpha = 0.7f) else GoldSoft.copy(alpha = 0.6f), fontSize = 11.sp)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showCityPicker = false }) { Text("إغلاق", color = GoldSoft) }
+            },
+            containerColor = NavyCard
+        )
+    }
+
 }
 
 /** قسم إعدادات — بطاقة بأيقونة ذهبية وعنوان، كما في الموقع */
@@ -355,61 +412,4 @@ private fun GoldToggle(on: Boolean, onToggle: (Boolean) -> Unit) {
                 .background(if (on) Navy else Color.White.copy(alpha = 0.7f))
         )
     }
-    // ═══ اختيار المدينة ═══
-    if (showCityPicker) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { showCityPicker = false },
-            title = { Text("اختر مدينتك", color = Gold, fontWeight = FontWeight.Bold) },
-            text = {
-                Column {
-                    OutlinedTextField(
-                        value = citySearch,
-                        onValueChange = { citySearch = it },
-                        placeholder = { Text("ابحث عن مدينة...", fontSize = 13.sp) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = androidx.compose.ui.graphics.Color.White,
-                            unfocusedTextColor = androidx.compose.ui.graphics.Color.White,
-                            cursorColor = Gold,
-                            focusedBorderColor = Gold,
-                            unfocusedBorderColor = NavyLight
-                        )
-                    )
-                    Column(Modifier.verticalScroll(rememberScrollState()).height(320.dp)) {
-                        val q = citySearch.trim()
-                        val filtered = if (q.isBlank()) allCities else allCities.filter { it.name.contains(q) || it.country.contains(q) }
-                        filtered.forEach { c ->
-                            val selected = c.name == city.name && c.country == city.country
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(if (selected) Gold else androidx.compose.ui.graphics.Color.Transparent)
-                                    .clickable {
-                                        city = c
-                                        com.elhajri.noor.data.Prefs.setCity(context, c)
-                                        com.elhajri.noor.notification.AdhanScheduler.scheduleNextAdhan(context)
-                                        showCityPicker = false
-                                    }
-                                    .padding(horizontal = 10.dp, vertical = 10.dp),
-                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                            ) {
-                                Icon(Icons.Filled.LocationOn, contentDescription = null, tint = if (selected) Navy else Gold, modifier = Modifier.size(16.dp))
-                                Spacer(Modifier.width(8.dp))
-                                Text(c.name, color = if (selected) Navy else androidx.compose.ui.graphics.Color.White, fontSize = 14.sp)
-                                Spacer(Modifier.width(6.dp))
-                                Text(c.country, color = if (selected) Navy.copy(alpha = 0.7f) else GoldSoft.copy(alpha = 0.6f), fontSize = 11.sp)
-                            }
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showCityPicker = false }) { Text("إغلاق", color = GoldSoft) }
-            },
-            containerColor = NavyCard
-        )
-    }
-
 }
