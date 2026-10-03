@@ -11,6 +11,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -223,13 +227,16 @@ fun QuranReaderScreen(
         val tracks = (currentSurahNum..minOf(114, currentSurahNum + 4)).mapNotNull { n ->
             val servers = currentReciter.servers
             val name = allSurahs.find { it.number == n }?.name ?: currentName
-            if (servers.isEmpty()) null
+            // بدون إنترنت: الملف المحلي المنزّل أولاً، والبث احتياط
+            val local = com.elhajri.noor.quran.ReciterOffline.localPathIfAny(context, currentReciter.id, n)
+            if (servers.isEmpty() && local == null) null
             else com.elhajri.noor.audio.player.PlayerTrack(
                 id = "quran-$n",
-                url = "${servers[0]}${String.format("%03d", n)}.mp3",
+                url = local ?: "${servers[0]}${String.format("%03d", n)}.mp3",
                 title = "سورة $name",
                 artist = currentReciter.name,
-                fallbackUrls = servers.drop(1).map { "${it}${String.format("%03d", n)}.mp3" }
+                fallbackUrls = if (local != null) emptyList()
+                    else servers.map { "${it}${String.format("%03d", n)}.mp3" }
             )
         }
         if (playerState.currentId == "quran-$currentSurahNum") {
@@ -424,13 +431,15 @@ fun QuranReaderScreen(
             val tracks = (currentSurahNum..minOf(114, currentSurahNum + 4)).mapNotNull { n ->
                 val servers = reciter.servers
                 val name = allSurahs.find { it.number == n }?.name ?: currentName
-                if (servers.isEmpty()) null
+                val local = com.elhajri.noor.quran.ReciterOffline.localPathIfAny(context, reciter.id, n)
+                if (servers.isEmpty() && local == null) null
                 else com.elhajri.noor.audio.player.PlayerTrack(
                     id = "quran-$n",
-                    url = "${servers[0]}${String.format("%03d", n)}.mp3",
+                    url = local ?: "${servers[0]}${String.format("%03d", n)}.mp3",
                     title = "سورة $name",
                     artist = reciter.name,
-                    fallbackUrls = servers.drop(1).map { "${it}${String.format("%03d", n)}.mp3" }
+                    fallbackUrls = if (local != null) emptyList()
+                        else servers.map { "${it}${String.format("%03d", n)}.mp3" }
                 )
             }
             com.elhajri.noor.audio.player.QuranPlayerManager.playQueue(tracks, 0)
@@ -589,6 +598,16 @@ fun QuranReaderScreen(
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // ===== تلاوة بدون إنترنت للقارئ المحدد =====
+                com.elhajri.noor.quran.OfflineReciterRow(
+                    reciter = currentReciter,
+                    onDownload = { com.elhajri.noor.quran.ReciterOffline.downloadAll(context, currentReciter, currentReciter.servers) },
+                    onCancel = { com.elhajri.noor.quran.ReciterOffline.cancel() },
+                    onDelete = { com.elhajri.noor.quran.ReciterOffline.deleteAll(context, currentReciter.id) }
+                )
 
                 Spacer(modifier = Modifier.height(18.dp))
 
