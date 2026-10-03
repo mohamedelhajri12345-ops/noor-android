@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.res.painterResource
 
 /**
@@ -42,7 +43,7 @@ fun Modifier.themeScreenBackground(): Modifier {
                 val scale = maxOf(size.width / intrinsic.width, size.height / intrinsic.height)
                 val drawW = intrinsic.width * scale
                 val drawH = intrinsic.height * scale
-                androidx.compose.ui.graphics.drawscope.translate(
+                translate(
                     left = (size.width - drawW) / 2f,
                     top = (size.height - drawH) / 2f
                 ) {
