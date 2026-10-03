@@ -69,6 +69,10 @@ import org.json.JSONObject
 import java.io.File
 import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.foundation.lazy.items
 
 data class AyahItem(val number: Int, val text: String)
 
@@ -163,7 +167,6 @@ fun QuranReaderScreen(
     var ayahs by remember { mutableStateOf<List<AyahItem>>(emptyList()) }
     var isLoadingText by remember { mutableStateOf(true) }
     var isLightMode by remember { mutableStateOf(false) }
-    var showReciterDialog by remember { mutableStateOf(false) }
 
     val favorites by FavoritesStore.favorites.collectAsState()
     val isFav = favorites.contains(currentSurahNum)
@@ -234,21 +237,23 @@ fun QuranReaderScreen(
         }
     }
 
-    // Custom AnnotatedString for ayahs with gold medallions
+    // دوائر أرقام الآيات الذهبية المُضمّنة في النص — طبق الأصل عن الموقع
+    val ayahInlineContent = remember(ayahs) {
+        ayahs.associate { ayah ->
+            "ayah_${ayah.number}" to InlineTextContent(
+                placeholder = Placeholder(width = 22.sp, height = 22.sp, placeholderVerticalAlign = PlaceholderVerticalAlign.Center)
+            ) {
+                AyahBadge(number = toArabicNumber(ayah.number))
+            }
+        }
+    }
     val annotatedAyahsText = remember(ayahs) {
         buildAnnotatedString {
             ayahs.forEach { ayah ->
                 append(ayah.text)
-                append(" ")
-                withStyle(
-                    style = SpanStyle(
-                        color = Gold,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                ) {
-                    append(" ﴿${toArabicNumber(ayah.number)}﴾ ")
-                }
+                append("  ")
+                appendInlineContent("ayah_${ayah.number}", "[${ayah.number}]")
+                append("   ")
             }
         }
     }
@@ -408,176 +413,207 @@ fun QuranReaderScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "سورة $currentName",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Gold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ChevronRight, contentDescription = "رجوع", tint = Gold)
-                    }
-                },
-                actions = {
-                    // استنساخ: نسخ المصحف
-                    IconButton(onClick = { showCopySheet = true }) {
-                        Icon(
-                            imageVector = Icons.Default.ContentCopy,
-                            contentDescription = "استنساخ المصحف",
-                            tint = Gold
-                        )
-                    }
-                    // Reading Mode Toggle
-                    IconButton(onClick = { isLightMode = !isLightMode }) {
-                        Icon(
-                            imageVector = if (isLightMode) Icons.Default.NightsStay else Icons.Default.WbSunny,
-                            contentDescription = "تغيير الوضع",
-                            tint = Gold
-                        )
-                    }
-                    // Favorite Toggle
-                    IconButton(onClick = { FavoritesStore.toggleFavorite(context, currentSurahNum) }) {
-                        Icon(
-                            imageVector = if (isFav) Icons.Default.Star else Icons.Default.StarBorder,
-                            contentDescription = "مفضلة",
-                            tint = if (isFav) Gold else GoldSoft
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = NavyCard
+    val selectReciter: (Reciter) -> Unit = { reciter ->
+        currentReciter = reciter
+        Prefs.setReciter(context, reciter.id)
+        // طبق الأصل عن الموقع: تبديل القارئ يعيد تشغيل القائمة الحالية بالقارئ الجديد مباشرة
+        if (com.elhajri.noor.audio.player.QuranPlayerManager.state.value.currentId != null) {
+            val tracks = (currentSurahNum..minOf(114, currentSurahNum + 4)).mapNotNull { n ->
+                val servers = reciter.servers
+                val name = allSurahs.find { it.number == n }?.name ?: currentName
+                if (servers.isEmpty()) null
+                else com.elhajri.noor.audio.player.PlayerTrack(
+                    id = "quran-$n",
+                    url = "${servers[0]}${String.format("%03d", n)}.mp3",
+                    title = "سورة $name",
+                    artist = reciter.name,
+                    fallbackUrls = servers.drop(1).map { "${it}${String.format("%03d", n)}.mp3" }
                 )
-            )
-        },
-        bottomBar = {
-            // Audio Player Bar
-            Surface(
-                color = NavyCard,
-                tonalElevation = 8.dp,
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    // Progress bar / Seek bar
-                    Slider(
-                        value = progress,
-                        onValueChange = { com.elhajri.noor.audio.player.QuranPlayerManager.seek(it * playerState.duration) },
-                        colors = SliderDefaults.colors(
-                            thumbColor = Gold,
-                            activeTrackColor = Gold,
-                            inactiveTrackColor = NavyLight
-                        ),
-                        modifier = Modifier.fillMaxWidth()
+            }
+            com.elhajri.noor.audio.player.QuranPlayerManager.playQueue(tracks, 0)
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        // ===== الخلفية: نسيج إسلامي أخضر داكن — طبق الأصل عن الموقع =====
+        Image(
+            painter = painterResource(com.elhajri.noor.R.drawable.quran_green_bg),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+        )
+
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                Column {
+                    QuranPageHeader(
+                        onBrightness = { isLightMode = !isLightMode },
+                        onFavorites = { FavoritesStore.toggleFavorite(context, currentSurahNum) }
                     )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        // Reciter selector button
-                        TextButton(
-                            onClick = { showReciterDialog = true },
-                            colors = ButtonDefaults.textButtonColors(contentColor = GoldSoft)
-                        ) {
-                            Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(currentReciter.name, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                        }
-
-                        // Play/Pause Button
-                        IconButton(
-                            onClick = {
-                                if (isPlaying) {
-                                    com.elhajri.noor.audio.player.QuranPlayerManager.toggle()
-                                } else {
-                                    if (playerState.currentId != null) {
-                                        com.elhajri.noor.audio.player.QuranPlayerManager.toggle()
-                                    } else {
-                                        playAudio()
-                                    }
-                                }
-                            },
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(Gold)
-                        ) {
-                            if (isLoadingAudio) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = Navy,
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                    contentDescription = "تشغيل",
-                                    tint = Navy,
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
-                        }
-
-                        // Surah Info badge
-                        currentSurah?.let {
-                            Text(
-                                text = "${it.type} · ${toArabicNumber(it.ayahs)} آية",
-                                fontSize = 12.sp,
-                                color = GoldSoft.copy(alpha = 0.7f)
+                    QuranBackRow(onBack = onBack)
+                }
+            },
+            bottomBar = {
+                // شريط تحكم رفيع يظهر فقط أثناء تشغيل هذه السورة — طبق الأصل عن الموقع (بلا شريط دائم)
+                if (playerState.currentId == "quran-$currentSurahNum") {
+                    Surface(color = Color(0xFF0E2B1E), tonalElevation = 0.dp) {
+                        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+                            Slider(
+                                value = progress,
+                                onValueChange = { com.elhajri.noor.audio.player.QuranPlayerManager.seek(it * playerState.duration) },
+                                colors = SliderDefaults.colors(
+                                    thumbColor = Gold,
+                                    activeTrackColor = Gold,
+                                    inactiveTrackColor = Color.White.copy(alpha = 0.15f)
+                                ),
+                                modifier = Modifier.fillMaxWidth().height(24.dp)
                             )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(currentReciter.name, color = GoldSoft, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                IconButton(
+                                    onClick = { com.elhajri.noor.audio.player.QuranPlayerManager.toggle() },
+                                    modifier = Modifier.size(40.dp).clip(CircleShape).background(Gold)
+                                ) {
+                                    Icon(
+                                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                        contentDescription = "تشغيل",
+                                        tint = Color(0xFF0D2B1F),
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
-        },
-        containerColor = if (isLightMode) Color(0xFFFFFBEB) else Navy
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            if (isLoadingText) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Gold
-                )
-            } else if (ayahs.isEmpty()) {
-                Text(
-                    text = "تعذر تحميل نص السورة. يرجى الاتصال بالإنترنت.",
-                    color = if (isLightMode) Color.DarkGray else TextMain,
-                    modifier = Modifier.align(Alignment.Center),
-                    textAlign = TextAlign.Center
-                )
-            } else {
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                // ===== بطاقة السورة الرئيسية: اسم السورة + زر تشغيل دائري ذهبي كبير — طبق الأصل عن الموقع =====
                 Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isLightMode) Color(0xFFFEF3C7) else NavyCard
-                    ),
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier.fillMaxSize()
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF0F3324).copy(alpha = 0.75f)),
+                    shape = RoundedCornerShape(22.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.3f)),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(20.dp)
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 26.dp, horizontal = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "سورة $currentName",
+                            color = Gold,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = AmiriFamily,
+                            textAlign = TextAlign.Center
+                        )
+                        currentSurah?.let {
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "${it.type} · ${toArabicNumber(it.ayahs)} آية",
+                                color = GoldSoft.copy(alpha = 0.75f),
+                                fontSize = 13.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(22.dp))
+                        IconButton(
+                            onClick = {
+                                if (isPlaying) {
+                                    com.elhajri.noor.audio.player.QuranPlayerManager.toggle()
+                                } else if (playerState.currentId == "quran-$currentSurahNum") {
+                                    com.elhajri.noor.audio.player.QuranPlayerManager.toggle()
+                                } else {
+                                    playAudio()
+                                }
+                            },
+                            modifier = Modifier.size(84.dp).clip(CircleShape).background(Gold)
+                        ) {
+                            if (isLoadingAudio) {
+                                CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color(0xFF0D2B1F), strokeWidth = 2.5.dp)
+                            } else {
+                                Icon(
+                                    imageVector = if (isPlaying && playerState.currentId == "quran-$currentSurahNum") Icons.Default.Pause else Icons.Default.PlayArrow,
+                                    contentDescription = "تشغيل السورة كاملة",
+                                    tint = Color(0xFF0D2B1F),
+                                    modifier = Modifier.size(40.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = "تشغيل السورة كاملة",
+                            color = GoldSoft.copy(alpha = 0.8f),
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // ===== شرائح اختيار القارئ — طبق الأصل عن الموقع =====
+                Text("القارئ", color = GoldSoft.copy(alpha = 0.7f), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(modifier = Modifier.height(8.dp))
+                androidx.compose.foundation.lazy.LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(allReciters) { reciter ->
+                        val selected = reciter.id == currentReciter.id
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(if (selected) Gold else Color.White.copy(alpha = 0.05f))
+                                .border(1.dp, if (selected) Color.Transparent else Gold.copy(alpha = 0.25f), RoundedCornerShape(20.dp))
+                                .clickable { selectReciter(reciter) }
+                                .padding(horizontal = 16.dp, vertical = 10.dp)
+                        ) {
+                            Text(
+                                text = reciter.name,
+                                color = if (selected) Color(0xFF0D2B1F) else GoldSoft,
+                                fontSize = 13.sp,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // ===== نص السورة =====
+                if (isLoadingText) {
+                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 60.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Gold)
+                    }
+                } else if (ayahs.isEmpty()) {
+                    Text(
+                        text = "تعذر تحميل نص السورة. يرجى الاتصال بالإنترنت.",
+                        color = TextMain,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 60.dp),
+                        textAlign = TextAlign.Center
+                    )
+                } else {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isLightMode) Color(0xFFFEF3C7) else Color(0xFF0F3324).copy(alpha = 0.7f)
+                        ),
+                        shape = RoundedCornerShape(20.dp),
+                        border = if (isLightMode) null else androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.2f)),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = annotatedAyahsText,
+                            inlineContent = ayahInlineContent,
                             style = TextStyle(
-                                // حجم خط المصحف قابل للتعديل من الإعدادات (صغير/متوسط/كبير)
                                 fontSize = when (com.elhajri.noor.data.Prefs.getReaderFontSize(context)) {
                                     "S" -> 18.sp; "L" -> 26.sp; else -> 22.sp
                                 },
@@ -586,76 +622,13 @@ fun QuranReaderScreen(
                                 color = if (isLightMode) Color(0xFF1C1917) else TextMain,
                                 textAlign = TextAlign.Justify
                             ),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth().padding(20.dp)
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
-    }
-
-    // Reciter Selection Dialog
-    if (showReciterDialog) {
-        AlertDialog(
-            onDismissRequest = { showReciterDialog = false },
-            title = { Text("اختر القارئ", color = Gold, fontWeight = FontWeight.Bold) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    allReciters.forEach { reciter ->
-                        val isSelected = reciter.id == currentReciter.id
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    currentReciter = reciter
-                                    Prefs.setReciter(context, reciter.id)
-                                    // like the web changeReciter: restart the queue with the new reciter
-                                    if (com.elhajri.noor.audio.player.QuranPlayerManager.state.value.currentId != null) {
-                                        val tracks = (currentSurahNum..minOf(114, currentSurahNum + 4)).mapNotNull { n ->
-                                            val servers = reciter.servers
-                                            val name = allSurahs.find { it.number == n }?.name ?: currentName
-                                            if (servers.isEmpty()) null
-                                            else com.elhajri.noor.audio.player.PlayerTrack(
-                                                id = "quran-$n",
-                                                url = "${servers[0]}${String.format("%03d", n)}.mp3",
-                                                title = "سورة $name",
-                                                artist = reciter.name,
-                                                fallbackUrls = servers.drop(1).map { "${it}${String.format("%03d", n)}.mp3" }
-                                            )
-                                        }
-                                        com.elhajri.noor.audio.player.QuranPlayerManager.playQueue(tracks, 0)
-                                    }
-                                    showReciterDialog = false
-                                    if (isPlaying) {
-                                        playAudio()
-                                    }
-                                },
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (isSelected) Gold else NavyLight
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Text(
-                                    text = reciter.name,
-                                    color = if (isSelected) Navy else Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showReciterDialog = false }) {
-                    Text("إلغاء", color = GoldSoft)
-                }
-            },
-            containerColor = NavyCard
-        )
     }
 }
