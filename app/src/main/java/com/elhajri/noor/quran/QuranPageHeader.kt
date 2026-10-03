@@ -14,12 +14,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.NightsStay
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -56,18 +52,6 @@ fun QuranPageHeader(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 HeaderIcon(onClick = onBrightness) {
                     Icon(Icons.Filled.WbSunny, contentDescription = "السطوع", tint = Gold, modifier = Modifier.size(16.dp))
-                }
-                HeaderIcon(onClick = onSettings) {
-                    Icon(Icons.Filled.Settings, contentDescription = "الإعدادات", tint = Gold, modifier = Modifier.size(16.dp))
-                }
-                HeaderIcon(onClick = onAssistant) {
-                    Icon(Icons.Filled.AutoAwesome, contentDescription = "المساعد الذكي", tint = Gold, modifier = Modifier.size(16.dp))
-                }
-                HeaderIcon(onClick = onFavorites) {
-                    Icon(Icons.Filled.FavoriteBorder, contentDescription = "المفضلة", tint = Gold, modifier = Modifier.size(16.dp))
-                }
-                HeaderIcon(onClick = onSearch, filled = true) {
-                    Icon(Icons.Filled.Search, contentDescription = "بحث", tint = Color.White, modifier = Modifier.size(16.dp))
                 }
             }
 

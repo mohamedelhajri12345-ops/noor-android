@@ -236,7 +236,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 .fillMaxWidth()
                 .height(190.dp)
                 .graphicsLayer { scaleX = heroScale; scaleY = heroScale }
-                .clickable(interactionSource = heroInteraction, indication = null) { onNavigate("prayer") }
+                .clickable(interactionSource = heroInteraction, indication = androidx.compose.material3.LocalIndication.current) { onNavigate("prayer") }
         ) {
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -294,7 +294,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                             .clip(RoundedCornerShape(16.dp))
                             .background(Brush.verticalGradient(listOf(NavyLight.copy(alpha = 0.6f), Color(0xFF11141A).copy(alpha = 0.5f))))
                             .border(1.dp, Gold.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
-                            .clickable(interactionSource = interaction, indication = null) { onNavigate(item.route) },
+                            .clickable(interactionSource = interaction, indication = androidx.compose.material3.LocalIndication.current) { onNavigate(item.route) },
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -334,7 +334,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         .graphicsLayer { scaleX = shareScale; scaleY = shareScale }
                         .clip(RoundedCornerShape(12.dp))
                         .background(Gold.copy(alpha = 0.10f))
-                        .clickable(interactionSource = shareInteraction, indication = null) {
+                        .clickable(interactionSource = shareInteraction, indication = androidx.compose.material3.LocalIndication.current) {
                             val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                                 type = "text/plain"
                                 putExtra(android.content.Intent.EXTRA_TEXT, "${verse.text}\n\n${verse.ref}")

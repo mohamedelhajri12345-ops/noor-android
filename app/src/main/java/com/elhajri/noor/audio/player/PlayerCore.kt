@@ -16,7 +16,12 @@ import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.elhajri.noor.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -460,7 +465,8 @@ private fun buildPlaybackNotification(
         .setContentIntent(openAppIntent)
         .setOngoing(s.isPlaying)
         .setOnlyAlertOnce(true)
-        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
         .setColor(0xFFD4AF37.toInt())      // لمسة ذهبية تناسب هوية التطبيق
         .setColorized(true)
         .addAction(R.drawable.ic_notif_prev, "السابق", actionIntent(NotificationActions.ACTION_PREV))
@@ -476,6 +482,9 @@ private fun buildPlaybackNotification(
 
 /** خدمة إشعار مستقلة لمشغّل القرآن فقط */
 class QuranPlaybackService : Service() {
+    private var observeScope: CoroutineScope? = null
+    private var lastStateKey = ""
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -486,10 +495,26 @@ class QuranPlaybackService : Service() {
             NotificationActions.ACTION_STOP -> { QuranPlayerManager.stop(); stopSelf(); return START_NOT_STICKY }
         }
         startForeground(NOTIF_ID, buildPlaybackNotification(this, CHANNEL, NOTIF_ID, QuranPlayerManager, "quran", QuranPlaybackService::class.java, "القرآن الكريم"))
+        // مزامنة دائمة: أي تغيير حالة (من التطبيق أو الإشعار أو تركيز الصوت) يحدّث الإشعار فوراً
+        if (observeScope == null) {
+            observeScope = CoroutineScope(Dispatchers.Main + Job()).also { sc ->
+                sc.launch {
+                    QuranPlayerManager.state.collect { st ->
+                        val key = "${st.isPlaying}|${st.currentId}|${st.title}"
+                        if (key != lastStateKey) {
+                            lastStateKey = key
+                            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                            nm.notify(NOTIF_ID, buildPlaybackNotification(this@QuranPlaybackService, CHANNEL, NOTIF_ID, QuranPlayerManager, "quran", QuranPlaybackService::class.java, "القرآن الكريم"))
+                        }
+                    }
+                }
+            }
+        }
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
+        observeScope?.cancel(); observeScope = null
         try { QuranPlayerManager.stop() } catch (_: Exception) {}
         super.onDestroy()
     }
@@ -519,6 +544,9 @@ class QuranPlaybackService : Service() {
 
 /** خدمة إشعار مستقلة لمشغّل الأناشيد فقط */
 class NasheedPlaybackService : Service() {
+    private var observeScope: CoroutineScope? = null
+    private var lastStateKey = ""
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -529,10 +557,25 @@ class NasheedPlaybackService : Service() {
             NotificationActions.ACTION_STOP -> { PlayerCore.stop(); stopSelf(); return START_NOT_STICKY }
         }
         startForeground(NOTIF_ID, buildPlaybackNotification(this, CHANNEL, NOTIF_ID, PlayerCore, "nasheed", NasheedPlaybackService::class.java, "الأناشيد الإسلامية"))
+        if (observeScope == null) {
+            observeScope = CoroutineScope(Dispatchers.Main + Job()).also { sc ->
+                sc.launch {
+                    PlayerCore.state.collect { st ->
+                        val key = "${st.isPlaying}|${st.currentId}|${st.title}"
+                        if (key != lastStateKey) {
+                            lastStateKey = key
+                            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                            nm.notify(NOTIF_ID, buildPlaybackNotification(this@NasheedPlaybackService, CHANNEL, NOTIF_ID, PlayerCore, "nasheed", NasheedPlaybackService::class.java, "الأناشيد الإسلامية"))
+                        }
+                    }
+                }
+            }
+        }
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
+        observeScope?.cancel(); observeScope = null
         try { PlayerCore.stop() } catch (_: Exception) {}
         super.onDestroy()
     }

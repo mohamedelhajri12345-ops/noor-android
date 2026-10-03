@@ -460,8 +460,7 @@ fun QuranReaderScreen(
             topBar = {
                 Column {
                     QuranPageHeader(
-                        onBrightness = { isLightMode = !isLightMode },
-                        onFavorites = { FavoritesStore.toggleFavorite(context, currentSurahNum) }
+                        onBrightness = { isLightMode = !isLightMode }
                     )
                     QuranBackRow(onBack = onBack)
                 }
