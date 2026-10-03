@@ -73,6 +73,8 @@ import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.border
+import androidx.compose.ui.text.appendInlineContent
 
 data class AyahItem(val number: Int, val text: String)
 
