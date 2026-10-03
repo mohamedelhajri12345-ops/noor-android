@@ -42,9 +42,10 @@ fun Modifier.themeScreenBackground(): Modifier {
                 val scale = maxOf(size.width / intrinsic.width, size.height / intrinsic.height)
                 val drawW = intrinsic.width * scale
                 val drawH = intrinsic.height * scale
-                androidx.compose.ui.graphics.drawscope.withTransform({
-                    translate(left = (size.width - drawW) / 2f, top = (size.height - drawH) / 2f)
-                }) {
+                androidx.compose.ui.graphics.drawscope.translate(
+                    left = (size.width - drawW) / 2f,
+                    top = (size.height - drawH) / 2f
+                ) {
                     with(painter) { draw(size = Size(drawW, drawH), alpha = 1f) }
                 }
             }

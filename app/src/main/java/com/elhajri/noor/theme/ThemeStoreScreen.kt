@@ -326,9 +326,11 @@ fun ThemePreview(def: NoorThemeDef) {
         Column(
             modifier = Modifier
                 .matchParentSize()
-                .background(
-                    if (def.backgroundRes != 0) Color.Transparent
-                    else Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
+                .then(
+                    if (def.backgroundRes != 0) Modifier
+                    else Modifier.background(
+                        Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
+                    )
                 )
                 .padding(6.dp)
         ) {
