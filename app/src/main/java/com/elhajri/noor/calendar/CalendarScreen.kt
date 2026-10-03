@@ -1,5 +1,6 @@
 package com.elhajri.noor.calendar
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -221,7 +222,7 @@ fun CalendarScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
     ) {
         Text(

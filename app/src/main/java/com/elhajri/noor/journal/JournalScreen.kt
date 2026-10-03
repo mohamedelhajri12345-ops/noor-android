@@ -1,5 +1,6 @@
 package com.elhajri.noor.journal
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -156,7 +157,7 @@ fun JournalScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
     ) {
         // Header

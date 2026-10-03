@@ -1,5 +1,6 @@
 package com.elhajri.noor.quiz
 
+import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -64,7 +65,7 @@ fun QuizScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
     ) {
         if (!isStarted) {

@@ -1,5 +1,6 @@
 package com.elhajri.noor.hajj
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -97,7 +98,7 @@ fun HajjGuideScreen(onBack: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
     ) {
         // Top Bar
         Row(

@@ -1,5 +1,6 @@
 package com.elhajri.noor.tasbih
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import android.os.Build
 import android.os.VibrationEffect
@@ -105,7 +106,7 @@ fun TasbihScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

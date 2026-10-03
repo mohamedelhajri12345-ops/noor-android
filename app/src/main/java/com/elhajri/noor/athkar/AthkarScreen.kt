@@ -1,5 +1,6 @@
 package com.elhajri.noor.athkar
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,7 +56,7 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(NoorGradients.ScreenBackground)
+                .themeScreenBackground()
                 .padding(16.dp)
         ) {
             com.elhajri.noor.ui.NoorSectionTitle(

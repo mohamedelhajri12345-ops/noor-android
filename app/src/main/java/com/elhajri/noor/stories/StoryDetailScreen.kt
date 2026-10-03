@@ -1,5 +1,6 @@
 package com.elhajri.noor.stories
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -50,7 +51,7 @@ fun StoryDetailScreen(storyId: Int, onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
     ) {
         // Top Bar
         Row(

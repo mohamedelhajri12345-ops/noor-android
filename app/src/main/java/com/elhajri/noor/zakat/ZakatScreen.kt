@@ -1,5 +1,6 @@
 package com.elhajri.noor.zakat
 
+import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -143,7 +144,7 @@ fun ZakatScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
             .verticalScroll(scrollState)
     ) {

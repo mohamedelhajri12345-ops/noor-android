@@ -207,7 +207,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         // ============ الخلفية الجديدة: سماء ليلية ومسجد — خلفية كامل الشاشة ============
         Image(
-            painter = androidx.compose.ui.res.painterResource(R.drawable.mosque_night_bg),
+            painter = androidx.compose.ui.res.painterResource(R.drawable.theme_bg_makkah_night),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

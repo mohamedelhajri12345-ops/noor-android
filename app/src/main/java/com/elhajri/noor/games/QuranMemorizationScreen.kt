@@ -1,5 +1,6 @@
 package com.elhajri.noor.games
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -59,7 +60,7 @@ fun QuranMemorizationScreen(onBack: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
     ) {
         // Top Bar
         Row(

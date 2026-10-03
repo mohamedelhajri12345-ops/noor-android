@@ -1,5 +1,6 @@
 package com.elhajri.noor.favorites
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,7 +48,7 @@ fun FavoritesScreen(onOpenSurah: (Surah) -> Unit, onOpenStory: (Int) -> Unit) {
     var favStoryIds by remember { mutableStateOf(StoryFavorites.get(context)) }
     LaunchedEffect(Unit) { FavoritesStore.favorites.collect { favSurahIds = it } }
 
-    Column(modifier = Modifier.fillMaxSize().background(NoorGradients.ScreenBackground).padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().themeScreenBackground().padding(16.dp)) {
         Text("المفضلة", color = Gold, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Text("السور والقصص التي تتابعها", color = GoldSoft, fontSize = 13.sp)
         Spacer(Modifier.height(12.dp))

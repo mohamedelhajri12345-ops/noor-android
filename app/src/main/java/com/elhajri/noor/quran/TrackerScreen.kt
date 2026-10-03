@@ -1,5 +1,6 @@
 package com.elhajri.noor.quran
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -164,7 +165,7 @@ fun TrackerScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
     ) {
         // Top Header Tabs

@@ -16,11 +16,53 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.res.painterResource
 
 /**
  * التدرّجات والمكوّنات الفاخرة — نظام "الأبنوس والذهب الإمبراطوري"
  * من مواصفات فريق التصميم (design_spec.md).
  */
+/**
+ * خلفية الشاشة الموضوعية — صورة الثيم الحقيقية عالية الجودة (من الويب)
+ * مغطاة بطبقة لونية من ألوان الثيم نفسه (شفافية مدروسة) بحيث تبقى النصوص
+ * واضحة تماماً وتتغيّر هوية التطبيق كاملة مع كل ثيم: خلفية + ألوان معاً.
+ */
+@Composable
+fun Modifier.themeScreenBackground(): Modifier {
+    val def = com.elhajri.noor.theme.NoorThemeState.active
+    val res = def.backgroundRes
+    return if (res != 0) {
+        val painter = painterResource(res)
+        this.drawBehind {
+            // 1) صورة الثيم بقصّ مركزي يملأ الشاشة (ContentScale.Crop)
+            val intrinsic = painter.intrinsicSize
+            if (intrinsic != Size.Unspecified && intrinsic.width > 0f && intrinsic.height > 0f) {
+                val scale = maxOf(size.width / intrinsic.width, size.height / intrinsic.height)
+                val drawW = intrinsic.width * scale
+                val drawH = intrinsic.height * scale
+                androidx.compose.ui.graphics.drawscope.withTransform({
+                    translate(left = (size.width - drawW) / 2f, top = (size.height - drawH) / 2f)
+                }) {
+                    with(painter) { draw(size = Size(drawW, drawH), alpha = 1f) }
+                }
+            }
+            // 2) طبقة ألوان الثيم فوق الصورة
+            drawRect(
+                brush = Brush.verticalGradient(
+                    listOf(
+                        def.background.copy(alpha = 0.84f),
+                        def.backgroundEnd.copy(alpha = 0.90f)
+                    )
+                )
+            )
+        }
+    } else {
+        themeScreenBackground()
+    }
+}
+
 object NoorGradients {
 
     private val T get() = com.elhajri.noor.theme.NoorThemeState.active

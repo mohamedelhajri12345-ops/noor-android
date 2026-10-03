@@ -1,5 +1,6 @@
 package com.elhajri.noor.games
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -108,7 +109,7 @@ private fun NamesBrowseMode(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
     ) {
         Row(
@@ -262,7 +263,7 @@ private fun NamesQuizMode(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
     ) {
         Row(

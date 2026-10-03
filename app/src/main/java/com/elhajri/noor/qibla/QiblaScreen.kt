@@ -1,5 +1,6 @@
 package com.elhajri.noor.qibla
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -121,7 +122,7 @@ fun QiblaScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(NoorGradients.ScreenBackground)
+                .themeScreenBackground()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween

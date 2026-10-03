@@ -1,5 +1,6 @@
 package com.elhajri.noor.stories
 
+import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -43,7 +44,7 @@ fun StoriesScreen(onOpenStory: (Int) -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
     ) {
         com.elhajri.noor.ui.NoorSectionTitle(

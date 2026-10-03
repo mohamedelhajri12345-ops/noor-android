@@ -1,5 +1,6 @@
 package com.elhajri.noor.athkar
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import android.os.Build
 import android.os.VibrationEffect
@@ -135,7 +136,7 @@ fun AthkarDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
     ) {
         // Header

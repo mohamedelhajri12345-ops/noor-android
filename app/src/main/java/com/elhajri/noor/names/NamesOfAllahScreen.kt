@@ -1,5 +1,6 @@
 package com.elhajri.noor.names
 
+import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -34,7 +35,7 @@ fun NamesOfAllahScreen() {
     var search by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf<NameOfAllah?>(null) }
 
-    Column(modifier = Modifier.fillMaxSize().background(NoorGradients.ScreenBackground).padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxSize().themeScreenBackground().padding(16.dp)) {
         Text("أسماء الله الحسنى", color = Gold, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Text("﴿وَلِلَّهِ الْأَسْمَاءُ الْحُسْنَىٰ فَادْعُوهُ بِهَا﴾", color = GoldSoft, fontSize = 14.sp, fontFamily = AmiriFamily)
         Spacer(Modifier.height(12.dp))

@@ -1,5 +1,6 @@
 package com.elhajri.noor.quran
 
+import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -69,7 +70,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(horizontal = 16.dp)
     ) {
         Spacer(modifier = Modifier.height(12.dp))

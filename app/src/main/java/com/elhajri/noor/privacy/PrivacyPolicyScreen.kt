@@ -1,5 +1,6 @@
 package com.elhajri.noor.privacy
 
+import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -80,7 +81,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NoorGradients.ScreenBackground)
+            .themeScreenBackground()
             .padding(16.dp)
     ) {
         // Top Back Row

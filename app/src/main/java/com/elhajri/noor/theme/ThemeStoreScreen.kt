@@ -3,6 +3,9 @@ package com.elhajri.noor.theme
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -237,7 +240,7 @@ private fun ThemeCard(
 
         Spacer(Modifier.height(8.dp))
 
-        Text(def.name, color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        Text((com.elhajri.noor.theme.NoorThemes.icons[def.id] ?: "✨") + " " + def.name, color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         Text(
             def.description,
             color = TextMain.copy(alpha = 0.5f),
@@ -292,17 +295,43 @@ private val EmeraldSuccessSoft = Color(0xFF34D399)
  */
 @Composable
 fun ThemePreview(def: NoorThemeDef) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(128.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(
-                Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
-            )
             .border(1.dp, def.accent.copy(alpha = 0.18f), RoundedCornerShape(12.dp))
-            .padding(6.dp)
     ) {
+        // الصورة الحقيقية للثيم من الويب — تُميّز كل بطاقة عن الأخرى بصرياً
+        if (def.backgroundRes != 0) {
+            Image(
+                painter = painterResource(def.backgroundRes),
+                contentDescription = def.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize()
+            )
+            Box(
+                Modifier
+                    .matchParentSize()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                def.background.copy(alpha = 0.72f),
+                                def.backgroundEnd.copy(alpha = 0.84f)
+                            )
+                        )
+                    )
+            )
+        }
+        Column(
+            modifier = Modifier
+                .matchParentSize()
+                .background(
+                    if (def.backgroundRes != 0) Color.Transparent
+                    else Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
+                )
+                .padding(6.dp)
+        ) {
         // الشريط العلوي
         Row(
             modifier = Modifier
@@ -376,6 +405,7 @@ fun ThemePreview(def: NoorThemeDef) {
                         .background(if (i == 0) def.accent else def.textSecondary.copy(alpha = 0.4f))
                 )
             }
+        }
         }
     }
 }

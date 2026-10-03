@@ -1,5 +1,6 @@
 package com.elhajri.noor.auth
 
+import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -59,7 +60,7 @@ fun ForgotPasswordScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(NoorGradients.ScreenBackground),
+                .themeScreenBackground(),
             contentAlignment = Alignment.Center
         ) {
             Column(

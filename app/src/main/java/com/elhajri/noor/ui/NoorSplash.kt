@@ -101,7 +101,7 @@ fun NoorSplash(onFinished: () -> Unit) {
     ) {
         // الخلفية الجديدة: سماء الليل والمسجد — نفس خلفية التطبيق
         Image(
-            painter = androidx.compose.ui.res.painterResource(R.drawable.mosque_night_bg),
+            painter = androidx.compose.ui.res.painterResource(R.drawable.theme_bg_makkah_night),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = androidx.compose.ui.layout.ContentScale.Crop

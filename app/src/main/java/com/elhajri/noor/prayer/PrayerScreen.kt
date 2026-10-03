@@ -1,5 +1,6 @@
 package com.elhajri.noor.prayer
 
+import com.elhajri.noor.ui.themeScreenBackground
 import android.media.AudioAttributes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -230,7 +231,7 @@ fun PrayerScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(NoorGradients.ScreenBackground)
+                .themeScreenBackground()
                 .padding(16.dp)
         ) {
             Row(

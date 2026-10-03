@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import com.elhajri.noor.R
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -32,6 +33,8 @@ data class NoorThemeDef(
     // ألوان الحالات
     val success: Color = Color(0xFF10B981),
     val error: Color = Color(0xFFEF4444),
+    // خلفية الثيم الحقيقية — صورة ويب عالية الجودة تخص كل ثيم (0 = تدرّج فقط)
+    val backgroundRes: Int = 0,
     // الأنماط البصرية
     val cardRadius: Dp = 16.dp,
     val buttonRadius: Dp = 14.dp,
@@ -73,7 +76,7 @@ object NoorThemes {
         Color(text), Color(textSec)
     )
 
-    val all = listOf(
+    private val base = listOf(
 
         // ─────────── 00 — الثيم الافتراضي المجاني ───────────
         theme(
@@ -242,6 +245,57 @@ object NoorThemes {
             accent = 0xFFE5C158, accentSoft = 0xFFF8E29E, accentDeep = 0xFFAC8C3E,
             text = 0xFFFAFAF7, textSec = 0xFFC7CDE0
         )
+    )
+
+    /** خلفية حقيقية من الويب لكل ثيم — صور عالية الجودة تُميّز كل ثيمة بجمالها */
+    private val backgrounds = mapOf(
+        "fajr_noor" to R.drawable.theme_bg_fajr_noor,
+        "emerald_quran" to R.drawable.theme_bg_emerald_quran,
+        "golden_mosque" to R.drawable.theme_bg_golden_mosque,
+        "makkah_night" to R.drawable.theme_bg_makkah_night,
+        "madinah_calm" to R.drawable.theme_bg_madinah_calm,
+        "royal_kaaba" to R.drawable.theme_bg_royal_kaaba,
+        "blue_sky" to R.drawable.theme_bg_blue_sky,
+        "silver_crescent" to R.drawable.theme_bg_silver_crescent,
+        "golden_desert" to R.drawable.theme_bg_golden_desert,
+        "olive" to R.drawable.theme_bg_olive,
+        "islamic_turquoise" to R.drawable.theme_bg_islamic_turquoise,
+        "spiritual_violet" to R.drawable.theme_bg_spiritual_violet,
+        "night_emerald" to R.drawable.theme_bg_night_emerald,
+        "pink_dawn" to R.drawable.theme_bg_pink_dawn,
+        "islamic_sea" to R.drawable.theme_bg_islamic_sea,
+        "manuscripts" to R.drawable.theme_bg_manuscripts,
+        "emerald_dome" to R.drawable.theme_bg_emerald_dome,
+        "ramadan" to R.drawable.theme_bg_ramadan,
+        "night_crescent" to R.drawable.theme_bg_night_crescent,
+        "noor_premium" to R.drawable.theme_bg_noor_premium
+    )
+
+    val all: List<NoorThemeDef> = base.map { it.copy(backgroundRes = backgrounds[it.id] ?: 0) }
+
+    /** أيقونة تعريفية لكل ثيم — شخصية بصرية خاصة لكل ثيمة في المتجر */
+    val icons = mapOf(
+        "noor_default" to "✨",
+        "fajr_noor" to "🌅",
+        "emerald_quran" to "📗",
+        "golden_mosque" to "🕌",
+        "makkah_night" to "🕋",
+        "madinah_calm" to "🌙",
+        "royal_kaaba" to "🕋",
+        "blue_sky" to "☁️",
+        "silver_crescent" to "🌙",
+        "golden_desert" to "🏜️",
+        "olive" to "🫒",
+        "islamic_turquoise" to "🔷",
+        "spiritual_violet" to "💜",
+        "night_emerald" to "🌿",
+        "pink_dawn" to "🌸",
+        "islamic_sea" to "🌊",
+        "manuscripts" to "📜",
+        "emerald_dome" to "🏛️",
+        "ramadan" to "🏮",
+        "night_crescent" to "🌛",
+        "noor_premium" to "👑"
     )
 
     fun byId(id: String): NoorThemeDef? = all.find { it.id == id }
