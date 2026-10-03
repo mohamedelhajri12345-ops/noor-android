@@ -173,8 +173,8 @@ fun QuranReaderScreen(
     val favorites by FavoritesStore.favorites.collectAsState()
     val isFav = favorites.contains(currentSurahNum)
 
-    // Reciter setup
-    val savedReciterId = remember { Prefs.getReciter(context) }
+    // Reciter setup — من إعدادات التطبيق الموحّدة (نفس مخزن صفحة الإعدادات)
+    val savedReciterId = remember { com.elhajri.noor.settings.NoorSettings.getReciter(context).ifBlank { Prefs.getReciter(context) } }
     var currentReciter by remember {
         mutableStateOf(
             allReciters.find { it.id == savedReciterId } ?: allReciters.firstOrNull() ?: Reciter("alafasy", "مشاري العفاسي", listOf("https://server11.mp3quran.net/afs/"))
@@ -418,6 +418,7 @@ fun QuranReaderScreen(
     val selectReciter: (Reciter) -> Unit = { reciter ->
         currentReciter = reciter
         Prefs.setReciter(context, reciter.id)
+        com.elhajri.noor.settings.NoorSettings.setReciter(context, reciter.id)
         // طبق الأصل عن الموقع: تبديل القارئ يعيد تشغيل القائمة الحالية بالقارئ الجديد مباشرة
         if (com.elhajri.noor.audio.player.QuranPlayerManager.state.value.currentId != null) {
             val tracks = (currentSurahNum..minOf(114, currentSurahNum + 4)).mapNotNull { n ->

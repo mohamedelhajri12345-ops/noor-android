@@ -49,7 +49,10 @@ data class PrayerItem(
 @Composable
 fun PrayerScreen() {
     val context = LocalContext.current
-    val city = remember { Prefs.getCity(context) ?: City("مكة المكرمة", 21.4225, 39.8262, "السعودية") }
+    var city by remember { mutableStateOf(Prefs.getCity(context) ?: City("مكة المكرمة", 21.4225, 39.8262, "السعودية")) }
+    var showCityPicker by remember { mutableStateOf(false) }
+    var citySearch by remember { mutableStateOf("") }
+    val allCities = remember { com.elhajri.noor.data.DataLoader.cities(context) }
 
     var timings by remember { mutableStateOf<PrayerTimings?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -155,6 +158,71 @@ fun PrayerScreen() {
         }
     }
 
+    // ═══ اختيار المدينة — طبق الأصل عن القائمة السابقة ═══
+    if (showCityPicker) {
+        AlertDialog(
+            onDismissRequest = { showCityPicker = false },
+            title = { Text("اختر مدينتك", color = Gold, fontWeight = FontWeight.Bold) },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = citySearch,
+                        onValueChange = { citySearch = it },
+                        placeholder = { Text("ابحث عن مدينة...", fontSize = 13.sp) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            cursorColor = Gold,
+                            focusedBorderColor = Gold,
+                            unfocusedBorderColor = NavyLight
+                        )
+                    )
+                    LazyColumn(modifier = Modifier.height(320.dp)) {
+                        val q = citySearch.trim()
+                        val filtered = if (q.isBlank()) allCities else allCities.filter {
+                            it.name.contains(q) || it.country.contains(q)
+                        }
+                        items(filtered) { c ->
+                            val selected = c.name == city.name && c.country == city.country
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (selected) Gold else Color.Transparent)
+                                    .clickable {
+                                        city = c
+                                        Prefs.setCity(context, c)
+                                        // أعد جدولة إشعارات الأذان للموقع الجديد
+                                        AdhanScheduler.scheduleNextAdhan(context)
+                                        showCityPicker = false
+                                    }
+                                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Filled.LocationOn,
+                                    contentDescription = null,
+                                    tint = if (selected) Navy else Gold,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(c.name, color = if (selected) Navy else Color.White, fontSize = 14.sp)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(c.country, color = if (selected) Navy.copy(alpha = 0.7f) else GoldSoft.copy(alpha = 0.6f), fontSize = 11.sp)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showCityPicker = false }) { Text("إغلاق", color = GoldSoft) }
+            },
+            containerColor = NavyCard
+        )
+    }
+
     Scaffold(
         containerColor = Color(0xFF070B14)
     ) { padding ->
@@ -182,7 +250,8 @@ fun PrayerScreen() {
                         text = "${city.name}, ${city.country}",
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable { showCityPicker = true }
                     )
                 }
 

@@ -77,6 +77,9 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
     } ?: return
 
     var expanded by remember { mutableStateOf(false) }
+    // إخفاء الشريط من الشاشة (الصوت يستمر بالخلفية) — يُعاد إظهاره عند تشغيل مقطع جديد
+    var dismissedId by remember { mutableStateOf<String?>(null) }
+    if (dismissedId == active.state.currentId) return
     val context = LocalContext.current
 
     fun manager(): com.elhajri.noor.audio.player.PlayerFacade = if (active.isQuran) QuranPlayerManager else NasheedPlayerManager
@@ -147,7 +150,7 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
                             )
                         }
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(4.dp))
                     // expand
                     Icon(
                         Icons.Filled.KeyboardArrowUp,
@@ -158,6 +161,17 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
                             .clip(CircleShape)
                             .clickable { expanded = true }
                             .padding(2.dp)
+                    )
+                    // إخفاء من الشاشة — يستمر التشغيل بالخلفية
+                    Icon(
+                        Icons.Filled.Close,
+                        contentDescription = "إخفاء المشغل (يستمر الصوت في الخلفية)",
+                        tint = GoldSoft.copy(alpha = 0.7f),
+                        modifier = Modifier
+                            .size(22.dp)
+                            .clip(CircleShape)
+                            .clickable { dismissedId = active.state.currentId }
+                            .padding(3.dp)
                     )
                 }
                 // thin progress line
