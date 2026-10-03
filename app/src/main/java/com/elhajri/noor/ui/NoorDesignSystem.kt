@@ -61,7 +61,7 @@ fun Modifier.themeScreenBackground(): Modifier {
             )
         }
     } else {
-        themeScreenBackground()
+        background(NoorGradients.ScreenBackground)
     }
 }
 
