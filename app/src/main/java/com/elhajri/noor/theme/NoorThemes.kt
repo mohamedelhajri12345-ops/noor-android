@@ -92,10 +92,10 @@ object NoorThemes {
 
         // ─────────── 00 — الثيم الافتراضي المجاني ───────────
         theme(
-            "noor_default", "نور الأساسي", "الثيم الافتراضي الفاخر — أبنوس مخملي وذهب إمبراطوري", price = 0,
-            bg = 0xFF0A0E14, bgEnd = 0xFF0A0E14, surface = 0xFF15181E, surfaceVariant = 0xFF1A1F29,
-            accent = 0xFFD4AF35, accentSoft = 0xFFF7D56E, accentDeep = 0xFF9E7C2E,
-            text = 0xFFFAF8F5, textSec = 0xFFC5BAA8
+            "noor_default", "نور الأساسي", "الهوية المعتمدة — أخضر ليلي زيتوني وذهب دافئ", price = 0,
+            bg = 0xFF10220F, bgEnd = 0xFF081209, surface = 0xFF13291B, surfaceVariant = 0xFF1A3323,
+            accent = 0xFFE9C46A, accentSoft = 0xFFF6E2A0, accentDeep = 0xFFA57C31,
+            text = 0xFFEDE9DD, textSec = 0xFFB9C4B0
         ),
 
         // ─────────── 01 — نور الفجر ───────────

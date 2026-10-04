@@ -1,6 +1,7 @@
 package com.elhajri.noor.home
 
 import android.icu.util.IslamicCalendar
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,14 +9,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.foundation.Image
-import com.elhajri.noor.R
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,8 +25,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -39,18 +43,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.elhajri.noor.prayer.PrayerRepository
+import com.elhajri.noor.theme.ThemeStore
 import com.elhajri.noor.ui.AmiriFamily
-import com.elhajri.noor.ui.Gold
-import com.elhajri.noor.ui.GoldSoft
-import com.elhajri.noor.ui.Navy
-import com.elhajri.noor.ui.NavyLight
-import com.elhajri.noor.ui.TextMain
 import java.util.Calendar
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlinx.coroutines.delay
 
-// صور الموقع الأصلية نفسها — طبق الأصل
+// ═══════════ الهوية البصرية المعتمدة v8 — أخضر زيتوني ليلي + ذهب دافئ ═══════════
+private val OliveTop = Color(0xFF10220F)      // أعلى الخلفية
+private val OliveMid = Color(0xFF0B180D)      // وسطها
+private val OliveDeep = Color(0xFF081209)      // أسفلها
+private val CardOlive0 = Color(0xFF223E28)    // البطاقات — أخضر أفتح مختلف عن الخلفية
+private val CardOlive1 = Color(0xFF102618)
+private val CardOlive2 = Color(0xFF09160E)
+private val Gold8 = Color(0xFFE9C46A)          // الذهب الدافئ
+private val Gold8Soft = Color(0xFFF6E2A0)     // الذهب الفاتح
+private val TextSoft = Color(0xFFEDE9DD)      // النصوص
+
+// صورة الموقع الأصلية نفسها — من كود PrayerWidget.jsx حرفياً
 private const val HERO_IMG = "https://media.base44.com/images/public/6a833faeb9e42cca9a6576fa/edd00f95f_generated_image.png"
-private const val EMBLEM_IMG = "https://media.base44.com/images/public/6a833faeb9e42cca9a6576fa/f6fc7be6c_generated_image.png"
 
 private fun toArabicDigits(value: Any): String {
     val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
@@ -58,36 +70,16 @@ private fun toArabicDigits(value: Any): String {
 }
 
 // آيات اليوم — من الكود المصدري للموقع حرفياً
-private data class DailyVerse(val text: String, val ref: String, val ayahNumber: String)
+private data class DailyVerse(val text: String, val ref: String)
 private val VERSES = listOf(
-    DailyVerse("أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", "سورة الرعد — الآية ٢٨", "٢٨"),
-    DailyVerse("وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا", "سورة الطلاق — الآية ٢", "٢"),
-    DailyVerse("إِنَّ مَعَ الْعُسْرِ يُسْرًا", "سورة الشرح — الآية ٦", "٦"),
-    DailyVerse("فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ", "سورة البقرة — الآية ١٥٢", "١٥٢"),
-    DailyVerse("وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ", "سورة الحديد — الآية ٤", "٤"),
-    DailyVerse("رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي", "سورة طه — الآيتان ٢٥-٢٦", "٢٥"),
-    DailyVerse("لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا", "سورة البقرة — الآية ٢٨٦", "٢٨٦"),
-    DailyVerse("وَبَشِّرِ الصَّابِرِينَ", "سورة البقرة — الآية ١٥٥", "١٥٥"),
-)
-
-// أحاديث اليوم — من الكود المصدري للموقع حرفياً
-private data class DailyHadith(val text: String, val ref: String)
-private val HADITHS = listOf(
-    DailyHadith("إنَّ اللهَ تعالى يقول: أنا عندَ ظنِّ عبدي بي، وأنا معَه إذا ذكَرَني", "رواه البخاري ومسلم"),
-    DailyHadith("مَن كان يؤمن بالله واليوم الآخر فليقل خيرًا أو ليصمت", "متفق عليه"),
-    DailyHadith("الطُّهُورُ شَطْرُ الإِيمَانِ", "رواه مسلم"),
-    DailyHadith("لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ", "متفق عليه"),
-    DailyHadith("مَن سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الجَنَّة", "رواه مسلم"),
-    DailyHadith("الكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ", "متفق عليه"),
-    DailyHadith("تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ لَكَ صَدَقَةٌ", "رواه الترمذي"),
-)
-
-// المناسبات القادمة — من بيانات الموقع
-private data class Occasion(val name: String, val subtitle: String, val hijriDate: String, val icon: ImageVector)
-private val OCCASIONS = listOf(
-    Occasion("المولد النبوي", "ذكرى مولد النبي ﷺ", "١٢ ربيع الأول", Icons.Filled.AutoAwesome),
-    Occasion("الإسراء والمعراج", "ذكرى رحلة الإسراء والمعراج", "٢٧ رجب", Icons.Filled.Star),
-    Occasion("ليلة النصف من شعبان", "ليلة مباركة يكثر فيها الدعاء", "١٥ شعبان", Icons.Filled.DarkMode),
+    DailyVerse("أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", "سورة الرعد — الآية ٢٨"),
+    DailyVerse("وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا", "سورة الطلاق — الآية ٢"),
+    DailyVerse("إِنَّ مَعَ الْعُسْرِ يُسْرًا", "سورة الشرح — الآية ٦"),
+    DailyVerse("فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ", "سورة البقرة — الآية ١٥٢"),
+    DailyVerse("وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ", "سورة الحديد — الآية ٤"),
+    DailyVerse("رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي", "سورة طه — الآيتان ٢٥-٢٦"),
+    DailyVerse("لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا", "سورة البقرة — الآية ٢٨٦"),
+    DailyVerse("وَبَشِّرِ الصَّابِرِينَ", "سورة البقرة — الآية ١٥٥"),
 )
 
 private val HIJRI_MONTHS = listOf(
@@ -116,18 +108,198 @@ private fun pressScale(interactionSource: MutableInteractionSource): Float {
     return scale
 }
 
-/** بطاقة فاخرة — نفس luxury-card بالموقع: تدرج عمودي بحواف ذهبية خفيفة */
+/** زخرفة إسلامية هندسية — نجمة ثمانية متكررة خافتة في خلفية الشاشة */
+private fun DrawScope.drawOctagramSquare(cx: Float, cy: Float, r: Float, angleDeg: Float, color: Color, strokePx: Float) {
+    val rad = Math.toRadians(angleDeg.toDouble())
+    val pts = (0 until 4).map { i ->
+        val a = rad + i * Math.PI / 2.0
+        Offset(cx + (r * cos(a)).toFloat(), cy + (r * sin(a)).toFloat())
+    }
+    for (i in 0 until 4) {
+        val p0 = pts[i]; val p1 = pts[(i + 1) % 4]
+        drawLine(color, p0, p1, strokeWidth = strokePx, cap = StrokeCap.Round)
+    }
+}
+
 @Composable
-private fun LuxuryCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Column(
-        modifier = modifier
+private fun OrnamentBackground() {
+    Canvas(Modifier.fillMaxSize()) {
+        val tile = 110.dp.toPx()
+        val strokePx = 1.dp.toPx()
+        val color = Color(0xFF96AA6E).copy(alpha = 0.13f)
+        var x = 0f
+        while (x < size.width + tile) {
+            var y = 0f
+            while (y < size.height + tile) {
+                val cx = x + tile / 2f
+                val cy = y + tile / 2f
+                val r = tile * 0.34f
+                drawOctagramSquare(cx, cy, r, 0f, color, strokePx)
+                drawOctagramSquare(cx, cy, r, 45f, color, strokePx)
+                drawCircle(color, radius = tile * 0.085f, center = Offset(cx, cy), style = Stroke(strokePx))
+                drawLine(color, Offset(x, cy), Offset(x + tile * 0.16f, cy), strokePx)
+                drawLine(color, Offset(x + tile * 0.84f, cy), Offset(x + tile, cy), strokePx)
+                drawLine(color, Offset(cx, y), Offset(cx, y + tile * 0.16f), strokePx)
+                drawLine(color, Offset(cx, y + tile * 0.84f), Offset(cx, y + tile), strokePx)
+                y += tile
+            }
+            x += tile
+        }
+    }
+}
+
+/** شريط زخرفي بأقواس متكررة فوق بطاقة الصلاة — كما في التصميم المعتمد */
+@Composable
+private fun ArchBand() {
+    Canvas(Modifier.fillMaxWidth().height(15.dp)) {
+        val tileW = 34.dp.toPx()
+        val strokePx = 1.dp.toPx()
+        val color = Gold8.copy(alpha = 0.55f)
+        var x = 0f
+        while (x < size.width) {
+            val left = x + 2.dp.toPx()
+            val right = x + tileW - 2.dp.toPx()
+            val mid = x + tileW / 2f
+            val path = Path().apply {
+                moveTo(left, size.height)
+                lineTo(left, size.height * 0.45f)
+                quadraticBezierTo(left, 0f, mid, 0f)
+                quadraticBezierTo(right, 0f, right, size.height * 0.45f)
+                lineTo(right, size.height)
+            }
+            drawPath(path, color, style = Stroke(strokePx))
+            x += tileW
+        }
+    }
+}
+
+/** بطاقة الصلاة — صورة الموقع الأصلية تغطي البطاقة كاملة، تحية وهجري فوقها، إطار ذهبي */
+@Composable
+private fun HeroPrayerCard(
+    greeting: String,
+    hijri: String,
+    nextPrayerName: String,
+    nextPrayerTimeLabel: String,
+    countdown: String,
+    onNavigate: (String) -> Unit
+) {
+    val heroInteraction = remember { MutableInteractionSource() }
+    val heroScale = pressScale(heroInteraction)
+    Box(
+        modifier = Modifier
             .fillMaxWidth()
+            .height(238.dp)
+            .graphicsLayer { scaleX = heroScale; scaleY = heroScale }
+            .shadow(elevation = 10.dp, shape = RoundedCornerShape(22.dp))
+            .clip(RoundedCornerShape(22.dp))
+            .background(Color.Black)
+            .border(1.5.dp, Gold8.copy(alpha = 0.35f), RoundedCornerShape(22.dp))
+            .clickable(interactionSource = heroInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate("prayer") }
+    ) {
+        AsyncImage(
+            model = HERO_IMG,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        // تعتيم متدرج يثبّت النصوص فوق الصورة
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    listOf(Color.Black.copy(alpha = 0.25f), Color.Black.copy(alpha = 0.55f), Color.Black.copy(alpha = 0.80f))
+                )
+            )
+        )
+        // إضاءة علوية للعمق ثلاثي الأبعاد
+        Box(
+            Modifier.fillMaxWidth().height(60.dp).background(
+                Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.10f), Color.Transparent))
+            )
+        )
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.End
+        ) {
+            // التحية + التاريخ الهجري — كما في الموقع
+            Column(horizontalAlignment = Alignment.End) {
+                Text(greeting, color = Gold8Soft, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
+                if (hijri.isNotEmpty()) {
+                    Text(hijri, color = Color.White.copy(alpha = 0.75f), fontSize = 10.sp)
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // الصلاة القادمة — جهة اليمين
+                Column(horizontalAlignment = Alignment.Start) {
+                    Text("الصلاة التالية", color = Gold8.copy(alpha = 0.85f), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                    Text(nextPrayerName, color = Gold8Soft, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
+                    Text(nextPrayerTimeLabel, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                }
+                // حلقة العد التنازلي — جهة اليسار مع تسميتها
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .border(2.dp, Gold8.copy(alpha = 0.75f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(countdown, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(Modifier.height(4.dp))
+                    Text("حتى الأذان", color = Color.White.copy(alpha = 0.85f), fontSize = 9.sp)
+                }
+            }
+        }
+    }
+}
+
+/** بطاقة استكشاف — 3D بإضاءة علوية وحافة ذهبية، مع تموج عند الضغط */
+private data class Explore(val route: String, val title: String, val sub: String, val icon: ImageVector)
+
+@Composable
+private fun ExploreCard(item: Explore, modifier: Modifier = Modifier, onNavigate: (String) -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
+    val scale = pressScale(interaction)
+    Row(
+        modifier = modifier
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+            .shadow(elevation = 5.dp, shape = RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
-            .background(Brush.verticalGradient(listOf(NavyLight.copy(alpha = 0.88f), Color(0xFF11141A).copy(alpha = 0.82f))))
-            .border(1.dp, Gold.copy(alpha = 0.10f), RoundedCornerShape(16.dp))
-            .padding(20.dp),
-        content = content
-    )
+            .background(
+                Brush.verticalGradient(
+                    listOf(CardOlive0.copy(alpha = 0.78f), CardOlive1.copy(alpha = 0.88f), CardOlive2.copy(alpha = 0.92f))
+                )
+            )
+            .border(1.dp, Gold8.copy(alpha = 0.38f), RoundedCornerShape(16.dp))
+            .clickable(interactionSource = interaction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate(item.route) }
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(Gold8.copy(alpha = 0.26f), Gold8.copy(alpha = 0.08f), Gold8.copy(alpha = 0.16f))
+                    )
+                )
+                .border(1.dp, Gold8.copy(alpha = 0.5f), RoundedCornerShape(12.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(item.icon, contentDescription = item.title, tint = Gold8, modifier = Modifier.size(20.dp))
+        }
+        Spacer(Modifier.width(10.dp))
+        Column {
+            Text(item.title, color = TextSoft, fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
+            Text(item.sub, color = TextSoft.copy(alpha = 0.60f), fontSize = 9.5.sp)
+        }
+    }
 }
 
 @Composable
@@ -143,10 +315,11 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         else -> "ليلة مباركة"
     }
     val hijri = remember { hijriDateLabel() }
+    val points = remember { ThemeStore.getPoints(context) }
 
     var nextPrayerName by remember { mutableStateOf("...") }
     var nextPrayerTimeLabel by remember { mutableStateOf("") }
-    var countdown by remember { mutableStateOf("--:--:--") }
+    var countdown by remember { mutableStateOf("--:--") }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -180,8 +353,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     if (timeInMillis <= now.timeInMillis) add(Calendar.DAY_OF_YEAR, 1)
                 }
                 val diff = ((target.timeInMillis - now.timeInMillis) / 1000).coerceAtLeast(0)
-                countdown = String.format("%02d:%02d:%02d", diff / 3600, (diff % 3600) / 60, diff % 60)
-                    .let { toArabicDigits(it) }
+                countdown = String.format("%d:%02d", diff / 3600, (diff % 3600) / 60).let { toArabicDigits(it) }
             }
             delay(1000)
         }
@@ -189,246 +361,118 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
     val dayIndex = remember { Calendar.getInstance().get(Calendar.DAY_OF_MONTH) }
     val verse = VERSES[dayIndex % VERSES.size]
-    val hadith = HADITHS[dayIndex % HADITHS.size]
 
-    // الوصول السريع — نفس قائمة الموقع بأيقوناته الذهبية
-    data class Quick(val route: String, val label: String, val icon: ImageVector)
-    val quickAccess = listOf(
-        Quick("prayer", "الصلاة", Icons.Filled.Mosque),
-        Quick("tasbih", "السبحة", Icons.Filled.TouchApp),
-        Quick("athkar", "الأذكار", Icons.Filled.AutoStories),
-        Quick("quran", "القرآن", Icons.Filled.MenuBook),
-        Quick("games", "الألعاب", Icons.Filled.SportsEsports),
-        Quick("library", "الأناشيد", Icons.Filled.MusicNote),
-        Quick("quiz", "الاختبار", Icons.Filled.Quiz),
-        Quick("stories", "القصص", Icons.Filled.Book),
+    // استكشف نور — ستة أبواب كما في التصميم المعتمد
+    val explore = listOf(
+        Explore("quran", "القرآن الكريم", "تلاوة، حفظ، تفسير", Icons.Filled.MenuBook),
+        Explore("athkar", "الأذكار", "أذكار اليوم والليلة", Icons.Filled.Favorite),
+        Explore("qibla", "القبلة", "اتجاه القبلة بدقة", Icons.Filled.Explore),
+        Explore("library", "الأناشيد", "إيقاع بلا آلات", Icons.Filled.MusicNote),
+        Explore("games", "ميدان الألعاب", "٦ تحديات إيمانية", Icons.Filled.SportsEsports),
+        Explore("ai", "المساعد الذكي", "أسئلتك الفقهية", Icons.Filled.AutoAwesome),
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // ============ الخلفية الجديدة: سماء ليلية ومسجد — خلفية كامل الشاشة ============
-        Image(
-            painter = androidx.compose.ui.res.painterResource(R.drawable.theme_bg_makkah_night),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        // الخلفية الزيتونية المتدرجة + الزخارف الإسلامية الخافتة
         Box(
-            modifier = Modifier.fillMaxSize().background(
-                Brush.verticalGradient(
-                    0f to Navy.copy(alpha = 0.60f),
-                    0.45f to Navy.copy(alpha = 0.74f),
-                    1f to Navy.copy(alpha = 0.92f)
-                )
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(listOf(OliveTop, OliveMid, OliveDeep))
+            )
+        )
+        OrnamentBackground()
+        // توهج ذهبي علوي خفيف
+        Box(
+            Modifier.fillMaxWidth().height(260.dp).background(
+                Brush.verticalGradient(listOf(Gold8.copy(alpha = 0.07f), Color.Transparent))
             )
         )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        // ============ ودجت الصلاة — نص فوق خلفية الشاشة، بلا صورة محلية ولا إطار ============
-        val heroInteraction = remember { MutableInteractionSource() }
-        val heroScale = pressScale(heroInteraction)
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(190.dp)
-                .graphicsLayer { scaleX = heroScale; scaleY = heroScale }
-                .clickable(interactionSource = heroInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate("prayer") }
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
+            // الشريط الزخرفي فوق البطاقة
+            ArchBand()
+            Spacer(Modifier.height(4.dp))
+
+            // بطاقة الصلاة — صورة الموقع الأصلية
+            HeroPrayerCard(greeting, hijri, nextPrayerName, nextPrayerTimeLabel, countdown, onNavigate)
+
+            Spacer(Modifier.height(10.dp))
+
+            // آية اليوم — بطاقة زجاجية بحافة ذهبية وعمق ثلاثي الأبعاد
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(greeting, color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
-                    if (hijri.isNotEmpty()) {
-                        Text(hijri, color = Gold.copy(alpha = 0.8f), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    // العد التنازلي — جهة البداية كما في الموقع
-                    Column(horizontalAlignment = Alignment.Start) {
-                        Text(countdown, color = TextMain, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                        Text("الوقت المتبقي", color = Gold.copy(alpha = 0.8f), fontSize = 10.sp)
-                    }
-                    // الصلاة القادمة — الجهة الأخرى
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text("الصلاة القادمة", color = Gold.copy(alpha = 0.8f), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-                        Text(nextPrayerName, color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
-                        Text(nextPrayerTimeLabel, color = TextMain.copy(alpha = 0.9f), fontSize = 12.sp)
-                    }
-                }
-            }
-        }
-
-        Spacer(Modifier.height(20.dp))
-
-        // ============ الوصول السريع — شبكة 4×2 بحدود ذهبية وأيقونات ذهبية ============
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.width(4.dp).height(16.dp).clip(RoundedCornerShape(2.dp)).background(Gold))
-            Spacer(Modifier.width(8.dp))
-            Text("الوصول السريع", color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-        }
-        Spacer(Modifier.height(12.dp))
-        for (row in 0..1) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                for (col in 0..3) {
-                    val item = quickAccess[row * 4 + col]
-                    val interaction = remember(item.route) { MutableInteractionSource() }
-                    val scale = pressScale(interaction)
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f)
-                            .graphicsLayer { scaleX = scale; scaleY = scale }
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Brush.verticalGradient(listOf(NavyLight.copy(alpha = 0.6f), Color(0xFF11141A).copy(alpha = 0.5f))))
-                            .border(1.dp, Gold.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
-                            .clickable(interactionSource = interaction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate(item.route) },
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(item.icon, contentDescription = item.label, tint = Gold, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.height(6.dp))
-                        Text(item.label, color = TextMain, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-                    }
-                }
-            }
-            if (row == 0) Spacer(Modifier.height(10.dp))
-        }
-
-        Spacer(Modifier.height(20.dp))
-
-        // ============ آية اليوم ============
-        LuxuryCard {
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("آية اليوم", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(verse.text, color = TextMain, fontSize = 18.sp, fontFamily = AmiriFamily, textAlign = TextAlign.Center)
-                    Spacer(Modifier.width(6.dp))
-                    Box(
-                        modifier = Modifier.size(28.dp).clip(RoundedCornerShape(50)).background(Gold.copy(alpha = 0.10f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(verse.ayahNumber, color = Gold, fontSize = 11.sp)
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-                Text(verse.ref, color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
-                Spacer(Modifier.height(12.dp))
-                val shareInteraction = remember { MutableInteractionSource() }
-                val shareScale = pressScale(shareInteraction)
-                Row(
-                    modifier = Modifier
-                        .graphicsLayer { scaleX = shareScale; scaleY = shareScale }
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Gold.copy(alpha = 0.10f))
-                        .clickable(interactionSource = shareInteraction, indication = androidx.compose.foundation.LocalIndication.current) {
-                            val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(android.content.Intent.EXTRA_TEXT, "${verse.text}\n\n${verse.ref}")
-                            }
-                            context.startActivity(android.content.Intent.createChooser(send, "مشاركة الآية"))
-                        }
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Filled.Share, contentDescription = null, tint = Gold, modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text("مشاركة الآية", color = Gold, fontSize = 12.sp)
-                }
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        // ============ الحديث الشريف — بشعار التطبيق ============
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(Brush.verticalGradient(listOf(NavyLight.copy(alpha = 0.88f), Color(0xFF11141A).copy(alpha = 0.82f))))
-                .border(1.dp, Gold.copy(alpha = 0.10f), RoundedCornerShape(16.dp))
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text("الحديث الشريف", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(8.dp))
-                Text("قال رسول الله ﷺ: ${hadith.text}", color = TextMain, fontSize = 16.sp, fontFamily = AmiriFamily)
-                Spacer(Modifier.height(8.dp))
-                Text(hadith.ref, color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
-            }
-            Spacer(Modifier.width(12.dp))
-            Image(
-                painter = androidx.compose.ui.res.painterResource(R.mipmap.ic_launcher),
-                contentDescription = "أيقونة التطبيق",
                 modifier = Modifier
-                    .size(56.dp)
+                    .fillMaxWidth()
+                    .shadow(elevation = 6.dp, shape = RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
-                    .border(1.dp, Gold.copy(alpha = 0.35f), RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        Spacer(Modifier.height(20.dp))
-
-        // ============ المناسبات القادمة ============
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.width(4.dp).height(16.dp).clip(RoundedCornerShape(2.dp)).background(Gold))
-                Spacer(Modifier.width(8.dp))
-                Text("المناسبات القادمة", color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color(0xFF2A5838).copy(alpha = 0.30f),
+                                Color(0xFF123420).copy(alpha = 0.42f),
+                                Gold8.copy(alpha = 0.12f)
+                            )
+                        )
+                    )
+                    .border(1.dp, Gold8.copy(alpha = 0.40f), RoundedCornerShape(16.dp))
+                    .padding(horizontal = 15.dp, vertical = 10.dp)
+            ) {
+                Text("آية اليوم", color = Gold8, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                Spacer(Modifier.height(6.dp))
+                Text(verse.text, color = TextSoft, fontSize = 17.sp, fontFamily = AmiriFamily, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                Spacer(Modifier.height(4.dp))
+                Text(verse.ref, color = Gold8Soft.copy(alpha = 0.80f), fontSize = 10.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End)
             }
-            Text(
-                "الكل",
-                color = Gold, fontSize = 12.sp,
-                modifier = Modifier.clickable { onNavigate("calendar") }
-            )
-        }
-        Spacer(Modifier.height(10.dp))
-        OCCASIONS.forEach { occ ->
+
+            Spacer(Modifier.height(14.dp))
+
+            // عنوان استكشف نور
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.width(4.dp).height(16.dp).clip(RoundedCornerShape(2.dp)).background(Gold8))
+                Spacer(Modifier.width(8.dp))
+                Text("استكشف نور", color = Gold8, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(Modifier.height(10.dp))
+
+            // شبكة الاستكشاف ٢×٣
+            for (row in 0..2) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    ExploreCard(explore[row * 2], Modifier.weight(1f), onNavigate)
+                    ExploreCard(explore[row * 2 + 1], Modifier.weight(1f), onNavigate)
+                }
+                Spacer(Modifier.height(10.dp))
+            }
+
+            // شريط النقاط — كسب الجنيهات عبر الإعلانات
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(NavyLight.copy(alpha = 0.45f))
-                    .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
-                    .padding(12.dp),
+                    .shadow(elevation = 4.dp, shape = RoundedCornerShape(13.dp))
+                    .clip(RoundedCornerShape(13.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(Gold8.copy(alpha = 0.16f), Gold8.copy(alpha = 0.06f), CardOlive2.copy(alpha = 0.40f))
+                        )
+                    )
+                    .border(1.dp, Gold8.copy(alpha = 0.45f), RoundedCornerShape(13.dp))
+                    .padding(horizontal = 13.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(Gold.copy(alpha = 0.10f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(occ.icon, contentDescription = null, tint = Gold, modifier = Modifier.size(16.dp))
-                }
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(occ.name, color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                    Text(occ.subtitle, color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
-                }
-                Text(occ.hijriDate, color = Gold, fontSize = 12.sp)
+                Text("نقاطك: ${toArabicDigits(points)} 🌙", color = Gold8Soft, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    "أكمل ٣ إعلانات واربح ٣٠٠ نقطة ←",
+                    color = Gold8Soft.copy(alpha = 0.85f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.clickable { onNavigate("earn") }
+                )
             }
-        }
 
-        Spacer(Modifier.height(16.dp))
-    }
+            Spacer(Modifier.height(16.dp))
+        }
     }
 }
