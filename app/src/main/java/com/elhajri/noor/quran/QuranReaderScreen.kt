@@ -11,11 +11,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Person
@@ -81,6 +81,52 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.text.appendInlineContent
 
 data class AyahItem(val number: Int, val text: String)
+
+/** الترجمة الإنجليزية للآية — Saheeh International عبر alquran.cloud مجاناً */
+data class AyahTranslation(val number: Int, val english: String)
+
+private suspend fun fetchOrLoadSurahTranslation(context: Context, surahNumber: Int): List<AyahTranslation> = withContext(Dispatchers.IO) {
+    // تخزين محلي أولاً — الترجمة تُحمّل مرة واحدة وتعمل لاحقاً دون إنترنت
+    val file = File(context.filesDir, "quran_en_$surahNumber.json")
+    if (file.exists() && file.length() > 0) {
+        try {
+            val arr = JSONArray(file.readText())
+            val list = List(arr.length()) { i ->
+                val o = arr.getJSONObject(i)
+                AyahTranslation(o.getInt("number"), o.getString("text"))
+            }
+            if (list.isNotEmpty()) return@withContext list
+        } catch (_: Exception) {}
+    }
+    try {
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url("https://api.alquran.cloud/v1/surah/$surahNumber/en.sahih")
+            .build()
+        client.newCall(request).execute().use { response ->
+            if (response.isSuccessful) {
+                val dataObj = JSONObject(response.body?.string() ?: "").getJSONObject("data")
+                val ayahsArr = dataObj.getJSONArray("ayahs")
+                val result = mutableListOf<AyahTranslation>()
+                val cacheArr = JSONArray()
+                for (i in 0 until ayahsArr.length()) {
+                    val aObj = ayahsArr.getJSONObject(i)
+                    val num = aObj.optInt("numberInSurah", i + 1)
+                    val txt = aObj.getString("text")
+                    result.add(AyahTranslation(num, txt))
+                    val o = JSONObject()
+                    o.put("number", num); o.put("text", txt)
+                    cacheArr.put(o)
+                }
+                if (result.isNotEmpty()) file.writeText(cacheArr.toString())
+                return@withContext result
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    emptyList()
+}
 
 private suspend fun fetchOrLoadSurahAyahs(context: Context, surahNumber: Int): List<AyahItem> = withContext(Dispatchers.IO) {
     // ===== المصحف الكامل مدمج داخل التطبيق — يعمل بدون إنترنت من أول فتحة =====
@@ -173,6 +219,9 @@ fun QuranReaderScreen(
     var ayahs by remember { mutableStateOf<List<AyahItem>>(emptyList()) }
     var isLoadingText by remember { mutableStateOf(true) }
     var isLightMode by remember { mutableStateOf(false) }
+    var showTranslation by remember { mutableStateOf(false) }
+    var translation by remember { mutableStateOf<List<AyahTranslation>>(emptyList()) }
+    var translationLoading by remember { mutableStateOf(false) }
 
     val favorites by FavoritesStore.favorites.collectAsState()
     val isFav = favorites.contains(currentSurahNum)
@@ -218,6 +267,15 @@ fun QuranReaderScreen(
             .putString("streak_last_date", today)
             .putInt("streak_count", streak)
             .apply()
+    }
+
+    // الترجمة الإنجليزية — تُجلب عند التفعيل وتُخزّن محلياً للعمل دون إنترنت لاحقاً
+    LaunchedEffect(showTranslation, currentSurahNum) {
+        if (showTranslation) {
+            translationLoading = true
+            translation = fetchOrLoadSurahTranslation(context, currentSurahNum)
+            translationLoading = false
+        }
     }
 
     // Auto-advance handled natively by the playback queue (current + next 4 surahs)
@@ -460,7 +518,9 @@ fun QuranReaderScreen(
             topBar = {
                 Column {
                     QuranPageHeader(
-                        onBrightness = { isLightMode = !isLightMode }
+                        onBrightness = { isLightMode = !isLightMode },
+                        onTranslation = { showTranslation = !showTranslation },
+                        showTranslationActive = showTranslation
                     )
                     QuranBackRow(onBack = onBack)
                 }
@@ -645,6 +705,68 @@ fun QuranReaderScreen(
                             ),
                             modifier = Modifier.fillMaxWidth().padding(20.dp)
                         )
+                    }
+                }
+
+                // ===== الترجمة الإنجليزية — Saheeh International تحت المصحف =====
+                if (showTranslation) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isLightMode) Color(0xFFFEF3C7).copy(alpha = 0.9f)
+                            else Color(0xFF0F3324).copy(alpha = 0.6f)
+                        ),
+                        shape = RoundedCornerShape(18.dp),
+                        border = if (isLightMode) null else androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.25f)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Filled.Translate, contentDescription = null, tint = Gold, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("English Translation — Saheeh International", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                            if (translationLoading) {
+                                Text(
+                                    "Loading translation...",
+                                    color = TextMain.copy(alpha = 0.7f),
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            } else if (translation.isEmpty()) {
+                                Text(
+                                    "تعذر تحميل الترجمة. يرجى الاتصال بالإنترنت مرة واحدة لتحميلها.",
+                                    color = TextMain.copy(alpha = 0.8f),
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            } else {
+                                translation.forEach { t ->
+                                    Text(
+                                        text = t.english,
+                                        color = if (isLightMode) Color(0xFF3F3F46) else TextMain.copy(alpha = 0.85f),
+                                        fontSize = 13.sp,
+                                        lineHeight = 20.sp,
+                                        textAlign = TextAlign.Start,
+                                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                                    )
+                                    Text(
+                                        text = "[${t.number}]",
+                                        color = Gold.copy(alpha = 0.75f),
+                                        fontSize = 10.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 

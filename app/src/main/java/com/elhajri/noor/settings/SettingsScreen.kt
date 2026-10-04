@@ -251,7 +251,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                 Text("نور", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 Text("تطبيق الإسلام الشامل", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Text("القرآن · الأذكار · الصلاة · القبلة · القصص · الألعاب · الذكاء الاصطناعي", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
-                Text("النسخة 5.0", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
+                Text("النسخة " + context.packageManager.getPackageInfo(context.packageName, 0).versionName.toString(), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "سياسة الخصوصية ←",

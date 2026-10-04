@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -26,11 +26,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 import com.elhajri.noor.ui.Gold
 
 /**
  * رأس صفحة القرآن — طبق الأصل عن الموقع: صف أيقونات دائرية خفيفة على جانب،
- * شعار "نور" مع العنوان الفرعي على الجانب الآخر، وهلال ذهبي في دائرة مُعبّأة.
+ * أيقونة التطبيق الرسمية مع «القرآن الكريم» — بلا هلال نهائياً كما هو معتمد.
  */
 @Composable
 fun QuranPageHeader(
@@ -38,7 +40,9 @@ fun QuranPageHeader(
     onAssistant: () -> Unit = {},
     onFavorites: () -> Unit = {},
     onSearch: () -> Unit = {},
-    onBrightness: () -> Unit = {}
+    onBrightness: () -> Unit = {},
+    onTranslation: () -> Unit = {},
+    showTranslationActive: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -50,6 +54,9 @@ fun QuranPageHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                HeaderIcon(onClick = onTranslation, filled = showTranslationActive) {
+                    Icon(Icons.Filled.Translate, contentDescription = "الترجمة الإنجليزية", tint = Gold, modifier = Modifier.size(16.dp))
+                }
                 HeaderIcon(onClick = onBrightness) {
                     Icon(Icons.Filled.WbSunny, contentDescription = "السطوع", tint = Gold, modifier = Modifier.size(16.dp))
                 }
@@ -57,18 +64,15 @@ fun QuranPageHeader(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("نور", color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                    Text("تطبيق الإسلام الشامل", color = Gold.copy(alpha = 0.6f), fontSize = 10.sp)
+                    Text("القرآن الكريم", color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold)
                 }
                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .size(34.dp)
-                        .background(Gold, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Filled.NightsStay, contentDescription = "الوضع الليلي", tint = Color(0xFF0D2B1F), modifier = Modifier.size(18.dp))
-                }
+                AsyncImage(
+                    model = com.elhajri.noor.R.mipmap.ic_launcher,
+                    contentDescription = "القرآن الكريم",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(34.dp).background(Gold.copy(alpha = 0.14f), CircleShape)
+                )
             }
         }
     }
