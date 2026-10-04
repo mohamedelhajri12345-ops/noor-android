@@ -311,6 +311,51 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
             Spacer(Modifier.height(10.dp))
 
+            // شريط الإعلانات — فوق العناصر مباشرة كما طلب محمد
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(elevation = 4.dp, shape = RoundedCornerShape(13.dp))
+                    .clip(RoundedCornerShape(13.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(Gold8.copy(alpha = 0.16f), Gold8.copy(alpha = 0.06f), com.elhajri.noor.ui.Navy.copy(alpha = 0.40f))
+                        )
+                    )
+                    .border(1.dp, Gold8.copy(alpha = 0.45f), RoundedCornerShape(13.dp))
+                    .padding(horizontal = 13.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("نقاطك: ${toArabicDigits(points)} 🌙", color = Gold8Soft, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    "أكمل ٣ إعلانات واربح ٣٠٠ نقطة ←",
+                    color = Gold8Soft.copy(alpha = 0.85f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.clickable { onNavigate("earn") }
+                )
+            }
+
+            // استكشف نور — العناصر فوق الآية
+            Spacer(Modifier.height(12.dp))
+            // عنوان استكشف نور
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.width(4.dp).height(16.dp).clip(RoundedCornerShape(2.dp)).background(Gold8))
+                Spacer(Modifier.width(8.dp))
+                Text("استكشف نور", color = Gold8, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(Modifier.height(10.dp))
+
+            // شبكة الاستكشاف ٢×٣
+            for (row in 0..2) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    ExploreCard(explore[row * 2], Modifier.weight(1f), onNavigate)
+                    ExploreCard(explore[row * 2 + 1], Modifier.weight(1f), onNavigate)
+                }
+                Spacer(Modifier.height(10.dp))
+            }
+
             // آية اليوم — بطاقة زجاجية بحافة ذهبية وعمق ثلاثي الأبعاد
             Column(
                 modifier = Modifier
@@ -337,49 +382,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             }
 
             Spacer(Modifier.height(14.dp))
-
-            // عنوان استكشف نور
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.width(4.dp).height(16.dp).clip(RoundedCornerShape(2.dp)).background(Gold8))
-                Spacer(Modifier.width(8.dp))
-                Text("استكشف نور", color = Gold8, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            }
-            Spacer(Modifier.height(10.dp))
-
-            // شبكة الاستكشاف ٢×٣
-            for (row in 0..2) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    ExploreCard(explore[row * 2], Modifier.weight(1f), onNavigate)
-                    ExploreCard(explore[row * 2 + 1], Modifier.weight(1f), onNavigate)
-                }
-                Spacer(Modifier.height(10.dp))
-            }
-
-            // شريط النقاط — كسب الجنيهات عبر الإعلانات
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(elevation = 4.dp, shape = RoundedCornerShape(13.dp))
-                    .clip(RoundedCornerShape(13.dp))
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(Gold8.copy(alpha = 0.16f), Gold8.copy(alpha = 0.06f), com.elhajri.noor.ui.Navy.copy(alpha = 0.40f))
-                        )
-                    )
-                    .border(1.dp, Gold8.copy(alpha = 0.45f), RoundedCornerShape(13.dp))
-                    .padding(horizontal = 13.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("نقاطك: ${toArabicDigits(points)} 🌙", color = Gold8Soft, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
-                Text(
-                    "أكمل ٣ إعلانات واربح ٣٠٠ نقطة ←",
-                    color = Gold8Soft.copy(alpha = 0.85f),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clickable { onNavigate("earn") }
-                )
-            }
 
             Spacer(Modifier.height(16.dp))
         }
