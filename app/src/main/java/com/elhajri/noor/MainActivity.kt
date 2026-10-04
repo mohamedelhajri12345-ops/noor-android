@@ -54,10 +54,13 @@ import com.elhajri.noor.calendar.CalendarScreen
 import com.elhajri.noor.community.CommunityScreen
 import com.elhajri.noor.donation.DonationScreen
 import com.elhajri.noor.favorites.FavoritesScreen
-import com.elhajri.noor.games.GamesScreen
-import com.elhajri.noor.games.NamesGameScreen
-import com.elhajri.noor.games.ProphetsJourneyScreen
-import com.elhajri.noor.games.QuranMemorizationScreen
+import com.elhajri.noor.games.NoorGameHubScreen
+import com.elhajri.noor.games.KalimatGameScreen
+import com.elhajri.noor.games.TriviaLadderGameScreen
+import com.elhajri.noor.games.AyatChainGameScreen
+import com.elhajri.noor.games.NamesMatchGameScreen
+import com.elhajri.noor.games.TimelineGameScreen
+import com.elhajri.noor.games.TartilMirrorGameScreen
 import com.elhajri.noor.hajj.HajjGuideScreen
 import com.elhajri.noor.journal.JournalScreen
 import com.elhajri.noor.more.MoreScreen
@@ -329,10 +332,13 @@ fun NoorApp() {
             composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
             composable("library") { com.elhajri.noor.quran.LibraryScreen(onBack = { navController.popBackStack() }) }
             composable("tracker") { TrackerScreen() }
-            composable("games") { GamesScreen(onNavigate = { navController.navigate(it) }) }
-            composable("names_game") { NamesGameScreen(onBack = { navController.popBackStack() }) }
-            composable("journey_game") { ProphetsJourneyScreen(onBack = { navController.popBackStack() }) }
-            composable("mem_game") { QuranMemorizationScreen(onBack = { navController.popBackStack() }) }
+            composable("games") { NoorGameHubScreen(onBack = { navController.popBackStack() }, onNavigate = { navController.navigate(it) }) }
+            composable("game_kalimat") { KalimatGameScreen(onBack = { navController.popBackStack() }) }
+            composable("game_trivia") { TriviaLadderGameScreen(onBack = { navController.popBackStack() }) }
+            composable("game_ayat") { AyatChainGameScreen(onBack = { navController.popBackStack() }) }
+            composable("game_match") { NamesMatchGameScreen(onBack = { navController.popBackStack() }) }
+            composable("game_timeline") { TimelineGameScreen(onBack = { navController.popBackStack() }) }
+            composable("game_tartil") { TartilMirrorGameScreen(onBack = { navController.popBackStack() }) }
             composable("hajj") { HajjGuideScreen(onBack = { navController.popBackStack() }) }
             composable("zakat") { ZakatScreen() }
         }

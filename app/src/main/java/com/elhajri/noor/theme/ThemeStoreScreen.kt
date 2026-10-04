@@ -3,6 +3,7 @@ package com.elhajri.noor.theme
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -323,6 +324,12 @@ fun ThemePreview(def: NoorThemeDef) {
                     )
             )
         }
+        // النمط الهندسي المميز — هوية كل ثيم فوق خلفية المعاينة
+        Box(
+            Modifier
+                .matchParentSize()
+                .drawBehind { com.elhajri.noor.ui.drawThemePattern(def.pattern, def.accent, def.background) }
+        )
         Column(
             modifier = Modifier
                 .matchParentSize()
