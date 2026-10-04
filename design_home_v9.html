@@ -27,7 +27,7 @@
     radial-gradient(1px 1px at 70px 150px, rgba(255,255,255,.5), transparent 100%),
     radial-gradient(1.2px 1.2px at 350px 170px, rgba(255,255,255,.55), transparent 100%);
     opacity:.8; }
-  .content { position:relative; height:100%; display:flex; flex-direction:column; }
+  .content { position:relative; z-index:5; height:100%; display:flex; flex-direction:column; }
 
   /* ═══ الشريط العلوي — أيقونة التطبيق + «القرآن الكريم» ═══ */
   .topbar { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 4px; }
@@ -109,11 +109,11 @@
   .nav.on::after { content:''; width:5px; height:5px; border-radius:50%; background:#F0D58A; box-shadow:0 0 8px #E9C46A; }
 
   /* ═══ الخلفية الجديدة — سماء ليلية واقعية مرسومة بالكود بالكامل ═══ */
-  .night-sky { position:absolute; inset:0; z-index:1;
+  .night-sky { position:absolute; inset:0; z-index:0;
     background:
       radial-gradient(75% 42% at 50% -8%, rgba(233,196,106,.14), transparent 62%),
       linear-gradient(178deg, #0F2312 0%, #0A180C 48%, #06100A 100%); }
-  .stars { position:absolute; inset:0; z-index:1; opacity:.85;
+  .stars { position:absolute; inset:0; z-index:0; opacity:.85;
     background-image:
       radial-gradient(1.6px 1.6px at 12% 9%, rgba(255,255,255,.75) 50%, transparent 52%),
       radial-gradient(1.2px 1.2px at 78% 6%, rgba(255,248,220,.65) 50%, transparent 52%),
@@ -133,7 +133,7 @@
       radial-gradient(2.2px 2.2px at 47% 5%, rgba(255,250,235,.85) 50%, transparent 52%),
       radial-gradient(1.3px 1.3px at 68% 3%, rgba(255,248,220,.7) 50%, transparent 52%),
       radial-gradient(1.6px 1.6px at 25% 4%, rgba(255,255,255,.6) 50%, transparent 52%); }
-  .sky-depth { position:absolute; left:0; right:0; bottom:0; height:38%; z-index:1;
+  .sky-depth { position:absolute; left:0; right:0; bottom:0; height:38%; z-index:0;
     background:linear-gradient(to top, rgba(2,7,4,.55), transparent); }
 </style>
 </head>
@@ -142,18 +142,8 @@
   <div class="night-sky"></div>
   <div class="stars"></div>
   <div class="sky-depth"></div>
-  <div class="bg-flow"></div>
-  <svg class="silk" viewBox="0 0 430 780" preserveAspectRatio="none">
-    <defs>
-      <linearGradient id="silkGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="rgba(233,196,106,0)"/><stop offset=".5" stop-color="rgba(233,196,106,.5)"/><stop offset="1" stop-color="rgba(16,122,74,0)"/>
-      </linearGradient>
-    </defs>
-    <path d="M-20,110 C120,50 300,180 450,95"/>
-    <path d="M-20,160 C140,100 310,225 450,140" opacity=".35"/>
-    <path d="M-20,620 C150,560 280,670 450,600"/>
-    <path d="M-20,250 C100,300 350,210 450,285" stroke="rgba(16,122,74,.6)" opacity=".45"/>
-  </svg>
+  
+  
   <div class="stars"></div>
 
   <div class="content">
