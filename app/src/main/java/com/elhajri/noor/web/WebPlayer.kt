@@ -214,6 +214,8 @@ class WebPlayerService : Service() {
         } catch (_: Exception) { null }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setColor(0xFFE9C46A.toInt())
+            .setColorized(true)
             .setContentTitle(WebPlayerBus.title.ifBlank { "القرآن الكريم" })
             .setContentText(if (playing) "التلاوة تعمل الآن" else "متوقف مؤقتاً")
             .setSmallIcon(R.drawable.ic_notification)

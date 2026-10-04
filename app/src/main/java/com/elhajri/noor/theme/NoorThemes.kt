@@ -8,15 +8,6 @@ import com.elhajri.noor.R
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/**
- * النمط الهندسي المميز لكل ثيم — هوية بصرية كاملة وليست مجرد ألوان:
- * كل ثيم يحمل زخرفته الخاصة التي تُرسم خلف الواجهات بشفافية ناعمة.
- */
-enum class ThemePattern {
-    NONE, GIRIH_STAR, SUN_RAYS, VINE, ARCHES, STARDUST, CLOUDS,
-    GOLD_BANDS, CRESCENTS, DUNES, ZELLIGE, FLOWERS, WAVES,
-    KUFIC, DOMES, LANTERNS
-}
 
 /**
  * تعريف الثيم — بنية بيانات واضحة تجعل إضافة ثيم جديد مسألة سطر واحد
@@ -45,8 +36,6 @@ data class NoorThemeDef(
     val error: Color = Color(0xFFEF4444),
     // خلفية الثيم الحقيقية — صورة ويب عالية الجودة تخص كل ثيم (0 = تدرّج فقط)
     val backgroundRes: Int = 0,
-    // النمط الهندسي المميز (زخرفة الهوية)
-    val pattern: ThemePattern = ThemePattern.GIRIH_STAR,
     // الأنماط البصرية
     val cardRadius: Dp = 16.dp,
     val buttonRadius: Dp = 14.dp,
@@ -283,34 +272,7 @@ object NoorThemes {
         "noor_premium" to R.drawable.theme_bg_noor_premium
     )
 
-    /** نمط الزخرفة المميز لكل ثيم — هوية كاملة لا مجرد ألوان */
-    private val patternsById = mapOf(
-        "noor_default" to ThemePattern.GIRIH_STAR,
-        "fajr_noor" to ThemePattern.SUN_RAYS,
-        "emerald_quran" to ThemePattern.VINE,
-        "golden_mosque" to ThemePattern.ARCHES,
-        "makkah_night" to ThemePattern.STARDUST,
-        "madinah_calm" to ThemePattern.CLOUDS,
-        "royal_kaaba" to ThemePattern.GOLD_BANDS,
-        "blue_sky" to ThemePattern.CLOUDS,
-        "silver_crescent" to ThemePattern.CRESCENTS,
-        "golden_desert" to ThemePattern.DUNES,
-        "olive" to ThemePattern.VINE,
-        "islamic_turquoise" to ThemePattern.ZELLIGE,
-        "spiritual_violet" to ThemePattern.STARDUST,
-        "night_emerald" to ThemePattern.VINE,
-        "pink_dawn" to ThemePattern.FLOWERS,
-        "islamic_sea" to ThemePattern.WAVES,
-        "manuscripts" to ThemePattern.KUFIC,
-        "emerald_dome" to ThemePattern.DOMES,
-        "ramadan" to ThemePattern.LANTERNS,
-        "night_crescent" to ThemePattern.CRESCENTS,
-        "noor_premium" to ThemePattern.GIRIH_STAR
-    )
-
-    val all: List<NoorThemeDef> = base.map {
-        it.copy(backgroundRes = backgrounds[it.id] ?: 0, pattern = patternsById[it.id] ?: ThemePattern.GIRIH_STAR)
-    }
+    val all: List<NoorThemeDef> = base.map { it.copy(backgroundRes = backgrounds[it.id] ?: 0) }
 
     /** أيقونة تعريفية لكل ثيم — شخصية بصرية خاصة لكل ثيمة في المتجر */
     val icons = mapOf(

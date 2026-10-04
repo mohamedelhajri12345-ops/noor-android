@@ -77,9 +77,10 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
     } ?: return
 
     var expanded by remember { mutableStateOf(false) }
-    // إخفاء الشريط من الشاشة (الصوت يستمر بالخلفية) — يُعاد إظهاره عند تشغيل مقطع جديد
+    // إخفاء الشريط من الشاشة (الصوت يستمر بالخلفية) — يعود فور استئناف التشغيل
+    // كما في منطق الموقع المصدري: الشريط مرئي دائماً طالما الصوت يعمل
     var dismissedId by remember { mutableStateOf<String?>(null) }
-    if (dismissedId == active.state.currentId) return
+    if (dismissedId == active.state.currentId && !active.state.isPlaying) return
     val context = LocalContext.current
 
     fun manager(): com.elhajri.noor.audio.player.PlayerFacade = if (active.isQuran) QuranPlayerManager else NasheedPlayerManager

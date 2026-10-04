@@ -1,7 +1,6 @@
 package com.elhajri.noor.home
 
 import android.icu.util.IslamicCalendar
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,13 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -45,21 +39,14 @@ import coil.compose.AsyncImage
 import com.elhajri.noor.prayer.PrayerRepository
 import com.elhajri.noor.theme.ThemeStore
 import com.elhajri.noor.ui.AmiriFamily
+import com.elhajri.noor.ui.themeScreenBackground
 import java.util.Calendar
-import kotlin.math.cos
-import kotlin.math.sin
 import kotlinx.coroutines.delay
 
-// ═══════════ الهوية البصرية المعتمدة v8 — أخضر زيتوني ليلي + ذهب دافئ ═══════════
-private val OliveTop = Color(0xFF10220F)      // أعلى الخلفية
-private val OliveMid = Color(0xFF0B180D)      // وسطها
-private val OliveDeep = Color(0xFF081209)      // أسفلها
-private val CardOlive0 = Color(0xFF223E28)    // البطاقات — أخضر أفتح مختلف عن الخلفية
-private val CardOlive1 = Color(0xFF102618)
-private val CardOlive2 = Color(0xFF09160E)
-private val Gold8 = Color(0xFFE9C46A)          // الذهب الدافئ
-private val Gold8Soft = Color(0xFFF6E2A0)     // الذهب الفاتح
-private val TextSoft = Color(0xFFEDE9DD)      // النصوص
+// ألوان الشاشة تتبع الثيم النشط حرفياً — تغيير الثيم يغيّرها فوراً
+private val Gold8 get() = com.elhajri.noor.ui.Gold
+private val Gold8Soft get() = com.elhajri.noor.ui.GoldSoft
+private val TextSoft get() = com.elhajri.noor.ui.TextMain
 
 // صورة الموقع الأصلية نفسها — من كود PrayerWidget.jsx حرفياً
 private const val HERO_IMG = "https://media.base44.com/images/public/6a833faeb9e42cca9a6576fa/edd00f95f_generated_image.png"
@@ -106,71 +93,6 @@ private fun pressScale(interactionSource: MutableInteractionSource): Float {
         label = "pressScale"
     )
     return scale
-}
-
-/** زخرفة إسلامية هندسية — نجمة ثمانية متكررة خافتة في خلفية الشاشة */
-private fun DrawScope.drawOctagramSquare(cx: Float, cy: Float, r: Float, angleDeg: Float, color: Color, strokePx: Float) {
-    val rad = Math.toRadians(angleDeg.toDouble())
-    val pts = (0 until 4).map { i ->
-        val a = rad + i * Math.PI / 2.0
-        Offset(cx + (r * cos(a)).toFloat(), cy + (r * sin(a)).toFloat())
-    }
-    for (i in 0 until 4) {
-        val p0 = pts[i]; val p1 = pts[(i + 1) % 4]
-        drawLine(color, p0, p1, strokeWidth = strokePx, cap = StrokeCap.Round)
-    }
-}
-
-@Composable
-private fun OrnamentBackground() {
-    Canvas(Modifier.fillMaxSize()) {
-        val tile = 110.dp.toPx()
-        val strokePx = 1.dp.toPx()
-        val color = Color(0xFF96AA6E).copy(alpha = 0.13f)
-        var x = 0f
-        while (x < size.width + tile) {
-            var y = 0f
-            while (y < size.height + tile) {
-                val cx = x + tile / 2f
-                val cy = y + tile / 2f
-                val r = tile * 0.34f
-                drawOctagramSquare(cx, cy, r, 0f, color, strokePx)
-                drawOctagramSquare(cx, cy, r, 45f, color, strokePx)
-                drawCircle(color, radius = tile * 0.085f, center = Offset(cx, cy), style = Stroke(strokePx))
-                drawLine(color, Offset(x, cy), Offset(x + tile * 0.16f, cy), strokePx)
-                drawLine(color, Offset(x + tile * 0.84f, cy), Offset(x + tile, cy), strokePx)
-                drawLine(color, Offset(cx, y), Offset(cx, y + tile * 0.16f), strokePx)
-                drawLine(color, Offset(cx, y + tile * 0.84f), Offset(cx, y + tile), strokePx)
-                y += tile
-            }
-            x += tile
-        }
-    }
-}
-
-/** شريط زخرفي بأقواس متكررة فوق بطاقة الصلاة — كما في التصميم المعتمد */
-@Composable
-private fun ArchBand() {
-    Canvas(Modifier.fillMaxWidth().height(15.dp)) {
-        val tileW = 34.dp.toPx()
-        val strokePx = 1.dp.toPx()
-        val color = Gold8.copy(alpha = 0.55f)
-        var x = 0f
-        while (x < size.width) {
-            val left = x + 2.dp.toPx()
-            val right = x + tileW - 2.dp.toPx()
-            val mid = x + tileW / 2f
-            val path = Path().apply {
-                moveTo(left, size.height)
-                lineTo(left, size.height * 0.45f)
-                quadraticBezierTo(left, 0f, mid, 0f)
-                quadraticBezierTo(right, 0f, right, size.height * 0.45f)
-                lineTo(right, size.height)
-            }
-            drawPath(path, color, style = Stroke(strokePx))
-            x += tileW
-        }
-    }
 }
 
 /** بطاقة الصلاة — صورة الموقع الأصلية تغطي البطاقة كاملة، تحية وهجري فوقها، إطار ذهبي */
@@ -272,7 +194,11 @@ private fun ExploreCard(item: Explore, modifier: Modifier = Modifier, onNavigate
             .clip(RoundedCornerShape(16.dp))
             .background(
                 Brush.verticalGradient(
-                    listOf(CardOlive0.copy(alpha = 0.78f), CardOlive1.copy(alpha = 0.88f), CardOlive2.copy(alpha = 0.92f))
+                    listOf(
+                        com.elhajri.noor.ui.NavyLight.copy(alpha = 0.78f),
+                        com.elhajri.noor.ui.NavyCard.copy(alpha = 0.88f),
+                        com.elhajri.noor.ui.Navy.copy(alpha = 0.92f)
+                    )
                 )
             )
             .border(1.dp, Gold8.copy(alpha = 0.38f), RoundedCornerShape(16.dp))
@@ -372,20 +298,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         Explore("ai", "المساعد الذكي", "أسئلتك الفقهية", Icons.Filled.AutoAwesome),
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // الخلفية الزيتونية المتدرجة + الزخارف الإسلامية الخافتة
-        Box(
-            Modifier.fillMaxSize().background(
-                Brush.verticalGradient(listOf(OliveTop, OliveMid, OliveDeep))
-            )
-        )
-        OrnamentBackground()
-        // توهج ذهبي علوي خفيف
-        Box(
-            Modifier.fillMaxWidth().height(260.dp).background(
-                Brush.verticalGradient(listOf(Gold8.copy(alpha = 0.07f), Color.Transparent))
-            )
-        )
+    Box(modifier = Modifier.fillMaxSize().themeScreenBackground()) {
 
         Column(
             modifier = Modifier
@@ -393,10 +306,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            // الشريط الزخرفي فوق البطاقة
-            ArchBand()
-            Spacer(Modifier.height(4.dp))
-
             // بطاقة الصلاة — صورة الموقع الأصلية
             HeroPrayerCard(greeting, hijri, nextPrayerName, nextPrayerTimeLabel, countdown, onNavigate)
 
@@ -411,8 +320,8 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     .background(
                         Brush.verticalGradient(
                             listOf(
-                                Color(0xFF2A5838).copy(alpha = 0.30f),
-                                Color(0xFF123420).copy(alpha = 0.42f),
+                                com.elhajri.noor.ui.NavyLight.copy(alpha = 0.35f),
+                                com.elhajri.noor.ui.NavyCard.copy(alpha = 0.45f),
                                 Gold8.copy(alpha = 0.12f)
                             )
                         )
@@ -454,7 +363,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     .clip(RoundedCornerShape(13.dp))
                     .background(
                         Brush.horizontalGradient(
-                            listOf(Gold8.copy(alpha = 0.16f), Gold8.copy(alpha = 0.06f), CardOlive2.copy(alpha = 0.40f))
+                            listOf(Gold8.copy(alpha = 0.16f), Gold8.copy(alpha = 0.06f), com.elhajri.noor.ui.Navy.copy(alpha = 0.40f))
                         )
                     )
                     .border(1.dp, Gold8.copy(alpha = 0.45f), RoundedCornerShape(13.dp))

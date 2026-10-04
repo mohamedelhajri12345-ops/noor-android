@@ -467,7 +467,7 @@ private fun buildPlaybackNotification(
         .setOnlyAlertOnce(true)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
-        .setColor(0xFFD4AF37.toInt())      // لمسة ذهبية تناسب هوية التطبيق
+        .setColor(0xFFE9C46A.toInt())      // ذهبي دافئ — هوية التطبيق المعتمدة
         .setColorized(true)
         .addAction(R.drawable.ic_notif_prev, "السابق", actionIntent(NotificationActions.ACTION_PREV))
         .addAction(playPauseIcon, if (s.isPlaying) "إيقاف" else "تشغيل", actionIntent(NotificationActions.ACTION_TOGGLE))

@@ -147,6 +147,8 @@ class AdhanPlaybackService : Service() {
         } catch (_: Exception) { null }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setColor(0xFFE9C46A.toInt())
+            .setColorized(true)
             .setContentTitle("الأذان")
             .setContentText("أذان مكة المكرمة — يعمل الآن")
             .setSmallIcon(R.drawable.ic_notification)

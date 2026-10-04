@@ -59,6 +59,7 @@ class AdhanReceiver : BroadcastReceiver() {
         )
 
         val notification = NotificationCompat.Builder(context, Channels.ADHAN)
+            .setColor(0xFFE9C46A.toInt())
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle("حان الآن موعد صلاة $prayerName")
             .setContentText(

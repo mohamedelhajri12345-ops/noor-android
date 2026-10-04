@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
-import com.elhajri.noor.ui.drawThemePattern
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
@@ -329,7 +328,6 @@ fun ThemePreview(def: NoorThemeDef) {
         Box(
             Modifier
                 .matchParentSize()
-                .drawBehind { drawThemePattern(def.pattern, def.accent, def.background) }
         )
         Column(
             modifier = Modifier
