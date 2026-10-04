@@ -8,6 +8,8 @@
   body { width:1280px; height:760px; background:#020604; display:flex; align-items:center; justify-content:center; font-family:'Tajawal',sans-serif; overflow:hidden; }
 
   .phone { width:430px; height:780px; transform:scale(0.87); border-radius:44px; border:6px solid #12261B; position:relative; overflow:hidden; background:#04120C; }
+  .ornament-bg { position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='rgba(150,170,110,.12)' stroke-width='1'%3E%3Cpath d='M60 8 L74 34 L104 34 L112 60 L104 86 L74 86 L60 112 L46 86 L16 86 L8 60 L16 34 L46 34 Z'/%3E%3Cpath d='M60 24 L70 44 L94 44 L100 60 L94 76 L70 76 L60 96 L50 76 L26 76 L20 60 L26 44 L50 44 Z'/%3E%3Ccircle cx='60' cy='60' r='10'/%3E%3Cpath d='M0 60 L8 60 M112 60 L120 60 M60 0 L60 8 M60 112 L60 120'/%3E%3C/g%3E%3C/svg%3E"); }
   .bg-flow { position:absolute; inset:0;
     background:
       radial-gradient(120% 70% at 85% -10%, rgba(233,196,106,.13), transparent 60%),
@@ -43,6 +45,9 @@
   .greet p { color:rgba(242,247,239,.45); font-size:11px; margin-top:1px; }
 
   /* ═══ بطاقة الصلاة — التوقيت ثم صورة المسجد بإطارها الذهبي تحته ═══ */
+  .arch-band { margin:10px 18px 2px; height:15px; opacity:.55; position:relative; z-index:2;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='15' viewBox='0 0 34 15'%3E%3Cpath d='M2 15 L2 7 Q2 1 9 1 Q16 1 16 7 L16 15' fill='none' stroke='rgba(220,190,120,.55)' stroke-width='1'/%3E%3C/svg%3E");
+    background-repeat:repeat-x; background-size:34px 15px; }
   .hero { margin:12px 18px 0; border-radius:22px; position:relative; overflow:hidden; height:238px;
     border:2px solid rgba(233,196,106,.8);
     box-shadow:inset 0 0 0 1.5px rgba(233,196,106,.35), inset 0 2px 0 rgba(240,213,138,.28), 0 8px 28px rgba(0,0,0,.55); }
@@ -69,7 +74,7 @@
 
   /* ═══ آية اليوم ═══ */
   .ayah { margin:10px 18px 0; border-radius:16px; padding:10px 15px; position:relative;
-    background:linear-gradient(160deg, rgba(24,74,48,.34) 0%, rgba(10,36,22,.42) 60%, rgba(233,196,106,.12) 100%);
+    background:linear-gradient(160deg, rgba(42,90,56,.30) 0%, rgba(18,52,32,.42) 60%, rgba(233,196,106,.12) 100%);
     border:1px solid rgba(233,196,106,.4);
     box-shadow:inset 0 1px 0 rgba(240,213,138,.18), inset 0 -1px 0 rgba(0,0,0,.4), 0 5px 14px rgba(0,0,0,.4);
     backdrop-filter:blur(6px); }
@@ -83,7 +88,7 @@
   .sec i { flex:1; height:1px; background:linear-gradient(90deg, rgba(233,196,106,.5), transparent); }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:8px 18px 0; }
   .card { border-radius:16px; padding:10px 12px; display:flex; align-items:center; gap:10px; position:relative;
-    background:linear-gradient(160deg, rgba(20,52,34,.80) 0%, rgba(8,26,16,.88) 55%, rgba(4,16,10,.92) 100%);
+    background:linear-gradient(160deg, rgba(34,62,40,.78) 0%, rgba(16,38,24,.88) 55%, rgba(9,22,14,.92) 100%);
     border:1px solid rgba(233,196,106,.38);
     box-shadow:inset 0 1px 0 rgba(240,213,138,.22), inset 0 -1px 0 rgba(0,0,0,.5), 0 5px 14px rgba(0,0,0,.45);
     backdrop-filter:blur(6px); }
@@ -111,6 +116,7 @@
 </head>
 <body>
 <div class="phone">
+  <div class="ornament-bg"></div>
   <div class="bg-flow"></div>
   <svg class="silk" viewBox="0 0 430 780" preserveAspectRatio="none">
     <defs>
@@ -139,6 +145,7 @@
       </div>
     </div>
 
+    <div class="arch-band"></div>
     <div class="hero">
       <!-- الصورة تغطي البطاقة كاملة خلف كل العناصر — إطار ذهبي -->
       <img class="hero-bg" src="https://media.base44.com/images/public/6a833faeb9e42cca9a6576fa/edd00f95f_generated_image.png" alt="مسجد ليلي بقباب ذهبية">
