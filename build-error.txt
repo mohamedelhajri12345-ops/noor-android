@@ -1,0 +1,50 @@
+
+> Task :app:stripReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libllm_inference_engine_jni.so.
+
+> Task :app:mergeReleaseArtProfile
+> Task :app:extractReleaseNativeSymbolTables
+> Task :app:processReleaseManifestForPackage
+> Task :app:mergeExtDexRelease
+> Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:mergeReleaseShaders
+> Task :app:compileReleaseShaders NO-SOURCE
+--
+> Task :app:bundleReleaseResources
+> Task :app:compileReleaseKotlin
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/AyatChainGame.kt:261:48 'internal' function exposes its 'private-in-file' parameter type AyatSurah
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/NamesMatchGame.kt:15:60 Unresolved reference: Replay
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/NamesMatchGame.kt:105:89 Unresolved reference: Replay
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TartilMirrorGame.kt:200:46 Only safe (?.) or non-null asserted (!!.) calls are allowed on a nullable receiver of type BlankAyah?
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/theme/ThemeStoreScreen.kt:331:51 Unresolved reference: drawThemePattern
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:93:36 Classifier 'ThemePattern' does not have a companion object, and thus must be initialized here
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:95:5 'when' expression must be exhaustive, add necessary 'NONE', 'GIRIH_STAR', 'SUN_RAYS', 'VINE', 'ARCHES', 'STARDUST', 'CLOUDS', ... branches or 'else' branch instead
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:96:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:98:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:123:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:133:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:149:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:163:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:183:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:199:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:206:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:223:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:241:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:262:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:281:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:296:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:304:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/ui/NoorDesignSystem.kt:316:9 Comparison of incompatible enums 'ThemePattern' and '[Error type: Error property type]' is always unsuccessful
+
+> Task :app:compileReleaseKotlin FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --info or --debug option to get more log output.
+Build failed at Sun Oct  4 00:55:51 UTC 2026
