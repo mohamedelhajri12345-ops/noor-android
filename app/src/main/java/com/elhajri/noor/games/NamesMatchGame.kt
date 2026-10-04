@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Replay
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -102,7 +102,7 @@ fun NamesMatchGameScreen(onBack: () -> Unit) {
                     Text("رباط معاني الله", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Text("طابق اسم الله مع معناه", color = GoldSoft, fontSize = 11.sp)
                 }
-                IconButton(onClick = { setup(level) }) { Icon(Icons.AutoMirrored.Filled.Replay, contentDescription = "إعادة", tint = GoldSoft) }
+                IconButton(onClick = { setup(level) }) { Icon(Icons.Default.Replay, contentDescription = "إعادة", tint = GoldSoft) }
             }
             Row(Modifier.padding(horizontal = 18.dp, vertical = 4.dp)) {
                 Text("المرحلة ${level + 1}", color = GoldSoft, fontSize = 12.sp)

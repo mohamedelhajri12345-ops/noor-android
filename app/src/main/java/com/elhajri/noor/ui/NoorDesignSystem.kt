@@ -90,12 +90,11 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
     val a = accent.copy(alpha = 0.055f)
     val w = size.width
     val h = size.height
-    val P = com.elhajri.noor.theme.ThemePattern
     val pi = PI.toFloat()
     when (pattern) {
-        P.NONE -> {}
+        com.elhajri.noor.theme.ThemePattern.NONE -> {}
         // النجمة الثمانية الإسلامية (Girih)
-        P.GIRIH_STAR -> {
+        com.elhajri.noor.theme.ThemePattern.GIRIH_STAR -> {
             val t = 150f
             var y = 0f
             var row = 0
@@ -120,7 +119,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // أشعة الشمس من أعلى المنتصف
-        P.SUN_RAYS -> {
+        com.elhajri.noor.theme.ThemePattern.SUN_RAYS -> {
             val cx = w / 2f
             val cy = -h * 0.15f
             for (i in 0 until 24) {
@@ -130,7 +129,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // نمور متوالجة
-        P.VINE -> {
+        com.elhajri.noor.theme.ThemePattern.VINE -> {
             val t = 130f
             var y = t / 2f
             while (y < h + t) {
@@ -146,7 +145,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // صفوف أقواس
-        P.ARCHES -> {
+        com.elhajri.noor.theme.ThemePattern.ARCHES -> {
             val t = 110f
             var x = 0f
             while (x < w) {
@@ -160,7 +159,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // سُدُم متناثرة
-        P.STARDUST -> {
+        com.elhajri.noor.theme.ThemePattern.STARDUST -> {
             val t = 120f
             var y = 40f
             var row = 0
@@ -180,7 +179,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // سُحُب ناعمة
-        P.CLOUDS -> {
+        com.elhajri.noor.theme.ThemePattern.CLOUDS -> {
             var y = 90f
             var row = 0
             while (y < h * 0.5f) {
@@ -196,14 +195,14 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // أشرطة ذهبية عمودية على الحواف
-        P.GOLD_BANDS -> {
+        com.elhajri.noor.theme.ThemePattern.GOLD_BANDS -> {
             drawRect(a, topLeft = Offset(0f, 0f), size = Size(10f, h))
             drawRect(a, topLeft = Offset(w - 10f, 0f), size = Size(10f, h))
             drawRect(a.copy(alpha = 0.028f), topLeft = Offset(26f, 0f), size = Size(3f, h))
             drawRect(a.copy(alpha = 0.028f), topLeft = Offset(w - 29f, 0f), size = Size(3f, h))
         }
         // أهلّة متناثرة (دائرة ذهبية تُقتطع بدائرة بلون الخلفية)
-        P.CRESCENTS -> {
+        com.elhajri.noor.theme.ThemePattern.CRESCENTS -> {
             val t = 150f
             val bgA = bg.copy(alpha = 0.055f)
             var y = 60f
@@ -220,7 +219,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // كثبان متوالجة
-        P.DUNES -> {
+        com.elhajri.noor.theme.ThemePattern.DUNES -> {
             var y = h * 0.25f
             var row = 0
             while (y < h + 60f) {
@@ -238,7 +237,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // زليج مغربي — معينات متراكبة
-        P.ZELLIGE -> {
+        com.elhajri.noor.theme.ThemePattern.ZELLIGE -> {
             val t = 90f
             var y = 0f
             var row = 0
@@ -259,7 +258,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // أزهار متكررة
-        P.FLOWERS -> {
+        com.elhajri.noor.theme.ThemePattern.FLOWERS -> {
             val t = 140f
             var y = 70f
             var row = 0
@@ -278,7 +277,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // أمواج بحرية
-        P.WAVES -> {
+        com.elhajri.noor.theme.ThemePattern.WAVES -> {
             var y = h * 0.2f
             while (y < h) {
                 val path = Path()
@@ -293,7 +292,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // شبكة كوفية دقيقة
-        P.KUFIC -> {
+        com.elhajri.noor.theme.ThemePattern.KUFIC -> {
             val t = 80f
             var y = 0f
             while (y < h) { drawLine(a, Offset(0f, y), Offset(w, y), strokeWidth = 1f); y += t }
@@ -301,7 +300,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             while (x < w) { drawLine(a, Offset(x, 0f), Offset(x, h), strokeWidth = 1f); x += t }
         }
         // صفوف قباب علوية
-        P.DOMES -> {
+        com.elhajri.noor.theme.ThemePattern.DOMES -> {
             val t = 160f
             var x = -t * 0.25f
             while (x < w + t) {
@@ -313,7 +312,7 @@ fun DrawScope.drawThemePattern(pattern: com.elhajri.noor.theme.ThemePattern, acc
             }
         }
         // فوانيس معلقة
-        P.LANTERNS -> {
+        com.elhajri.noor.theme.ThemePattern.LANTERNS -> {
             val t = 170f
             var y = 30f
             var row = 0

@@ -258,7 +258,7 @@ private fun AyatChainPlay(context: Context, surah: AyatSurah, onDone: () -> Unit
 }
 
 /** تشغيل تلاوة السورة مكافأة عند إتمام الترتيب */
-internal fun playSurahReward(context: Context, surah: AyatSurah) {
+private fun playSurahReward(context: Context, surah: AyatSurah) {
     try {
         val reciters = DataLoader.reciters(context)
         val reciter = reciters.firstOrNull() ?: return

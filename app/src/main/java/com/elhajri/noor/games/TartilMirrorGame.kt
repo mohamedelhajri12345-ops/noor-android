@@ -197,7 +197,7 @@ private fun MirrorPlay(context: Context, surah: MirrorSurah, onDone: () -> Unit,
 
             if (revealed) {
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("✓ صحيح — «${current.correct}»", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                    Text("✓ صحيح — «${current!!.correct}»", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(10.dp))
                     Box(
                         Modifier
