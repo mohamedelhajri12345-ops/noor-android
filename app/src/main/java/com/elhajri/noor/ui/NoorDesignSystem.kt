@@ -34,49 +34,37 @@ import androidx.compose.ui.res.painterResource
  * من مواصفات فريق التصميم (design_spec.md).
  */
 /**
- * خلفية الشاشة الموضوعية — صورة الثيم الحقيقية عالية الجودة (من الويب)
- * مغطاة بطبقة لونية من ألوان الثيم نفسه (شفافية مدروسة) بحيث تبقى النصوص
- * واضحة تماماً وتتغيّر هوية التطبيق كاملة مع كل ثيم: خلفية + ألوان معاً.
+ * خلفية الشاشة الموضوعية — مرسومة بالكود بالكامل (تدرّج رأسي من ألوان الثيم
+ * + توهّج قطري ناعم بلون التمييز) دون أي صور ويب ودون زخارف هندسية.
+ * النتيجة: نصوص واضحة تماماً في كل الثيمات وهوية تتبدل كاملة مع كل ثيمة.
  */
 @Composable
 fun Modifier.themeScreenBackground(): Modifier {
     val def = com.elhajri.noor.theme.NoorThemeState.active
-    val res = def.backgroundRes
-    val painter = if (res != 0) painterResource(res) else null
     return this.drawBehind {
-        var usedImage = false
-        if (painter != null) {
-            // 1) صورة الثيم بقصّ مركزي يملأ الشاشة (ContentScale.Crop)
-            val intrinsic = painter.intrinsicSize
-            if (intrinsic != Size.Unspecified && intrinsic.width > 0f && intrinsic.height > 0f) {
-                val scale = maxOf(size.width / intrinsic.width, size.height / intrinsic.height)
-                val drawW = intrinsic.width * scale
-                val drawH = intrinsic.height * scale
-                translate(
-                    left = (size.width - drawW) / 2f,
-                    top = (size.height - drawH) / 2f
-                ) {
-                    with(painter) { draw(size = Size(drawW, drawH), alpha = 1f) }
-                }
-                usedImage = true
-            }
-        }
-        if (!usedImage) {
-            // 2) تدرّج ألوان الثيم
-            drawRect(
-                brush = Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
+        // 1) التدرّج الأساسي الرأسي من ألوان الثيم
+        drawRect(
+            brush = Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
+        )
+        // 2) توهّج قطري ناعم بلون التمييز — عمق ثلاثي الأبعاد بلا صور
+        drawRect(
+            brush = Brush.radialGradient(
+                colors = listOf(
+                    def.accent.copy(alpha = 0.10f),
+                    Color.Transparent
+                ),
+                center = Offset(x = size.width * 0.80f, y = size.height * 0.06f),
+                radius = size.width.coerceAtLeast(size.height) * 1.10f
             )
-        } else {
-            // طبقة ألوان الثيم فوق الصورة
-            drawRect(
-                brush = Brush.verticalGradient(
-                    listOf(
-                        def.background.copy(alpha = 0.84f),
-                        def.backgroundEnd.copy(alpha = 0.90f)
-                    )
-                )
+        )
+        // 3) إضاءة سفلية خفيفة تمنح البطاقات تبايناً أعلى وخطاً أوضح
+        drawRect(
+            brush = Brush.verticalGradient(
+                0f to Color.Transparent,
+                0.72f to def.backgroundEnd.copy(alpha = 0.55f),
+                1f to def.backgroundEnd
             )
-        }
+        )
     }
 }
 

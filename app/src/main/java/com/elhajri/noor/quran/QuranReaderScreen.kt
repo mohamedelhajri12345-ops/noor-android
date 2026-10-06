@@ -71,8 +71,6 @@ import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -504,14 +502,8 @@ fun QuranReaderScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // ===== الخلفية: نسيج إسلامي أخضر داكن — طبق الأصل عن الموقع =====
-        Image(
-            painter = painterResource(com.elhajri.noor.R.drawable.quran_green_bg),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = androidx.compose.ui.layout.ContentScale.Crop
-        )
+    Box(modifier = Modifier.fillMaxSize().com.elhajri.noor.ui.themeScreenBackground()) {
+        // ===== الخلفية: مرسومة بالكود من ألوان الثيم — بلا صور وبلا زخارف =====
 
         Scaffold(
             containerColor = Color.Transparent,

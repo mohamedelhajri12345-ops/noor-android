@@ -30,7 +30,6 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
 import com.elhajri.noor.ui.NoorGradients
-import com.elhajri.noor.ui.NoorHeroBanner
 import com.elhajri.noor.ui.NoorHeroImages
 
 internal fun toArabicNumber(number: Any): String {

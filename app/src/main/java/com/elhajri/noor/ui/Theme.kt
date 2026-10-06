@@ -61,15 +61,30 @@ val NoorColors get() = darkColorScheme(
     outline = Gold.copy(alpha = 0.4f)
 )
 
+// كل أنماط الخط في التطبيق = Tajawal (خط عربي واضح) — لا يبقى أي نص بالخط الافتراضي
+private fun tajawal(size: Int, weight: FontWeight, line: Int? = null) = TextStyle(
+    fontWeight = weight,
+    fontSize = size.sp,
+    lineHeight = (line ?: (size * 1.7)).sp,
+    fontFamily = TajawalFamily
+)
+
 private val NoorTypography = Typography(
-    headlineLarge = TextStyle(fontWeight = FontWeight.Bold, fontSize = 28.sp, fontFamily = TajawalFamily),
-    headlineMedium = TextStyle(fontWeight = FontWeight.Bold, fontSize = 22.sp, fontFamily = TajawalFamily),
-    headlineSmall = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = TajawalFamily),
-    titleLarge = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = TajawalFamily),
-    titleMedium = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 16.sp, fontFamily = TajawalFamily),
-    bodyLarge = TextStyle(fontSize = 16.sp, lineHeight = 28.sp, fontFamily = TajawalFamily),
-    bodyMedium = TextStyle(fontSize = 14.sp, lineHeight = 24.sp, fontFamily = TajawalFamily),
-    labelLarge = TextStyle(fontWeight = FontWeight.Medium, fontSize = 14.sp, fontFamily = TajawalFamily)
+    displayLarge = tajawal(34, FontWeight.Bold),
+    displayMedium = tajawal(30, FontWeight.Bold),
+    displaySmall = tajawal(26, FontWeight.Bold),
+    headlineLarge = tajawal(28, FontWeight.Bold),
+    headlineMedium = tajawal(22, FontWeight.Bold),
+    headlineSmall = tajawal(18, FontWeight.Bold),
+    titleLarge = tajawal(18, FontWeight.Bold),
+    titleMedium = tajawal(16, FontWeight.SemiBold),
+    titleSmall = tajawal(14, FontWeight.SemiBold),
+    bodyLarge = tajawal(16, FontWeight.Normal, 28),
+    bodyMedium = tajawal(14, FontWeight.Normal, 24),
+    bodySmall = tajawal(12, FontWeight.Normal, 20),
+    labelLarge = tajawal(14, FontWeight.Medium),
+    labelMedium = tajawal(12, FontWeight.Medium),
+    labelSmall = tajawal(11, FontWeight.Medium)
 )
 
 @Composable

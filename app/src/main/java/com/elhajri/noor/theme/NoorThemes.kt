@@ -34,7 +34,7 @@ data class NoorThemeDef(
     // ألوان الحالات
     val success: Color = Color(0xFF10B981),
     val error: Color = Color(0xFFEF4444),
-    // خلفية الثيم الحقيقية — صورة ويب عالية الجودة تخص كل ثيم (0 = تدرّج فقط)
+    // خلفية مرسومة بالكود فقط (تدرّجات وإضاءة) — لا صور ويب نهائياً بحكم قرار محمد
     val backgroundRes: Int = 0,
     // الأنماط البصرية
     val cardRadius: Dp = 16.dp,
@@ -248,31 +248,7 @@ object NoorThemes {
         )
     )
 
-    /** خلفية حقيقية من الويب لكل ثيم — صور عالية الجودة تُميّز كل ثيمة بجمالها */
-    private val backgrounds = mapOf(
-        "fajr_noor" to R.drawable.theme_bg_fajr_noor,
-        "emerald_quran" to R.drawable.theme_bg_emerald_quran,
-        "golden_mosque" to R.drawable.theme_bg_golden_mosque,
-        "makkah_night" to R.drawable.theme_bg_makkah_night,
-        "madinah_calm" to R.drawable.theme_bg_madinah_calm,
-        "royal_kaaba" to R.drawable.theme_bg_royal_kaaba,
-        "blue_sky" to R.drawable.theme_bg_blue_sky,
-        "silver_crescent" to R.drawable.theme_bg_silver_crescent,
-        "golden_desert" to R.drawable.theme_bg_golden_desert,
-        "olive" to R.drawable.theme_bg_olive,
-        "islamic_turquoise" to R.drawable.theme_bg_islamic_turquoise,
-        "spiritual_violet" to R.drawable.theme_bg_spiritual_violet,
-        "night_emerald" to R.drawable.theme_bg_night_emerald,
-        "pink_dawn" to R.drawable.theme_bg_pink_dawn,
-        "islamic_sea" to R.drawable.theme_bg_islamic_sea,
-        "manuscripts" to R.drawable.theme_bg_manuscripts,
-        "emerald_dome" to R.drawable.theme_bg_emerald_dome,
-        "ramadan" to R.drawable.theme_bg_ramadan,
-        "night_crescent" to R.drawable.theme_bg_night_crescent,
-        "noor_premium" to R.drawable.theme_bg_noor_premium
-    )
-
-    val all: List<NoorThemeDef> = base.map { it.copy(backgroundRes = backgrounds[it.id] ?: 0) }
+    val all: List<NoorThemeDef> = base
 
     /** أيقونة تعريفية لكل ثيم — شخصية بصرية خاصة لكل ثيمة في المتجر */
     val icons = mapOf(

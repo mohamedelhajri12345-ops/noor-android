@@ -4,9 +4,6 @@ import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.foundation.Image
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -303,40 +300,11 @@ fun ThemePreview(def: NoorThemeDef) {
             .clip(RoundedCornerShape(12.dp))
             .border(1.dp, def.accent.copy(alpha = 0.18f), RoundedCornerShape(12.dp))
     ) {
-        // الصورة الحقيقية للثيم من الويب — تُميّز كل بطاقة عن الأخرى بصرياً
-        if (def.backgroundRes != 0) {
-            Image(
-                painter = painterResource(def.backgroundRes),
-                contentDescription = def.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize()
-            )
-            Box(
-                Modifier
-                    .matchParentSize()
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                def.background.copy(alpha = 0.72f),
-                                def.backgroundEnd.copy(alpha = 0.84f)
-                            )
-                        )
-                    )
-            )
-        }
-        // النمط الهندسي المميز — هوية كل ثيم فوق خلفية المعاينة
-        Box(
-            Modifier
-                .matchParentSize()
-        )
         Column(
             modifier = Modifier
                 .matchParentSize()
-                .then(
-                    if (def.backgroundRes != 0) Modifier
-                    else Modifier.background(
-                        Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
-                    )
+                .background(
+                    Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
                 )
                 .padding(6.dp)
         ) {
