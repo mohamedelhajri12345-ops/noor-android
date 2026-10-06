@@ -102,12 +102,10 @@ fun MoreScreen(onNavigate: (String) -> Unit) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(NavyCard)
-                        .border(1.dp, Gold.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
+                        .fillMaxWidth()
+                        .com.elhajri.noor.ui.noorGlassCard(cornerRadius = 16.dp)
                         .clickable { onNavigate(f.route) }
                         .padding(14.dp)
-                        .fillMaxWidth()
                 ) {
                     Box(
                         contentAlignment = Alignment.Center,

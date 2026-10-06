@@ -58,6 +58,7 @@ import com.elhajri.noor.data.DataLoader
 import com.elhajri.noor.data.Prefs
 import com.elhajri.noor.data.Reciter
 import com.elhajri.noor.ui.AmiriFamily
+import com.elhajri.noor.ui.themeScreenBackground
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
@@ -502,7 +503,7 @@ fun QuranReaderScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().com.elhajri.noor.ui.themeScreenBackground()) {
+    Box(modifier = Modifier.fillMaxSize().themeScreenBackground()) {
         // ===== الخلفية: مرسومة بالكود من ألوان الثيم — بلا صور وبلا زخارف =====
 
         Scaffold(

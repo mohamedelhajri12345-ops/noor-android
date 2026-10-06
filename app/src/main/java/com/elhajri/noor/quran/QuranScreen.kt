@@ -167,19 +167,14 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
             ) {
                 items(filteredSurahs, key = { it.number }) { surah ->
                     val isFav = favorites.contains(surah.number)
-                    Card(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onSurahClick(surah) },
-                        colors = CardDefaults.cardColors(containerColor = NavyCard),
-                        shape = RoundedCornerShape(16.dp)
+                            .com.elhajri.noor.ui.noorGlassCard(cornerRadius = 16.dp)
+                            .clickable { onSurahClick(surah) }
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
                             // Surah Number Medallion
                             Box(
                                 modifier = Modifier
@@ -232,7 +227,6 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                                 tint = GoldSoft.copy(alpha = 0.5f),
                                 modifier = Modifier.size(18.dp)
                             )
-                        }
                     }
                 }
             }

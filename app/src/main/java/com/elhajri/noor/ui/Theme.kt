@@ -62,12 +62,15 @@ val NoorColors get() = darkColorScheme(
 )
 
 // كل أنماط الخط في التطبيق = Tajawal (خط عربي واضح) — لا يبقى أي نص بالخط الافتراضي
-private fun tajawal(size: Int, weight: FontWeight, line: Int? = null) = TextStyle(
-    fontWeight = weight,
-    fontSize = size.sp,
-    lineHeight = (line ?: (size * 1.7)).sp,
-    fontFamily = TajawalFamily
-)
+private fun tajawal(size: Int, weight: FontWeight, line: Int? = null): TextStyle {
+    val lh = line?.toFloat() ?: (size * 1.7f)
+    return TextStyle(
+        fontWeight = weight,
+        fontSize = size.sp,
+        lineHeight = lh.sp,
+        fontFamily = TajawalFamily
+    )
+}
 
 private val NoorTypography = Typography(
     displayLarge = tajawal(34, FontWeight.Bold),

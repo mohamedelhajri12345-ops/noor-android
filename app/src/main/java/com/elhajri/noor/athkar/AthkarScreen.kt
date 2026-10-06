@@ -30,7 +30,6 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
 import com.elhajri.noor.ui.NoorGradients
-import com.elhajri.noor.ui.NoorHeroImages
 
 internal fun toArabicNumber(number: Any): String {
     val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
