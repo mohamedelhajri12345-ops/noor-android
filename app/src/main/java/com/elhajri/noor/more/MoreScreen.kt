@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.ui.AmiriFamily
+import com.elhajri.noor.ui.noorGlassCard
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
@@ -103,7 +104,7 @@ fun MoreScreen(onNavigate: (String) -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .com.elhajri.noor.ui.noorGlassCard(cornerRadius = 16.dp)
+                        .noorGlassCard(cornerRadius = 16.dp)
                         .clickable { onNavigate(f.route) }
                         .padding(14.dp)
                 ) {

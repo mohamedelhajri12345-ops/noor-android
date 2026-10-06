@@ -1,6 +1,7 @@
 package com.elhajri.noor.quran
 
 import com.elhajri.noor.ui.themeScreenBackground
+import com.elhajri.noor.ui.noorGlassCard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -170,7 +171,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .com.elhajri.noor.ui.noorGlassCard(cornerRadius = 16.dp)
+                            .noorGlassCard(cornerRadius = 16.dp)
                             .clickable { onSurahClick(surah) }
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
