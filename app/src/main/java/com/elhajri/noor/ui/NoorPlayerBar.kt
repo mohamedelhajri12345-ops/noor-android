@@ -313,11 +313,11 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
             var dragging by remember { mutableStateOf(false) }
             var dragValue by remember { mutableStateOf(0f) }
             Slider(
-                value = if (dragging) dragValue else (s.duration - s.currentTime).coerceIn(0f, s.duration),
+                value = if (dragging) dragValue else s.currentTime.coerceIn(0f, if (s.duration > 0f) s.duration else 1f),
                 onValueChange = { dragging = true; dragValue = it },
                 onValueChangeFinished = {
                     manager().ensurePlayer(context)
-                    manager().seek((s.duration - dragValue).coerceIn(0f, s.duration))
+                    manager().seek(dragValue.coerceIn(0f, s.duration))
                     dragging = false
                 },
                 valueRange = 0f..(if (s.duration > 0f) s.duration else 1f),

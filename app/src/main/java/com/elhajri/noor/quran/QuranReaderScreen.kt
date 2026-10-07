@@ -408,7 +408,7 @@ fun QuranReaderScreen(
                         modifier = Modifier.weight(1f)
                     )
                     OutlinedButton(
-                        onClick = { if (copyFrom < (currentSurah?.ayahs ?: copyFrom + 1) - 1) copyFrom++ },
+                        onClick = { if (copyFrom < copyTo) copyFrom++ },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Gold),
                         border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.4f)),
                         modifier = Modifier.size(40.dp),
@@ -432,7 +432,7 @@ fun QuranReaderScreen(
                         modifier = Modifier.weight(1f)
                     )
                     OutlinedButton(
-                        onClick = { if (copyTo < (currentSurah?.ayahs ?: copyTo)) copyTo++ },
+                        onClick = { if (copyTo < (currentSurah?.ayahs ?: ayahs.size)) copyTo++ },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Gold),
                         border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.4f)),
                         modifier = Modifier.size(40.dp),
@@ -506,9 +506,7 @@ fun QuranReaderScreen(
                         Spacer(modifier = Modifier.height(22.dp))
                         IconButton(
                             onClick = {
-                                if (isPlaying) {
-                                    com.elhajri.noor.audio.player.QuranPlayerManager.toggle()
-                                } else if (playerState.currentId == "quran-$currentSurahNum") {
+                                if (playerState.currentId == "quran-$currentSurahNum") {
                                     com.elhajri.noor.audio.player.QuranPlayerManager.toggle()
                                 } else {
                                     playAudio()
