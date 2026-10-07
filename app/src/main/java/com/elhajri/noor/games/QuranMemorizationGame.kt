@@ -18,12 +18,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Clock
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Trophy
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -319,7 +319,7 @@ fun QuranMemorizationGameScreen(onBack: () -> Unit) {
                                                 Modifier.clip(RoundedCornerShape(8.dp)).background(Color.Yellow.copy(alpha = 0.2f)).padding(horizontal = 8.dp, vertical = 4.dp)
                                             ) {
                                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                                    Icon(Icons.Default.Clock, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(14.dp))
+                                                    Icon(Icons.Default.Schedule, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(14.dp))
                                                     Spacer(Modifier.width(4.dp))
                                                     Text("قيد الحفظ", color = Color.Yellow, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                                 }
@@ -458,7 +458,7 @@ fun QuranMemorizationGameScreen(onBack: () -> Unit) {
                     } else {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(Icons.Default.Trophy, contentDescription = null, tint = Gold, modifier = Modifier.size(52.dp))
+                                Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(52.dp))
                                 Spacer(Modifier.height(10.dp))
                                 Text("انتهى الاختبار!", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                 Spacer(Modifier.height(6.dp))

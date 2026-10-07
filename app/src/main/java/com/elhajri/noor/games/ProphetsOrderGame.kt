@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.pm.ActivityInfo
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,7 +20,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Trophy
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -95,7 +96,7 @@ fun ProphetsOrderGameScreen(onBack: () -> Unit) {
                     Text("التسلسل الزمني لبواسل التوحيد", color = GoldSoft, fontSize = 12.sp)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Trophy, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
                     Text(totalScore.toArabicDigits(), color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
@@ -304,7 +305,7 @@ fun ProphetsOrderGameScreen(onBack: () -> Unit) {
                             contentAlignment = Alignment.Center
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(Icons.Default.Trophy, contentDescription = null, tint = Gold, modifier = Modifier.size(40.dp))
+                                Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(40.dp))
                                 Spacer(Modifier.height(6.dp))
                                 Text("ممتاز! الترتيب الصحيح مكتمل!", color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 Spacer(Modifier.height(10.dp))

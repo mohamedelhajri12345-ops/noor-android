@@ -395,7 +395,7 @@ private fun BeautifulArabicKeyboard(
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 6.dp, top = 2.dp),
+                .padding(start = 6.dp, end = 6.dp, top = 2.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

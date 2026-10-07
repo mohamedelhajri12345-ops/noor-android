@@ -12,7 +12,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Trophy
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -238,7 +238,7 @@ fun ProphetsJourneyGameScreen(onBack: () -> Unit) {
                     Text("١٥ محطة في سير المرسلين", color = GoldSoft, fontSize = 11.sp)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Trophy, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
                     Text(totalScore.toArabicDigits(), color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
@@ -303,7 +303,7 @@ fun ProphetsJourneyGameScreen(onBack: () -> Unit) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Icon(Icons.Default.Trophy, contentDescription = null, tint = Gold, modifier = Modifier.size(48.dp))
+                        Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(48.dp))
                         Spacer(Modifier.height(10.dp))
                         Text("اكتملت المحطة ${lvl.toArabicDigits()}", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         Text(station.prophet, color = GoldSoft, fontSize = 13.sp)

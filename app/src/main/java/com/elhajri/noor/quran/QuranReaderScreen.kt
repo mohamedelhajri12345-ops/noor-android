@@ -89,8 +89,8 @@ private suspend fun fetchOrLoadSurahTranslation(context: Context, surahNumber: I
     try {
         val text = context.assets.open("data/translation_en_sahih.json").bufferedReader().use { it.readText() }
         val obj = JSONObject(text)
-        if (obj.has(String(surahNumber))) {
-            val arr = obj.getJSONArray(String(surahNumber))
+        if (obj.has(surahNumber.toString())) {
+            val arr = obj.getJSONArray(surahNumber.toString())
             return@withContext List(arr.length()) { i ->
                 val pair = arr.getJSONArray(i)
                 AyahTranslation(pair.getInt(0), pair.getString(1))

@@ -16,7 +16,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Trophy
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -116,7 +116,7 @@ fun NumbersQuizGameScreen(onBack: () -> Unit) {
                     Text("الأرقام والأعداد الإيمانية في الشريعة", color = GoldSoft, fontSize = 11.sp)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Trophy, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(4.dp))
                     Text(totalScore.toArabicDigits(), color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
@@ -301,7 +301,7 @@ fun NumbersQuizGameScreen(onBack: () -> Unit) {
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                         ) {
                             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(Icons.Default.Trophy, contentDescription = null, tint = Gold, modifier = Modifier.size(56.dp))
+                                Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(56.dp))
                                 Spacer(Modifier.height(12.dp))
                                 Text("انتهى المستوى ${lvl.toArabicDigits()}!", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                 Spacer(Modifier.height(8.dp))
