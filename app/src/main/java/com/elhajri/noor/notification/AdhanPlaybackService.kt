@@ -146,7 +146,7 @@ class AdhanPlaybackService : Service() {
         } catch (_: Exception) { null }
 
         return NotificationCompat.Builder(this, AudioSessionManager.MEDIA_CHANNEL_ID)
-            .setColor(0xFF38BDF8.toInt())      // أزرق سماوي - Sky Blue Accent
+            .setColor(0xFFE9C46A.toInt())      // ذهبي دافئ - Gold Accent (تعليمة ثابتة)
             .setColorized(true)
             .setContentTitle("الأذان الشريف")
             .setContentText("أذان مكة المكرمة — يعمل الآن")

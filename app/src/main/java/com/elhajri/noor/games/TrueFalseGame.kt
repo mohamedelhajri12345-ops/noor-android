@@ -162,7 +162,7 @@ fun TrueFalseGameScreen(onBack: () -> Unit) {
                 // Gameplay for current level (5 questions per level)
                 val lvl = currentLevel!!
                 val levelQuestions = remember(lvl) {
-                    val start = ((lvl - 1) * 5) % questions.size
+                    val start = ((lvl - 1) * 5) % questions.size.coerceAtLeast(1)
                     val end = (start + 5).coerceAtMost(questions.size)
                     questions.subList(start, end)
                 }

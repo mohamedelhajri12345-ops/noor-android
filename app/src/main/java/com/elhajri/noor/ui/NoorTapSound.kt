@@ -93,25 +93,27 @@ object NoorTapSound {
 
     /** نقرة أزرار خفيفة ولطيفة (~40ms) */
     fun tap(context: Context) {
-        playSound(context, tickSoundId)
+        playSound(context) { tickSoundId }
     }
 
     /** نغمة تحديد دافئة عند اختيار عنصر أو تبويب (~55ms) */
     fun select(context: Context) {
-        playSound(context, selectSoundId)
+        playSound(context) { selectSoundId }
     }
 
     /** جرس نجاح خفيف وهادئ عند إتمام عمل أو شارة (~80ms) */
     fun success(context: Context) {
-        playSound(context, successSoundId)
+        playSound(context) { successSoundId }
     }
 
-    private fun playSound(context: Context, soundId: Int) {
+    private fun playSound(context: Context, soundIdProvider: () -> Int) {
         if (!isSoundEnabled(context)) return
         val appContext = context.applicationContext
         if (soundPool == null) {
             initSoundPool(appContext)
         }
+        // Read the id AFTER init so the very first tap is not silent
+        val soundId = soundIdProvider()
         try {
             val pool = soundPool ?: return
             if (soundId != 0) {
@@ -127,6 +129,9 @@ object NoorTapSound {
             soundPool?.release()
         } catch (_: Exception) {}
         soundPool = null
+        tickSoundId = 0
+        selectSoundId = 0
+        successSoundId = 0
     }
 }
 

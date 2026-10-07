@@ -479,7 +479,7 @@ private fun buildPlaybackNotification(
         .setOnlyAlertOnce(true)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
-        .setColor(0xFF38BDF8.toInt())      // أزرق سماوي - Sky Blue Accent
+        .setColor(0xFFE9C46A.toInt())      // ذهبي دافئ - Gold Accent (تعليمة ثابتة)
         .setColorized(true)
         .addAction(R.drawable.ic_notif_prev, "السابق", actionIntent(NotificationActions.ACTION_PREV))
         .addAction(playPauseIcon, if (s.isPlaying) "إيقاف مؤقت" else "تشغيل", actionIntent(NotificationActions.ACTION_TOGGLE))

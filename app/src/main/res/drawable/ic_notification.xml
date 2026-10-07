@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- أيقونة إشعار شريط الحالة الموحدة: مصحف شريف مفتوح بأسلوب عصري مع هلال إسلامي أنيق -->
+<!-- أيقونة إشعار شريط الحالة الموحدة: مصحف شريف مفتوح بأسلوب عصري -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24"
     android:tint="#FFFFFF">
-    <!-- الهلال الإسلامي العلوي -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M12,2 C9.2,2 7,4.2 7,7 C7,8.2 7.4,9.3 8.1,10.2 C7.2,9.3 6.6,8 6.6,6.6 C6.6,4.3 8.2,2.4 10.4,2.1 C10.9,2 11.5,2 12,2 Z" />
     <!-- المصحف الشريف المفتوح بتفاصيل دقيقة عصرية -->
     <path
         android:fillColor="#FFFFFF"

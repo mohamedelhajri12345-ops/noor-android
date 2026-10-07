@@ -122,6 +122,7 @@ fun QuranMemorizationGameScreen(onBack: () -> Unit) {
                 stars = progressData.stars,
                 customData = obj.toString()
             )
+            progressData = progressData.copy(customData = obj.toString())
         } catch (_: Exception) {}
     }
 

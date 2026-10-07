@@ -133,7 +133,7 @@ fun NamesOfAllahGameScreen(onBack: () -> Unit) {
                             if (lvl >= highestUnlocked && stars >= 2) {
                                 highestUnlocked = (lvl + 1).coerceAtMost(totalLevels)
                             }
-                            val newStars = stars + if (stars >= 2) 1 else 0
+                            val newStars = progressData.stars + if (stars >= 2) 1 else 0
                             NewGameProgress.save(
                                 context, "game_names_allah",
                                 highestUnlocked, totalScore,

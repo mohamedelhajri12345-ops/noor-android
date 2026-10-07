@@ -59,7 +59,7 @@ class AdhanReceiver : BroadcastReceiver() {
         )
 
         val notification = NotificationCompat.Builder(context, Channels.ADHAN)
-            .setColor(0xFF38BDF8.toInt())
+            .setColor(0xFFE9C46A.toInt())
             .setSmallIcon(com.elhajri.noor.R.drawable.ic_notification)
             .setContentTitle("حان الآن موعد صلاة $prayerName")
             .setContentText(
