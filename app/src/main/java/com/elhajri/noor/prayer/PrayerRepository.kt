@@ -20,9 +20,35 @@ data class PrayerTimings(
     val hijriDate: String
 )
 
+object PrayerMethods {
+    /** Aladhan calculation-method IDs per country — official religious authorities */
+    fun methodFor(country: String): Int? = when (country) {
+        "السعودية" -> 4      // Umm al-Qura
+        "الإمارات", "عمان", "البحرين" -> 8   // Gulf Region
+        "الكويت" -> 9
+        "قطر" -> 10
+        "مصر" -> 5
+        "المغرب" -> 21
+        "الجزائر" -> 19
+        "تونس" -> 18
+        "الأردن" -> 23
+        "تركيا" -> 13
+        "فرنسا" -> 12
+        "أمريكا", "كندا" -> 2 // ISNA
+        "باكستان", "الهند", "بنغلاديش", "أفغانستان", "أوزبكستان", "كازاخستان", "قيرغيزستان", "طاجيكستان", "تركمانستان" -> 1 // Karachi
+        "إندونيسيا" -> 20
+        "ماليزيا" -> 17
+        "سنغافورة" -> 11
+        "إيران" -> 7
+        "روسيا" -> 14
+        else -> null
+    }
+}
+
 object PrayerRepository {
     private const val PREFS_NAME = "noor_prayer_cache"
     private const val KEY_CACHED_TIMINGS = "cached_timings_json"
+    private const val KEY_CACHED_CITY = "cached_city_key"
 
     private val client: OkHttpClient by lazy { OkHttpClient() }
 
@@ -30,7 +56,8 @@ object PrayerRepository {
         context: Context,
         date: String = "",
         lat: Double = 21.4225,
-        lng: Double = 39.8262
+        lng: Double = 39.8262,
+        country: String = ""
     ): PrayerTimings = withContext(Dispatchers.IO) {
         val targetDate = if (date.isBlank()) {
             SimpleDateFormat("dd-MM-yyyy", Locale.US).format(Date())
@@ -38,7 +65,11 @@ object PrayerRepository {
             date
         }
 
-        val url = "https://api.aladhan.com/v1/timings/$targetDate?latitude=$lat&longitude=$lng"
+        val method = PrayerMethods.methodFor(country)
+        val url = StringBuilder()
+            .append("https://api.aladhan.com/v1/timings/$targetDate?latitude=$lat&longitude=$lng")
+            .apply { method?.let { append("&method=$it") } }
+            .toString()
         try {
             val request = Request.Builder().url(url).build()
             val response = client.newCall(request).execute()
@@ -46,16 +77,17 @@ object PrayerRepository {
                 val bodyStr = response.body?.string() ?: ""
                 val timings = parseTimingsJson(bodyStr)
                 if (timings != null) {
-                    saveToCache(context, bodyStr)
+                    // Cache is stamped with its city so a location change never reuses old times
+                    saveToCache(context, bodyStr, lat, lng)
                     return@withContext timings
                 }
             }
         } catch (_: Exception) {
-            // Fetch failed (offline) -> fallback to cache
+            // Fetch failed (offline) -> fallback to cache for THIS city only
         }
 
-        // Fallback to cache or default values
-        getFromCache(context) ?: PrayerTimings(
+        // Fallback: cache of the same city only, else neutral defaults
+        getFromCache(context, lat, lng) ?: PrayerTimings(
             fajr = "05:00",
             sunrise = "06:15",
             dhuhr = "12:15",
@@ -82,18 +114,31 @@ object PrayerRepository {
         parseTimingsJson(bodyStr) ?: throw Exception("Failed to parse prayer timings")
     }
 
+    /** Cached timings for the CURRENT saved city — used by the adhan scheduler */
     fun getCachedTimings(context: Context): PrayerTimings? {
-        return getFromCache(context)
+        val city = com.elhajri.noor.data.Prefs.getCity(context) ?: return getFromCache(context, null, null)
+        return getFromCache(context, city.lat, city.lng)
     }
 
-    private fun saveToCache(context: Context, jsonStr: String) {
+    private fun saveToCache(context: Context, jsonStr: String, lat: Double, lng: Double) {
         val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        sp.edit().putString(KEY_CACHED_TIMINGS, jsonStr).apply()
+        sp.edit()
+            .putString(KEY_CACHED_TIMINGS, jsonStr)
+            .putString(KEY_CACHED_CITY, "$lat|$lng")
+            .apply()
     }
 
-    private fun getFromCache(context: Context): PrayerTimings? {
+    /** Returns cached timings only when they belong to the requested city (tolerance 0.05 deg) */
+    private fun getFromCache(context: Context, lat: Double?, lng: Double?): PrayerTimings? {
         val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val cachedJson = sp.getString(KEY_CACHED_TIMINGS, null) ?: return null
+        if (lat != null && lng != null) {
+            val cachedCity = sp.getString(KEY_CACHED_CITY, null) ?: return null
+            val parts = cachedCity.split("|")
+            val cLat = parts.getOrNull(0)?.toDoubleOrNull() ?: return null
+            val cLng = parts.getOrNull(1)?.toDoubleOrNull() ?: return null
+            if (kotlin.math.abs(cLat - lat) > 0.05 || kotlin.math.abs(cLng - lng) > 0.05) return null
+        }
         return parseTimingsJson(cachedJson)
     }
 

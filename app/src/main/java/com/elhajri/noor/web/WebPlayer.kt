@@ -11,15 +11,12 @@ import android.media.MediaPlayer
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.elhajri.noor.R
+import com.elhajri.noor.audio.AudioSessionManager
+import com.elhajri.noor.audio.AudioSource
 import java.lang.ref.WeakReference
 
 /**
- * WebPlayerBus — وسيط حالة مشغّل الويب (قرآن/أناشيد داخل WebView الموقع).
- *
- * يستقبل أحداث الصوت من صفحة الموقع عبر جسر JS، ويحتفظ بأحدث حالة
- * (الرابط، الموضع الحالي، حالة التشغيل) لكي:
- *  1. تُعرض إشعارات MediaStyle احترافية أثناء التشغيل.
- *  2. تُستكمل التلاوة أصلياً عبر MediaPlayer عند إغلاق التطبيق.
+ * WebPlayerBus — وسيط حالة مشغّل الويب.
  */
 object WebPlayerBus {
     @Volatile var isPlaying: Boolean = false
@@ -27,7 +24,6 @@ object WebPlayerBus {
     @Volatile var positionSec: Float = 0f
     @Volatile var title: String = "القرآن الكريم"
 
-    // مرجع ضعيف للويب فيو — لا يمنع تحريره من الذاكرة
     @Volatile private var webRef: WeakReference<android.webkit.WebView>? = null
 
     fun bind(webView: android.webkit.WebView) { webRef = WeakReference(webView) }
@@ -35,7 +31,6 @@ object WebPlayerBus {
         if (webRef?.get() === webView) webRef = null
     }
 
-    /** تنفيذ أمر JS داخل الصفحة الحالية (إن كانت حية) */
     fun injectJs(js: String) {
         val wv = webRef?.get() ?: return
         wv.post { try { wv.evaluateJavascript(js, null) } catch (_: Exception) {} }
@@ -43,21 +38,11 @@ object WebPlayerBus {
 }
 
 /**
- * WebPlayerService — خدمة أمامية لمشغّل الويب.
- *
- * وضعان:
- *  A. وضع الويب (WEB): التلاوة تعمل داخل WebView (المستخدم داخل التطبيق).
- *     الخدمة تعرض إشعار MediaStyle أنيقاً بأيقونة التطبيق الكبيرة،
- *     وأزرارها ترسل الأوامر إلى صفحة الموقع مباشرة.
- *  B. الوضع الأصيل (NATIVE): عند إغلاق التطبيق (onDestroy) تلتقط الخدمة
- *     التلاوة من نفس الرابط ونفس الثانية عبر MediaPlayer — فيستمر الصوت
- *     في العمل حتى بعد إغلاق التطبيق، ويُدار من الإشعارات.
+ * WebPlayerService — خدمة أمامية لمشغّل الويب متكاملة مع AudioSessionManager.
  */
 class WebPlayerService : Service() {
 
     companion object {
-        private const val CHANNEL_ID = "noor_web_playback"
-        private const val NOTIF_ID = 4210
         const val ACTION_WEB_SYNC = "com.elhajri.noor.web.WEB_SYNC"
         const val ACTION_TAKEOVER = "com.elhajri.noor.web.TAKEOVER"
         const val ACTION_TOGGLE = "com.elhajri.noor.web.TOGGLE"
@@ -67,7 +52,6 @@ class WebPlayerService : Service() {
             launch(context, ACTION_WEB_SYNC)
         }
 
-        /** التقاط التلاوة أصلياً — يُستدعى لحظة إغلاق التطبيق أثناء تشغيل الصوت */
         fun takeover(context: Context) {
             launch(context, ACTION_TAKEOVER)
         }
@@ -79,14 +63,7 @@ class WebPlayerService : Service() {
         private fun launch(context: Context, action: String) {
             val ctx = context.applicationContext
             try {
-                if (android.os.Build.VERSION.SDK_INT >= 26) {
-                    val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                    nm.createNotificationChannel(
-                        android.app.NotificationChannel(
-                            CHANNEL_ID, "تشغيل التلاوة والأناشيد", android.app.NotificationManager.IMPORTANCE_LOW
-                        )
-                    )
-                }
+                AudioSessionManager.ensureChannel(ctx)
                 val i = Intent(ctx, WebPlayerService::class.java).apply { this.action = action }
                 androidx.core.content.ContextCompat.startForegroundService(ctx, i)
             } catch (_: Exception) {}
@@ -99,33 +76,43 @@ class WebPlayerService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        AudioSessionManager.ensureChannel(this)
+        val notifId = AudioSessionManager.MEDIA_NOTIFICATION_ID
+
         when (intent?.action) {
             ACTION_WEB_SYNC -> {
-                // الصوت يعمل الآن داخل الويب: أوقف أي تشغيل أصلي سابق (المستخدم عاد للتطبيق وشغّل من جديد)
+                if (WebPlayerBus.isPlaying) {
+                    AudioSessionManager.onPlaybackStarted(this, AudioSource.WEB)
+                }
                 if (nativeMode) {
                     stopNativePlayback()
                     nativeMode = false
                 }
-                startForeground(NOTIF_ID, buildNotification(WebPlayerBus.isPlaying))
+                startForeground(notifId, buildNotification(WebPlayerBus.isPlaying))
             }
             ACTION_TAKEOVER -> {
-                // التطبيق أُغلق: استكمال أصيل من نفس الثانية
                 if (!nativeMode && WebPlayerBus.isPlaying && !WebPlayerBus.url.isNullOrBlank()) {
+                    AudioSessionManager.onPlaybackStarted(this, AudioSource.WEB)
                     startNativePlayback()
                 }
                 if (mediaPlayer != null || !WebPlayerBus.isPlaying) {
-                    startForeground(NOTIF_ID, buildNotification(WebPlayerBus.isPlaying && nativeMode))
+                    startForeground(notifId, buildNotification(WebPlayerBus.isPlaying && nativeMode))
                 }
             }
             ACTION_TOGGLE -> {
                 if (nativeMode) {
                     val mp = mediaPlayer
                     if (mp != null) {
-                        if (mp.isPlaying) mp.pause() else mp.start()
-                        startForeground(NOTIF_ID, buildNotification(mp.isPlaying))
+                        if (mp.isPlaying) {
+                            mp.pause()
+                            AudioSessionManager.onPlaybackStopped(this, AudioSource.WEB)
+                        } else {
+                            AudioSessionManager.onPlaybackStarted(this, AudioSource.WEB)
+                            mp.start()
+                        }
+                        startForeground(notifId, buildNotification(mp.isPlaying))
                     }
                 } else {
-                    // إيقاف/تشغيل عبر صفحة الموقع نفسها
                     val js = if (WebPlayerBus.isPlaying)
                         "(function(){document.querySelectorAll('audio,video').forEach(function(a){try{a.pause()}catch(e){}})})()"
                     else
@@ -134,12 +121,13 @@ class WebPlayerService : Service() {
                 }
             }
             ACTION_STOP -> {
-                startForeground(NOTIF_ID, buildNotification(false)) // التزام شرط الخدمة الأمامية أولاً
+                startForeground(notifId, buildNotification(false))
                 if (nativeMode) stopNativePlayback()
                 else WebPlayerBus.injectJs(
                     "(function(){document.querySelectorAll('audio,video').forEach(function(a){try{a.pause()}catch(e){}})})()"
                 )
                 WebPlayerBus.isPlaying = false
+                AudioSessionManager.onPlaybackStopped(this, AudioSource.WEB)
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
@@ -163,14 +151,16 @@ class WebPlayerService : Service() {
                     if (targetMs in 0..(player.duration.coerceAtLeast(0))) player.seekTo(targetMs)
                     player.start()
                     nativeMode = true
-                    startForeground(NOTIF_ID, buildNotification(true))
+                    startForeground(AudioSessionManager.MEDIA_NOTIFICATION_ID, buildNotification(true))
                 }
                 setOnCompletionListener {
                     WebPlayerBus.isPlaying = false
+                    AudioSessionManager.onPlaybackStopped(this@WebPlayerService, AudioSource.WEB)
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
                 }
                 setOnErrorListener { _, _, _ ->
+                    AudioSessionManager.onPlaybackStopped(this@WebPlayerService, AudioSource.WEB)
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
                     true
@@ -191,13 +181,14 @@ class WebPlayerService : Service() {
 
     override fun onDestroy() {
         stopNativePlayback()
+        AudioSessionManager.onPlaybackStopped(this, AudioSource.WEB)
         super.onDestroy()
     }
 
     private fun buildNotification(playing: Boolean): Notification {
         val openApp = PendingIntent.getActivity(
             this, 0,
-            packageManager.getLaunchIntentForPackage(packageName),
+            packageManager.getLaunchIntentForPackage(packageName) ?: Intent(this, com.elhajri.noor.MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE
         )
         fun action(intentAction: String, code: Int): PendingIntent {
@@ -208,13 +199,12 @@ class WebPlayerService : Service() {
             )
         }
 
-        // أيقونة التطبيق الرسمية عريضة في الإشعار — مظهر احترافي
         val largeIcon = try {
             BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
         } catch (_: Exception) { null }
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setColor(0xFFE9C46A.toInt())
+        return NotificationCompat.Builder(this, AudioSessionManager.MEDIA_CHANNEL_ID)
+            .setColor(0xFF38BDF8.toInt())      // أزرق سماوي - Sky Blue Accent
             .setColorized(true)
             .setContentTitle(WebPlayerBus.title.ifBlank { "القرآن الكريم" })
             .setContentText(if (playing) "التلاوة تعمل الآن" else "متوقف مؤقتاً")
@@ -224,14 +214,15 @@ class WebPlayerService : Service() {
             .setOngoing(playing)
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
+            .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
             .addAction(
-                if (playing) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
+                if (playing) R.drawable.ic_notif_pause else R.drawable.ic_notif_play,
                 if (playing) "إيقاف مؤقت" else "تشغيل",
                 action(ACTION_TOGGLE, 11)
             )
             .addAction(
-                android.R.drawable.ic_menu_close_clear_cancel,
-                "إيقاف",
+                R.drawable.ic_notif_close,
+                "إغلاق",
                 action(ACTION_STOP, 12)
             )
             .setStyle(

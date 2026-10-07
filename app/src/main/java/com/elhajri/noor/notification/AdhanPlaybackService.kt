@@ -1,7 +1,6 @@
 package com.elhajri.noor.notification
 
 import android.app.Notification
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
@@ -11,28 +10,25 @@ import android.graphics.BitmapFactory
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.IBinder
-import androidx.core.content.ContextCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.elhajri.noor.R
+import com.elhajri.noor.audio.AudioSessionManager
+import com.elhajri.noor.audio.AudioSource
 
 /**
- * AdhanPlaybackService — تشغيل الأذان بأعلى جودة احترافية.
- *
- * 1. الأذان ملف صوتي محلي داخل التطبيق (res/raw/adhan_makkah.mp3):
- *    يعمل فوراً بلا انتظار تحميل من الإنترنت، ويعمل حتى بلا اتصال.
- * 2. إشعار MediaStyle أنيق أثناء الأذان: أيقونة التطبيق الرسمية عريضة،
- *    وزر إيقاف حقيقي يعمل من الإشعار نفسه.
- * 3. خدمة أمامية: الأذان لا ينقطع حتى لو خرج المستخدم من التطبيق.
+ * AdhanPlaybackService — تشغيل الأذان بأعلى جودة احترافية مع التكامل الكامل
+ * مع مدير الجلسات الصوتية الموحد (AudioSessionManager).
  */
 class AdhanPlaybackService : Service() {
 
     companion object {
-        private const val CHANNEL_ID = "noor_adhan_playback"
-        private const val NOTIF_ID = 4211
         const val ACTION_PLAY = "com.elhajri.noor.adhan.PLAY"
         const val ACTION_STOP = "com.elhajri.noor.adhan.STOP"
 
-        @Volatile var isPlaying: Boolean = false
+        @Volatile
+        var isPlaying: Boolean = false
+            private set
 
         fun play(context: Context) {
             launch(context, ACTION_PLAY)
@@ -45,14 +41,7 @@ class AdhanPlaybackService : Service() {
         private fun launch(context: Context, action: String) {
             val ctx = context.applicationContext
             try {
-                if (android.os.Build.VERSION.SDK_INT >= 26) {
-                    val nm = ctx.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                    nm.createNotificationChannel(
-                        NotificationChannel(
-                            CHANNEL_ID, "تشغيل الأذان", NotificationManager.IMPORTANCE_LOW
-                        )
-                    )
-                }
+                AudioSessionManager.ensureChannel(ctx)
                 val i = Intent(ctx, AdhanPlaybackService::class.java).apply { this.action = action }
                 ContextCompat.startForegroundService(ctx, i)
             } catch (_: Exception) {}
@@ -64,9 +53,12 @@ class AdhanPlaybackService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        AudioSessionManager.ensureChannel(this)
+        val notifId = AudioSessionManager.MEDIA_NOTIFICATION_ID
+
         when (intent?.action) {
             ACTION_PLAY -> {
-                // إيقاف أي أذان سابق ثم تشغيل جديد من البداية — فوري ومحلي
+                AudioSessionManager.onPlaybackStarted(this, AudioSource.ADHAN)
                 releasePlayer()
                 try {
                     val mp = MediaPlayer().apply {
@@ -76,22 +68,23 @@ class AdhanPlaybackService : Service() {
                                 .setUsage(AudioAttributes.USAGE_MEDIA)
                                 .build()
                         )
-                        // الملف المحلي: تشغيل فوري بلا شبكة
                         val afd = resources.openRawResourceFd(R.raw.adhan_makkah)
                         setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                         afd.close()
                         setOnPreparedListener { player ->
                             player.start()
                             AdhanPlaybackService.isPlaying = true
-                            startForeground(NOTIF_ID, buildNotification())
+                            startForeground(notifId, buildNotification())
                         }
                         setOnCompletionListener {
                             AdhanPlaybackService.isPlaying = false
+                            AudioSessionManager.onPlaybackStopped(this@AdhanPlaybackService, AudioSource.ADHAN)
                             stopForeground(STOP_FOREGROUND_REMOVE)
                             stopSelf()
                         }
                         setOnErrorListener { _, _, _ ->
                             AdhanPlaybackService.isPlaying = false
+                            AudioSessionManager.onPlaybackStopped(this@AdhanPlaybackService, AudioSource.ADHAN)
                             stopForeground(STOP_FOREGROUND_REMOVE)
                             stopSelf()
                             true
@@ -101,15 +94,16 @@ class AdhanPlaybackService : Service() {
                     mediaPlayer = mp
                 } catch (_: Exception) {
                     AdhanPlaybackService.isPlaying = false
+                    AudioSessionManager.onPlaybackStopped(this, AudioSource.ADHAN)
                     stopSelf()
                 }
-                // إن تأخر التجهيز: التزام شرط startForegroundService
-                startForeground(NOTIF_ID, buildNotification())
+                startForeground(notifId, buildNotification())
             }
             ACTION_STOP -> {
-                startForeground(NOTIF_ID, buildNotification()) // التزام شرط الخدمة الأمامية
+                startForeground(notifId, buildNotification())
                 releasePlayer()
                 isPlaying = false
+                AudioSessionManager.onPlaybackStopped(this, AudioSource.ADHAN)
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
@@ -118,38 +112,43 @@ class AdhanPlaybackService : Service() {
     }
 
     private fun releasePlayer() {
-        try { mediaPlayer?.stop() } catch (_: Exception) {}
-        try { mediaPlayer?.release() } catch (_: Exception) {}
+        try {
+            mediaPlayer?.let {
+                if (it.isPlaying) it.stop()
+                it.release()
+            }
+        } catch (_: Exception) {}
         mediaPlayer = null
     }
 
     override fun onDestroy() {
         releasePlayer()
         isPlaying = false
+        AudioSessionManager.onPlaybackStopped(this, AudioSource.ADHAN)
         super.onDestroy()
     }
 
     private fun buildNotification(): Notification {
         val openApp = PendingIntent.getActivity(
             this, 0,
-            packageManager.getLaunchIntentForPackage(packageName),
+            packageManager.getLaunchIntentForPackage(packageName)
+                ?: Intent(this, com.elhajri.noor.MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE
         )
         val stopIntent = Intent(this, AdhanPlaybackService::class.java).apply { action = ACTION_STOP }
         val stopPending = PendingIntent.getService(
-            this, 21, stopIntent,
+            this, 1001, stopIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // أيقونة التطبيق الرسمية عريضة في الإشعار — مظهر احترافي
         val largeIcon = try {
             BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
         } catch (_: Exception) { null }
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setColor(0xFFE9C46A.toInt())
+        return NotificationCompat.Builder(this, AudioSessionManager.MEDIA_CHANNEL_ID)
+            .setColor(0xFF38BDF8.toInt())      // أزرق سماوي - Sky Blue Accent
             .setColorized(true)
-            .setContentTitle("الأذان")
+            .setContentTitle("الأذان الشريف")
             .setContentText("أذان مكة المكرمة — يعمل الآن")
             .setSmallIcon(R.drawable.ic_notification)
             .setLargeIcon(largeIcon)
@@ -157,7 +156,8 @@ class AdhanPlaybackService : Service() {
             .setOngoing(isPlaying)
             .setOnlyAlertOnce(true)
             .setShowWhen(false)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "إيقاف", stopPending)
+            .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
+            .addAction(R.drawable.ic_notif_close, "إيقاف", stopPending)
             .setStyle(
                 androidx.media.app.NotificationCompat.MediaStyle()
                     .setShowActionsInCompactView(0)

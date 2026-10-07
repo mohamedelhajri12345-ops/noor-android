@@ -80,7 +80,13 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
     // إخفاء الشريط من الشاشة (الصوت يستمر بالخلفية) — يعود فور استئناف التشغيل
     // كما في منطق الموقع المصدري: الشريط مرئي دائماً طالما الصوت يعمل
     var dismissedId by remember { mutableStateOf<String?>(null) }
-    if (dismissedId == active.state.currentId && !active.state.isPlaying) return
+    var wasPlaying by remember { mutableStateOf(false) }
+    // When playback (re)starts the bar returns; while dismissed the audio keeps running in background
+    LaunchedEffect(active.state.isPlaying, active.state.currentId) {
+        if (active.state.isPlaying && !wasPlaying) dismissedId = null
+        wasPlaying = active.state.isPlaying
+    }
+    if (dismissedId == active.state.currentId) return
     val context = LocalContext.current
 
     fun manager(): com.elhajri.noor.audio.player.PlayerFacade = if (active.isQuran) QuranPlayerManager else NasheedPlayerManager
@@ -88,9 +94,9 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth()) {
         // MINI BAR — like the web: [play] title/artist + progress + expand
         Surface(
-            color = PlayerBarBg,
+            color = Color(0xE60A1120),
             shape = RoundedCornerShape(16.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.25f)),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.4f)),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -179,8 +185,8 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(2.dp)
-                        .background(Color(0xFF1A2445))
+                        .height(3.dp)
+                        .background(Color(0x3387CEEB))
                 ) {
                     val pct = if (active.state.duration > 0f)
                         (active.state.currentTime / active.state.duration).coerceIn(0f, 1f)
@@ -189,7 +195,7 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .fillMaxHeight()
                             .fillMaxWidth(pct)
-                            .background(Gold)
+                            .background(Color(0xFF87CEEB))
                             .align(Alignment.CenterStart)
                     )
                 }

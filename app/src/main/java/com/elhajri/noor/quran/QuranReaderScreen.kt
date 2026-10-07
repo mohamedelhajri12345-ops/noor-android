@@ -81,44 +81,19 @@ import androidx.compose.foundation.text.appendInlineContent
 
 data class AyahItem(val number: Int, val text: String)
 
-/** الترجمة الإنجليزية للآية — Saheeh International عبر alquran.cloud مجاناً */
+/** English translation — Saheeh International, bundled fully offline in assets */
 data class AyahTranslation(val number: Int, val english: String)
 
 private suspend fun fetchOrLoadSurahTranslation(context: Context, surahNumber: Int): List<AyahTranslation> = withContext(Dispatchers.IO) {
-    // تخزين محلي أولاً — الترجمة تُحمّل مرة واحدة وتعمل لاحقاً دون إنترنت
-    val file = File(context.filesDir, "quran_en_$surahNumber.json")
-    if (file.exists() && file.length() > 0) {
-        try {
-            val arr = JSONArray(file.readText())
-            val list = List(arr.length()) { i ->
-                val o = arr.getJSONObject(i)
-                AyahTranslation(o.getInt("number"), o.getString("text"))
-            }
-            if (list.isNotEmpty()) return@withContext list
-        } catch (_: Exception) {}
-    }
+    // Read the bundled offline translation first; works with zero internet.
     try {
-        val client = OkHttpClient()
-        val request = Request.Builder()
-            .url("https://api.alquran.cloud/v1/surah/$surahNumber/en.sahih")
-            .build()
-        client.newCall(request).execute().use { response ->
-            if (response.isSuccessful) {
-                val dataObj = JSONObject(response.body?.string() ?: "").getJSONObject("data")
-                val ayahsArr = dataObj.getJSONArray("ayahs")
-                val result = mutableListOf<AyahTranslation>()
-                val cacheArr = JSONArray()
-                for (i in 0 until ayahsArr.length()) {
-                    val aObj = ayahsArr.getJSONObject(i)
-                    val num = aObj.optInt("numberInSurah", i + 1)
-                    val txt = aObj.getString("text")
-                    result.add(AyahTranslation(num, txt))
-                    val o = JSONObject()
-                    o.put("number", num); o.put("text", txt)
-                    cacheArr.put(o)
-                }
-                if (result.isNotEmpty()) file.writeText(cacheArr.toString())
-                return@withContext result
+        val text = context.assets.open("data/translation_en_sahih.json").bufferedReader().use { it.readText() }
+        val obj = JSONObject(text)
+        if (obj.has(String(surahNumber))) {
+            val arr = obj.getJSONArray(String(surahNumber))
+            return@withContext List(arr.length()) { i ->
+                val pair = arr.getJSONArray(i)
+                AyahTranslation(pair.getInt(0), pair.getString(1))
             }
         }
     } catch (e: Exception) {
@@ -479,29 +454,6 @@ fun QuranReaderScreen(
         }
     }
 
-    val selectReciter: (Reciter) -> Unit = { reciter ->
-        currentReciter = reciter
-        Prefs.setReciter(context, reciter.id)
-        com.elhajri.noor.settings.NoorSettings.setReciter(context, reciter.id)
-        // طبق الأصل عن الموقع: تبديل القارئ يعيد تشغيل القائمة الحالية بالقارئ الجديد مباشرة
-        if (com.elhajri.noor.audio.player.QuranPlayerManager.state.value.currentId != null) {
-            val tracks = (currentSurahNum..minOf(114, currentSurahNum + 4)).mapNotNull { n ->
-                val servers = reciter.servers
-                val name = allSurahs.find { it.number == n }?.name ?: currentName
-                val local = com.elhajri.noor.quran.ReciterOffline.localPathIfAny(context, reciter.id, n)
-                if (servers.isEmpty() && local == null) null
-                else com.elhajri.noor.audio.player.PlayerTrack(
-                    id = "quran-$n",
-                    url = local ?: "${servers[0]}${String.format("%03d", n)}.mp3",
-                    title = "سورة $name",
-                    artist = reciter.name,
-                    fallbackUrls = if (local != null) emptyList()
-                        else servers.map { "${it}${String.format("%03d", n)}.mp3" }
-                )
-            }
-            com.elhajri.noor.audio.player.QuranPlayerManager.playQueue(tracks, 0)
-        }
-    }
 
     Box(modifier = Modifier.fillMaxSize().themeScreenBackground()) {
         // ===== الخلفية: مرسومة بالكود من ألوان الثيم — بلا صور وبلا زخارف =====
@@ -509,52 +461,13 @@ fun QuranReaderScreen(
         Scaffold(
             containerColor = Color.Transparent,
             topBar = {
-                Column {
-                    QuranPageHeader(
-                        onBrightness = { isLightMode = !isLightMode },
-                        onTranslation = { showTranslation = !showTranslation },
-                        showTranslationActive = showTranslation
-                    )
-                    QuranBackRow(onBack = onBack)
-                }
+                QuranPageHeader(
+                    onBack = onBack,
+                    onBrightness = { isLightMode = !isLightMode },
+                    onTranslation = { showTranslation = !showTranslation },
+                    showTranslationActive = showTranslation
+                )
             },
-            bottomBar = {
-                // شريط تحكم رفيع يظهر فقط أثناء تشغيل هذه السورة — طبق الأصل عن الموقع (بلا شريط دائم)
-                if (playerState.currentId == "quran-$currentSurahNum") {
-                    Surface(color = Color(0xFF0E2B1E), tonalElevation = 0.dp) {
-                        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-                            Slider(
-                                value = progress,
-                                onValueChange = { com.elhajri.noor.audio.player.QuranPlayerManager.seek(it * playerState.duration) },
-                                colors = SliderDefaults.colors(
-                                    thumbColor = Gold,
-                                    activeTrackColor = Gold,
-                                    inactiveTrackColor = Color.White.copy(alpha = 0.15f)
-                                ),
-                                modifier = Modifier.fillMaxWidth().height(24.dp)
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(currentReciter.name, color = GoldSoft, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                                IconButton(
-                                    onClick = { com.elhajri.noor.audio.player.QuranPlayerManager.toggle() },
-                                    modifier = Modifier.size(40.dp).clip(CircleShape).background(Gold)
-                                ) {
-                                    Icon(
-                                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                        contentDescription = "تشغيل",
-                                        tint = Color(0xFF0D2B1F),
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -565,9 +478,9 @@ fun QuranReaderScreen(
             ) {
                 // ===== بطاقة السورة الرئيسية: اسم السورة + زر تشغيل دائري ذهبي كبير — طبق الأصل عن الموقع =====
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF0F3324).copy(alpha = 0.75f)),
+                    colors = CardDefaults.cardColors(containerColor = com.elhajri.noor.theme.NoorThemeState.active.surface.copy(alpha = 0.75f)),
                     shape = RoundedCornerShape(22.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.3f)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, com.elhajri.noor.theme.NoorThemeState.active.accent.copy(alpha = 0.35f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
@@ -601,7 +514,7 @@ fun QuranReaderScreen(
                                     playAudio()
                                 }
                             },
-                            modifier = Modifier.size(84.dp).clip(CircleShape).background(Gold)
+                            modifier = Modifier.size(84.dp).clip(CircleShape).background(com.elhajri.noor.theme.NoorThemeState.active.accent)
                         ) {
                             if (isLoadingAudio) {
                                 CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color(0xFF0D2B1F), strokeWidth = 2.5.dp)
@@ -625,42 +538,6 @@ fun QuranReaderScreen(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                // ===== شرائح اختيار القارئ — طبق الأصل عن الموقع =====
-                Text("القارئ", color = GoldSoft.copy(alpha = 0.7f), fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                Spacer(modifier = Modifier.height(8.dp))
-                androidx.compose.foundation.lazy.LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(allReciters) { reciter ->
-                        val selected = reciter.id == currentReciter.id
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(if (selected) Gold else Color.White.copy(alpha = 0.05f))
-                                .border(1.dp, if (selected) Color.Transparent else Gold.copy(alpha = 0.25f), RoundedCornerShape(20.dp))
-                                .clickable { selectReciter(reciter) }
-                                .padding(horizontal = 16.dp, vertical = 10.dp)
-                        ) {
-                            Text(
-                                text = reciter.name,
-                                color = if (selected) Color(0xFF0D2B1F) else GoldSoft,
-                                fontSize = 13.sp,
-                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // ===== تلاوة بدون إنترنت للقارئ المحدد =====
-                com.elhajri.noor.quran.OfflineReciterRow(
-                    reciter = currentReciter,
-                    onDownload = { com.elhajri.noor.quran.ReciterOffline.downloadAll(context, currentReciter, currentReciter.servers) },
-                    onCancel = { com.elhajri.noor.quran.ReciterOffline.cancel() },
-                    onDelete = { com.elhajri.noor.quran.ReciterOffline.deleteAll(context, currentReciter.id) }
-                )
-
                 Spacer(modifier = Modifier.height(18.dp))
 
                 // ===== نص السورة =====
@@ -678,10 +555,10 @@ fun QuranReaderScreen(
                 } else {
                     Card(
                         colors = CardDefaults.cardColors(
-                            containerColor = if (isLightMode) Color(0xFFFEF3C7) else Color(0xFF0F3324).copy(alpha = 0.7f)
+                            containerColor = if (isLightMode) Color(0xFFFEF3C7) else com.elhajri.noor.theme.NoorThemeState.active.surface.copy(alpha = 0.7f)
                         ),
                         shape = RoundedCornerShape(20.dp),
-                        border = if (isLightMode) null else androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.2f)),
+                        border = if (isLightMode) null else androidx.compose.foundation.BorderStroke(1.dp, com.elhajri.noor.theme.NoorThemeState.active.accent.copy(alpha = 0.25f)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(

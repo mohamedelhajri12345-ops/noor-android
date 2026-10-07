@@ -28,6 +28,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.res.painterResource
+import com.elhajri.noor.theme.drawThemeMotif
 
 /**
  * التدرّجات والمكوّنات الفاخرة — نظام "الأبنوس والذهب الإمبراطوري"
@@ -35,7 +36,7 @@ import androidx.compose.ui.res.painterResource
  */
 /**
  * خلفية الشاشة الموضوعية — مرسومة بالكود بالكامل (تدرّج رأسي من ألوان الثيم
- * + توهّج قطري ناعم بلون التمييز) دون أي صور ويب ودون زخارف هندسية.
+ * + توهّج قطري ناعم بلون التمييز + البصمة البصرية الفريدة للثيمة) دون أي صور ويب ودون زخارف هندسية.
  * النتيجة: نصوص واضحة تماماً في كل الثيمات وهوية تتبدل كاملة مع كل ثيمة.
  */
 @Composable
@@ -57,7 +58,10 @@ fun Modifier.themeScreenBackground(): Modifier {
                 radius = size.width.coerceAtLeast(size.height) * 1.10f
             )
         )
-        // 3) إضاءة سفلية خفيفة تمنح البطاقات تبايناً أعلى وخطاً أوضح
+        // 3) رسم البصمة البصرية الفريدة للثيمة النشطة (Theme Signature Motif Layer)
+        drawThemeMotif(def)
+
+        // 4) إضاءة سفلية خفيفة تمنح البطاقات تبايناً أعلى وخطاً أوضح
         drawRect(
             brush = Brush.verticalGradient(
                 0f to Color.Transparent,

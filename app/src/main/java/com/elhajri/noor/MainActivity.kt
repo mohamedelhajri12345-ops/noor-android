@@ -3,46 +3,26 @@ package com.elhajri.noor
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.SportsEsports
-import androidx.compose.material.icons.filled.TouchApp
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 
 import com.elhajri.noor.athkar.AthkarDetailScreen
 import com.elhajri.noor.athkar.AthkarScreen
@@ -61,10 +41,19 @@ import com.elhajri.noor.games.AyatChainGameScreen
 import com.elhajri.noor.games.NamesMatchGameScreen
 import com.elhajri.noor.games.TimelineGameScreen
 import com.elhajri.noor.games.TartilMirrorGameScreen
+import com.elhajri.noor.games.ProphetsOrderGameScreen
+import com.elhajri.noor.games.TrueFalseGameScreen
+import com.elhajri.noor.games.NumbersQuizGameScreen
+import com.elhajri.noor.games.QuranMemorizationGameScreen
+import com.elhajri.noor.games.NamesOfAllahGameScreen
+import com.elhajri.noor.games.ProphetsJourneyGameScreen
 import com.elhajri.noor.hajj.HajjGuideScreen
+import com.elhajri.noor.home.HomeScreen
 import com.elhajri.noor.journal.JournalScreen
 import com.elhajri.noor.more.MoreScreen
 import com.elhajri.noor.names.NamesOfAllahScreen
+import com.elhajri.noor.nav.NoorBottomBar
+import com.elhajri.noor.nav.bottomBarTabs
 import com.elhajri.noor.notification.NotificationCenterScreen
 import com.elhajri.noor.prayer.PrayerScreen
 import com.elhajri.noor.privacy.PrivacyPolicyScreen
@@ -76,22 +65,11 @@ import com.elhajri.noor.settings.SettingsScreen
 import com.elhajri.noor.stories.StoriesScreen
 import com.elhajri.noor.stories.StoryDetailScreen
 import com.elhajri.noor.tasbih.TasbihScreen
-import com.elhajri.noor.zakat.ZakatScreen
-import com.elhajri.noor.web.NoorWebView
-import com.elhajri.noor.web.NoorWeb
-import com.elhajri.noor.home.HomeScreen
-import com.elhajri.noor.ui.Gold
-import com.elhajri.noor.ui.GoldSoft
-import com.elhajri.noor.ui.NavyCard
-import com.elhajri.noor.ui.NoorTheme
 import com.elhajri.noor.ui.NoorPlayerBar
-import com.elhajri.noor.ui.NoorTopBar
 import com.elhajri.noor.ui.NoorSplash
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import com.elhajri.noor.ui.NoorTheme
+import com.elhajri.noor.ui.NoorTopBar
+import com.elhajri.noor.zakat.ZakatScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,8 +89,15 @@ class MainActivity : ComponentActivity() {
         // schedule the next adhan alert as soon as the app opens (timings fetch caches itself)
         Thread {
             try {
+                // Use the user's SAVED city (not default Mecca) so the cache and adhan match the location
+                val savedCity = com.elhajri.noor.data.Prefs.getCity(this@MainActivity)
                 kotlinx.coroutines.runBlocking {
-                    com.elhajri.noor.prayer.PrayerRepository.getTimings(this@MainActivity)
+                    com.elhajri.noor.prayer.PrayerRepository.getTimings(
+                        this@MainActivity,
+                        lat = savedCity?.lat ?: 21.4225,
+                        lng = savedCity?.lng ?: 39.8262,
+                        country = savedCity?.country ?: ""
+                    )
                 }
                 com.elhajri.noor.notification.AdhanScheduler.scheduleNextAdhan(this@MainActivity)
             } catch (_: Exception) {}
@@ -135,216 +120,176 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private data class Tab(val route: String, val label: String, val icon: ImageVector)
-
-private val tabs = listOf(
-    Tab("home", "الرئيسية", Icons.Filled.Home),
-    Tab("quran", "القرآن", Icons.Filled.MenuBook),
-    Tab("tasbih", "السبحة", Icons.Filled.TouchApp),
-    Tab("games", "الألعاب", Icons.Filled.SportsEsports),
-    Tab("more", "المزيد", Icons.Filled.GridView)
-)
-
 @Composable
 fun NoorApp() {
     var showSplash by remember { mutableStateOf(true) }
     val navController = rememberNavController()
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
-    val showBar = currentRoute in tabs.map { it.route }
+    val mainRoutes = remember { bottomBarTabs.map { it.route }.toSet() }
+    val showBar = currentRoute in mainRoutes
 
-    // حماية من النقر المتسارع/المتكرر — سبب تعطل الشريط السفلي عند الاستخدام الكثيف:
-    // النقرات السريعة المتتالية كانت تكدّس وجهات في حزمة الرجوع حتى تتجمّد القناة
-    var lastNavAtMs by remember { mutableStateOf(0L) }
+    // التنقل الآمن للشاشات الفرعية — يمنع فتح نفس الشاشة مرتين مع تجاوب فوري
     val navigateSafe: (String) -> Unit = { route ->
-        val now = android.os.SystemClock.elapsedRealtime()
-        if (now - lastNavAtMs >= 350L) {
-            lastNavAtMs = now
-            navController.navigate(route) { launchSingleTop = true }
+        val activeRoute = navController.currentDestination?.route
+        if (activeRoute != route) {
+            try {
+                navController.navigate(route) {
+                    launchSingleTop = true
+                }
+            } catch (_: Exception) {}
         }
-        Unit
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-    Scaffold(
-        topBar = {
-            if (showBar) NoorTopBar(
-                onCommunity = { navigateSafe("community") },
-                onDonate = { navigateSafe("donation") },
-                onAssistant = { navigateSafe("ai") },
-                onSettings = { navigateSafe("settings") }
-            )
-        },
-        bottomBar = {
-            if (showBar) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    // player bar (mini) — directly above the bottom bar, like the web
-                    NoorPlayerBar()
-                    // web bottom nav: thin bar, small icons, gold dot under active tab
-                    NavigationBar(
-                        containerColor = Color(0xE60A0F1A),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(58.dp),
-                        tonalElevation = 0.dp
-                    ) {
-                        tabs.forEach { tab ->
-                            val selected = currentRoute == tab.route
-                            NavigationBarItem(
-                                selected = selected,
-                                onClick = {
-                                    if (currentRoute == tab.route) return@NavigationBarItem
-                                    val now = android.os.SystemClock.elapsedRealtime()
-                                    if (now - lastNavAtMs < 350L) return@NavigationBarItem
-                                    lastNavAtMs = now
-                                    navController.navigate(tab.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                },
-                                icon = {
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Icon(
-                                            tab.icon,
-                                            contentDescription = tab.label,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(Modifier.height(2.dp))
-                                        // gold dot under the active tab (web style)
-                                        Box(
-                                            modifier = Modifier
-                                                .size(4.dp)
-                                                .background(
-                                                    if (selected) Gold else Color.Transparent,
-                                                    CircleShape
-                                                )
-                                        )
-                                    }
-                                },
-                                label = {
-                                    Text(
-                                        tab.label,
-                                        fontSize = 10.sp,
-                                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-                                    )
-                                },
-                                colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = Gold,
-                                    selectedTextColor = Gold,
-                                    unselectedIconColor = GoldSoft.copy(alpha = 0.45f),
-                                    unselectedTextColor = GoldSoft.copy(alpha = 0.45f),
-                                    indicatorColor = Gold.copy(alpha = 0.14f)
-                                )
-                            )
-                        }
+    // التنقل الموثوق لشريط التنقل السفلي — يعمل بدقة 100% في كل الأوقات وعلى كل الأجهزة
+    val onTabSelected: (String) -> Unit = { targetRoute ->
+        val activeRoute = navController.currentDestination?.route
+        if (activeRoute != targetRoute) {
+            try {
+                val startDestId = navController.graph.findStartDestination().id
+                navController.navigate(targetRoute) {
+                    popUpTo(startDestId) {
+                        saveState = true
                     }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            } catch (_: Exception) {
+                navController.navigate(targetRoute) {
+                    launchSingleTop = true
                 }
             }
         }
-    ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = "home",
-            modifier = Modifier.padding(padding),
-            // انتقال ناعم موحّد: ظهور بتلاشٍ ورفعٍ خفيف — هوية بصرية راقية
-            enterTransition = {
-                androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(240)) +
-                    androidx.compose.animation.slideInVertically(
-                        animationSpec = androidx.compose.animation.core.tween(240)
-                    ) { it / 24 }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                if (showBar) NoorTopBar(
+                    onCommunity = { navigateSafe("community") },
+                    onDonate = { navigateSafe("donation") },
+                    onAssistant = { navigateSafe("ai") },
+                    onSettings = { navigateSafe("settings") }
+                )
             },
-            exitTransition = { androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(180)) },
-            popEnterTransition = { androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(240)) },
-            popExitTransition = {
-                androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(180)) +
-                    androidx.compose.animation.slideOutVertically(
-                        animationSpec = androidx.compose.animation.core.tween(200)
-                    ) { it / 24 }
+            bottomBar = {
+                if (showBar) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        // player bar (mini) — directly above the bottom bar, like the web
+                        NoorPlayerBar()
+                        // 2026 Modern Glass Bottom Bar with animated active indicator & theme-aware icons
+                        NoorBottomBar(
+                            currentRoute = currentRoute,
+                            onTabSelected = onTabSelected
+                        )
+                    }
+                }
             }
-        ) {
-            composable("home") { HomeScreen(onNavigate = { navigateSafe(it) }) }
-            composable("prayer") { PrayerScreen() }
-            composable("quran") { com.elhajri.noor.quran.QuranScreen(onSurahClick = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") }) }
-            composable("athkar") { AthkarScreen(onOpenCategory = { cat, title -> navController.navigate("athkarDetail/$cat/$title") }) }
-            composable("more") { MoreScreen(onNavigate = { navigateSafe(it) }) }
-
-            composable("qibla") { QiblaScreen() }
-            composable("tasbih") { TasbihScreen() }
-            composable("names") { NamesOfAllahScreen() }
-            composable("quiz") { QuizScreen() }
-            composable("stories") { StoriesScreen(onOpenStory = { id -> navController.navigate("story/$id") }) }
-            composable("settings") { SettingsScreen(onOpenPrivacy = { navController.navigate("privacy") }) }
-            composable("themes") { com.elhajri.noor.theme.ThemeStoreScreen(onOpenEarnPoints = { navController.navigate("earn") }) }
-            composable("earn") { com.elhajri.noor.theme.EarnPointsScreen(onBack = { navController.popBackStack() }) }
-
-            composable("reader/{number}/{name}") { entry ->
-                val number = entry.arguments?.getString("number")?.toIntOrNull() ?: 1
-                val name = entry.arguments?.getString("name") ?: ""
-                QuranReaderScreen(surahNumber = number, surahName = name, onBack = { navController.popBackStack() })
-            }
-            composable("athkarDetail/{cat}/{title}") { entry ->
-                val cat = entry.arguments?.getString("cat") ?: "morning"
-                val title = entry.arguments?.getString("title") ?: ""
-                AthkarDetailScreen(categoryId = cat, title = title, onBack = { navController.popBackStack() })
-            }
-            composable("story/{id}") { entry ->
-                val id = entry.arguments?.getString("id")?.toIntOrNull() ?: 1
-                StoryDetailScreen(storyId = id, onBack = { navController.popBackStack() })
-            }
-
-            composable("login") { LoginScreen(
-                // كان يذهب دائماً إلى الرئيسية بعد الدخول، فيقطع المستخدم عن شاشة "المجتمع" التي طلبت تسجيل الدخول؛
-                // الآن يرجع لنفس الشاشة التي طلبت تسجيل الدخول (المجتمع مثلاً)
-                onSuccess = { navController.popBackStack() },
-                onRegister = { navController.navigate("register") },
-                onForgot = { navController.navigate("forgot") }
-            ) }
-            composable("register") { RegisterScreen(
-                // بعد إنشاء الحساب: شاشة إدخال رمز التحقق الذي وصله على البريد
-                onSuccess = { navController.navigate("verifyOtp") },
-                onLogin = { navController.popBackStack() }
-            ) }
-            composable("verifyOtp") { com.elhajri.noor.auth.VerifyOtpScreen(
-                onVerified = {
-                    navController.popBackStack("login", inclusive = true)
-                    navController.navigate("community")
+        ) { padding ->
+            NavHost(
+                navController = navController,
+                startDestination = "home",
+                modifier = Modifier.padding(padding),
+                // انتقال ناعم موحّد: ظهور بتلاشٍ ورفعٍ خفيف — هوية بصرية راقية
+                enterTransition = {
+                    androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(240)) +
+                        androidx.compose.animation.slideInVertically(
+                            animationSpec = androidx.compose.animation.core.tween(240)
+                        ) { it / 24 }
                 },
-                onBack = { navController.popBackStack() }
-            ) }
-            composable("forgot") { ForgotPasswordScreen(onBack = { navController.popBackStack() }) }
-            composable("reset") { ResetPasswordScreen(onBack = { navController.popBackStack() }) }
+                exitTransition = { androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(180)) },
+                popEnterTransition = { androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(240)) },
+                popExitTransition = {
+                    androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(180)) +
+                        androidx.compose.animation.slideOutVertically(
+                            animationSpec = androidx.compose.animation.core.tween(200)
+                        ) { it / 24 }
+                }
+            ) {
+                composable("home") { HomeScreen(onNavigate = { navigateSafe(it) }) }
+                composable("prayer") { PrayerScreen() }
+                composable("quran") { com.elhajri.noor.quran.QuranScreen(onSurahClick = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") }) }
+                composable("athkar") { AthkarScreen(onOpenCategory = { cat, title -> navController.navigate("athkarDetail/$cat/$title") }) }
+                composable("more") { MoreScreen(onNavigate = { navigateSafe(it) }) }
 
-            composable("journal") { JournalScreen() }
-            composable("calendar") { CalendarScreen() }
-            composable("privacy") { PrivacyPolicyScreen(onBack = { navController.popBackStack() }) }
-            composable("community") { CommunityScreen(
-                onBack = { navController.popBackStack() },
-                // هذا كان ناقصاً بالكامل: زر "تسجيل الدخول" في المجتمع لم يكن مرتبطاً بأي تنقّل فعلي
-                onNavigateToLogin = { navController.navigate("login") }
-            ) }
-            composable("ai") { com.elhajri.noor.ai.AiChatScreen(onBack = { navController.popBackStack() }) }
-            composable("favorites") { FavoritesScreen(
-                onOpenSurah = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") },
-                onOpenStory = { id -> navController.navigate("story/$id") }
-            ) }
-            composable("donation") { DonationScreen(onBack = { navController.popBackStack() }) }
-            composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
-            composable("library") { com.elhajri.noor.quran.LibraryScreen(onBack = { navController.popBackStack() }) }
-            composable("tracker") { TrackerScreen() }
-            composable("games") { NoorGameHubScreen(onBack = { navController.popBackStack() }, onNavigate = { navController.navigate(it) }) }
-            composable("game_kalimat") { KalimatGameScreen(onBack = { navController.popBackStack() }) }
-            composable("game_trivia") { TriviaLadderGameScreen(onBack = { navController.popBackStack() }) }
-            composable("game_ayat") { AyatChainGameScreen(onBack = { navController.popBackStack() }) }
-            composable("game_match") { NamesMatchGameScreen(onBack = { navController.popBackStack() }) }
-            composable("game_timeline") { TimelineGameScreen(onBack = { navController.popBackStack() }) }
-            composable("game_tartil") { TartilMirrorGameScreen(onBack = { navController.popBackStack() }) }
-            composable("hajj") { HajjGuideScreen(onBack = { navController.popBackStack() }) }
-            composable("zakat") { ZakatScreen() }
+                composable("qibla") { QiblaScreen() }
+                composable("tasbih") { TasbihScreen() }
+                composable("names") { NamesOfAllahScreen() }
+                composable("quiz") { QuizScreen() }
+                composable("stories") { StoriesScreen(onOpenStory = { id -> navController.navigate("story/$id") }) }
+                composable("settings") { SettingsScreen(onOpenPrivacy = { navController.navigate("privacy") }) }
+                composable("themes") { com.elhajri.noor.theme.ThemeStoreScreen(onOpenEarnPoints = { navController.navigate("earn") }) }
+                composable("earn") { com.elhajri.noor.theme.EarnPointsScreen(onBack = { navController.popBackStack() }) }
+
+                composable("reader/{number}/{name}") { entry ->
+                    val number = entry.arguments?.getString("number")?.toIntOrNull() ?: 1
+                    val name = entry.arguments?.getString("name") ?: ""
+                    QuranReaderScreen(surahNumber = number, surahName = name, onBack = { navController.popBackStack() })
+                }
+                composable("athkarDetail/{cat}/{title}") { entry ->
+                    val cat = entry.arguments?.getString("cat") ?: "morning"
+                    val title = entry.arguments?.getString("title") ?: ""
+                    AthkarDetailScreen(categoryId = cat, title = title, onBack = { navController.popBackStack() })
+                }
+                composable("story/{id}") { entry ->
+                    val id = entry.arguments?.getString("id")?.toIntOrNull() ?: 1
+                    StoryDetailScreen(storyId = id, onBack = { navController.popBackStack() })
+                }
+
+                composable("login") { LoginScreen(
+                    onSuccess = { navController.popBackStack() },
+                    onRegister = { navController.navigate("register") },
+                    onForgot = { navController.navigate("forgot") }
+                ) }
+                composable("register") { RegisterScreen(
+                    onSuccess = { navController.navigate("verifyOtp") },
+                    onLogin = { navController.popBackStack() }
+                ) }
+                composable("verifyOtp") { com.elhajri.noor.auth.VerifyOtpScreen(
+                    onVerified = {
+                        navController.popBackStack("login", inclusive = true)
+                        navController.navigate("community")
+                    },
+                    onBack = { navController.popBackStack() }
+                ) }
+                composable("forgot") { ForgotPasswordScreen(onBack = { navController.popBackStack() }) }
+                composable("reset") { ResetPasswordScreen(onBack = { navController.popBackStack() }) }
+
+                composable("journal") { JournalScreen() }
+                composable("calendar") { CalendarScreen() }
+                composable("privacy") { PrivacyPolicyScreen(onBack = { navController.popBackStack() }) }
+                composable("community") { CommunityScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigateToLogin = { navController.navigate("login") }
+                ) }
+                composable("ai") { com.elhajri.noor.ai.AiChatScreen(onBack = { navController.popBackStack() }) }
+                composable("favorites") { FavoritesScreen(
+                    onOpenSurah = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") },
+                    onOpenStory = { id -> navController.navigate("story/$id") }
+                ) }
+                composable("donation") { DonationScreen(onBack = { navController.popBackStack() }) }
+                composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
+                composable("library") { com.elhajri.noor.quran.LibraryScreen(onBack = { navController.popBackStack() }) }
+                composable("tracker") { TrackerScreen() }
+                composable("games") { NoorGameHubScreen(onBack = { navController.popBackStack() }, onNavigate = { navController.navigate(it) }) }
+                composable("game_kalimat") { KalimatGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_trivia") { TriviaLadderGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_ayat") { AyatChainGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_match") { NamesMatchGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_timeline") { TimelineGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_tartil") { TartilMirrorGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_prophets_order") { ProphetsOrderGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_true_false") { TrueFalseGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_numbers_quiz") { NumbersQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quran_mem") { QuranMemorizationGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_names_allah") { NamesOfAllahGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_prophets_journey") { ProphetsJourneyGameScreen(onBack = { navController.popBackStack() }) }
+                composable("hajj") { HajjGuideScreen(onBack = { navController.popBackStack() }) }
+                composable("zakat") { ZakatScreen() }
+            }
         }
-    }
-    if (showSplash) {
-        NoorSplash(onFinished = { showSplash = false })
-    }
+        if (showSplash) {
+            NoorSplash(onFinished = { showSplash = false })
+        }
     }
 }

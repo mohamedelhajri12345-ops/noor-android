@@ -66,8 +66,17 @@ fun PrayerScreen() {
 
     LaunchedEffect(city) {
         isLoading = true
-        timings = PrayerRepository.getTimings(context, lat = city.lat, lng = city.lng)
+        timings = PrayerRepository.getTimings(
+            context,
+            lat = city.lat,
+            lng = city.lng,
+            country = city.country
+        )
         isLoading = false
+        // Reschedule adhan now that the cache holds THIS city's fresh times
+        if (isAdhanEnabled) {
+            com.elhajri.noor.notification.AdhanScheduler.scheduleNextAdhan(context)
+        }
     }
 
     DisposableEffect(Unit) {
@@ -195,8 +204,7 @@ fun PrayerScreen() {
                                     .clickable {
                                         city = c
                                         Prefs.setCity(context, c)
-                                        // أعد جدولة إشعارات الأذان للموقع الجديد
-                                        AdhanScheduler.scheduleNextAdhan(context)
+                                        // الجدولة تحدث بعد جلب مواقيت الموقع الجديد (LaunchedEffect أعلاه)
                                         showCityPicker = false
                                     }
                                     .padding(horizontal = 10.dp, vertical = 10.dp),

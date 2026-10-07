@@ -3,6 +3,7 @@ package com.elhajri.noor.quran
 import com.elhajri.noor.ui.themeScreenBackground
 import com.elhajri.noor.ui.noorGlassCard
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -102,6 +103,11 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // ===== شريط القارئ المدمج — اختيار المقرئ والتنزيل بلا إنترنت من الشاشة الرئيسية =====
+        CompactReciterStrip()
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -231,6 +237,71 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * شريط القارئ المدمج: اسم المقرئ المختار + شريحة صغيرة لكل مقرئ + تنزيل دون إنترنت للمختار.
+ * يعرض بطاقة رفيعة واحدة لا تستهلك مساحة كبيرة.
+ */
+@Composable
+private fun CompactReciterStrip() {
+    val context = LocalContext.current
+    val allReciters = remember { DataLoader.reciters(context) }
+    val savedReciterId = remember { com.elhajri.noor.settings.NoorSettings.getReciter(context).ifBlank { com.elhajri.noor.data.Prefs.getReciter(context) } }
+    var currentReciter by remember {
+        mutableStateOf(
+            allReciters.find { it.id == savedReciterId } ?: allReciters.firstOrNull()
+                ?: com.elhajri.noor.data.Reciter("alafasy", "مشاري العفاسي", listOf("https://server11.mp3quran.net/afs/"))
+        )
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .noorGlassCard(cornerRadius = 14.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("القارئ", color = GoldSoft, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(modifier = Modifier.width(8.dp))
+        androidx.compose.foundation.lazy.LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            modifier = Modifier.weight(1f)
+        ) {
+            items(allReciters.size) { i ->
+                val reciter = allReciters[i]
+                val selected = reciter.id == currentReciter.id
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(if (selected) Gold else Color.White.copy(alpha = 0.05f))
+                        .border(1.dp, if (selected) Color.Transparent else Gold.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
+                        .clickable {
+                            currentReciter = reciter
+                            com.elhajri.noor.data.Prefs.setReciter(context, reciter.id)
+                            com.elhajri.noor.settings.NoorSettings.setReciter(context, reciter.id)
+                        }
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                ) {
+                    Text(
+                        text = reciter.name,
+                        color = if (selected) Color(0xFF0D2B1F) else GoldSoft,
+                        fontSize = 11.sp,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                    )
+                }
+            }
+        }
+        // تنزيل دون إنترنت للمقرئ المختار — أيقونة مدمجة بلا مساحة كبيرة
+        IconButton(
+            onClick = {
+                com.elhajri.noor.quran.ReciterOffline.downloadAll(context, currentReciter, currentReciter.servers)
+            },
+            modifier = Modifier.size(30.dp)
+        ) {
+            Icon(Icons.Default.Download, contentDescription = "تنزيل التلاوات دون إنترنت", tint = Gold, modifier = Modifier.size(16.dp))
         }
     }
 }

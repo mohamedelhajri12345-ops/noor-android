@@ -306,6 +306,7 @@ fun ThemePreview(def: NoorThemeDef) {
                 .background(
                     Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
                 )
+                .drawBehind { drawThemeMotif(def) }
                 .padding(6.dp)
         ) {
         // الشريط العلوي
