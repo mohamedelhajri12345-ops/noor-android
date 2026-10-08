@@ -37,6 +37,7 @@ import java.util.Calendar
 import java.util.Locale
 import com.elhajri.noor.ui.NoorGradients
 import androidx.compose.ui.graphics.Color
+import com.elhajri.noor.theme.noorGlassCard
 
 data class PrayerItem(
     val name: String,
@@ -297,9 +298,9 @@ fun PrayerScreen() {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
+                    .height(180.dp).noorGlassCard(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
             ) {
                 Box(
@@ -453,9 +454,9 @@ fun PrayerCard(item: PrayerItem) {
     val borderColor = if (item.isNext) Gold else Gold.copy(alpha = 0.15f)
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().noorGlassCard(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = bgColor),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         border = androidx.compose.foundation.BorderStroke(if (item.isNext) 1.5.dp else 1.dp, borderColor)
     ) {
         Row(

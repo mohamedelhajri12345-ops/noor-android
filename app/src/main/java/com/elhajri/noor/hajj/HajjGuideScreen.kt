@@ -38,6 +38,7 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import org.json.JSONObject
 import com.elhajri.noor.ui.NoorGradients
+import com.elhajri.noor.theme.noorGlassCard
 
 private fun toArabicDigits(number: Any): String {
     val str = number.toString()
@@ -275,8 +276,8 @@ private fun StepCard(index: Int, step: Step, isUnderstood: Boolean, onUnderstand
     var expanded by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = NavyCard),
+        modifier = Modifier.fillMaxWidth().noorGlassCard(),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
@@ -358,8 +359,8 @@ private fun StepCard(index: Int, step: Step, isUnderstood: Boolean, onUnderstand
 @Composable
 private fun DuaCard(dua: Dua) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = NavyCard),
+        modifier = Modifier.fillMaxWidth().noorGlassCard(),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
@@ -470,8 +471,8 @@ private fun HajjQuizView(context: Context, onFinish: () -> Unit) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = NavyCard),
+            modifier = Modifier.fillMaxWidth().noorGlassCard(),
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
             shape = RoundedCornerShape(20.dp)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {

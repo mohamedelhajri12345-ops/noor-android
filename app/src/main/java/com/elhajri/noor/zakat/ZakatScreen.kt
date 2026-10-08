@@ -32,6 +32,7 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.NoorGradients
+import com.elhajri.noor.theme.noorGlassCard
 
 private fun toArabicDigits(number: Any): String {
     val str = number.toString()
@@ -200,8 +201,8 @@ fun ZakatScreen() {
                             .clickable {
                                 selectedCategory = c.id
                                 result = null
-                            },
-                        colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            }.noorGlassCard(),
+                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                         shape = RoundedCornerShape(18.dp)
                     ) {
                         Row(
@@ -271,8 +272,8 @@ fun ZakatScreen() {
 
             if (cat == "gold" || cat == "mixed") {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -341,8 +342,8 @@ fun ZakatScreen() {
 
             if (cat == "silver" || cat == "mixed") {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -390,8 +391,8 @@ fun ZakatScreen() {
 
             if (cat == "cash" || cat == "mixed") {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -419,8 +420,8 @@ fun ZakatScreen() {
 
             if (cat == "merch" || cat == "mixed") {
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -463,8 +464,8 @@ fun ZakatScreen() {
 
             result?.let { res ->
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Column(modifier = Modifier.padding(18.dp)) {

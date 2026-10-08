@@ -196,7 +196,7 @@ private fun ExploreCard(item: Explore, modifier: Modifier = Modifier, onNavigate
                 Brush.verticalGradient(
                     listOf(
                         com.elhajri.noor.ui.NavyLight.copy(alpha = 0.78f),
-                        com.elhajri.noor.ui.NavyCard.copy(alpha = 0.88f),
+                        com.elhajri.noor.ui.NavyCard.copy(alpha = 0.6f),
                         com.elhajri.noor.ui.Navy.copy(alpha = 0.92f)
                     )
                 )
@@ -366,7 +366,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                         Brush.verticalGradient(
                             listOf(
                                 com.elhajri.noor.ui.NavyLight.copy(alpha = 0.35f),
-                                com.elhajri.noor.ui.NavyCard.copy(alpha = 0.45f),
+                                com.elhajri.noor.ui.NavyCard.copy(alpha = 0.3f),
                                 Gold8.copy(alpha = 0.12f)
                             )
                         )

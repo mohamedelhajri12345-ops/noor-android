@@ -38,6 +38,7 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
+import com.elhajri.noor.theme.noorGlassCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,8 +105,8 @@ fun DonationScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(24.dp),
                 border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
             ) {
@@ -148,8 +149,8 @@ fun DonationScreen(onBack: () -> Unit) {
             }
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -252,8 +253,8 @@ fun DonationScreen(onBack: () -> Unit) {
             }
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -271,8 +272,8 @@ fun DonationScreen(onBack: () -> Unit) {
 
                     bankFields.forEach { (label, value, copyLabel) ->
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = NavyLight),
+                            modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Row(
@@ -317,8 +318,8 @@ fun DonationScreen(onBack: () -> Unit) {
             }
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(

@@ -41,6 +41,8 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
 import com.elhajri.noor.ui.NoorGradients
+import androidx.compose.ui.graphics.Color
+import com.elhajri.noor.theme.noorGlassCard
 
 private fun toArabicNumber(number: Any): String {
     val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
@@ -151,8 +153,8 @@ fun TasbihScreen() {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 20.dp),
-            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                .padding(bottom = 20.dp).noorGlassCard(),
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
             shape = RoundedCornerShape(24.dp)
         ) {
             Column(

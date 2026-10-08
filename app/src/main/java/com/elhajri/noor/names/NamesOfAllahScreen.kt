@@ -27,6 +27,8 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.NoorGradients
+import androidx.compose.ui.graphics.Color
+import com.elhajri.noor.theme.noorGlassCard
 
 @Composable
 fun NamesOfAllahScreen() {
@@ -55,8 +57,8 @@ fun NamesOfAllahScreen() {
         ) {
             items(filtered) { name ->
                 Card(
-                    modifier = Modifier.aspectRatio(1f).clickable { selected = name },
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    modifier = Modifier.aspectRatio(1f).clickable { selected = name }.noorGlassCard(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Box(

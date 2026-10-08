@@ -1,53 +1,35 @@
 package com.elhajri.noor.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
-import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.res.painterResource
+import com.elhajri.noor.theme.GlassRecipe
 import com.elhajri.noor.theme.drawThemeMotif
+import com.elhajri.noor.theme.noorGlassCard as themeNoorGlassCard
 
 /**
- * التدرّجات والمكوّنات الفاخرة — نظام "الأبنوس والذهب الإمبراطوري"
- * من مواصفات فريق التصميم (design_spec.md).
- */
-/**
- * خلفية الشاشة الموضوعية — مرسومة بالكود بالكامل (تدرّج رأسي من ألوان الثيم
- * + توهّج قطري ناعم بلون التمييز + البصمة البصرية الفريدة للثيمة) دون أي صور ويب ودون زخارف هندسية.
- * النتيجة: نصوص واضحة تماماً في كل الثيمات وهوية تتبدل كاملة مع كل ثيمة.
+ * Background for themed screens — code-drawn vertical gradient + radial accent glow + signature motif.
  */
 @Composable
 fun Modifier.themeScreenBackground(): Modifier {
     val def = com.elhajri.noor.theme.NoorThemeState.active
     return this.drawBehind {
-        // 1) التدرّج الأساسي الرأسي من ألوان الثيم
+        // 1) Vertical background gradient
         drawRect(
             brush = Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
         )
-        // 2) توهّج قطري ناعم بلون التمييز — عمق ثلاثي الأبعاد بلا صور
+        // 2) Radial accent glow
         drawRect(
             brush = Brush.radialGradient(
                 colors = listOf(
@@ -58,10 +40,10 @@ fun Modifier.themeScreenBackground(): Modifier {
                 radius = size.width.coerceAtLeast(size.height) * 1.10f
             )
         )
-        // 3) رسم البصمة البصرية الفريدة للثيمة النشطة (Theme Signature Motif Layer)
+        // 3) Theme motif
         drawThemeMotif(def)
 
-        // 4) إضاءة سفلية خفيفة تمنح البطاقات تبايناً أعلى وخطاً أوضح
+        // 4) Bottom lighting gradient
         drawRect(
             brush = Brush.verticalGradient(
                 0f to Color.Transparent,
@@ -73,29 +55,19 @@ fun Modifier.themeScreenBackground(): Modifier {
 }
 
 /**
- * معدّل البطاقة الزجاجية الفاخرة — استخدامه:
- * Modifier.noorGlassCard()  أو  Modifier.noorGlassCard(cornerRadius = 14.dp)
+ * Glass card modifier delegating to the canonical GlassRecipe in theme package.
  */
 fun Modifier.noorGlassCard(
     cornerRadius: Dp = 20.dp,
     borderWidth: Dp = 1.dp,
     shape: Shape = RoundedCornerShape(cornerRadius)
-): Modifier = this
-    .shadow(
-        elevation = 10.dp,
-        shape = shape,
-        ambientColor = Color(0x99000000),
-        spotColor = Gold.copy(alpha = 0.15f)
-    )
-    .clip(shape)
-    .background(NoorGradients.GlassSurface)
-    .border(
-        width = borderWidth,
-        brush = NoorGradients.GlassBorderGold,
-        shape = shape
-    )
+): Modifier = this.themeNoorGlassCard(
+    cornerRadius = cornerRadius,
+    borderWidth = borderWidth,
+    shape = shape
+)
 
-/** الخط الذهبي الرفيع الفاصل بين الأقسام */
+/** Thin golden divider line */
 @Composable
 fun NoorGoldenDivider(modifier: Modifier = Modifier) {
     Box(
@@ -110,39 +82,28 @@ object NoorGradients {
 
     private val T get() = com.elhajri.noor.theme.NoorThemeState.active
 
-    /** خلفية الشاشات: تدرّج الثيم الحالي */
+    /** Screen background gradient */
     val ScreenBackground get() = Brush.verticalGradient(
         colors = listOf(T.background, T.backgroundEnd)
     )
 
-    /** اللون المعدني للأزرار والعناوين الكبرى — ألوان الثيم */
+    /** Imperial metallic gradient */
     val ImperialGoldMetallic get() = Brush.linearGradient(
         colors = listOf(T.accentSoft, T.accent, T.accent, T.accentDeep)
     )
 
-    /** تدرّج الأزرار الناعم — ألوان الثيم */
+    /** Button gradient */
     val GoldButton get() = Brush.horizontalGradient(
         colors = listOf(T.accentSoft, T.accent, T.accentDeep)
     )
 
-    /** حدود البطاقات الزجاجية بألوان الثيم */
-    val GlassBorderGold get() = Brush.linearGradient(
-        colors = listOf(
-            T.accentSoft.copy(alpha = 0.50f),
-            T.accent.copy(alpha = 0.15f),
-            T.accentSoft.copy(alpha = 0.35f)
-        )
-    )
+    /** Glass card border gradient */
+    val GlassBorderGold get() = GlassRecipe.borderGradient
 
-    /** تعبئة البطاقات الزجاجية شبه الشفافة — سطح الثيم */
-    val GlassSurface get() = Brush.linearGradient(
-        colors = listOf(
-            T.surfaceVariant.copy(alpha = 0.17f),
-            T.surface.copy(alpha = 0.10f)
-        )
-    )
+    /** Glass surface gradient */
+    val GlassSurface get() = GlassRecipe.surfaceGradient
 
-    /** الخط الفاصل الذهبي التلاشي في الطرفين */
+    /** Fading divider gradient */
     val GoldenDivider = Brush.horizontalGradient(
         colors = listOf(
             Color.Transparent,
@@ -153,7 +114,7 @@ object NoorGradients {
         )
     )
 
-    /** تدرّج نصوص العناوين والآيات */
+    /** Text gradient */
     val GoldText = Brush.linearGradient(
         colors = listOf(
             ChampagneGold,

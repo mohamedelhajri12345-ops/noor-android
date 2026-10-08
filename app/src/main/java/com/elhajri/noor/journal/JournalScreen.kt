@@ -37,6 +37,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import com.elhajri.noor.ui.NoorGradients
+import androidx.compose.ui.graphics.Color
+import com.elhajri.noor.theme.noorGlassCard
 
 data class JournalEntry(
     val id: Long,
@@ -201,8 +203,8 @@ fun JournalScreen() {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    .padding(bottom = 16.dp).noorGlassCard(),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -343,8 +345,8 @@ fun JournalScreen() {
             ) {
                 items(entries, key = { it.id }) { entry ->
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = NavyCard),
+                        modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(

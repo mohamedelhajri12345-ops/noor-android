@@ -233,7 +233,7 @@ fun NumbersQuizGameScreen(onBack: () -> Unit) {
                                             when {
                                                 selectedOption != null && isCorrect -> Gold.copy(alpha = 0.3f)
                                                 isSelected && !isCorrect -> Color.Red.copy(alpha = 0.3f)
-                                                else -> NavyCard.copy(alpha = 0.85f)
+                                                else -> NavyCard.copy(alpha = 0.6f)
                                             }
                                         )
                                         .border(

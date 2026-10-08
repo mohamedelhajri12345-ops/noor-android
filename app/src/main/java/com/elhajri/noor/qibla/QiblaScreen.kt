@@ -39,6 +39,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.tan
 import com.elhajri.noor.ui.NoorGradients
+import com.elhajri.noor.theme.noorGlassCard
 
 private const val MECCA_LAT = 21.4225
 private const val MECCA_LNG = 39.8262
@@ -244,9 +245,9 @@ fun QiblaScreen() {
             }
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().noorGlassCard(),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 border = androidx.compose.foundation.BorderStroke(
                     1.dp,
                     if (isAligned) Color(0xFF4CAF50) else Gold.copy(alpha = 0.3f)

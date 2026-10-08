@@ -32,6 +32,7 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
 import androidx.compose.ui.graphics.Color
+import com.elhajri.noor.theme.noorGlassCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,10 +62,10 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF070B14))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = com.elhajri.noor.ui.Navy)
             )
         },
-        containerColor = Color(0xFF070B14)
+        containerColor = com.elhajri.noor.ui.Navy
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -75,8 +76,8 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(20.dp),
                 border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
             ) {
@@ -139,8 +140,8 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
             }
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Column(
@@ -191,8 +192,8 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
 
                         prayerList.forEach { (name, time) ->
                             Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = NavyLight),
+                                modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
                                 Row(
@@ -219,8 +220,8 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
                         }
                     } else {
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = NavyLight),
+                            modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Column(
@@ -265,8 +266,8 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
             }
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = NavyCard),
+                modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(20.dp)
             ) {
                 Row(

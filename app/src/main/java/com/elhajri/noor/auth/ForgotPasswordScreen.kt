@@ -23,6 +23,7 @@ import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
+import com.elhajri.noor.ui.noorGlassCard
 import kotlinx.coroutines.launch
 import com.elhajri.noor.ui.NoorGradients
 import androidx.compose.ui.graphics.Color
@@ -102,9 +103,9 @@ fun ForgotPasswordScreen(
                 )
 
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().noorGlassCard(cornerRadius = 24.dp),
                     shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     Column(

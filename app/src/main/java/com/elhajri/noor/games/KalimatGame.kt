@@ -378,7 +378,7 @@ private fun BeautifulArabicKeyboard(
         Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
-            .background(NavyCard.copy(alpha = 0.85f))
+            .background(NavyCard.copy(alpha = 0.6f))
             .border(1.dp, Gold.copy(alpha = 0.25f), RoundedCornerShape(18.dp))
             .padding(vertical = 10.dp, horizontal = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -446,7 +446,7 @@ private fun KeyboardRow(
                 LetterState.CORRECT_SPOT -> Triple(Gold, Navy, Gold)
                 LetterState.IN_WORD_WRONG_SPOT -> Triple(Color(0xFFF3E5AB), Navy, Gold)
                 LetterState.NOT_IN_WORD -> Triple(Navy.copy(alpha = 0.4f), Color.White.copy(alpha = 0.25f), Color.Transparent)
-                LetterState.UNGUESSED -> Triple(NavyCard.copy(alpha = 0.9f), Color.White, Gold.copy(alpha = 0.2f))
+                LetterState.UNGUESSED -> Triple(NavyCard.copy(alpha = 0.6f), Color.White, Gold.copy(alpha = 0.2f))
             }
 
             Box(

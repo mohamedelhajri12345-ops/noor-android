@@ -25,6 +25,8 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
 import com.elhajri.noor.ui.NoorGradients
+import androidx.compose.ui.graphics.Color
+import com.elhajri.noor.theme.noorGlassCard
 
 data class PrivacySection(val num: String, val title: String, val body: String)
 
@@ -154,8 +156,8 @@ fun PrivacyPolicyScreen(onBack: () -> Unit = {}) {
         ) {
             items(sections) { s ->
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = NavyCard),
+                    modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Column(

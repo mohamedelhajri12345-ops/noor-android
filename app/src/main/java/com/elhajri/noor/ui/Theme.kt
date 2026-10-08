@@ -11,9 +11,9 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.elhajri.noor.theme.NoorThemeState
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.R
+import com.elhajri.noor.theme.NoorThemeState
 
 val TajawalFamily = FontFamily(
     Font(R.font.tajawal_regular, FontWeight.Normal),
@@ -25,16 +25,10 @@ val AmiriFamily = FontFamily(
     Font(R.font.amiri_bold, FontWeight.Bold)
 )
 
-
-// ============================================================================
-// نظام الثيمات الديناميكي — الأسماء نفسها حتى تتجدد كل الشاشات تلقائياً
-// عند تبديل الثيم من متجر الثيمات دون إعادة إنشاء أي نشاط.
-// قيم البداية = ثيم "نور الأساسي" (الأبنوس والذهب الإمبراطوري).
-// ============================================================================
-
+// Dynamic theme colors deriving from NoorThemeState
 val Navy get() = NoorThemeState.active.background
-val NavyLight get() = NoorThemeState.active.surfaceVariant
-val NavyCard get() = NoorThemeState.active.surface
+val NavyLight get() = NoorThemeState.active.surfaceVariant.copy(alpha = 0.18f)
+val NavyCard get() = NoorThemeState.active.surfaceVariant.copy(alpha = 0.12f)
 val Gold get() = NoorThemeState.active.accent
 val GoldSoft get() = NoorThemeState.active.accentSoft
 val TextMain get() = NoorThemeState.active.textPrimary
@@ -61,7 +55,6 @@ val NoorColors get() = darkColorScheme(
     outline = Gold.copy(alpha = 0.4f)
 )
 
-// كل أنماط الخط في التطبيق = Tajawal (خط عربي واضح) — لا يبقى أي نص بالخط الافتراضي
 private fun tajawal(size: Int, weight: FontWeight, line: Int? = null): TextStyle {
     val lh = line?.toFloat() ?: (size * 1.7f)
     return TextStyle(

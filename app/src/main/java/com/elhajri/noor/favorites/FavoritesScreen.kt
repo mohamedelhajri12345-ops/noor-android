@@ -24,6 +24,8 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NoorGradients
+import androidx.compose.ui.graphics.Color
+import com.elhajri.noor.theme.noorGlassCard
 
 object StoryFavorites {
     private const val KEY = "favorite_stories"
@@ -63,8 +65,8 @@ fun FavoritesScreen(onOpenSurah: (Surah) -> Unit, onOpenStory: (Int) -> Unit) {
             if (favSurahs.isNotEmpty()) {
                 item { Text("السور المفضلة", color = Gold, fontWeight = FontWeight.Bold) }
                 items(favSurahs) { s ->
-                    Card(colors = CardDefaults.cardColors(containerColor = NavyCard), shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth().clickable { onOpenSurah(s) }) {
+                    Card(colors = CardDefaults.cardColors(containerColor = Color.Transparent), shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().clickable { onOpenSurah(s) }.noorGlassCard()) {
                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text("﴿ ${s.name} ﴾", color = GoldSoft, fontSize = 16.sp, modifier = Modifier.weight(1f))
                             Text("آية ${s.ayahs}", color = GoldSoft.copy(alpha = 0.6f), fontSize = 12.sp)
@@ -75,8 +77,8 @@ fun FavoritesScreen(onOpenSurah: (Surah) -> Unit, onOpenStory: (Int) -> Unit) {
             if (favStories.isNotEmpty()) {
                 item { Text("القصص المفضلة", color = Gold, fontWeight = FontWeight.Bold) }
                 items(favStories) { st ->
-                    Card(colors = CardDefaults.cardColors(containerColor = NavyCard), shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth().clickable { onOpenStory(st.id) }) {
+                    Card(colors = CardDefaults.cardColors(containerColor = Color.Transparent), shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().clickable { onOpenStory(st.id) }.noorGlassCard()) {
                         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text(st.title, color = GoldSoft, fontSize = 16.sp, modifier = Modifier.weight(1f))
                         }

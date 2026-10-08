@@ -352,7 +352,7 @@ fun ChatView(
     }
 
     Scaffold(
-        containerColor = Color(0xFF070B14),
+        containerColor = com.elhajri.noor.ui.Navy,
         topBar = {
             TopAppBar(
                 title = {
@@ -391,7 +391,7 @@ fun ChatView(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF070B14))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = com.elhajri.noor.ui.Navy)
             )
         }
     ) { padding ->

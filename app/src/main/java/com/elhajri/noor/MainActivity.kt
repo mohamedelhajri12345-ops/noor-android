@@ -272,6 +272,11 @@ fun NoorApp() {
                 composable("library") { com.elhajri.noor.quran.LibraryScreen(onBack = { navController.popBackStack() }) }
                 composable("tracker") { TrackerScreen() }
                 composable("games") { NoorGameHubScreen(onBack = { navController.popBackStack() }, onNavigate = { navController.navigate(it) }) }
+                composable("videos") { com.elhajri.noor.videos.VideosScreen(onBack = { navController.popBackStack() }, onOpenVideo = { videoId -> navController.navigate("videoPlayer/$videoId") }) }
+                composable("videoPlayer/{videoId}") { entry ->
+                    val videoId = entry.arguments?.getString("videoId") ?: ""
+                    com.elhajri.noor.videos.VideoPlayerScreen(initialVideoId = videoId, onBack = { navController.popBackStack() })
+                }
                 composable("game_kalimat") { KalimatGameScreen(onBack = { navController.popBackStack() }) }
                 composable("game_trivia") { TriviaLadderGameScreen(onBack = { navController.popBackStack() }) }
                 composable("game_ayat") { AyatChainGameScreen(onBack = { navController.popBackStack() }) }

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Flip
 import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.OndemandVideo
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.WbTwilight
@@ -50,6 +51,7 @@ private data class GameEntry(
 )
 
 private val games = listOf(
+    GameEntry("videos", "مكتبة الفيديو للأطفال", "قصص الأنبياء، الأناشيد، وسير القرآن للأطفال", Icons.Default.OndemandVideo, true),
     GameEntry("game_kalimat", "كلمة من الذكر", "لغز اليوم: تخمّن اسم الله الحسنى في ٦ محاولات", Icons.Default.WbTwilight, true),
     GameEntry("game_trivia", "ميدان المعرفة", "سلم ذهبي من ١٠ أسئلة بوسائل مساعدة إيمانية", Icons.Default.EmojiEvents, true),
     GameEntry("game_ayat", "سلسلة الآيات", "رتّب آيات السورة في مواضعها واستمع للتلاوة", Icons.Default.Timer, true),
@@ -65,7 +67,7 @@ private val games = listOf(
 )
 
 /**
- * "ميدان نور الإيماني" — بوابة الألعاب الجديدة الست، بنفس هوية التطبيق.
+ * "ميدان نور الإيماني" — بوابة الألعاب والأنشطة، بنفس هوية التطبيق.
  */
 @Composable
 fun NoorGameHubScreen(onBack: () -> Unit, onNavigate: (String) -> Unit) {
@@ -77,7 +79,7 @@ fun NoorGameHubScreen(onBack: () -> Unit, onNavigate: (String) -> Unit) {
                 }
                 Column {
                     Text("ميدان نور الإيماني", color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                    Text("ألعاب الذكر والحكمة — ست محطات إيمانية جديدة", color = GoldSoft, fontSize = 11.sp)
+                    Text("ألعاب الذكر والحكمة والمحتوى التفاعلي للإسلام الصغير", color = GoldSoft, fontSize = 11.sp)
                 }
             }
 
@@ -93,7 +95,7 @@ fun NoorGameHubScreen(onBack: () -> Unit, onNavigate: (String) -> Unit) {
                             .fillMaxWidth()
                             .height(168.dp)
                             .clip(RoundedCornerShape(18.dp))
-                            .background(NavyCard.copy(alpha = 0.85f))
+                            .background(NavyCard.copy(alpha = 0.6f))
                             .border(1.dp, Gold.copy(alpha = 0.28f), RoundedCornerShape(18.dp))
                             .clickable { onNavigate(g.route) }
                             .padding(14.dp),

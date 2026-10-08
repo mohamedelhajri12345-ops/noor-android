@@ -91,7 +91,7 @@ fun NoorBottomBar(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        NavyCard.copy(alpha = 0.88f),
+                        NavyCard.copy(alpha = 0.6f),
                         Navy.copy(alpha = 0.96f)
                     )
                 )

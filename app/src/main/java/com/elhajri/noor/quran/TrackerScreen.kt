@@ -50,6 +50,7 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import com.elhajri.noor.ui.NoorGradients
+import com.elhajri.noor.theme.noorGlassCard
 
 private const val TRACKER_PREFS = "nur_quran_tracker_prefs"
 private const val KEY_TRACKER = "tracker_json"
@@ -208,10 +209,10 @@ fun TrackerScreen() {
                     // Ring Progress Card
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
-                        ) {
+                        .noorGlassCard()) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -279,8 +280,8 @@ fun TrackerScreen() {
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceEvenly
                                 ) {
-                                    Card(
-                                        colors = CardDefaults.cardColors(containerColor = NavyLight),
+                                    Card(modifier = Modifier.noorGlassCard(), 
+                                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
                                         Column(
@@ -291,8 +292,8 @@ fun TrackerScreen() {
                                             Text("أيام متتالية", fontSize = 10.sp, color = GoldSoft.copy(alpha = 0.7f))
                                         }
                                     }
-                                    Card(
-                                        colors = CardDefaults.cardColors(containerColor = NavyLight),
+                                    Card(modifier = Modifier.noorGlassCard(), 
+                                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                                         shape = RoundedCornerShape(12.dp)
                                     ) {
                                         Column(
@@ -350,10 +351,10 @@ fun TrackerScreen() {
                     // Goal Selector
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
-                        ) {
+                        .noorGlassCard()) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text("الهدف اليومي (صفحات)", color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.height(10.dp))
@@ -383,10 +384,10 @@ fun TrackerScreen() {
                     // Badges Section
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
-                        ) {
+                        .noorGlassCard()) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text("الإنجازات والشارات", color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.height(12.dp))
@@ -425,10 +426,10 @@ fun TrackerScreen() {
                     // Khatma Progress
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
-                        ) {
+                        .noorGlassCard()) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Text("التقدم في الختمة الحالية", color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.height(16.dp))
@@ -479,10 +480,10 @@ fun TrackerScreen() {
                     // Surah Completed count
                     item {
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.fillMaxWidth()
-                        ) {
+                        .noorGlassCard()) {
                             Row(
                                 modifier = Modifier.padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
@@ -611,10 +612,10 @@ private fun BadgeCard(badge: BadgeItem, modifier: Modifier = Modifier) {
 @Composable
 private fun ReportItem(label: String, value: String) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = NavyLight),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier.fillMaxWidth()
-    ) {
+    .noorGlassCard()) {
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) {
             Text(label, fontSize = 10.sp, color = GoldSoft.copy(alpha = 0.7f))
             Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Gold)

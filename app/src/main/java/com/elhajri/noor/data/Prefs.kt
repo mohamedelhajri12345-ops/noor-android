@@ -1,6 +1,7 @@
 package com.elhajri.noor.data
 
 import android.content.Context
+import java.util.Calendar
 
 object Prefs {
     private const val FILE = "noor_prefs"
@@ -43,4 +44,47 @@ object Prefs {
     // حجم خط المصحف: S / M / L
     fun getReaderFontSize(context: Context): String = sp(context).getString("reader_font_size", "M") ?: "M"
     fun setReaderFontSize(context: Context, v: String) = sp(context).edit().putString("reader_font_size", v).apply()
+
+    // ───────────────────────── Kids Videos Prefs ─────────────────────────
+
+    fun getLastWatchedVideoId(context: Context): String? =
+        sp(context).getString("last_video_id", null)
+
+    fun getLastWatchedVideoTitle(context: Context): String? =
+        sp(context).getString("last_video_title", null)
+
+    fun getLastWatchedVideoPosition(context: Context): Long =
+        sp(context).getLong("last_video_pos", 0L)
+
+    fun saveLastWatchedVideo(context: Context, videoId: String, title: String, positionSec: Long) {
+        sp(context).edit()
+            .putString("last_video_id", videoId)
+            .putString("last_video_title", title)
+            .putLong("last_video_pos", positionSec)
+            .apply()
+    }
+
+    fun getDailyWatchedVideosCount(context: Context): Int {
+        checkDailyReset(context)
+        return sp(context).getInt("daily_watched_videos_count", 0)
+    }
+
+    fun incrementDailyWatchedVideosCount(context: Context) {
+        checkDailyReset(context)
+        val current = getDailyWatchedVideosCount(context)
+        sp(context).edit().putInt("daily_watched_videos_count", current + 1).apply()
+    }
+
+    private fun checkDailyReset(context: Context) {
+        val cal = Calendar.getInstance()
+        val today = "${cal.get(Calendar.YEAR)}-${cal.get(Calendar.DAY_OF_YEAR)}"
+        val lastDay = sp(context).getString("daily_videos_date", "")
+
+        if (today != lastDay) {
+            sp(context).edit()
+                .putString("daily_videos_date", today)
+                .putInt("daily_watched_videos_count", 0)
+                .apply()
+        }
+    }
 }

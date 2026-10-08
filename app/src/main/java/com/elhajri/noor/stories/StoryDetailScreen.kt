@@ -29,6 +29,7 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import org.json.JSONObject
 import com.elhajri.noor.ui.NoorGradients
+import com.elhajri.noor.theme.noorGlassCard
 
 private data class StoryDetail(
     val id: Int,
@@ -97,8 +98,8 @@ fun StoryDetailScreen(storyId: Int, onBack: () -> Unit) {
             ) {
                 Column {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = NavyCard),
+                        modifier = Modifier.fillMaxWidth().noorGlassCard(),
+                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         Column(
