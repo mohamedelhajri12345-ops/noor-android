@@ -1,0 +1,31 @@
+
+> Task :app:stripReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libllm_inference_engine_jni.so.
+
+> Task :app:processReleaseManifestForPackage
+> Task :app:mergeExtDexRelease
+> Task :app:extractReleaseNativeSymbolTables
+> Task :app:mergeReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:mergeReleaseShaders
+> Task :app:compileReleaseShaders NO-SOURCE
+> Task :app:generateReleaseAssets UP-TO-DATE
+--
+> Task :app:bundleReleaseResources
+> Task :app:compileReleaseKotlin
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/videos/VideoPlayerScreen.kt:131:9 Unresolved reference: webViewInstance
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/videos/VideoPlayerScreen.kt:136:9 Unresolved reference: seekTo
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/videos/VideoPlayerScreen.kt:527:29 Cannot find a parameter with this name: containerColor
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/videos/VideoPlayerScreen.kt:666:21 An argument is already passed for this parameter
+
+> Task :app:compileReleaseKotlin FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --info or --debug option to get more log output.
+Build failed at Fri Oct  9 00:57:32 UTC 2026
