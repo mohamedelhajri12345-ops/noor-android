@@ -126,16 +126,6 @@ fun VideoPlayerScreen(
     var speedMenuExpanded by remember { mutableStateOf(false) }
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    fun setRate(rate: Float) {
-        playbackRate = rate
-        webViewInstance?.evaluateJavascript("setRate($rate);", null)
-    }
-
-    fun skipBy(delta: Float) {
-        val target = (currentTime + delta).coerceIn(0f, if (duration > 0f) duration else 0f)
-        seekTo(target)
-    }
-
     // Auto-hide controls overlay after 4s
     var areControlsVisible by remember { mutableStateOf(true) }
 
@@ -193,6 +183,16 @@ fun VideoPlayerScreen(
     fun seekTo(seconds: Float) {
         currentTime = seconds
         webViewInstance?.evaluateJavascript("seekTo($seconds);", null)
+    }
+
+    fun setRate(rate: Float) {
+        playbackRate = rate
+        webViewInstance?.evaluateJavascript("setRate($rate);", null)
+    }
+
+    fun skipBy(delta: Float) {
+        val target = (currentTime + delta).coerceIn(0f, if (duration > 0f) duration else 0f)
+        seekTo(target)
     }
 
     // Immersive TV mode: hide system bars while landscape, restore on exit
@@ -524,7 +524,7 @@ fun VideoPlayerScreen(
                         DropdownMenu(
                             expanded = speedMenuExpanded,
                             onDismissRequest = { speedMenuExpanded = false },
-                            containerColor = Color(0xFF0B1120)
+                            modifier = Modifier.background(Color(0xFF0B1120))
                         ) {
                             listOf(0.75f, 1f, 1.25f, 1.5f, 2f).forEach { r ->
                                 DropdownMenuItem(
@@ -659,13 +659,12 @@ fun VideoPlayerScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Card(
-                    modifier = Modifier.noorGlassCard(cornerRadius = 24.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Gold),
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(24.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.88f)
                         .padding(16.dp)
+                        .noorGlassCard(cornerRadius = 24.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(20.dp),
