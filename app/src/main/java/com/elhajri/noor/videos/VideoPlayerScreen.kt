@@ -18,6 +18,10 @@ import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -50,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.elhajri.noor.data.Prefs
+import com.elhajri.noor.theme.noorGlassCard
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.toArabicDigits
@@ -535,6 +540,68 @@ fun VideoPlayerScreen(
                                         speedMenuExpanded = false
                                     }
                                 )
+                            }
+                        }
+                    }
+                }
+
+                // Related videos strip (our own curated list, replaces YouTube suggestions)
+                if (!isLandscape) {
+                    val related = remember(currentVideoId) {
+                        val cat = currentVideo?.category
+                        KidsVideoStore.loadVideos(context)
+                            .filter { it.category == cat && it.id != currentVideoId }
+                            .shuffled()
+                            .take(12)
+                    }
+                    if (related.isNotEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .navigationBarsPadding()
+                                .padding(bottom = 96.dp)
+                        ) {
+                            Text(
+                                "فيديوهات مشابهة",
+                                color = Gold,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                            )
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                items(related, key = { it.id }) { v ->
+                                    Column(
+                                        modifier = Modifier
+                                            .width(132.dp)
+                                            .noorGlassCard(cornerRadius = 12.dp)
+                                            .clickable {
+                                                currentVideoId = v.id
+                                                currentTime = 0f
+                                                isEndedOverlayVisible = false
+                                                webViewInstance?.evaluateJavascript(
+                                                    "if(player && player.loadVideoById) player.loadVideoById('${v.id}');", null
+                                                )
+                                            }
+                                    ) {
+                                        AsyncImage(
+                                            model = v.thumbnailUrl,
+                                            contentDescription = v.title,
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier.fillMaxWidth().height(74.dp)
+                                        )
+                                        Text(
+                                            v.title,
+                                            color = Color.White,
+                                            fontSize = 10.sp,
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.padding(6.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
