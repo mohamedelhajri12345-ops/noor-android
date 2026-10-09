@@ -11,7 +11,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -70,23 +69,21 @@ fun Modifier.noorGlassCard(
     cornerRadius: Dp = 20.dp,
     borderWidth: Dp = 1.dp,
     shape: Shape = RoundedCornerShape(cornerRadius),
-    elevation: Dp = 8.dp
+    elevation: Dp = 0.dp
 ): Modifier {
     val T = NoorThemeState.active
+    // NOTE: no shadow() on purpose. A shadow drawn under a translucent fill shows through
+    // the glass as a dark rectangular patch (visible "squares" with hard corners) and its
+    // tone changes with whatever sits behind each card. Depth comes from a uniform fill,
+    // a soft top highlight and a thin gradient border instead, so every card looks identical.
     return this
-        .shadow(
-            elevation = elevation,
-            shape = shape,
-            ambientColor = Color(0x55000000),
-            spotColor = T.accent.copy(alpha = 0.15f)
-        )
         .clip(shape)
+        .background(GLASS_BASE_FILL)
         .background(
             brush = Brush.verticalGradient(
                 colors = listOf(
-                    T.accentSoft.copy(alpha = 0.14f),
-                    T.surfaceVariant.copy(alpha = 0.10f),
-                    T.surface.copy(alpha = 0.07f)
+                    T.accentSoft.copy(alpha = 0.10f),
+                    Color.Transparent
                 )
             )
         )
@@ -94,14 +91,18 @@ fun Modifier.noorGlassCard(
             width = borderWidth,
             brush = Brush.linearGradient(
                 colors = listOf(
-                    T.accentSoft.copy(alpha = 0.40f),
-                    T.accent.copy(alpha = 0.15f),
-                    T.accentSoft.copy(alpha = 0.25f)
+                    T.accentSoft.copy(alpha = 0.38f),
+                    T.accent.copy(alpha = 0.16f),
+                    T.accentSoft.copy(alpha = 0.28f)
                 )
             ),
             shape = shape
         )
 }
+
+/** One single uniform glass tint used by every card in the app (no per-card variation). */
+private val GLASS_BASE_FILL: Color
+    get() = Color.White.copy(alpha = 0.055f)
 
 /**
  * Extension for applying glass style with explicit corner radius in 20-28dp range.
@@ -109,7 +110,7 @@ fun Modifier.noorGlassCard(
 fun Modifier.noorGlassStyle(
     cornerRadius: Dp = 24.dp,
     borderWidth: Dp = 1.dp,
-    elevation: Dp = 8.dp
+    elevation: Dp = 0.dp
 ): Modifier = noorGlassCard(
     cornerRadius = cornerRadius,
     borderWidth = borderWidth,
@@ -124,7 +125,7 @@ fun NoorGlassCard(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 20.dp,
     borderWidth: Dp = 1.dp,
-    elevation: Dp = 8.dp,
+    elevation: Dp = 0.dp,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {

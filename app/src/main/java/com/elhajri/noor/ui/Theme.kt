@@ -27,8 +27,10 @@ val AmiriFamily = FontFamily(
 
 // Dynamic theme colors deriving from NoorThemeState
 val Navy get() = NoorThemeState.active.background
-val NavyLight get() = NoorThemeState.active.surfaceVariant.copy(alpha = 0.18f)
-val NavyCard get() = NoorThemeState.active.surfaceVariant.copy(alpha = 0.12f)
+// Panel tokens share ONE neutral glass tone with noorGlassCard (white tint, no theme-green cast),
+// so every panel/card/row in the app looks identical on top of any theme background.
+val NavyLight get() = Color.White.copy(alpha = 0.085f)
+val NavyCard get() = Color.White.copy(alpha = 0.055f)
 val Gold get() = NoorThemeState.active.accent
 val GoldSoft get() = NoorThemeState.active.accentSoft
 val TextMain get() = NoorThemeState.active.textPrimary

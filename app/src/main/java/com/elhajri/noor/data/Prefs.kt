@@ -87,4 +87,18 @@ object Prefs {
                 .apply()
         }
     }
+    // ===== Kids Videos: registry of videos that fail to embed/play =====
+    private const val BROKEN_VIDEOS_KEY = "broken_video_ids"
+
+    fun getBrokenVideos(context: Context): Set<String> {
+        return sp(context).getStringSet(BROKEN_VIDEOS_KEY, emptySet()) ?: emptySet()
+    }
+
+    fun addBrokenVideo(context: Context, videoId: String) {
+        val p = sp(context)
+        val current = p.getStringSet(BROKEN_VIDEOS_KEY, emptySet()) ?: emptySet()
+        if (videoId !in current) {
+            p.edit().putStringSet(BROKEN_VIDEOS_KEY, current + videoId).apply()
+        }
+    }
 }

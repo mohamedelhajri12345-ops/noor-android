@@ -42,6 +42,7 @@ import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.themeScreenBackground
 import java.util.Calendar
 import kotlinx.coroutines.delay
+import com.elhajri.noor.theme.noorGlassCard
 
 // ألوان الشاشة تتبع الثيم النشط حرفياً — تغيير الثيم يغيّرها فوراً
 private val Gold8 get() = com.elhajri.noor.ui.Gold
@@ -112,7 +113,6 @@ private fun HeroPrayerCard(
             .fillMaxWidth()
             .height(238.dp)
             .graphicsLayer { scaleX = heroScale; scaleY = heroScale }
-            .shadow(elevation = 10.dp, shape = RoundedCornerShape(22.dp))
             .clip(RoundedCornerShape(22.dp))
             .background(Color.Black)
             .border(1.5.dp, Gold8.copy(alpha = 0.35f), RoundedCornerShape(22.dp))
@@ -190,17 +190,7 @@ private fun ExploreCard(item: Explore, modifier: Modifier = Modifier, onNavigate
     Row(
         modifier = modifier
             .graphicsLayer { scaleX = scale; scaleY = scale }
-            .shadow(elevation = 5.dp, shape = RoundedCornerShape(16.dp))
-            .clip(RoundedCornerShape(16.dp))
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        com.elhajri.noor.ui.NavyLight.copy(alpha = 0.78f),
-                        com.elhajri.noor.ui.NavyCard.copy(alpha = 0.6f),
-                        com.elhajri.noor.ui.Navy.copy(alpha = 0.92f)
-                    )
-                )
-            )
+            .noorGlassCard(cornerRadius = 16.dp)
             .border(1.dp, Gold8.copy(alpha = 0.38f), RoundedCornerShape(16.dp))
             .clickable(interactionSource = interaction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate(item.route) }
             .padding(horizontal = 12.dp, vertical = 10.dp),
@@ -315,7 +305,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(elevation = 4.dp, shape = RoundedCornerShape(13.dp))
                     .clip(RoundedCornerShape(13.dp))
                     .background(
                         Brush.horizontalGradient(
@@ -360,7 +349,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(elevation = 6.dp, shape = RoundedCornerShape(16.dp))
                     .clip(RoundedCornerShape(16.dp))
                     .background(
                         Brush.verticalGradient(

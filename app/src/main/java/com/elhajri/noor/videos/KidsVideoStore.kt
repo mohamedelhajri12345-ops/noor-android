@@ -26,6 +26,14 @@ object KidsVideoStore {
     private var cachedVideos: List<KidsVideo>? = null
 
     /**
+     * Clears the in-memory cache so the next load re-reads assets
+     * and re-applies the broken-videos filter.
+     */
+    fun invalidate() {
+        synchronized(this) { cachedVideos = null }
+    }
+
+    /**
      * Loads all videos from assets/data/videos_kids.json.
      * Caches in memory on first call for zero IO overhead on subsequent queries.
      */
@@ -57,8 +65,10 @@ object KidsVideoStore {
                 e.printStackTrace()
             }
 
-            cachedVideos = list
-            return list
+            // Exclude videos known to be unavailable/broken at runtime
+            val broken = try { com.elhajri.noor.data.Prefs.getBrokenVideos(context) } catch (e: Exception) { emptySet() }
+            cachedVideos = if (broken.isEmpty()) list else list.filter { it.id !in broken }
+            return cachedVideos!!
         }
     }
 

@@ -7,6 +7,17 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
+import android.app.Activity
+import android.content.res.Configuration
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.compose.material.icons.filled.Forward10
+import androidx.compose.material.icons.filled.Replay10
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.layout.RowScope
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -47,12 +58,19 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
+ * Embedding origin. YouTube rejects embeds (errors 152/153) when the host page has no valid
+ * origin/Referer, or when it pretends to be youtube.com. We identify as the app's own https origin.
+ */
+private const val PLAYER_ORIGIN = "https://holyquran2.base44.app"
+
+/**
  * JS Bridge interface for forwarding YouTube IFrame events to Compose.
  */
 class VideoPlayerJsBridge(
     private val onStateChange: (Int) -> Unit,
     private val onProgress: (Float, Float, Boolean) -> Unit,
-    private val onEnded: () -> Unit
+    private val onEnded: () -> Unit,
+    private val onVideoError: (Int) -> Unit = {}
 ) {
     @JavascriptInterface
     fun sendStateChange(state: Int) {
@@ -67,6 +85,11 @@ class VideoPlayerJsBridge(
     @JavascriptInterface
     fun sendVideoEnded() {
         onEnded()
+    }
+
+    @JavascriptInterface
+    fun sendVideoError(code: Int) {
+        onVideoError(code)
     }
 }
 
@@ -93,6 +116,20 @@ fun VideoPlayerScreen(
     var currentTime by remember { mutableStateOf(0f) }
     var duration by remember { mutableStateOf(0f) }
     var isEndedOverlayVisible by remember { mutableStateOf(false) }
+    var consecutiveErrors by remember { mutableStateOf(0) }
+    var playbackRate by remember { mutableStateOf(1f) }
+    var speedMenuExpanded by remember { mutableStateOf(false) }
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    fun setRate(rate: Float) {
+        playbackRate = rate
+        webViewInstance?.evaluateJavascript("setRate($rate);", null)
+    }
+
+    fun skipBy(delta: Float) {
+        val target = (currentTime + delta).coerceIn(0f, if (duration > 0f) duration else 0f)
+        seekTo(target)
+    }
 
     // Auto-hide controls overlay after 4s
     var areControlsVisible by remember { mutableStateOf(true) }
@@ -153,6 +190,22 @@ fun VideoPlayerScreen(
         webViewInstance?.evaluateJavascript("seekTo($seconds);", null)
     }
 
+    // Immersive TV mode: hide system bars while landscape, restore on exit
+    DisposableEffect(isLandscape) {
+        val window = (context as? Activity)?.window
+        if (window != null) {
+            val controller = WindowCompat.getInsetsController(window, window.decorView)
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            if (isLandscape) {
+                controller.hide(WindowInsetsCompat.Type.systemBars())
+            } else {
+                controller.show(WindowInsetsCompat.Type.systemBars())
+            }
+        }
+        onDispose { }
+    }
+
     // Handle Hardware Back Button
     BackHandler {
         webViewInstance?.evaluateJavascript("pauseVideo();", null)
@@ -197,8 +250,9 @@ fun VideoPlayerScreen(
                     }
                     webChromeClient = WebChromeClient()
                     webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            super.onPageFinished(view, url)
+                        override fun shouldOverrideUrlLoading(view: WebView?, request: android.webkit.WebResourceRequest?): Boolean {
+                            // Keep the user inside the app: block every navigation away from the player
+                            return true
                         }
                     }
 
@@ -206,6 +260,7 @@ fun VideoPlayerScreen(
                         onStateChange = { state ->
                             // 1 = PLAYING, 2 = PAUSED, 0 = ENDED
                             isPlaying = (state == 1)
+                            if (state == 1) consecutiveErrors = 0
                         },
                         onProgress = { cur, dur, playing ->
                             currentTime = cur
@@ -222,13 +277,39 @@ fun VideoPlayerScreen(
                                     playNextVideo()
                                 }
                             }
+                        },
+                        onVideoError = { code ->
+                            // 100/101/150 = video unavailable or not embeddable; 2/5 = player error
+                            isPlaying = false
+                            if (code == 101 || code == 150 || code == 100 || code == 2 || code == 5) {
+                                Prefs.addBrokenVideo(context, currentVideoId)
+                                KidsVideoStore.invalidate()
+                                consecutiveErrors += 1
+                                if (consecutiveErrors < 6) {
+                                    Toast.makeText(
+                                        context,
+                                        "هذا الفيديو غير متاح، ننتقل تلقائياً إلى الفيديو التالي",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    coroutineScope.launch {
+                                        delay(1200)
+                                        if (!isPlaying) playNextVideo()
+                                    }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "تعذر تشغيل عدة فيديوهات متتالية، جرّب فيديو آخر",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
                         }
                     )
 
                     addJavascriptInterface(bridge, "AndroidBridge")
 
                     val htmlContent = buildYouTubeHtml(currentVideoId)
-                    loadDataWithBaseURL("https://www.youtube.com", htmlContent, "text/html", "UTF-8", null)
+                    loadDataWithBaseURL(PLAYER_ORIGIN, htmlContent, "text/html", "UTF-8", null)
 
                     webViewInstance = this
                 }
@@ -250,13 +331,20 @@ fun VideoPlayerScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                Color.Black.copy(alpha = 0.8f),
-                                Color.Transparent,
-                                Color.Black.copy(alpha = 0.85f)
+                        if (isEndedOverlayVisible || !isPlaying) {
+                            // fully opaque while paused/ended: hides YouTube suggestions completely
+                            Brush.verticalGradient(
+                                listOf(Color.Black.copy(alpha = 0.98f), Color.Black.copy(alpha = 0.98f))
                             )
-                        )
+                        } else {
+                            Brush.verticalGradient(
+                                listOf(
+                                    Color.Black.copy(alpha = 0.8f),
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.85f)
+                                )
+                            )
+                        }
                     )
             ) {
                 // Top Bar: Back Button & Video Information
@@ -281,7 +369,7 @@ fun VideoPlayerScreen(
                         )
                     }
 
-                    Column(
+                    if (!isLandscape) Column(
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 8.dp)
@@ -341,6 +429,23 @@ fun VideoPlayerScreen(
                         )
                     }
 
+                    // Skip back 10 seconds
+                    IconButton(
+                        onClick = { skipBy(-10f) },
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(Color.Black.copy(alpha = 0.4f))
+                            .border(1.dp, Gold.copy(alpha = 0.5f), CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Replay10,
+                            contentDescription = "تراجع 10 ثوان",
+                            tint = Gold,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
                     // Main Play / Pause Button
                     Box(
                         modifier = Modifier
@@ -360,6 +465,23 @@ fun VideoPlayerScreen(
                         )
                     }
 
+                    // Skip forward 10 seconds
+                    IconButton(
+                        onClick = { skipBy(10f) },
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(Color.Black.copy(alpha = 0.4f))
+                            .border(1.dp, Gold.copy(alpha = 0.5f), CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Forward10,
+                            contentDescription = "تقديم 10 ثوان",
+                            tint = Gold,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
                     // Next Video
                     IconButton(
                         onClick = { playNextVideo() },
@@ -375,6 +497,46 @@ fun VideoPlayerScreen(
                             tint = Gold,
                             modifier = Modifier.size(24.dp)
                         )
+                    }
+
+                    // Playback Speed
+                    Box {
+                        IconButton(
+                            onClick = { speedMenuExpanded = true },
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(Color.Black.copy(alpha = 0.4f))
+                                .border(1.dp, Gold.copy(alpha = 0.5f), CircleShape)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Speed,
+                                contentDescription = "سرعة التشغيل",
+                                tint = Gold,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = speedMenuExpanded,
+                            onDismissRequest = { speedMenuExpanded = false },
+                            containerColor = Color(0xFF0B1120)
+                        ) {
+                            listOf(0.75f, 1f, 1.25f, 1.5f, 2f).forEach { r ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            if (r == 1f) "عادي" else "×$r",
+                                            color = if (r == playbackRate) Gold else Color.White,
+                                            fontWeight = if (r == playbackRate) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    },
+                                    onClick = {
+                                        setRate(r)
+                                        speedMenuExpanded = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -430,7 +592,8 @@ fun VideoPlayerScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                    modifier = Modifier.noorGlassCard(cornerRadius = 24.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     border = androidx.compose.foundation.BorderStroke(1.dp, Gold),
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier
@@ -526,12 +689,19 @@ private fun buildYouTubeHtml(videoId: String): String {
               border: none;
               pointer-events: none; /* Block touch interactions inside YouTube iframe */
             }
+            /* Transparent shield above the player: swallows every tap so YouTube UI
+               (logo, title, 'watch on YouTube', end-screen suggestions) is never reachable. */
+            #shield {
+              position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+              z-index: 10; background: transparent;
+            }
           </style>
         </head>
         <body>
           <div id="player-container">
             <div id="player"></div>
           </div>
+          <div id="shield"></div>
           <script>
             var tag = document.createElement('script');
             tag.src = "https://www.youtube.com/iframe_api";
@@ -551,11 +721,16 @@ private fun buildYouTubeHtml(videoId: String): String {
                   'disablekb': 1,
                   'enablejsapi': 1,
                   'autoplay': 1,
-                  'modestbranding': 1
+                  'modestbranding': 1,
+                  'origin': '$PLAYER_ORIGIN',
+                  'widget_referrer': '$PLAYER_ORIGIN',
+                  'cc_load_policy': 0,
+                  'color': 'white'
                 },
                 events: {
                   'onReady': onPlayerReady,
-                  'onStateChange': onPlayerStateChange
+                  'onStateChange': onPlayerStateChange,
+                  'onError': onPlayerError
                 }
               });
             }
@@ -581,6 +756,12 @@ private fun buildYouTubeHtml(videoId: String): String {
               }
             }
 
+            function onPlayerError(event) {
+              if (window.AndroidBridge && window.AndroidBridge.sendVideoError) {
+                window.AndroidBridge.sendVideoError(event.data);
+              }
+            }
+
             function startProgressTimer() {
               setInterval(function() {
                 if (player && player.getCurrentTime && window.AndroidBridge && window.AndroidBridge.sendProgress) {
@@ -593,6 +774,7 @@ private fun buildYouTubeHtml(videoId: String): String {
             }
 
             function playVideo() { if (player && player.playVideo) player.playVideo(); }
+            function setRate(r) { if (player && player.setPlaybackRate) player.setPlaybackRate(r); }
             function pauseVideo() { if (player && player.pauseVideo) player.pauseVideo(); }
             function seekTo(sec) { if (player && player.seekTo) player.seekTo(sec, true); }
           </script>

@@ -13,6 +13,12 @@ import com.elhajri.noor.theme.ThemeStore
  */
 object VideoGatingStore {
 
+    /**
+     * FREE TEST MODE: when true, ALL videos are free to watch (no ads, no points).
+     * Set back to false to re-enable rewarded-ads/points gating after final testing.
+     */
+    const val FREE_TEST_MODE = true
+
     const val FREE_DAILY_LIMIT = 3
     const val POINTS_UNLOCK_COST = 50
 
@@ -24,6 +30,7 @@ object VideoGatingStore {
      * and the specific video has not been unlocked in the current session.
      */
     fun shouldGateVideo(context: Context, videoId: String? = null): Boolean {
+        if (FREE_TEST_MODE) return false
         if (videoId != null && sessionUnlockedVideos.contains(videoId)) {
             return false
         }

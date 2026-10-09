@@ -87,7 +87,6 @@ fun NoorBottomBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 16.dp, ambientColor = Color.Black, spotColor = Gold.copy(alpha = 0.20f))
             .background(
                 Brush.verticalGradient(
                     colors = listOf(

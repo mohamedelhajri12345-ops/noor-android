@@ -420,7 +420,6 @@ private fun BeautifulArabicKeyboard(
                     .height(42.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(Gold)
-                    .shadow(4.dp, RoundedCornerShape(10.dp))
                     .clickable { onEnter() },
                 contentAlignment = Alignment.Center
             ) {
