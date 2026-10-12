@@ -48,8 +48,7 @@ fun RegisterScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    val googleAuthDone by remember { GoogleAuthEvents.succeeded }
-    LaunchedEffect(googleAuthDone) {
+    LaunchedEffect(GoogleAuthEvents.succeeded) {
         if (GoogleAuthEvents.consume()) onSuccess()
     }
 

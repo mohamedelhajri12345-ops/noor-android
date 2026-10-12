@@ -63,7 +63,7 @@ data class BottomBarTab(
     val inactiveIcon: ImageVector
 )
 
-val bottomBarTabs = listOf(
+fun bottomBarTabs() = listOf(
     BottomBarTab("home", t("الرئيسية", "Home"), Icons.Filled.Home, Icons.Outlined.Home),
     BottomBarTab("quran", t("القرآن", "Quran"), Icons.Filled.MenuBook, Icons.Outlined.MenuBook),
     BottomBarTab("tasbih", t("السبحة", "Tasbih"), Icons.Filled.TouchApp, Icons.Outlined.TouchApp),
