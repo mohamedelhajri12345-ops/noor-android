@@ -38,6 +38,7 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import kotlinx.coroutines.delay
 import org.json.JSONObject
+import com.elhajri.noor.ui.TextMain
 
 /**
  * "سلسلة الآيات" — ترتيب آيات السور في مواضعها الصحيحة (20 مستوى من قصار السور إلى أطولها).
@@ -132,7 +133,7 @@ fun AyatChainGameScreen(onBack: () -> Unit) {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 if (isUnlocked) {
-                                    Text("سورة ${s.name}", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                    Text("سورة ${s.name}", color = TextMain, fontSize = 11.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                                     Spacer(Modifier.height(2.dp))
                                     Row {
                                         for (st in 1..3) {

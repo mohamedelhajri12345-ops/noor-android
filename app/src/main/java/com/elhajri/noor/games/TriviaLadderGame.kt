@@ -39,6 +39,7 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import com.elhajri.noor.ui.TextMain
 
 /**
  * "ميدان المعرفة" — السلم الذهبي التفاعلي المكون من 20 مرحلة إيمانية.
@@ -117,7 +118,7 @@ fun TriviaLadderGameScreen(onBack: () -> Unit) {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 if (isUnlocked) {
-                                    Text("${index + 1}", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text("${index + 1}", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                     Spacer(Modifier.height(2.dp))
                                     Row {
                                         for (s in 1..3) {
@@ -320,7 +321,7 @@ private fun TriviaLadderPlayScreen(
                     .padding(18.dp)
             ) {
                 Text(
-                    q.q, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
+                    q.q, color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
                 )
                 if (q.ref.isNotBlank()) {

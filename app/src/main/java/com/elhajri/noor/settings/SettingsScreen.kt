@@ -95,12 +95,12 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
         Spacer(Modifier.height(12.dp))
 
         // ============ اللغة ============
-        SettingsSection(icon = Icons.Filled.Language, title = "اللغة") {
+        SettingsSection(icon = Icons.Filled.Language, title = t("اللغة", "Language")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                Text("اختر لغة التطبيق", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
+                Text(t("اختر لغة التطبيق", "Choose app language"), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("ar" to "العربية", "en" to "English").forEach { (code, name) ->
+                    listOf("ar" to t("العربية", "العربية"), "en" to "English").forEach { (code, name) ->
                         Text(
                             name,
                             color = if (lang == code) Navy else TextMain,
@@ -112,7 +112,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                                 .background(if (lang == code) Gold else NavyLight.copy(alpha = 0.5f))
                                 .clickable {
                                     lang = code
-                                    NoorSettings.setLang(context, code)
+                                    com.elhajri.noor.settings.NoorLocale.set(context, code)
                                 }
                                 .padding(vertical = 10.dp),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -125,9 +125,9 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
         Spacer(Modifier.height(12.dp))
 
         // ============ الموقع — مواقيت الصلاة والقبلة ============
-        SettingsSection(icon = Icons.Filled.LocationOn, title = "الموقع") {
+        SettingsSection(icon = Icons.Filled.LocationOn, title = t("الموقع", "Location")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                Text("مدينة الصلاة والقبلة", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
+                Text(t("مدينة الصلاة والقبلة", "Prayer times & Qibla city"), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 Row(
                     modifier = Modifier

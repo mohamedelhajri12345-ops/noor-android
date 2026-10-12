@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.noorGlassCard
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
@@ -58,24 +59,24 @@ private data class MoreFeature(
     val icon: ImageVector
 )
 
-private val features = listOf(
-    MoreFeature("favorites", "المفضلة", "السور والقصص المحفوظة", Icons.Filled.Favorite),
-    MoreFeature("community", "المجتمع", "دردشة الأعضاء", Icons.Filled.Groups),
-    MoreFeature("prayer", "الصلاة", "أوقات الصلاة", Icons.Filled.Schedule),
-    MoreFeature("qibla", "القبلة", "اتجاه القبلة", Icons.Filled.Explore),
-    MoreFeature("library", "المكتبة", "الأناشيد", Icons.Filled.MusicNote),
-    MoreFeature("journal", "المفكرة", "تدوين الخواطر", Icons.Filled.EditNote),
-    MoreFeature("calendar", "التقويم", "المناسبات الإسلامية", Icons.Filled.EditCalendar),
-    MoreFeature("stories", "قصص الأنبياء", "قصص ملهمة", Icons.Filled.HistoryEdu),
-    MoreFeature("quiz", "الاختبار الديني", "أسئلة وأجوبة", Icons.Filled.Help),
-    MoreFeature("tasbih", "السبحة", "عدّاد الذكر", Icons.Filled.Repeat),
-    MoreFeature("games", "الألعاب", "ألعاب إسلامية", Icons.Filled.Casino),
-    MoreFeature("ai", "المساعد الذكي", "ذكاء اصطناعي إسلامي", Icons.Filled.AutoAwesome),
-    MoreFeature("zakat", "حاسبة الزكاة", "احسب زكاتك", Icons.Filled.Paid),
-    MoreFeature("hajj", "الحج والعمرة", "دليل المصطافين", Icons.Filled.Bookmark),
-    MoreFeature("tracker", "ورد القرآن", "متتبع التلاوة", Icons.Filled.TaskAlt),
-    MoreFeature("themes", "متجر الثيمات", "ثيمات إسلامية بالنقاط", Icons.Filled.Palette),
-    MoreFeature("settings", "الإعدادات", "إعدادات التطبيق", Icons.Filled.Settings)
+private fun features() = listOf(
+    MoreFeature("favorites", t("المفضلة", "Favorites"), t("السور والقصص المحفوظة", "Saved surahs and stories"), Icons.Filled.Favorite),
+    MoreFeature("community", t("المجتمع", "Community"), t("دردشة الأعضاء", "Members chat"), Icons.Filled.Groups),
+    MoreFeature("prayer", t("الصلاة", "Prayer"), t("أوقات الصلاة", "Prayer times"), Icons.Filled.Schedule),
+    MoreFeature("qibla", t("القبلة", "Qibla"), t("اتجاه القبلة", "Qibla direction"), Icons.Filled.Explore),
+    MoreFeature("library", t("المكتبة", "Library"), t("الأناشيد", "Nasheeds"), Icons.Filled.MusicNote),
+    MoreFeature("journal", t("المفكرة", "Journal"), t("تدوين الخواطر", "Write your thoughts"), Icons.Filled.EditNote),
+    MoreFeature("calendar", t("التقويم", "Calendar"), t("المناسبات الإسلامية", "Islamic occasions"), Icons.Filled.EditCalendar),
+    MoreFeature("stories", t("قصص الأنبياء", "Prophet Stories"), t("قصص ملهمة", "Inspiring stories"), Icons.Filled.HistoryEdu),
+    MoreFeature("quiz", t("الاختبار الديني", "Religious Quiz"), t("أسئلة وأجوبة", "Questions & answers"), Icons.Filled.Help),
+    MoreFeature("tasbih", t("السبحة", "Tasbih"), t("عدّاد الذكر", "Dhikr counter"), Icons.Filled.Repeat),
+    MoreFeature("games", t("الألعاب", "Games"), t("ألعاب إسلامية", "Islamic games"), Icons.Filled.Casino),
+    MoreFeature("ai", t("المساعد الذكي", "Smart Assistant"), t("ذكاء اصطناعي إسلامي", "Islamic AI"), Icons.Filled.AutoAwesome),
+    MoreFeature("zakat", t("حاسبة الزكاة", "Zakat Calculator"), t("احسب زكاتك", "Calculate your zakat"), Icons.Filled.Paid),
+    MoreFeature("hajj", t("الحج والعمرة", "Hajj & Umrah"), t("دليل المصطافين", "Pilgrim guide"), Icons.Filled.Bookmark),
+    MoreFeature("tracker", t("ورد القرآن", "Quran Tracker"), t("متتبع التلاوة", "Recitation tracker"), Icons.Filled.TaskAlt),
+    MoreFeature("themes", t("متجر الثيمات", "Theme Store"), t("ثيمات إسلامية بالنقاط", "Islamic themes with points"), Icons.Filled.Palette),
+    MoreFeature("settings", t("الإعدادات", "Settings"), t("إعدادات التطبيق", "App settings"), Icons.Filled.Settings),
 )
 
 @Composable
@@ -99,7 +100,7 @@ fun MoreScreen(onNavigate: (String) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.weight(1f)
         ) {
-            items(features) { f ->
+            items(features()) { f ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier

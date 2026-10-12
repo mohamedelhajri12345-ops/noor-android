@@ -282,7 +282,7 @@ fun QuranReaderScreen(
     val ayahInlineContent = remember(ayahs) {
         ayahs.associate { ayah ->
             "ayah_${ayah.number}" to InlineTextContent(
-                placeholder = Placeholder(width = 22.sp, height = 22.sp, placeholderVerticalAlign = PlaceholderVerticalAlign.Center)
+                placeholder = Placeholder(width = 26.sp, height = 26.sp, placeholderVerticalAlign = PlaceholderVerticalAlign.Center)
             ) {
                 AyahBadge(number = toArabicNumber(ayah.number))
             }
@@ -292,9 +292,9 @@ fun QuranReaderScreen(
         buildAnnotatedString {
             ayahs.forEach { ayah ->
                 append(ayah.text)
-                append("  ")
+                append("\u00A0\u00A0")
                 appendInlineContent("ayah_${ayah.number}", "[${ayah.number}]")
-                append("   ")
+                append("\u00A0\u00A0\u00A0")
             }
         }
     }
@@ -569,7 +569,7 @@ fun QuranReaderScreen(
                                 lineHeight = 46.sp,
                                 fontFamily = AmiriFamily,
                                 color = if (isLightMode) Color(0xFF1C1917) else TextMain,
-                                textAlign = TextAlign.Justify
+                                textAlign = TextAlign.Right
                             ),
                             modifier = Modifier.fillMaxWidth().padding(20.dp)
                         )

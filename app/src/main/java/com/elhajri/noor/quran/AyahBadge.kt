@@ -17,7 +17,7 @@ import com.elhajri.noor.ui.Gold
 
 /** دائرة رقم الآية الذهبية — طبق الأصل عن الموقع (دائرة داكنة بحدّ ذهبي رفيع ورقم ذهبي) */
 @Composable
-fun AyahBadge(number: String, size: androidx.compose.ui.unit.Dp = 20.dp) {
+fun AyahBadge(number: String, size: androidx.compose.ui.unit.Dp = 24.dp) {
     Box(
         modifier = Modifier
             .size(size)

@@ -37,6 +37,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import kotlin.random.Random
+import com.elhajri.noor.ui.TextMain
 
 /**
  * "رباط معاني الله" — ذاكرة ومطابقة: طابق اسم الله الحسنى مع معناه الإيماني.
@@ -107,7 +108,7 @@ fun NamesMatchGameScreen(onBack: () -> Unit) {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 if (isUnlocked) {
-                                    Text("${index + 1}", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text("${index + 1}", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                     Spacer(Modifier.height(2.dp))
                                     Row {
                                         for (s in 1..3) {

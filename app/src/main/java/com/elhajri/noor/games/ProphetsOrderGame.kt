@@ -39,6 +39,7 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.noorGlassCard
 import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.delay
+import com.elhajri.noor.ui.TextMain
 
 private fun Int.toArabicDigits(): String {
     val arDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
@@ -106,7 +107,7 @@ fun ProphetsOrderGameScreen(onBack: () -> Unit) {
 
             if (currentLevel == null) {
                 // Level Selector (25 levels)
-                Text("اختر المستوى:", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("اختر المستوى:", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(4),
@@ -179,7 +180,7 @@ fun ProphetsOrderGameScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(16.dp))
 
                     // Selected Timeline Box
-                    Text("التسلسل المختار:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
+                    Text("التسلسل المختار:", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
                     Spacer(Modifier.height(6.dp))
                     Box(
                         Modifier
@@ -211,7 +212,7 @@ fun ProphetsOrderGameScreen(onBack: () -> Unit) {
                     Spacer(Modifier.height(20.dp))
 
                     // Shuffled Buttons Grid
-                    Text("الخيارات المتاحة:", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
+                    Text("الخيارات المتاحة:", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
                     Spacer(Modifier.height(8.dp))
 
                     LazyVerticalGrid(

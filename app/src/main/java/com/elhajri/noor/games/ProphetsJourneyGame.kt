@@ -29,6 +29,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.noorGlassCard
 import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.delay
+import com.elhajri.noor.ui.TextMain
 
 private fun Int.toArabicDigits(): String {
     val arDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
@@ -273,7 +274,7 @@ fun ProphetsJourneyGameScreen(onBack: () -> Unit) {
                         ) {
                             if (unlocked) {
                                 Text(lvl.toArabicDigits(), color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                                Text(station.prophet, color = Color.White, fontSize = 10.sp, maxLines = 1)
+                                Text(station.prophet, color = TextMain, fontSize = 10.sp, maxLines = 1)
                             } else {
                                 Icon(Icons.Default.Lock, contentDescription = null, tint = GoldSoft.copy(alpha = 0.5f), modifier = Modifier.size(18.dp))
                             }
@@ -347,7 +348,7 @@ fun ProphetsJourneyGameScreen(onBack: () -> Unit) {
                         Spacer(Modifier.height(8.dp))
                         Text(station.prophet, color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                         Spacer(Modifier.height(12.dp))
-                        Text(station.intro, color = Color.White, fontSize = 14.sp, textAlign = TextAlign.Center, lineHeight = 24.sp)
+                        Text(station.intro, color = TextMain, fontSize = 14.sp, textAlign = TextAlign.Center, lineHeight = 24.sp)
                         Spacer(Modifier.height(18.dp))
                         Button(
                             onClick = { introShown = true },
@@ -396,7 +397,7 @@ fun ProphetsJourneyGameScreen(onBack: () -> Unit) {
                                         .background(bg, RoundedCornerShape(14.dp)),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(opt, color = Color.White, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                                    Text(opt, color = TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
                                     if (selected != null && isCorrect) {
                                         Icon(Icons.Default.Check, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
                                     }

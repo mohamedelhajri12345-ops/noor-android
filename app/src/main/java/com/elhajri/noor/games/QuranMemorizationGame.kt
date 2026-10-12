@@ -45,6 +45,7 @@ import com.elhajri.noor.ui.noorGlassCard
 import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.delay
 import org.json.JSONObject
+import com.elhajri.noor.ui.TextMain
 
 private fun Int.toArabicDigits(): String {
     val arDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
@@ -211,7 +212,7 @@ fun QuranMemorizationGameScreen(onBack: () -> Unit) {
                 ) {
                     Column(Modifier.fillMaxWidth()) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("التقدم الكلي في الحفظ", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text("التقدم الكلي في الحفظ", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                             Text("$overallPercent٪", color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
                         Spacer(Modifier.height(8.dp))
@@ -297,7 +298,7 @@ fun QuranMemorizationGameScreen(onBack: () -> Unit) {
                                     }
                                     Spacer(Modifier.width(10.dp))
                                     Column {
-                                        Text("سورة ${surah.name}", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                        Text("سورة ${surah.name}", color = TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                                         Text("${surah.type} · ${surah.ayahs.toArabicDigits()} آية", color = GoldSoft, fontSize = 11.sp)
                                     }
                                 }
@@ -400,7 +401,7 @@ fun QuranMemorizationGameScreen(onBack: () -> Unit) {
                                 Modifier.fillMaxWidth().noorGlassCard(cornerRadius = 18.dp).padding(20.dp),
                                 colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                             ) {
-                                Text(currentQ.first, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                                Text(currentQ.first, color = TextMain, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                             }
 
                             Spacer(Modifier.height(16.dp))
@@ -428,7 +429,7 @@ fun QuranMemorizationGameScreen(onBack: () -> Unit) {
                                         .padding(horizontal = 14.dp),
                                     contentAlignment = Alignment.CenterStart
                                 ) {
-                                    Text(optText, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                    Text(optText, color = TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                                 }
                                 Spacer(Modifier.height(8.dp))
                             }

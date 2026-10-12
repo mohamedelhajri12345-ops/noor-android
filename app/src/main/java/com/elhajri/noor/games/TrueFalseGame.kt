@@ -38,6 +38,7 @@ import com.elhajri.noor.ui.noorGlassCard
 import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.delay
 import org.json.JSONObject
+import com.elhajri.noor.ui.TextMain
 
 private fun Int.toArabicDigits(): String {
     val arDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
@@ -119,7 +120,7 @@ fun TrueFalseGameScreen(onBack: () -> Unit) {
 
             if (currentLevel == null) {
                 // Level Map (24 levels)
-                Text("المستويات والمحطات:", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("المستويات والمحطات:", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(4),

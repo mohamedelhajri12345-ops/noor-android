@@ -34,6 +34,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import kotlin.random.Random
+import com.elhajri.noor.ui.TextMain
 
 /**
  * "خط الزمن النبوي" — مسار السيرة النبوية والتاريخ الإسلامي عبر 20 مرحلة زمنية.
@@ -137,7 +138,7 @@ fun TimelineGameScreen(onBack: () -> Unit) {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 if (isUnlocked) {
-                                    Text("${index + 1}", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text("${index + 1}", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                     Spacer(Modifier.height(2.dp))
                                     Row {
                                         for (s in 1..3) {
@@ -253,7 +254,7 @@ private fun TimelinePlayScreen(
                             .border(1.dp, Gold.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                             .padding(12.dp)
                     ) {
-                        Text(e.title, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text(e.title, color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         Text("سنة ${e.year} — ${e.note}", color = GoldSoft, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp))
                     }
                 }
@@ -278,7 +279,7 @@ private fun TimelinePlayScreen(
                             .clickable { tap(ev) }
                             .padding(13.dp)
                     ) {
-                        Text(ev.title, color = Color.White, fontSize = 14.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                        Text(ev.title, color = TextMain, fontSize = 14.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                     }
                 }
             } else {

@@ -53,6 +53,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NoorGradients
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.TajawalFamily
 
 data class BottomBarTab(
@@ -63,11 +64,11 @@ data class BottomBarTab(
 )
 
 val bottomBarTabs = listOf(
-    BottomBarTab("home", "الرئيسية", Icons.Filled.Home, Icons.Outlined.Home),
-    BottomBarTab("quran", "القرآن", Icons.Filled.MenuBook, Icons.Outlined.MenuBook),
-    BottomBarTab("tasbih", "السبحة", Icons.Filled.TouchApp, Icons.Outlined.TouchApp),
-    BottomBarTab("games", "الألعاب", Icons.Filled.SportsEsports, Icons.Outlined.SportsEsports),
-    BottomBarTab("more", "المزيد", Icons.Filled.GridView, Icons.Outlined.GridView)
+    BottomBarTab("home", t("الرئيسية", "Home"), Icons.Filled.Home, Icons.Outlined.Home),
+    BottomBarTab("quran", t("القرآن", "Quran"), Icons.Filled.MenuBook, Icons.Outlined.MenuBook),
+    BottomBarTab("tasbih", t("السبحة", "Tasbih"), Icons.Filled.TouchApp, Icons.Outlined.TouchApp),
+    BottomBarTab("games", t("الألعاب", "Games"), Icons.Filled.SportsEsports, Icons.Outlined.SportsEsports),
+    BottomBarTab("more", t("المزيد", "More"), Icons.Filled.GridView, Icons.Outlined.GridView)
 )
 
 /**
@@ -87,14 +88,7 @@ fun NoorBottomBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        NavyCard.copy(alpha = 0.6f),
-                        Navy.copy(alpha = 0.96f)
-                    )
-                )
-            )
+            .background(NoorGradients.ScreenBackground)
             .border(
                 width = 1.dp,
                 brush = NoorGradients.GlassBorderGold,
@@ -110,7 +104,7 @@ fun NoorBottomBar(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            bottomBarTabs.forEach { tab ->
+            bottomBarTabs().forEach { tab ->
                 val selected = currentRoute == tab.route
 
                 val iconScale by animateFloatAsState(

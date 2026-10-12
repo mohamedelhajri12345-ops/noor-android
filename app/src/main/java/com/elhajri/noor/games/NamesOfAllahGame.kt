@@ -31,6 +31,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.noorGlassCard
 import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.delay
+import com.elhajri.noor.ui.TextMain
 
 private fun Int.toArabicDigits(): String {
     val arDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
@@ -218,7 +219,7 @@ private fun NamesAtlas(names: List<com.elhajri.noor.data.NameOfAllah>, learnedNa
             ) {
                 Text(sel.name, color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(6.dp))
-                Text(sel.meaning, color = Color.White, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                Text(sel.meaning, color = TextMain, fontSize = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
             }
             Spacer(Modifier.height(10.dp))
         }
@@ -409,7 +410,7 @@ private fun NamesQuiz(
                         .background(bg, RoundedCornerShape(14.dp)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(opt, color = Color.White, fontSize = 14.sp, modifier = Modifier.weight(1f))
+                    Text(opt, color = TextMain, fontSize = 14.sp, modifier = Modifier.weight(1f))
                     if (selected != null && isCorrect) {
                         Icon(Icons.Default.Check, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
                     }

@@ -38,6 +38,7 @@ import com.elhajri.noor.audio.player.QuranPlayerManager
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
+import com.elhajri.noor.ui.TextMain
 
 private val PlayerBarBg = Color(0xFF0D1330)
 
@@ -464,7 +465,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                     ) {
                         Icon(Icons.Filled.Bedtime, contentDescription = "مؤقت النوم", tint = Gold, modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("مؤقت النوم", color = Color.White, fontSize = 12.sp)
+                        Text("مؤقت النوم", color = TextMain, fontSize = 12.sp)
                     }
                 }
                 Spacer(Modifier.width(10.dp))

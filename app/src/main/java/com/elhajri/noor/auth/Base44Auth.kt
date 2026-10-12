@@ -15,6 +15,13 @@ import org.json.JSONObject
 
 private const val BASE_URL = "https://app.base44.com"
 private const val APP_ID = "6a833faeb9e42cca9a6576fa"
+
+/** Google sign-in entry point on the Base44 auth service. */
+const val GOOGLE_AUTH_URL =
+    "$BASE_URL/api/apps/auth/login?app_id=$APP_ID&from_url="
+
+/** Deep link the browser redirects back to after Google auth, carrying access_token. */
+const val AUTH_REDIRECT = "noor://auth/callback"
 private const val LOGIN_PATH = "/api/apps/$APP_ID/auth/login"
 private const val REGISTER_PATH = "/api/apps/$APP_ID/auth/register"
 private const val FORGOT_PASSWORD_PATH = "/api/apps/$APP_ID/auth/forgot-password"
@@ -96,6 +103,34 @@ object Base44Auth {
     }
 
     suspend fun login(email: String, password: String): Result<Unit> = login(null, email, password)
+
+    /** Complete a Google OAuth sign-in from the deep-link redirect URL (contains access_token). */
+    suspend fun completeGoogleAuth(context: Context, redirectUrl: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val uri = android.net.Uri.parse(redirectUrl)
+            val token = uri.getQueryParameter("access_token")
+                ?: uri.getQueryParameter("token")
+                ?: run {
+                    // token may be in the fragment
+                    val frag = uri.fragment ?: ""
+                    Regex("access_token=([^&]+)").find(frag)?.groupValues?.get(1)
+                }
+            if (token.isNullOrBlank()) {
+                Result.failure(Exception("لم يتم استلام رمز الجلسة من جوجل"))
+            } else {
+                authToken = token
+                inMemoryLoggedIn = true
+                val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                sp.edit()
+                    .putBoolean(KEY_IS_LOGGED_IN, true)
+                    .putString(KEY_AUTH_TOKEN, token)
+                    .apply()
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     suspend fun login(context: Context?, email: String, password: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
@@ -179,7 +214,7 @@ object Base44Auth {
         try {
             val json = JSONObject().apply {
                 put("email", email)
-                put("otpCode", otpCode)
+                put("otp_code", otpCode) // server expects snake_case otp_code (was otpCode -> always rejected)
             }
             val requestBody = json.toString().toRequestBody(jsonMediaType)
             val request = Request.Builder()

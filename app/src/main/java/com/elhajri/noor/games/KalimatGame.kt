@@ -39,6 +39,7 @@ import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
+import com.elhajri.noor.ui.TextMain
 
 /**
  * "كلمة من الذكر" — لغز إيماني متعدد المستويات بأسلوب Wordle.
@@ -158,7 +159,7 @@ fun KalimatGameScreen(onBack: () -> Unit) {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 if (isUnlocked) {
-                                    Text("${lvl.levelNum}", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                    Text("${lvl.levelNum}", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                     Spacer(Modifier.height(2.dp))
                                     Row {
                                         for (s in 1..3) {
@@ -302,7 +303,7 @@ private fun KalimatPlayScreen(
                     color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.height(6.dp))
-                Text(level.meaning, color = Color.White, fontSize = 13.sp, textAlign = TextAlign.Center)
+                Text(level.meaning, color = TextMain, fontSize = 13.sp, textAlign = TextAlign.Center)
                 Text("﴿${level.dalil}﴾", color = GoldSoft, fontSize = 11.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 4.dp))
 
                 Spacer(Modifier.height(14.dp))

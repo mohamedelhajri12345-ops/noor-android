@@ -72,9 +72,33 @@ import com.elhajri.noor.ui.NoorTopBar
 import com.elhajri.noor.zakat.ZakatScreen
 
 class MainActivity : ComponentActivity() {
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        handleAuthRedirect(intent)
+    }
+
+    /** Completes Google sign-in when the browser redirects back to noor://auth/callback. */
+    private fun handleAuthRedirect(intent: android.content.Intent?) {
+        val data = intent?.data ?: return
+        if (data.scheme == "noor" && data.host == "auth" && data.path == "/callback") {
+            Thread {
+                val res = kotlinx.coroutines.runBlocking {
+                    com.elhajri.noor.auth.Base44Auth.completeGoogleAuth(this@MainActivity, data.toString())
+                }
+                if (res.isSuccess) {
+                    runOnUiThread {
+                        com.elhajri.noor.auth.GoogleAuthEvents.notifySuccess()
+                    }
+                }
+            }.start()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         com.elhajri.noor.auth.Base44Auth.init(applicationContext)
+        com.elhajri.noor.settings.NoorLocale.init(applicationContext)
         com.elhajri.noor.audio.player.QuranPlayerManager.ensure(applicationContext)
         com.elhajri.noor.audio.player.NasheedPlayerManager.ensure(applicationContext)
 
@@ -100,8 +124,11 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 com.elhajri.noor.notification.AdhanScheduler.scheduleNextAdhan(this@MainActivity)
+                    com.elhajri.noor.notification.NoorReminders.schedule(this@MainActivity)
             } catch (_: Exception) {}
         }.start()
+        handleAuthRedirect(intent)
+
         setContent {
             NoorTheme {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {

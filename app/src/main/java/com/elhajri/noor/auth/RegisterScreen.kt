@@ -1,6 +1,7 @@
 package com.elhajri.noor.auth
 
 import com.elhajri.noor.ui.themeScreenBackground
+import com.elhajri.noor.settings.t
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -47,6 +48,10 @@ fun RegisterScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    val googleAuthDone by remember { GoogleAuthEvents.succeeded }
+    LaunchedEffect(googleAuthDone) {
+        if (GoogleAuthEvents.consume()) onSuccess()
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -84,7 +89,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "إنشاء حساب جديد",
+                    text = t("إنشاء حساب جديد", "Create a new account"),
                     style = MaterialTheme.typography.headlineLarge,
                     color = Gold,
                     fontWeight = FontWeight.Bold
@@ -128,7 +133,7 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = fullName,
                             onValueChange = { fullName = it; errorMessage = null },
-                            label = { Text("الاسم الكامل", color = GoldSoft) },
+                            label = { Text(t("الاسم الكامل", "Full name"), color = GoldSoft) },
                             leadingIcon = {
                                 Icon(Icons.Filled.Person, contentDescription = null, tint = Gold)
                             },
@@ -153,7 +158,7 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = email,
                             onValueChange = { email = it; errorMessage = null },
-                            label = { Text("البريد الإلكتروني", color = GoldSoft) },
+                            label = { Text(t("البريد الإلكتروني", "Email"), color = GoldSoft) },
                             leadingIcon = {
                                 Icon(Icons.Filled.Mail, contentDescription = null, tint = Gold)
                             },
@@ -179,7 +184,7 @@ fun RegisterScreen(
                         OutlinedTextField(
                             value = password,
                             onValueChange = { password = it; errorMessage = null },
-                            label = { Text("كلمة المرور", color = GoldSoft) },
+                            label = { Text(t("كلمة المرور", "Password"), color = GoldSoft) },
                             leadingIcon = {
                                 Icon(Icons.Filled.Lock, contentDescription = null, tint = Gold)
                             },
@@ -273,8 +278,28 @@ fun RegisterScreen(
                                     strokeWidth = 2.dp
                                 )
                             } else {
-                                Text("إنشاء الحساب", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Text(t("إنشاء الحساب", "Create account"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             }
+                        }
+
+                        // ===== Create the account with Google (OAuth via the browser, returns via deep link) =====
+                        Spacer(modifier = Modifier.height(10.dp))
+                        OutlinedButton(
+                            onClick = {
+                                val url = GOOGLE_AUTH_URL + android.net.Uri.encode(AUTH_REDIRECT)
+                                android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse(url)
+                                ).also {
+                                    it.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    context.startActivity(it)
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Navy)
+                        ) {
+                            Text(t("إنشاء الحساب بحساب Google", "Create account with Google"), fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         }
                     }
                 }
@@ -284,9 +309,9 @@ fun RegisterScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("لديك حساب بالفعل؟ ", color = GoldSoft.copy(alpha = 0.8f), fontSize = 14.sp)
+                    Text(t("لديك حساب بالفعل؟ ", "Already have an account? "), color = GoldSoft.copy(alpha = 0.8f), fontSize = 14.sp)
                     TextButton(onClick = onLogin) {
-                        Text("تسجيل الدخول", color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text(t("تسجيل الدخول", "Sign in"), color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
                 }
             }

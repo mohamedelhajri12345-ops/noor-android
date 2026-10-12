@@ -43,6 +43,7 @@ import com.elhajri.noor.ui.themeScreenBackground
 import java.util.Calendar
 import kotlinx.coroutines.delay
 import com.elhajri.noor.theme.noorGlassCard
+import com.elhajri.noor.ui.TextMain
 
 // ألوان الشاشة تتبع الثيم النشط حرفياً — تغيير الثيم يغيّرها فوراً
 private val Gold8 get() = com.elhajri.noor.ui.Gold
@@ -159,7 +160,7 @@ private fun HeroPrayerCard(
                 Column(horizontalAlignment = Alignment.Start) {
                     Text("الصلاة التالية", color = Gold8.copy(alpha = 0.85f), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
                     Text(nextPrayerName, color = Gold8Soft, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
-                    Text(nextPrayerTimeLabel, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text(nextPrayerTimeLabel, color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
                 // حلقة العد التنازلي — جهة اليسار مع تسميتها
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -170,7 +171,7 @@ private fun HeroPrayerCard(
                             .border(2.dp, Gold8.copy(alpha = 0.75f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(countdown, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(countdown, color = TextMain, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                     Spacer(Modifier.height(4.dp))
                     Text("حتى الأذان", color = Color.White.copy(alpha = 0.85f), fontSize = 9.sp)

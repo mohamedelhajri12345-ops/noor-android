@@ -543,7 +543,7 @@ fun TrackerScreen() {
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
-                                            Text("سورة ${surah.name}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                                            Text("سورة ${surah.name}", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextMain)
                                             Text("${toArabicNumber(surah.ayahs)} آية", fontSize = 10.sp, color = GoldSoft.copy(alpha = 0.7f))
                                         }
                                         Icon(

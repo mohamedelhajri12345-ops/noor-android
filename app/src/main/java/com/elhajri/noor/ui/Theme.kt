@@ -6,6 +6,7 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -32,7 +33,13 @@ val Navy get() = NoorThemeState.active.background
 val NavyLight get() = Color.White.copy(alpha = 0.085f)
 val NavyCard get() = Color.White.copy(alpha = 0.055f)
 val Gold get() = NoorThemeState.active.accent
-val GoldSoft get() = NoorThemeState.active.accentSoft
+// Adaptive soft gold: on dark themes it stays the light champagne gold,
+// on light themes it switches to the deep gold so text always reads clearly.
+val GoldSoft: Color
+    get() {
+        val t = NoorThemeState.active
+        return if (t.background.luminance() > 0.5f) t.accentDeep else t.accentSoft
+    }
 val TextMain get() = NoorThemeState.active.textPrimary
 val ChampagneGold get() = NoorThemeState.active.accentSoft
 val ImperialGold get() = NoorThemeState.active.accent

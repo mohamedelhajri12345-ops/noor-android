@@ -34,6 +34,7 @@ import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import org.json.JSONObject
 import kotlin.random.Random
+import com.elhajri.noor.ui.TextMain
 
 /**
  * "مرآة الترتيل" — استرجاع الحفظ النشط: أكمل الكلمة المغطاة في الآية عبر 20 مرحلة إيمانية.
@@ -148,7 +149,7 @@ fun TartilMirrorGameScreen(onBack: () -> Unit) {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 if (isUnlocked) {
-                                    Text("سورة ${s.name}", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                                    Text("سورة ${s.name}", color = TextMain, fontSize = 11.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                                     Spacer(Modifier.height(2.dp))
                                     Row {
                                         for (st in 1..3) {
@@ -292,7 +293,7 @@ private fun MirrorPlay(
                                 .clickable { pick(opt) }
                                 .padding(13.dp)
                         ) {
-                            Text(opt, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                            Text(opt, color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                         }
                     }
                 }

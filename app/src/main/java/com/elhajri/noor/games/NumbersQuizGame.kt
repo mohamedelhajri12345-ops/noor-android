@@ -36,6 +36,7 @@ import com.elhajri.noor.ui.noorGlassCard
 import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.delay
 import org.json.JSONObject
+import com.elhajri.noor.ui.TextMain
 
 private fun Int.toArabicDigits(): String {
     val arDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
@@ -126,7 +127,7 @@ fun NumbersQuizGameScreen(onBack: () -> Unit) {
 
             if (currentLevel == null) {
                 // Level Map (15+ levels)
-                Text("المستويات والمراحل العدادية:", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("المستويات والمراحل العدادية:", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
@@ -257,7 +258,7 @@ fun NumbersQuizGameScreen(onBack: () -> Unit) {
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(optText, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                        Text(optText, color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                                         if (selectedOption != null) {
                                             if (isCorrect) {
                                                 Icon(Icons.Default.Check, contentDescription = null, tint = Gold)

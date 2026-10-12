@@ -253,6 +253,7 @@ fun LibraryScreen(onBack: () -> Unit) {
                         val visual = categoryVisuals[track.category] ?: Pair("🤲", "دينية")
 
                         Card(
+                            onClick = { playTrack(track) },
                             colors = CardDefaults.cardColors(
                                 containerColor = if (isCurrent) NavyLight else NavyCard
                             ),

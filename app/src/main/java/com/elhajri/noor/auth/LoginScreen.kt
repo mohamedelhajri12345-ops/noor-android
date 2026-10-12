@@ -1,6 +1,7 @@
 package com.elhajri.noor.auth
 
 import com.elhajri.noor.ui.themeScreenBackground
+import com.elhajri.noor.settings.t
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -45,6 +46,10 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    val googleAuthDone by remember { GoogleAuthEvents.succeeded }
+    LaunchedEffect(googleAuthDone) {
+        if (GoogleAuthEvents.consume()) onSuccess()
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -89,7 +94,7 @@ fun LoginScreen(
                 )
 
                 Text(
-                    text = "تسجيل الدخول إلى حسابك في نُور",
+                    text = t("تسجيل الدخول إلى حسابك في نُور", "Sign in to your NOOR account"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = GoldSoft.copy(alpha = 0.8f),
                     modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
@@ -126,7 +131,7 @@ fun LoginScreen(
                         OutlinedTextField(
                             value = email,
                             onValueChange = { email = it; errorMessage = null },
-                            label = { Text("البريد الإلكتروني", color = GoldSoft) },
+                            label = { Text(t("البريد الإلكتروني", "Email"), color = GoldSoft) },
                             leadingIcon = {
                                 Icon(Icons.Filled.Mail, contentDescription = null, tint = Gold)
                             },
@@ -152,7 +157,7 @@ fun LoginScreen(
                         OutlinedTextField(
                             value = password,
                             onValueChange = { password = it; errorMessage = null },
-                            label = { Text("كلمة المرور", color = GoldSoft) },
+                            label = { Text(t("كلمة المرور", "Password"), color = GoldSoft) },
                             leadingIcon = {
                                 Icon(Icons.Filled.Lock, contentDescription = null, tint = Gold)
                             },
@@ -179,7 +184,7 @@ fun LoginScreen(
                             contentAlignment = Alignment.CenterEnd
                         ) {
                             TextButton(onClick = onForgot) {
-                                Text("نسيت كلمة المرور؟", color = GoldSoft, fontSize = 13.sp)
+                                Text(t("نسيت كلمة المرور؟", "Forgot password?"), color = GoldSoft, fontSize = 13.sp)
                             }
                         }
 
@@ -188,7 +193,7 @@ fun LoginScreen(
                         Button(
                             onClick = {
                                 if (email.isBlank() || password.isBlank()) {
-                                    errorMessage = "يرجى ملء جميع الحقول"
+                                    errorMessage = t("يرجى ملء جميع الحقول", "Please fill in all fields")
                                     return@Button
                                 }
                                 isLoading = true
@@ -219,8 +224,28 @@ fun LoginScreen(
                                     strokeWidth = 2.dp
                                 )
                             } else {
-                                Text("تسجيل الدخول", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                Text(t("تسجيل الدخول", "Sign in"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                             }
+                        }
+
+                        // ===== Sign in with Google (OAuth via the browser, returns via deep link) =====
+                        Spacer(modifier = Modifier.height(10.dp))
+                        OutlinedButton(
+                            onClick = {
+                                val url = GOOGLE_AUTH_URL + android.net.Uri.encode(AUTH_REDIRECT)
+                                android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse(url)
+                                ).also {
+                                    it.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    context.startActivity(it)
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Navy)
+                        ) {
+                            Text(t("دخول بحساب Google", "Continue with Google"), fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         }
                     }
                 }
@@ -230,9 +255,9 @@ fun LoginScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("ليس لديك حساب؟ ", color = GoldSoft.copy(alpha = 0.8f), fontSize = 14.sp)
+                    Text(t("ليس لديك حساب؟ ", "No account yet? "), color = GoldSoft.copy(alpha = 0.8f), fontSize = 14.sp)
                     TextButton(onClick = onRegister) {
-                        Text("إنشاء حساب جديد", color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text(t("إنشاء حساب جديد", "Create a new account"), color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
                 }
             }

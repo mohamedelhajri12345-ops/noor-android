@@ -39,6 +39,7 @@ import com.elhajri.noor.ui.NavyLight
 import org.json.JSONObject
 import com.elhajri.noor.ui.NoorGradients
 import com.elhajri.noor.theme.noorGlassCard
+import com.elhajri.noor.ui.TextMain
 
 private fun toArabicDigits(number: Any): String {
     val str = number.toString()
@@ -517,7 +518,7 @@ private fun HajjQuizView(context: Context, onFinish: () -> Unit) {
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(opt, style = MaterialTheme.typography.bodyLarge, color = Color.White, modifier = Modifier.weight(1f))
+                                Text(opt, style = MaterialTheme.typography.bodyLarge, color = TextMain, modifier = Modifier.weight(1f))
                                 if (isAnswered) {
                                     if (isCorrect) Icon(Icons.Default.Check, contentDescription = null, tint = Color.White)
                                     else if (isSelected) Icon(Icons.Default.Close, contentDescription = null, tint = Color.White)
