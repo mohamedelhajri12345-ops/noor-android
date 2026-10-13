@@ -153,7 +153,7 @@ fun NoorApp() {
     val navController = rememberNavController()
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
-    val mainRoutes = remember { bottomBarTabs.map { it.route }.toSet() }
+    val mainRoutes = remember { bottomBarTabs().map { it.route }.toSet() }
     val showBar = currentRoute in mainRoutes
 
     // التنقل الآمن للشاشات الفرعية — يمنع فتح نفس الشاشة مرتين مع تجاوب فوري
