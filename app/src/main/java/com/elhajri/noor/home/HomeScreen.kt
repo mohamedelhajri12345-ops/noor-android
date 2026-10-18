@@ -35,7 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
+import com.elhajri.noor.R
 import com.elhajri.noor.prayer.PrayerRepository
 import com.elhajri.noor.theme.ThemeStore
 import com.elhajri.noor.ui.AmiriFamily
@@ -119,6 +122,14 @@ private fun HeroPrayerCard(
             .border(1.5.dp, Gold8.copy(alpha = 0.35f), RoundedCornerShape(22.dp))
             .clickable(interactionSource = heroInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate("prayer") }
     ) {
+        // Offline-first hero: bundled drawable renders instantly and works with no internet.
+        // The remote render stays as a higher-detail layer when the network is available.
+        Image(
+            painter = painterResource(R.drawable.hero_mosque),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         AsyncImage(
             model = HERO_IMG,
             contentDescription = null,
