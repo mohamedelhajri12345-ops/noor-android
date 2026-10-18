@@ -106,10 +106,10 @@ object NoorThemes {
 
         // ─────────── 01 — نور الفجر ───────────
         theme(
-            "fajr_noor", "نور الفجر", "سماء الفجر الهادئة — سماوي نقي وذهب خفيف لبداية يوم جديد",
-            bg = 0xFFEAF2FB, bgEnd = 0xFFDCE9F7, surface = 0xFFFDFEFE, surfaceVariant = 0xFFEAF2FB,
-            accent = 0xFFB08D2F, accentSoft = 0xFFD9BC66, accentDeep = 0xFF8A6C20,
-            text = 0xFF1E2A3A, textSec = 0xFF5B6B7E,
+            "fajr_noor", "نور الفجر", "سماء الفجر الهادئة — أزرق فجري داكن وذهب خفيف لبداية يوم جديد",
+            bg = 0xFF0C1826, bgEnd = 0xFF081220, surface = 0xFF142436, surfaceVariant = 0xFF1C3046,
+            accent = 0xFFD9BC66, accentSoft = 0xFFF0DCA0, accentDeep = 0xFFB08D2F,
+            text = 0xFFF6FBFF, textSec = 0xFFBFD2E4,
             motifType = ThemeMotifType.FAJR_DAWN,
             cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.dp, borderAlpha = 0.18f, glowColor = Color(0xFFD9BC66))
         ),
@@ -166,12 +166,12 @@ object NoorThemes {
 
         // ─────────── 07 — السماء الزرقاء ───────────
         theme(
-            "blue_sky", "السماء الزرقاء", "مشرق وعصري — أزرق ملكي على سماوي وأبيض",
-            bg = 0xFFE8F3FE, bgEnd = 0xFFD9EBFC, surface = 0xFFFEFEFF, surfaceVariant = 0xFFE3F0FD,
-            accent = 0xFF1D5FBF, accentSoft = 0xFF4E8AE6, accentDeep = 0xFF15418A,
-            text = 0xFF13233A, textSec = 0xFF4A607A,
+            "blue_sky", "السماء الزرقاء", "ليلي عميق — أزرق ملكي داكن صافٍ وخط واضح",
+            bg = 0xFF0A1A33, bgEnd = 0xFF071226, surface = 0xFF122540, surfaceVariant = 0xFF1B3460,
+            accent = 0xFF4E8AE6, accentSoft = 0xFF87B7F2, accentDeep = 0xFF1D5FBF,
+            text = 0xFFF2F8FF, textSec = 0xFFB8D0EC,
             motifType = ThemeMotifType.BLUE_SKY,
-            cardStyle = NoorCardStyle(radius = 18.dp, borderWidth = 1.dp, borderAlpha = 0.15f, glowColor = Color(0xFF1D5FBF))
+            cardStyle = NoorCardStyle(radius = 18.dp, borderWidth = 1.dp, borderAlpha = 0.30f, glowColor = Color(0xFF4E8AE6))
         ),
 
         // ─────────── 08 — الهلال الفضي ───────────
