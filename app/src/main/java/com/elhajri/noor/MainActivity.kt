@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,7 +85,6 @@ class MainActivity : ComponentActivity() {
     private fun handleAuthRedirect(intent: android.content.Intent?) {
         // no-op: Google OAuth login was removed by the owner's decision (it did not work).
     }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,6 +142,9 @@ class MainActivity : ComponentActivity() {
 fun NoorApp() {
     var showSplash by remember { mutableStateOf(true) }
     val navController = rememberNavController()
+    LaunchedEffect(Unit) {
+        com.elhajri.noor.ads.InterstitialAds.preload(androidx.compose.ui.platform.LocalContext.current)
+    }
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
     val mainRoutes = remember { bottomBarTabs().map { it.route }.toSet() }
@@ -156,10 +162,29 @@ fun NoorApp() {
         }
     }
 
+    // الإعلان البيني المهذب: يظهر فقط عند العودة للرئيسية من قسم الترفيه
+    // (الألعاب أو الفيديوهات) — أي في نهاية جلسة طبيعية، وبحد أقصى مرة كل
+    // ربع ساعة (التحقق داخل InterstitialAds) ولا يظهر أبداً أثناء أي تشغيل.
+    val scope = rememberCoroutineScope()
+    val appContext = androidx.compose.ui.platform.LocalContext.current
+    val politeInterstitial: (String?) -> Unit = { fromRoute ->
+        val mediaActive = com.elhajri.noor.audio.player.NasheedPlayerManager.state.value.isPlaying ||
+                com.elhajri.noor.audio.player.QuranPlayerManager.state.value.isPlaying
+        if ((fromRoute == "games" || fromRoute == "videos") && !mediaActive) {
+            scope.launch {
+                delay(900) // let the navigation settle first — ad appears on the calm home screen
+                (appContext as? android.app.Activity)?.let { activity ->
+                    com.elhajri.noor.ads.InterstitialAds.maybeShow(activity)
+                }
+            }
+        }
+    }
+
     // التنقل الموثوق لشريط التنقل السفلي — يعمل بدقة 100% في كل الأوقات وعلى كل الأجهزة
     val onTabSelected: (String) -> Unit = { targetRoute ->
         val activeRoute = navController.currentDestination?.route
         if (activeRoute != targetRoute) {
+            politeInterstitial(activeRoute)
             try {
                 val startDestId = navController.graph.findStartDestination().id
                 navController.navigate(targetRoute) {
