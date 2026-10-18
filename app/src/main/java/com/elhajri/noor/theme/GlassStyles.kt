@@ -100,9 +100,10 @@ fun Modifier.noorGlassCard(
         )
 }
 
-/** One single uniform glass tint used by every card in the app (no per-card variation). */
+/** One single uniform glass tint used by every card in the app (no per-card variation).
+ *  Follows the active theme's surface tone so cards melt into the app's colors (no white cast). */
 private val GLASS_BASE_FILL: Color
-    get() = Color.White.copy(alpha = 0.055f)
+    get() = NoorThemeState.active.surfaceVariant.copy(alpha = 0.30f)
 
 /**
  * Extension for applying glass style with explicit corner radius in 20-28dp range.

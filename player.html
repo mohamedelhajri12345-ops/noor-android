@@ -9,16 +9,20 @@
   #player-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
   #player { width: 100%; height: 100%; }
   iframe { width: 100%; height: 100%; border: none; pointer-events: none; }
+  #native-video { width: 100%; height: 100%; background: #000; }
 </style>
 </head>
 <body>
 <div id="player-container"><div id="player"></div></div>
 <script>
-  // NOOR embedded player. Served from a real https origin so YouTube accepts the embed
-  // (loadDataWithBaseURL with a fake origin gets rejected with errors 152/153/2/5).
+  // NOOR embedded player. Two modes:
+  //  ?v=VIDEOID          -> YouTube IFrame API (real https origin, no related videos)
+  //  ?mode=mp4&src=URL   -> Native HTML5 <video> (direct file, zero login, zero tracking)
   var first = true;
   var currentId = null;
   var player = null;
+  var nativeVideo = null;
+  var mode = qs('mode') || 'yt';
 
   function qs(name) {
     var m = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
@@ -27,6 +31,42 @@
 
   function report(title) { document.title = title; }
 
+  function bridge(fn) {
+    try { if (window.AndroidBridge && window.AndroidBridge[fn]) window.AndroidBridge[fn](); } catch (e) {}
+  }
+  function bridgeState(state) {
+    try { if (window.AndroidBridge && window.AndroidBridge.sendState) window.AndroidBridge.sendState(state); } catch (e) {}
+  }
+  function bridgeProgress(t, d) {
+    try { if (window.AndroidBridge && window.AndroidBridge.sendProgress) window.AndroidBridge.sendProgress(t, d, !!(nativeVideo && nativeVideo.paused)); } catch (e) {}
+  }
+
+  // ---------------- MP4 (native) mode ----------------
+  function setupNative(src) {
+    report('LOADING');
+    var container = document.getElementById('player');
+    nativeVideo = document.createElement('video');
+    nativeVideo.id = 'native-video';
+    nativeVideo.src = src;
+    nativeVideo.playsInline = true;
+    nativeVideo.setAttribute('playsinline', '');
+    nativeVideo.setAttribute('webkit-playsinline', '');
+    nativeVideo.preload = 'auto';
+    nativeVideo.onready = function () { report('READY'); bridge('sendPlayerReady'); };
+    nativeVideo.oncanplay = function () { report('READY'); bridge('sendPlayerReady'); };
+    nativeVideo.onplay = function () { report('PLAYING'); bridgeState(1); };
+    nativeVideo.onpause = function () { report('PAUSED'); bridgeState(2); };
+    nativeVideo.onended = function () { bridge('sendVideoEnded'); };
+    nativeVideo.onerror = function () { report('ERROR101'); try { if (window.AndroidBridge) window.AndroidBridge.sendVideoError(101); } catch (e) {} };
+    container.appendChild(nativeVideo);
+    var t = setInterval(function () {
+      if (!nativeVideo || nativeVideo.readyState < 1) return;
+      bridgeProgress(nativeVideo.currentTime || 0, nativeVideo.duration || 0);
+    }, 500);
+    nativeVideo.play().catch(function () { /* autoplay block: user taps play */ });
+  }
+
+  // ---------------- YouTube mode ----------------
   function onReady() {
     report('READY');
     if (window.AndroidBridge && window.AndroidBridge.sendPlayerReady) {
@@ -68,11 +108,12 @@
   }
 
   window.onYouTubeIframeAPIReady = function () {
+    if (mode === 'mp4') return; // native mode doesn't need the YT API
     currentId = qs('v');
     report('LOADING');
     player = new YT.Player('player', {
       videoId: currentId,
-      host: 'https://www.youtube-nocookie.com',
+      host: 'https://www.youtube.com',
       playerVars: {
         autoplay: 1,
         controls: 0,
@@ -95,11 +136,33 @@
   };
 
   // Functions called from the Android side via evaluateJavascript
-  function playVideo() { if (player && player.playVideo) { player.playVideo(); report('PLAYING'); } }
-  function pauseVideo() { if (player && player.pauseVideo) { player.pauseVideo(); report('PAUSED'); } }
-  function seekTo(t) { if (player && player.seekTo) player.seekTo(t, true); }
-  function setRate(r) { window.__rate = r; if (player && player.setPlaybackRate) player.setPlaybackRate(r); }
-  function loadNewVideo(id) {
+  function playVideo() {
+    if (mode === 'mp4') { if (nativeVideo) nativeVideo.play().catch(function(){}); report('PLAYING'); return; }
+    if (player && player.playVideo) { player.playVideo(); report('PLAYING'); }
+  }
+  function pauseVideo() {
+    if (mode === 'mp4') { if (nativeVideo) nativeVideo.pause(); report('PAUSED'); return; }
+    if (player && player.pauseVideo) { player.pauseVideo(); report('PAUSED'); }
+  }
+  function seekTo(t) {
+    if (mode === 'mp4') { if (nativeVideo) nativeVideo.currentTime = t; return; }
+    if (player && player.seekTo) player.seekTo(t, true);
+  }
+  function setRate(r) {
+    window.__rate = r;
+    if (mode === 'mp4') { if (nativeVideo) nativeVideo.playbackRate = r; return; }
+    if (player && player.setPlaybackRate) player.setPlaybackRate(r);
+  }
+  function loadNewVideo(id, src) {
+    // YouTube -> id; native mp4 -> src
+    if (src) {
+      mode = 'mp4';
+      if (nativeVideo) { nativeVideo.pause(); nativeVideo.src = src; nativeVideo.load(); nativeVideo.play().catch(function(){}); }
+      else setupNative(src);
+      report('LOADING');
+      return;
+    }
+    mode = 'yt';
     currentId = id;
     if (player && player.loadVideoById) {
       player.loadVideoById(id);
@@ -108,9 +171,13 @@
     }
   }
 
-  var tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(tag);
+  if (mode === 'mp4') {
+    setupNative(qs('src'));
+  } else {
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+  }
 </script>
 </body>
 </html>

@@ -12,12 +12,9 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 
 /**
- * إعلان بانر AdMob — بمعرف الوحدة التجريبي الرسمي من Google.
+ * إعلان بانر AdMob — بالوحدة الإعلانية الحقيقية من حساب المالك.
  * مكان آمن: أسفل شاشة الأقسام فقط، ضمن التمرير — لا يغطي محتوى
  * القرآن ولا الأزرار ولا يعطل التلاوة.
- *
- * قبل النشر الإنتاجي: استبدل معرّف الوحدة (ومعرّف التطبيق في المانيفست)
- * بمعرّفاتك الحقيقية من حسابك في AdMob.
  */
 @Composable
 fun NoorBannerAd(modifier: Modifier = Modifier) {
@@ -27,7 +24,7 @@ fun NoorBannerAd(modifier: Modifier = Modifier) {
             AdView(ctx).apply {
                 setAdSize(AdSize.BANNER)
                 // وحدة إعلانية تجريبية رسمية — بنرات اختبار فقط بلا أرباح
-                adUnitId = "ca-app-pub-3940256099942544/6300978111"
+                adUnitId = com.elhajri.noor.ads.AdIds.BANNER
                 loadAd(AdRequest.Builder().build())
             }
         }

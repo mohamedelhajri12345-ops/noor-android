@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun LoginScreen(
     onSuccess: () -> Unit,
-    onRegister: () -> Unit,
     onForgot: () -> Unit
 ) {
     val context = LocalContext.current
@@ -46,8 +45,6 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(GoogleAuthEvents.succeeded) {
-        if (GoogleAuthEvents.consume()) onSuccess()
     }
 
     Scaffold(
@@ -227,38 +224,9 @@ fun LoginScreen(
                             }
                         }
 
-                        // ===== Sign in with Google (OAuth via the browser, returns via deep link) =====
-                        Spacer(modifier = Modifier.height(10.dp))
-                        OutlinedButton(
-                            onClick = {
-                                val url = GOOGLE_AUTH_URL + android.net.Uri.encode(AUTH_REDIRECT)
-                                android.content.Intent(
-                                    android.content.Intent.ACTION_VIEW,
-                                    android.net.Uri.parse(url)
-                                ).also {
-                                    it.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    context.startActivity(it)
-                                }
-                            },
-                            modifier = Modifier.fillMaxWidth().height(50.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Navy)
-                        ) {
-                            Text(t("دخول بحساب Google", "Continue with Google"), fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(t("ليس لديك حساب؟ ", "No account yet? "), color = GoldSoft.copy(alpha = 0.8f), fontSize = 14.sp)
-                    TextButton(onClick = onRegister) {
-                        Text(t("إنشاء حساب جديد", "Create a new account"), color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    }
-                }
             }
         }
     }

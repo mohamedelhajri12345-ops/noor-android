@@ -1,7 +1,14 @@
 package com.elhajri.noor.quran
 
 import android.content.Context
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +33,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -252,13 +260,26 @@ fun LibraryScreen(onBack: () -> Unit) {
                         val isFav = favorites.contains(track.id)
                         val visual = categoryVisuals[track.category] ?: Pair("🤲", "دينية")
 
+                        // تفاعل الضغط: انكماش خفيف وإحساس فوري باللمس
+                        val interaction = remember { MutableInteractionSource() }
+                        val pressed by androidx.compose.animation.core.animateFloatAsState(
+                            targetValue = if (interaction.collectIsPressedAsState().value) 0.97f else 1f,
+                            animationSpec = tween(durationMillis = 120),
+                            label = "pressScale"
+                        )
+                        val isBufferingThis = isCurrent && playerState.isBuffering
+
                         Card(
                             onClick = { playTrack(track) },
+                            interactionSource = interaction,
                             colors = CardDefaults.cardColors(
                                 containerColor = if (isCurrent) NavyLight else NavyCard
                             ),
                             shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.fillMaxWidth()
+                            border = if (isCurrent) androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.55f)) else null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .scale(pressed)
                         ) {
                             Row(
                                 modifier = Modifier
@@ -320,7 +341,7 @@ fun LibraryScreen(onBack: () -> Unit) {
                                     )
                                 }
 
-                                // Play / Pause Button
+                                // Play / Pause Button (spinner أثناء التحميل، أشرطة متحركة أثناء التشغيل)
                                 IconButton(
                                     onClick = { playTrack(track) },
                                     modifier = Modifier
@@ -328,12 +349,31 @@ fun LibraryScreen(onBack: () -> Unit) {
                                         .clip(CircleShape)
                                         .background(Gold)
                                 ) {
-                                    Icon(
-                                        imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                        contentDescription = "تشغيل",
-                                        tint = Navy,
-                                        modifier = Modifier.size(24.dp)
-                                    )
+                                    when {
+                                        isBufferingThis -> CircularProgressIndicator(
+                                            color = Navy,
+                                            strokeWidth = 2.5.dp,
+                                            modifier = Modifier.size(22.dp)
+                                        )
+                                        isPlaying -> {
+                                            // مؤشر صوتي متحرك داخل الزر
+                                            val eq = rememberInfiniteTransition(label = "eq")
+                                            val h1 by eq.animateFloat(0.45f, 1f, infiniteRepeatable(tween(320), RepeatMode.Reverse), label = "h1")
+                                            val h2 by eq.animateFloat(1f, 0.4f, infiniteRepeatable(tween(430), RepeatMode.Reverse), label = "h2")
+                                            val h3 by eq.animateFloat(0.55f, 0.95f, infiniteRepeatable(tween(380), RepeatMode.Reverse), label = "h3")
+                                            Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
+                                                Box(Modifier.width(3.dp).height((14*h1).dp).clip(CircleShape).background(Navy))
+                                                Box(Modifier.width(3.dp).height((14*h2).dp).clip(CircleShape).background(Navy))
+                                                Box(Modifier.width(3.dp).height((14*h3).dp).clip(CircleShape).background(Navy))
+                                            }
+                                        }
+                                        else -> Icon(
+                                            imageVector = Icons.Default.PlayArrow,
+                                            contentDescription = "تشغيل",
+                                            tint = Navy,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
                                 }
                             }
                         }

@@ -73,7 +73,10 @@ private const val PLAYER_PAGE_URL = "https://mohamedelhajri12345-ops.github.io/n
 private val ALLOWED_HOSTS = listOf(
     "mohamedelhajri12345-ops.github.io",
     "youtube.com", "www.youtube.com", "www.youtube-nocookie.com",
-    "ytimg.com", "i.ytimg.com", "googlevideo.com", "gstatic.com", "googleapis.com"
+    "ytimg.com", "i.ytimg.com", "googlevideo.com", "gstatic.com", "googleapis.com",
+    // direct MP4 sources (public-domain / CC content)
+    "archive.org", "www.archive.org", "us.archive.org", "ia801402.us.archive.org", "ia601402.us.archive.org",
+    "archive.org:443"
 )
 
 /**
@@ -144,6 +147,11 @@ fun VideoPlayerScreen(
 
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
+    /** Builds the JS call for a video: direct MP4 when available, YouTube otherwise. */
+    fun jsLoadCall(v: com.elhajri.noor.videos.KidsVideo): String =
+        if (v.mp4Url != null) "loadNewVideo(null, '${v.mp4Url}');"
+        else "loadNewVideo('${v.id}');"
+
     fun playNextVideo() {
         val next = KidsVideoStore.getNextVideo(context, currentVideoId)
         if (next != null) {
@@ -151,7 +159,7 @@ fun VideoPlayerScreen(
             currentTime = 0f
             isEndedOverlayVisible = false
             isPlayerReady = false
-            webViewInstance?.evaluateJavascript("loadNewVideo('${next.id}');", null)
+            webViewInstance?.evaluateJavascript(jsLoadCall(next), null)
         }
     }
 
@@ -162,7 +170,7 @@ fun VideoPlayerScreen(
             currentTime = 0f
             isEndedOverlayVisible = false
             isPlayerReady = false
-            webViewInstance?.evaluateJavascript("loadNewVideo('${prev.id}');", null)
+            webViewInstance?.evaluateJavascript(jsLoadCall(prev), null)
         }
     }
 
@@ -311,35 +319,34 @@ fun VideoPlayerScreen(
                                     isPlayerReady = true
                                 },
                                 onVideoError = { code ->
-                                    // 100/101/150 = unavailable or not embeddable; 2/5 = player error
+                                    // 101/150 = embedding disabled (permanent); 100/2/5 often transient (network/sign-in wall).
+                                    // Owner requirement: never auto-skip rapidly — the user decides.
                                     isPlaying = false
-                                    if (code == 101 || code == 150 || code == 100 || code == 2 || code == 5) {
+                                    if (code == 101 || code == 150) {
                                         Prefs.addBrokenVideo(context, currentVideoId)
                                         KidsVideoStore.invalidate()
-                                        consecutiveErrors += 1
-                                        if (consecutiveErrors < 6) {
-                                            Toast.makeText(
-                                                context,
-                                                "هذا الفيديو غير متاح، ننتقل تلقائياً إلى الفيديو التالي",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            coroutineScope.launch {
-                                                delay(1200)
-                                                if (!isPlaying) playNextVideo()
-                                            }
-                                        } else {
-                                            Toast.makeText(
-                                                context,
-                                                "تعذر تشغيل عدة فيديوهات متتالية، جرّب فيديو آخر",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
+                                        Toast.makeText(
+                                            context,
+                                            "هذا الفيديو لا يسمح بالتشغيل المدمج — اضغط زر التالي لاختيار غيره",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "تعذر تشغيل الفيديو الآن — تحقق من الاتصال أو جرّب فيديو آخر",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
                                 }
                             )
 
                             addJavascriptInterface(bridge, "AndroidBridge")
-                            loadUrl("$PLAYER_PAGE_URL?v=$currentVideoId")
+                            val v = KidsVideoStore.getVideoById(context, currentVideoId)
+                            if (v?.mp4Url != null) {
+                                loadUrl("$PLAYER_PAGE_URL?mode=mp4&src=" + java.net.URLEncoder.encode(v.mp4Url, "UTF-8"))
+                            } else {
+                                loadUrl("$PLAYER_PAGE_URL?v=$currentVideoId")
+                            }
                             webViewInstance = this
                         }
                     },

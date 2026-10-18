@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 object RewardedAds {
 
     // وحدة إعلانات مكافأة تجريبية رسمية — للاختبار فقط
-    private const val AD_UNIT = "ca-app-pub-3940256099942544/5224358673"
+    private const val AD_UNIT = AdIds.REWARDED
 
     @Volatile private var rewardedAd: RewardedAd? = null
     @Volatile private var loading = false

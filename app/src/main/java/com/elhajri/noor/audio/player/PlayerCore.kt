@@ -90,6 +90,8 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
     private var queue: List<PlayerTrack> = emptyList()
     private var currentIndex = -1
     private var fallbackIndex = 0
+    private var sameUrlRetries = 0
+    private var retryRunnable: Runnable? = null
     private var shuffle = false
     private var repeatMode = "none"
     private var rate = 1f
@@ -142,6 +144,7 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
         isLoading = true
         isBuffering = true
         fallbackIndex = 0
+        sameUrlRetries = 0
         publish()
         try {
             val mp = player ?: MediaPlayer().also { created -> wire(created); player = created }
@@ -156,11 +159,46 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
             mp.prepareAsync()
             startForegroundService(ctx)
         } catch (_: Exception) {
-            if (!retryWithFallback()) {
-                isLoading = false
-                isBuffering = false
-                publish(error = "تعذّر تشغيل الملف")
-            }
+            onPlaybackFailed()
+        }
+    }
+
+    /**
+     * Archive.org and similar hosts occasionally answer 500 transiently.
+     * Retry the SAME url twice with a short delay before falling back.
+     */
+    private fun onPlaybackFailed() {
+        retryRunnable?.let { handler.removeCallbacks(it) }
+        if (sameUrlRetries < 2) {
+            sameUrlRetries++
+            isBuffering = true
+            publish()
+            retryRunnable = Runnable { playCurrentTrackUrl() }.also { handler.postDelayed(it, 800L * sameUrlRetries) }
+        } else if (!retryWithFallback()) {
+            isLoading = false
+            isBuffering = false
+            publish(error = "تعذّر تشغيل الملف — تحقق من الاتصال")
+        }
+    }
+
+    /** Re-attempts the current track url (used by the transient-error retry). */
+    private fun playCurrentTrackUrl() {
+        val track = queue.getOrNull(currentIndex) ?: return
+        val ctx = appContext ?: return
+        try {
+            val mp = player ?: MediaPlayer().also { created -> wire(created); player = created }
+            mp.reset()
+            mp.setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            mp.setDataSource(track.url)
+            mp.prepareAsync()
+            startForegroundService(ctx)
+        } catch (_: Exception) {
+            onPlaybackFailed()
         }
     }
 
@@ -181,11 +219,7 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
         mp.setOnCompletionListener { onTrackEnd() }
         mp.setOnErrorListener { p, _, _ ->
             try { p.reset() } catch (_: Exception) {}
-            if (!retryWithFallback()) {
-                isLoading = false
-                isBuffering = false
-                publish(error = "تعذّر تشغيل الملف")
-            }
+            onPlaybackFailed()
             true
         }
         mp.setOnBufferingUpdateListener { _, percent ->
@@ -297,6 +331,8 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
     }
 
     override fun stop() {
+        retryRunnable?.let { handler.removeCallbacks(it) }; retryRunnable = null
+        gapRunnable?.let { handler.removeCallbacks(it) }; gapRunnable = null
         stopAudio()
         clearSleepTimer()
         queue = emptyList()
@@ -469,18 +505,32 @@ private fun buildPlaybackNotification(
         BitmapFactory.decodeResource(context.resources, com.elhajri.noor.R.mipmap.ic_launcher)
     } catch (_: Exception) { null }
 
+    // == مواصفات محمد الحجري: إشعار أزرق كامل بلون التطبيق، أيقونة التطبيق الرسمية،
+    //    شريط تقدم طويل من اليمين لليسار مع الدقائق، وأزرار سميكة ثابتة في الوسط ==
+    val dur = if (s.duration.isFinite() && s.duration > 0f) s.duration.toInt() else 0
+    val pos = if (s.currentTime.isFinite()) s.currentTime.toInt().coerceAtLeast(0) else 0
+    val fmt = { sec: Int ->
+        val m = sec / 60
+        val r = sec % 60
+        "%d:%02d".format(m, r)
+    }
+    val timeText = if (dur > 0) "${fmt(pos)} / ${fmt(dur)}" else fmt(pos)
+    val artistLine = s.artist.ifBlank { "تطبيق نور - القرآن الكريم" }
+
     return NotificationCompat.Builder(context, channelId)
         .setContentTitle(s.title.ifBlank { fallbackTitle })
-        .setContentText(s.artist.ifBlank { "تطبيق نور - القرآن الكريم" })
-        .setSmallIcon(R.drawable.ic_notification)
+        .setContentText(artistLine)
+        .setSmallIcon(R.mipmap.ic_launcher)          // أيقونة التطبيق الرسمية بدل أيقونة الكتاب
         .setLargeIcon(largeIcon)
         .setContentIntent(openAppIntent)
         .setOngoing(s.isPlaying)
         .setOnlyAlertOnce(true)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
-        .setColor(0xFFE9C46A.toInt())      // ذهبي دافئ - Gold Accent (تعليمة ثابتة)
-        .setColorized(true)
+        .setColor(0xFF004090.toInt())                // الأزرق الرسمي للتطبيق (لون الأيقونة)
+        .setColorized(true)                          // الإشعار كله أزرق
+        .setProgress(dur, pos, false)                // شريط تقدم طويل مع الدقائق
+        .setSubText(timeText)                        // المدة الحالية / الكلية
         .addAction(R.drawable.ic_notif_prev, "السابق", actionIntent(NotificationActions.ACTION_PREV))
         .addAction(playPauseIcon, if (s.isPlaying) "إيقاف مؤقت" else "تشغيل", actionIntent(NotificationActions.ACTION_TOGGLE))
         .addAction(R.drawable.ic_notif_next, "التالي", actionIntent(NotificationActions.ACTION_NEXT))
@@ -521,7 +571,7 @@ class QuranPlaybackService : Service() {
             observeScope = CoroutineScope(Dispatchers.Main + Job()).also { sc ->
                 sc.launch {
                     QuranPlayerManager.state.collect { st ->
-                        val key = "${st.isPlaying}|${st.currentId}|${st.title}"
+                        val key = "${st.isPlaying}|${st.currentId}|${st.title}|${st.currentTime.toInt()}"
                         if (key != lastStateKey) {
                             lastStateKey = key
                             val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -585,7 +635,7 @@ class NasheedPlaybackService : Service() {
             observeScope = CoroutineScope(Dispatchers.Main + Job()).also { sc ->
                 sc.launch {
                     PlayerCore.state.collect { st ->
-                        val key = "${st.isPlaying}|${st.currentId}|${st.title}"
+                        val key = "${st.isPlaying}|${st.currentId}|${st.title}|${st.currentTime.toInt()}"
                         if (key != lastStateKey) {
                             lastStateKey = key
                             val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

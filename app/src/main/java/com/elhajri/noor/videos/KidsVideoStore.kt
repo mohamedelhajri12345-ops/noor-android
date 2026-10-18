@@ -9,10 +9,12 @@ data class KidsVideo(
     val id: String,
     val title: String,
     val category: String,
-    val channel: String
+    val channel: String,
+    /** Direct MP4 file URL (archive.org etc.) — plays natively with ZERO login. Null = YouTube mode. */
+    val mp4Url: String? = null
 ) {
     val thumbnailUrl: String
-        get() = "https://i.ytimg.com/vi/$id/hqdefault.jpg"
+        get() = if (id.startsWith("mp4_") || id.isBlank()) "" else "https://i.ytimg.com/vi/$id/hqdefault.jpg"
 }
 
 /**
@@ -57,8 +59,9 @@ object KidsVideoStore {
                     val category = obj.optString("category", "عام").trim()
                     val channel = obj.optString("channel", "نور للأطفال").trim()
 
+                    val mp4 = obj.optString("mp4", "").trim()
                     if (id.isNotEmpty() && title.isNotEmpty()) {
-                        list.add(KidsVideo(id = id, title = title, category = category, channel = channel))
+                        list.add(KidsVideo(id = id, title = title, category = category, channel = channel, mp4Url = mp4.ifBlank { null }))
                     }
                 }
             } catch (e: Exception) {

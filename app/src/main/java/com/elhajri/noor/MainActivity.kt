@@ -28,7 +28,6 @@ import com.elhajri.noor.athkar.AthkarDetailScreen
 import com.elhajri.noor.athkar.AthkarScreen
 import com.elhajri.noor.auth.ForgotPasswordScreen
 import com.elhajri.noor.auth.LoginScreen
-import com.elhajri.noor.auth.RegisterScreen
 import com.elhajri.noor.auth.ResetPasswordScreen
 import com.elhajri.noor.calendar.CalendarScreen
 import com.elhajri.noor.community.CommunityScreen
@@ -78,21 +77,10 @@ class MainActivity : ComponentActivity() {
         handleAuthRedirect(intent)
     }
 
-    /** Completes Google sign-in when the browser redirects back to noor://auth/callback. */
+    /** Google sign-in deep link removed (broken flow) — kept as no-op for safety. */
     private fun handleAuthRedirect(intent: android.content.Intent?) {
-        val data = intent?.data ?: return
-        if (data.scheme == "noor" && data.host == "auth" && data.path == "/callback") {
-            Thread {
-                val res = kotlinx.coroutines.runBlocking {
-                    com.elhajri.noor.auth.Base44Auth.completeGoogleAuth(this@MainActivity, data.toString())
-                }
-                if (res.isSuccess) {
-                    runOnUiThread {
-                        com.elhajri.noor.auth.GoogleAuthEvents.notifySuccess()
-                    }
-                }
-            }.start()
-        }
+        // no-op: Google OAuth login was removed by the owner's decision (it did not work).
+    }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -265,19 +253,7 @@ fun NoorApp() {
 
                 composable("login") { LoginScreen(
                     onSuccess = { navController.popBackStack() },
-                    onRegister = { navController.navigate("register") },
                     onForgot = { navController.navigate("forgot") }
-                ) }
-                composable("register") { RegisterScreen(
-                    onSuccess = { navController.navigate("verifyOtp") },
-                    onLogin = { navController.popBackStack() }
-                ) }
-                composable("verifyOtp") { com.elhajri.noor.auth.VerifyOtpScreen(
-                    onVerified = {
-                        navController.popBackStack("login", inclusive = true)
-                        navController.navigate("community")
-                    },
-                    onBack = { navController.popBackStack() }
                 ) }
                 composable("forgot") { ForgotPasswordScreen(onBack = { navController.popBackStack() }) }
                 composable("reset") { ResetPasswordScreen(onBack = { navController.popBackStack() }) }

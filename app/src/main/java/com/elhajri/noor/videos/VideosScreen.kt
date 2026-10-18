@@ -462,7 +462,10 @@ private fun VideoCard(
                     model = video.thumbnailUrl,
                     contentDescription = video.title,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    placeholder = androidx.compose.ui.res.painterResource(com.elhajri.noor.R.mipmap.ic_launcher),
+                    error = androidx.compose.ui.res.painterResource(com.elhajri.noor.R.mipmap.ic_launcher),
+                    fallback = androidx.compose.ui.res.painterResource(com.elhajri.noor.R.mipmap.ic_launcher)
                 )
 
                 // Dark gradient overlay
