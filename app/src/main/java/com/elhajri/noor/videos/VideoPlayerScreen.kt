@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
+import android.content.Context
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.ui.text.style.TextAlign
 import android.app.Activity
@@ -282,8 +283,70 @@ fun VideoPlayerScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if (isSignInRequired && currentVideo?.mp4Url == null) {
+                    // One-time consent for opening the YouTube app with the phone's own account
+                    val sharedPrefs = remember { context.getSharedPreferences("noor_settings", Context.MODE_PRIVATE) }
+                    var showYouTubeAppConsent by remember { mutableStateOf(false) }
+                    var pendingYouTubeAppOpen by remember { mutableStateOf(false) }
+
+                    fun launchYouTubeApp() {
+                        try {
+                            // vnd.youtube deep link opens the YouTube app which is already
+                            // signed in with the phone's account, so the video plays there.
+                            val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + currentVideoId))
+                            appIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            context.startActivity(appIntent)
+                        } catch (e: Exception) {
+                            // Fallback to browser watch URL (app chooser / browser)
+                            try {
+                                val webIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://www.youtube.com/watch?v=" + currentVideoId)
+                                )
+                                webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                context.startActivity(webIntent)
+                            } catch (e2: Exception) {
+                                Toast.makeText(context, "تعذر فتح يوتيوب", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
+                    if (showYouTubeAppConsent) {
+                        AlertDialog(
+                            onDismissRequest = { showYouTubeAppConsent = false },
+                            containerColor = Color(0xFF0D1322),
+                            title = { Text("فتح تطبيق يوتيوب", color = Gold, fontWeight = FontWeight.Bold) },
+                            text = {
+                                Text(
+                                    "سيفتح نُور الفيديو في تطبيق يوتيوب المثبت على هاتفك، ليعمل مباشرة بحساب يوتيوب المسجّل في جهازك دون تسجيل جديد داخل نُور.\n\nنُور لا يصل إلى حسابك على يوتيوب ولا يشارك بياناتك معه، والاختيار لك دائماً.",
+                                    color = Color.White.copy(alpha = 0.85f),
+                                    fontSize = 13.sp
+                                )
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        sharedPrefs.edit().putBoolean("youtube_app_allowed", true).apply()
+                                        showYouTubeAppConsent = false
+                                        launchYouTubeApp()
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color(0xFF0B1120))
+                                ) { Text("السماح") }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showYouTubeAppConsent = false }) { Text("لاحقاً", color = GoldSoft) }
+                            }
+                        )
+                    }
+
                     YouTubeSignInOverlay(
                         currentVideoId = currentVideoId,
+                        onOpenYouTubeApp = {
+                            if (sharedPrefs.getBoolean("youtube_app_allowed", false)) {
+                                launchYouTubeApp()
+                            } else {
+                                showYouTubeAppConsent = true
+                            }
+                        },
                         onOpenBrowser = {
                             try {
                                 val intent = Intent(
@@ -816,7 +879,8 @@ private fun GlassIconButton(
 private fun YouTubeSignInOverlay(
     currentVideoId: String,
     onOpenBrowser: () -> Unit,
-    onNavigateToCatalog: () -> Unit
+    onNavigateToCatalog: () -> Unit,
+    onOpenYouTubeApp: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -861,7 +925,7 @@ private fun YouTubeSignInOverlay(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "يتطلب يوتيوب تسجيل الدخول لمشاهدة هذا الفيديو. يمكنك فتحه مباشرة في المتصفح أو التطبيق، أو اختيار فيديوهات تعمل مباشرة بدون تسجيل دخول.",
+                text = "هذا الفيديو يتطلب تسجيل دخول يوتيوب. اسرع حل: افتحه في تطبيق يوتيوب على هاتفك — سيعمل فوراً بحسابك المسجّل فيه دون تسجيل جديد. أو استخدم المتصفح أو الفيديوهات المباشرة.",
                 color = GoldSoft,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
@@ -869,6 +933,28 @@ private fun YouTubeSignInOverlay(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Primary: open in the YouTube app (uses the account already signed in on the phone)
+            Button(
+                onClick = onOpenYouTubeApp,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Gold,
+                    contentColor = Color(0xFF0B1120)
+                ),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(42.dp)
+            ) {
+                Text(
+                    text = "افتح في تطبيق يوتيوب (بحسابك)",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
