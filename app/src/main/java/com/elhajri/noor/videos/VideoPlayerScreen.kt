@@ -1,6 +1,11 @@
 package com.elhajri.noor.videos
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.ui.text.style.TextAlign
 import android.app.Activity
 import android.content.res.Configuration
 import android.webkit.JavascriptInterface
@@ -142,6 +147,7 @@ fun VideoPlayerScreen(
     var playbackRate by remember { mutableStateOf(1f) }
     var speedMenuExpanded by remember { mutableStateOf(false) }
     var isPlayerReady by remember { mutableStateOf(false) }
+    var isSignInRequired by remember { mutableStateOf(false) }
     var areControlsVisible by remember { mutableStateOf(true) }
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
 
@@ -158,6 +164,7 @@ fun VideoPlayerScreen(
             currentVideoId = next.id
             currentTime = 0f
             isEndedOverlayVisible = false
+            isSignInRequired = false
             isPlayerReady = false
             webViewInstance?.evaluateJavascript(jsLoadCall(next), null)
         }
@@ -169,6 +176,7 @@ fun VideoPlayerScreen(
             currentVideoId = prev.id
             currentTime = 0f
             isEndedOverlayVisible = false
+            isSignInRequired = false
             isPlayerReady = false
             webViewInstance?.evaluateJavascript(jsLoadCall(prev), null)
         }
@@ -209,6 +217,7 @@ fun VideoPlayerScreen(
             Prefs.saveLastWatchedVideo(context, it.id, it.title, currentTime.toLong())
         }
         isEndedOverlayVisible = false
+        isSignInRequired = false
     }
 
     // Save playback position periodically
@@ -272,7 +281,27 @@ fun VideoPlayerScreen(
                     .background(Color.Black),
                 contentAlignment = Alignment.Center
             ) {
-                AndroidView(
+                if (isSignInRequired && currentVideo?.mp4Url == null) {
+                    YouTubeSignInOverlay(
+                        currentVideoId = currentVideoId,
+                        onOpenBrowser = {
+                            try {
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://www.youtube.com/watch?v=" + currentVideoId)
+                                )
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "تعذر فتح المتصفح", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        onNavigateToCatalog = {
+                            webViewInstance?.evaluateJavascript("pauseVideo();", null)
+                            onBack()
+                        }
+                    )
+                } else {
+                    AndroidView(
                     factory = { ctx ->
                         WebView(ctx).apply {
                             layoutParams = android.view.ViewGroup.LayoutParams(
@@ -319,17 +348,13 @@ fun VideoPlayerScreen(
                                     isPlayerReady = true
                                 },
                                 onVideoError = { code ->
-                                    // 101/150 = embedding disabled (permanent); 100/2/5 often transient (network/sign-in wall).
-                                    // Owner requirement: never auto-skip rapidly — the user decides.
+                                    // Detect load error or YouTube sign-in requirement in YouTube mode
                                     isPlaying = false
-                                    if (code == 101 || code == 150) {
+                                    val v = KidsVideoStore.getVideoById(context, currentVideoId)
+                                    if (v?.mp4Url == null) {
+                                        isSignInRequired = true
                                         Prefs.addBrokenVideo(context, currentVideoId)
                                         KidsVideoStore.invalidate()
-                                        Toast.makeText(
-                                            context,
-                                            "هذا الفيديو لا يسمح بالتشغيل المدمج — اضغط زر التالي لاختيار غيره",
-                                            Toast.LENGTH_LONG
-                                        ).show()
                                     } else {
                                         Toast.makeText(
                                             context,
@@ -361,6 +386,7 @@ fun VideoPlayerScreen(
                         modifier = Modifier.size(36.dp)
                     )
                 }
+            }
             }
 
             // ==================== PORTRAIT CONTROL DECK (always visible, always tappable) ====================
@@ -778,5 +804,117 @@ private fun GlassIconButton(
             tint = Gold,
             modifier = Modifier.size(24.dp)
         )
+    }
+}
+
+
+/**
+ * Friendly Arabic overlay displayed when a YouTube video requires YouTube sign-in / cannot be embedded.
+ * Replaces dead/unresponsive in-iframe sign-in buttons with native, responsive buttons.
+ */
+@Composable
+private fun YouTubeSignInOverlay(
+    currentVideoId: String,
+    onOpenBrowser: () -> Unit,
+    onNavigateToCatalog: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0D1322))
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .noorGlassCard(cornerRadius = 20.dp, borderWidth = 1.dp)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(Gold.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "تسجيل الدخول مطلوب",
+                    tint = Gold,
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = "هذا الفيديو يحتاج تسجيل دخول في يوتيوب",
+                color = Color.White,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Text(
+                text = "يتطلب يوتيوب تسجيل الدخول لمشاهدة هذا الفيديو. يمكنك فتحه مباشرة في المتصفح أو التطبيق، أو اختيار فيديوهات تعمل مباشرة بدون تسجيل دخول.",
+                color = GoldSoft,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 17.sp
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Button 1: Open in Browser
+                Button(
+                    onClick = onOpenBrowser,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Gold,
+                        contentColor = Color(0xFF0B1120)
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(42.dp)
+                ) {
+                    Text(
+                        text = "افتح في المتصفح",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
+                    )
+                }
+
+                // Button 2: Direct-MP4 catalog
+                OutlinedButton(
+                    onClick = onNavigateToCatalog,
+                    border = BorderStroke(1.dp, Gold.copy(alpha = 0.6f)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Gold
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(42.dp)
+                ) {
+                    Text(
+                        text = "فيديوهات تعمل مباشرة",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 11.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
     }
 }

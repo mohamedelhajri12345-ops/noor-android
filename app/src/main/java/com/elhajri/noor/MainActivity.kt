@@ -279,7 +279,16 @@ fun NoorApp() {
 
                 composable("login") { LoginScreen(
                     onSuccess = { navController.popBackStack() },
-                    onForgot = { navController.navigate("forgot") }
+                    onForgot = { navController.navigate("forgot") },
+                    onNavigateToRegister = { navController.navigate("register") }
+                ) }
+                composable("register") { com.elhajri.noor.auth.RegisterScreen(
+                    onNavigateToOtp = { navController.navigate("otp") },
+                    onBack = { navController.popBackStack() }
+                ) }
+                composable("otp") { com.elhajri.noor.auth.OtpScreen(
+                    onSuccess = { navController.popBackStack("login", inclusive = true) },
+                    onBack = { navController.popBackStack() }
                 ) }
                 composable("forgot") { ForgotPasswordScreen(onBack = { navController.popBackStack() }) }
                 composable("reset") { ResetPasswordScreen(onBack = { navController.popBackStack() }) }

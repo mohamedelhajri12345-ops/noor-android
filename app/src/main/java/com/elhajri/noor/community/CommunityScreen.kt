@@ -14,11 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.ui.AmiriFamily
+import com.elhajri.noor.theme.noorGlassCard
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.TextMain
@@ -188,6 +191,58 @@ fun CommunityScreen(
                         onBack = { selectedConv = null }
                     )
                 } else {
+                    // Restored profile header: avatar + handle + display name (owner request)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
+                            .noorGlassCard(cornerRadius = 18.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(46.dp)
+                                .clip(RoundedCornerShape(50)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (profile.avatarUrl.isNotEmpty()) {
+                                coil.compose.AsyncImage(
+                                    model = profile.avatarUrl,
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Gold),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = profile.displayName.trim().take(1).ifEmpty { "ن" },
+                                        color = Navy,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = profile.displayName,
+                                color = Gold,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                            Text(
+                                text = "اسم المعرف: " + profile.handle,
+                                color = Color.White.copy(alpha = 0.75f),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
                     ConversationList(
                         conversations = conversations,
                         currentUser = currentUser,

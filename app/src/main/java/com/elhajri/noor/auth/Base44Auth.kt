@@ -12,16 +12,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.io.IOException
 
 private const val BASE_URL = "https://app.base44.com"
 private const val APP_ID = "6a833faeb9e42cca9a6576fa"
 
-/** Google sign-in entry point on the Base44 auth service. */
-const val GOOGLE_AUTH_URL =
-    "$BASE_URL/api/apps/auth/login?app_id=$APP_ID&from_url="
-
-/** Deep link the browser redirects back to after Google auth, carrying access_token. */
-const val AUTH_REDIRECT = "noor://auth/callback"
 private const val LOGIN_PATH = "/api/apps/$APP_ID/auth/login"
 private const val REGISTER_PATH = "/api/apps/$APP_ID/auth/register"
 private const val FORGOT_PASSWORD_PATH = "/api/apps/$APP_ID/auth/forgot-password"
@@ -29,7 +24,9 @@ private const val RESET_PASSWORD_PATH = "/api/apps/$APP_ID/auth/reset-password"
 private const val VERIFY_OTP_PATH = "/api/apps/$APP_ID/auth/verify-otp"
 private const val RESEND_OTP_PATH = "/api/apps/$APP_ID/auth/resend-otp"
 
-/** جسر مؤقت لبيانات التحقق بين شاشة التسجيل وشاشة الرمز — في الذاكرة فقط */
+/**
+ * Temporary in-memory state for email & password during registration and OTP verification.
+ */
 object OtpFlow {
     var pendingEmail: String = ""
     var pendingPassword: String = ""
@@ -55,9 +52,6 @@ object Base44Auth {
         }
     }
 
-    // Attaches "Authorization: Bearer <token>" to every request once logged in —
-    // without this, entity/community calls always look unauthenticated even after a
-    // successful login (the token was fetched but never sent back to the server).
     private val authInterceptor = Interceptor { chain ->
         val original = chain.request()
         val token = authToken
@@ -104,38 +98,11 @@ object Base44Auth {
 
     suspend fun login(email: String, password: String): Result<Unit> = login(null, email, password)
 
-    /** Complete a Google OAuth sign-in from the deep-link redirect URL (contains access_token). */
-    suspend fun completeGoogleAuth(context: Context, redirectUrl: String): Result<Unit> = withContext(Dispatchers.IO) {
-        try {
-            val uri = android.net.Uri.parse(redirectUrl)
-            val token = uri.getQueryParameter("access_token")
-                ?: uri.getQueryParameter("token")
-                ?: run {
-                    // token may be in the fragment
-                    val frag = uri.fragment ?: ""
-                    Regex("access_token=([^&]+)").find(frag)?.groupValues?.get(1)
-                }
-            if (token.isNullOrBlank()) {
-                Result.failure(Exception("لم يتم استلام رمز الجلسة من جوجل"))
-            } else {
-                authToken = token
-                inMemoryLoggedIn = true
-                val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                sp.edit()
-                    .putBoolean(KEY_IS_LOGGED_IN, true)
-                    .putString(KEY_AUTH_TOKEN, token)
-                    .apply()
-                Result.success(Unit)
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
     suspend fun login(context: Context?, email: String, password: String): Result<Unit> = withContext(Dispatchers.IO) {
+        val cleanEmail = email.trim().lowercase()
         try {
             val json = JSONObject().apply {
-                put("email", email)
+                put("email", cleanEmail)
                 put("password", password)
             }
             val requestBody = json.toString().toRequestBody(jsonMediaType)
@@ -164,23 +131,32 @@ object Base44Auth {
                 Result.success(Unit)
             } else {
                 val errBody = response.body?.string()
-                val message = parseErrorMessage(errBody) ?: "فشل تسجيل الدخول (${response.code})"
+                val parsed = parseErrorMessage(errBody)
+                val message = when {
+                    parsed != null -> parsed
+                    response.code == 401 -> "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+                    else -> "فشل تسجيل الدخول (${response.code})"
+                }
                 Result.failure(Exception(message))
             }
+        } catch (e: IOException) {
+            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التحقق من الاتصال بالإنترنت"))
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(e.message ?: "حدث خطأ غير متوقع"))
         }
     }
 
     suspend fun register(email: String, password: String, fullName: String): Result<Unit> = register(null, email, password, fullName)
 
     suspend fun register(context: Context?, email: String, password: String, fullName: String): Result<Unit> = withContext(Dispatchers.IO) {
+        val cleanEmail = email.trim().lowercase()
+        val cleanName = fullName.trim()
         try {
             val json = JSONObject().apply {
-                put("email", email)
+                put("email", cleanEmail)
                 put("password", password)
-                put("full_name", fullName)
-                put("name", fullName)
+                put("full_name", cleanName)
+                put("name", cleanName)
             }
             val requestBody = json.toString().toRequestBody(jsonMediaType)
             val request = Request.Builder()
@@ -190,31 +166,35 @@ object Base44Auth {
 
             val response = httpClient.newCall(request).execute()
             if (response.isSuccessful) {
-                inMemoryLoggedIn = true
-                context?.let { ctx ->
-                    val sp = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                    sp.edit().putBoolean(KEY_IS_LOGGED_IN, true).apply()
-                }
                 Result.success(Unit)
             } else {
                 val errBody = response.body?.string()
-                val message = parseErrorMessage(errBody) ?: "فشل إنشاء الحساب (${response.code})"
+                val parsed = parseErrorMessage(errBody)
+                val message = when {
+                    parsed != null -> parsed
+                    response.code == 409 || (errBody?.contains("already", ignoreCase = true) == true) ->
+                        "البريد الإلكتروني مسجل بالفعل، يرجى تسجيل الدخول"
+                    else -> "فشل إنشاء الحساب (${response.code})"
+                }
                 Result.failure(Exception(message))
             }
+        } catch (e: IOException) {
+            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التحقق من الاتصال بالإنترنت"))
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(e.message ?: "حدث خطأ أثناء إنشاء الحساب"))
         }
     }
 
-    /**
-     * التحقق من رمز OTP المرسل إلى البريد الإلكتروني بعد إنشاء الحساب.
-     * إذا أعاد الخادم access_token خُزّن واستُخدم تلقائياً.
-     */
+    suspend fun verifyOtp(email: String, otpCode: String): Result<Unit> = verifyOtp(null, email, otpCode)
+
     suspend fun verifyOtp(context: Context?, email: String, otpCode: String): Result<Unit> = withContext(Dispatchers.IO) {
+        val cleanEmail = email.trim().lowercase()
+        val cleanOtp = otpCode.filter { it.isDigit() }
         try {
             val json = JSONObject().apply {
-                put("email", email)
-                put("otp_code", otpCode) // server expects snake_case otp_code (was otpCode -> always rejected)
+                put("email", cleanEmail)
+                put("otp_code", cleanOtp)
+                put("code", cleanOtp)
             }
             val requestBody = json.toString().toRequestBody(jsonMediaType)
             val request = Request.Builder()
@@ -243,18 +223,33 @@ object Base44Auth {
                 Result.success(Unit)
             } else {
                 val errBody = response.body?.string()
-                val message = parseErrorMessage(errBody) ?: "رمز التحقق غير صحيح أو منتهي (${response.code})"
+                val rawMsg = parseErrorMessage(errBody)
+                val rawLower = rawMsg?.lowercase() ?: ""
+                val message = when {
+                    rawLower.contains("expire") || rawLower.contains("منتهي") || response.code == 410 ->
+                        "رمز التحقق منتهي الصلاحية، يرجى إطلب رمز جديد"
+                    rawLower.contains("invalid") || rawLower.contains("wrong") || rawLower.contains("incorrect") || rawLower.contains("غير صحيح") || response.code == 400 || response.code == 401 || response.code == 422 ->
+                        "رمز التحقق غير صحيح، يرجى التأكد من الرمز المدخل"
+                    rawMsg != null -> rawMsg
+                    else -> "رمز التحقق غير صحيح أو منتهي الصلاحية (${response.code})"
+                }
                 Result.failure(Exception(message))
             }
+        } catch (e: IOException) {
+            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التأكد من اتصال الإنترنت والمحاولة مرة أخرى"))
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(e.message ?: "حدث خطأ أثناء التحقق من الرمز"))
         }
     }
 
-    /** إعادة إرسال رمز التحقق إلى البريد الإلكتروني */
-    suspend fun resendOtp(email: String): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun resendOtp(email: String): Result<Unit> = resendOtp(null, email)
+
+    suspend fun resendOtp(context: Context?, email: String): Result<Unit> = withContext(Dispatchers.IO) {
+        val cleanEmail = email.trim().lowercase()
         try {
-            val json = JSONObject().apply { put("email", email) }
+            val json = JSONObject().apply {
+                put("email", cleanEmail)
+            }
             val requestBody = json.toString().toRequestBody(jsonMediaType)
             val request = Request.Builder()
                 .url(BASE_URL + RESEND_OTP_PATH)
@@ -266,18 +261,22 @@ object Base44Auth {
                 Result.success(Unit)
             } else {
                 val errBody = response.body?.string()
-                val message = parseErrorMessage(errBody) ?: "فشل إعادة إرسال الرمز (${response.code})"
+                val parsed = parseErrorMessage(errBody)
+                val message = parsed ?: "فشل إعادة إرسال الرمز (${response.code})"
                 Result.failure(Exception(message))
             }
+        } catch (e: IOException) {
+            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التأكد من اتصال الإنترنت"))
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(e.message ?: "فشل إعادة إرسال الرمز"))
         }
     }
 
     suspend fun forgotPassword(email: String): Result<Unit> = withContext(Dispatchers.IO) {
+        val cleanEmail = email.trim().lowercase()
         try {
             val json = JSONObject().apply {
-                put("email", email)
+                put("email", cleanEmail)
             }
             val requestBody = json.toString().toRequestBody(jsonMediaType)
             val request = Request.Builder()
@@ -293,6 +292,8 @@ object Base44Auth {
                 val message = parseErrorMessage(errBody) ?: "فشل إرسال رابط إعادة التعيين"
                 Result.failure(Exception(message))
             }
+        } catch (e: IOException) {
+            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التحقق من اتصالك بالإنترنت"))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -320,6 +321,8 @@ object Base44Auth {
                 val message = parseErrorMessage(errBody) ?: "فشل إعادة تعيين كلمة المرور"
                 Result.failure(Exception(message))
             }
+        } catch (e: IOException) {
+            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التحقق من اتصالك بالإنترنت"))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -329,7 +332,8 @@ object Base44Auth {
         if (jsonStr.isNullOrEmpty()) return null
         return try {
             val obj = JSONObject(jsonStr)
-            obj.optString("message", obj.optString("error", null))
+            val msg = obj.optString("message", obj.optString("error", ""))
+            if (msg.isNotBlank()) msg else null
         } catch (_: Exception) {
             null
         }

@@ -35,7 +35,8 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun LoginScreen(
     onSuccess: () -> Unit,
-    onForgot: () -> Unit
+    onForgot: () -> Unit,
+    onNavigateToRegister: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -220,6 +221,20 @@ fun LoginScreen(
                                 )
                             } else {
                                 Text(t("تسجيل الدخول", "Sign in"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            }
+                        }
+
+                        if (onNavigateToRegister != null) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            TextButton(
+                                onClick = onNavigateToRegister,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = t("ليس لديك حساب؟ إنشاء حساب جديد", "Don't have an account? Sign up"),
+                                    color = GoldSoft,
+                                    fontSize = 14.sp
+                                )
                             }
                         }
 
