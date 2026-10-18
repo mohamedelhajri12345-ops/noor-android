@@ -142,8 +142,9 @@ class MainActivity : ComponentActivity() {
 fun NoorApp() {
     var showSplash by remember { mutableStateOf(true) }
     val navController = rememberNavController()
+    val appCtx = androidx.compose.ui.platform.LocalContext.current
     LaunchedEffect(Unit) {
-        com.elhajri.noor.ads.InterstitialAds.preload(androidx.compose.ui.platform.LocalContext.current)
+        com.elhajri.noor.ads.InterstitialAds.preload(appCtx)
     }
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route

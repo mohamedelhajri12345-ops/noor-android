@@ -44,7 +44,7 @@ object InterstitialAds {
                         override fun onAdDismissedFullScreenContent() {
                             interstitialAd = null
                         }
-                        override fun onAdFailedToShow(adError: AdError) {
+                        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                             interstitialAd = null
                         }
                     }
