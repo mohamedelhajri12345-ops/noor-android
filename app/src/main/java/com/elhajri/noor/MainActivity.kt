@@ -38,6 +38,44 @@ import com.elhajri.noor.community.CommunityScreen
 import com.elhajri.noor.donation.DonationScreen
 import com.elhajri.noor.favorites.FavoritesScreen
 import com.elhajri.noor.games.NoorGameHubScreen
+import com.elhajri.noor.games.WordSearchGame
+import com.elhajri.noor.games.TawafOrderGame
+import com.elhajri.noor.games.WuduStepsGame
+import com.elhajri.noor.games.PrayerOrderGame
+import com.elhajri.noor.games.DuasChainGame
+import com.elhajri.noor.games.DeedsBalanceGame
+import com.elhajri.noor.games.HijriMonthsGame
+import com.elhajri.noor.games.JuzOrderGame
+import com.elhajri.noor.games.LanternMemoryGame
+import com.elhajri.noor.games.IsraJourneyGame
+import com.elhajri.noor.games.WisdomPearlsGame
+import com.elhajri.noor.games.ZakatCalcGame
+import com.elhajri.noor.games.HijriDatesGame
+import com.elhajri.noor.games.AngelsAndUnseenQuizGame
+import com.elhajri.noor.games.FastingRulesGame
+import com.elhajri.noor.games.KindnessTapGame
+import com.elhajri.noor.games.DoctrineQuizGameScreen
+import com.elhajri.noor.games.FiqhQuizGameScreen
+import com.elhajri.noor.games.SirahQuizGameScreen
+import com.elhajri.noor.games.CompanionsQuizGameScreen
+import com.elhajri.noor.games.RamadanQuizGameScreen
+import com.elhajri.noor.games.HajjQuizGameScreen
+import com.elhajri.noor.games.MatchNamesMeaningGameScreen
+import com.elhajri.noor.games.MatchSurahTopicsGameScreen
+import com.elhajri.noor.games.MatchWorshipGameScreen
+import com.elhajri.noor.games.MatchAthkarTimesGameScreen
+import com.elhajri.noor.games.MatchMosqueCitiesGameScreen
+import com.elhajri.noor.games.MatchIslamicMonthsGameScreen
+import com.elhajri.noor.games.ScrambleProphetsGameScreen
+import com.elhajri.noor.games.ScrambleSurahsGameScreen
+import com.elhajri.noor.games.ScrambleNamesAllahGameScreen
+import com.elhajri.noor.games.ScrambleRamadanGameScreen
+import com.elhajri.noor.games.ProphetsQuizGameScreen
+import com.elhajri.noor.games.QuranStoriesQuizGameScreen
+import com.elhajri.noor.games.MannersQuizGameScreen
+import com.elhajri.noor.games.PrayerQuizGameScreen
+import com.elhajri.noor.games.HadithQuizGameScreen
+import com.elhajri.noor.games.AthkarQuizGameScreen
 import com.elhajri.noor.games.KalimatGameScreen
 import com.elhajri.noor.games.TriviaLadderGameScreen
 import com.elhajri.noor.games.AyatChainGameScreen
@@ -327,6 +365,46 @@ fun NoorApp() {
                 composable("game_quran_mem") { QuranMemorizationGameScreen(onBack = { navController.popBackStack() }) }
                 composable("game_names_allah") { NamesOfAllahGameScreen(onBack = { navController.popBackStack() }) }
                 composable("game_prophets_journey") { ProphetsJourneyGameScreen(onBack = { navController.popBackStack() }) }
+                // ===== New interactive games (batch 1) =====
+                composable("game_word_search") { WordSearchGame(onBack = { navController.popBackStack() }) }
+                composable("game_tawaf") { TawafOrderGame(onBack = { navController.popBackStack() }) }
+                composable("game_wudu") { WuduStepsGame(onBack = { navController.popBackStack() }) }
+                composable("game_prayer_order") { PrayerOrderGame(onBack = { navController.popBackStack() }) }
+                composable("game_duas_chain") { DuasChainGame(onBack = { navController.popBackStack() }) }
+                composable("game_deeds_balance") { DeedsBalanceGame(onBack = { navController.popBackStack() }) }
+                composable("game_hijri_months") { HijriMonthsGame(onBack = { navController.popBackStack() }) }
+                composable("game_juz_order") { JuzOrderGame(onBack = { navController.popBackStack() }) }
+                composable("game_lantern_memory") { LanternMemoryGame(onBack = { navController.popBackStack() }) }
+                composable("game_isra") { IsraJourneyGame(onBack = { navController.popBackStack() }) }
+                composable("game_wisdom_pearls") { WisdomPearlsGame(onBack = { navController.popBackStack() }) }
+                composable("game_zakat_calc") { ZakatCalcGame(onBack = { navController.popBackStack() }) }
+                composable("game_hijri_dates") { HijriDatesGame(onBack = { navController.popBackStack() }) }
+                composable("game_angels_unseen") { AngelsAndUnseenQuizGame(onBack = { navController.popBackStack() }) }
+                composable("game_fasting_rules") { FastingRulesGame(onBack = { navController.popBackStack() }) }
+                composable("game_kindness_tap") { KindnessTapGame(onBack = { navController.popBackStack() }) }
+                // ===== Batch 3: engine-based games =====
+                composable("game_quiz_doctrine") { DoctrineQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_fiqh") { FiqhQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_sirah") { SirahQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_companions") { CompanionsQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_ramadan") { RamadanQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_hajj") { HajjQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_match_names_meaning") { MatchNamesMeaningGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_match_surah_topics") { MatchSurahTopicsGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_match_worship") { MatchWorshipGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_match_athkar_times") { MatchAthkarTimesGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_match_mosque_cities") { MatchMosqueCitiesGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_match_islamic_months") { MatchIslamicMonthsGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_scramble_prophets") { ScrambleProphetsGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_scramble_surahs") { ScrambleSurahsGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_scramble_names_allah") { ScrambleNamesAllahGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_scramble_ramadan") { ScrambleRamadanGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_prophets") { ProphetsQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_quran_stories") { QuranStoriesQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_manners") { MannersQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_prayer") { PrayerQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_athkar") { AthkarQuizGameScreen(onBack = { navController.popBackStack() }) }
+                composable("game_quiz_hadith") { HadithQuizGameScreen(onBack = { navController.popBackStack() }) }
                 composable("hajj") { HajjGuideScreen(onBack = { navController.popBackStack() }) }
                 composable("zakat") { ZakatScreen() }
             }

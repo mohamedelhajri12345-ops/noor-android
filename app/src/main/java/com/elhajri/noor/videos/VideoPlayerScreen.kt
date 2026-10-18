@@ -5,7 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import android.content.Context
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.PlayCircleFill
 import androidx.compose.ui.text.style.TextAlign
 import android.app.Activity
 import android.content.res.Configuration
@@ -282,31 +282,41 @@ fun VideoPlayerScreen(
                     .background(Color.Black),
                 contentAlignment = Alignment.Center
             ) {
-                if (isSignInRequired && currentVideo?.mp4Url == null) {
+                // PROACTIVE: never embed YouTube-only videos in NOOR's player.
+                // The embedded player is what triggers YouTube's "sign in" wall with a dead
+                // button, so we show a beautiful launcher straight away instead. Opening in
+                // the installed YouTube app uses the account already signed in on the phone.
+                if (currentVideo?.mp4Url == null) {
                     // One-time consent for opening the YouTube app with the phone's own account
                     val sharedPrefs = remember { context.getSharedPreferences("noor_settings", Context.MODE_PRIVATE) }
                     var showYouTubeAppConsent by remember { mutableStateOf(false) }
                     var pendingYouTubeAppOpen by remember { mutableStateOf(false) }
 
                     fun launchYouTubeApp() {
+                        val watchUrl = "https://www.youtube.com/watch?v=" + currentVideoId
+                        // 1) Native vnd.youtube deep link: opens the installed YouTube app,
+                        //    which is already signed in with the phone's Google account.
                         try {
-                            // vnd.youtube deep link opens the YouTube app which is already
-                            // signed in with the phone's account, so the video plays there.
                             val appIntent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + currentVideoId))
                             appIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             context.startActivity(appIntent)
-                        } catch (e: Exception) {
-                            // Fallback to browser watch URL (app chooser / browser)
-                            try {
-                                val webIntent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://www.youtube.com/watch?v=" + currentVideoId)
-                                )
-                                webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                context.startActivity(webIntent)
-                            } catch (e2: Exception) {
-                                Toast.makeText(context, "تعذر فتح يوتيوب", Toast.LENGTH_SHORT).show()
-                            }
+                            return
+                        } catch (_: Exception) { }
+                        // 2) Explicit YouTube app package with the normal watch URL
+                        try {
+                            val pkgIntent = Intent(Intent.ACTION_VIEW, Uri.parse(watchUrl))
+                            pkgIntent.setPackage("com.google.android.youtube")
+                            pkgIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            context.startActivity(pkgIntent)
+                            return
+                        } catch (_: Exception) { }
+                        // 3) Browser as last resort
+                        try {
+                            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(watchUrl))
+                            webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            context.startActivity(webIntent)
+                        } catch (e2: Exception) {
+                            Toast.makeText(context, "تعذر فتح يوتيوب — ثبّت تطبيق يوتيوب أو المتصفح", Toast.LENGTH_LONG).show()
                         }
                     }
 
@@ -905,8 +915,8 @@ private fun YouTubeSignInOverlay(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "تسجيل الدخول مطلوب",
+                    imageVector = Icons.Default.PlayCircleFill,
+                    contentDescription = "تشغيل في تطبيق يوتيوب",
                     tint = Gold,
                     modifier = Modifier.size(26.dp)
                 )
@@ -915,7 +925,7 @@ private fun YouTubeSignInOverlay(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "هذا الفيديو يحتاج تسجيل دخول في يوتيوب",
+                text = "شغّل الفيديو في تطبيق يوتيوب",
                 color = Color.White,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
@@ -925,7 +935,7 @@ private fun YouTubeSignInOverlay(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "هذا الفيديو يتطلب تسجيل دخول يوتيوب. اسرع حل: افتحه في تطبيق يوتيوب على هاتفك — سيعمل فوراً بحسابك المسجّل فيه دون تسجيل جديد. أو استخدم المتصفح أو الفيديوهات المباشرة.",
+                text = "اضغط الزر الذهبي وسيعمل الفيديو فوراً في تطبيق يوتيوب بحسابك المسجّل في جهازك — بدون أي تسجيل دخول من داخل نُور. نُور لا يصل إلى حسابك ولا يجمع بياناتك.",
                 color = GoldSoft,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
