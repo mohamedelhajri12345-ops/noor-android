@@ -23,7 +23,7 @@ import androidx.compose.material.icons.filled.Balance
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Money
-import androidx.compose.material.icons.filled.Lookup
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.LocalFireDepartment
@@ -104,12 +104,12 @@ private val games = listOf(
     GameEntry("game_isra", "رحلة الإسراء والمعراج", "اجتز محطات الرحلة المباركة بترتيبها", Icons.Default.LocationOn, true, 0xffb39a55, "order"),
     GameEntry("game_wisdom_pearls", "لؤلؤة الحكمة", "طابق الحديث النبوي ببابه وموضوعه", Icons.Default.Psychology, true, 0xff7fb2a6, "knowledge"),
     GameEntry("game_zakat_calc", "عداد الزكاة", "احسب زكاة المال والذهب بنسبة صحيحة", Icons.Default.Money, true, 0xffc7a85b, "knowledge"),
-    GameEntry("game_hijri_dates", "لغز التواريخ", "طابق المناسبة الإسلامية بشهرها الهجري", Icons.Default.Lookup, true, 0xff8ecfc4, "knowledge"),
+    GameEntry("game_hijri_dates", "لغز التواريخ", "طابق المناسبة الإسلامية بشهرها الهجري", Icons.Default.Event, true, 0xff8ecfc4, "knowledge"),
     GameEntry("game_angels_unseen", "عالم الغيب", "أسئلة عن الملائكة والآخرة وعالم الغيب", Icons.Default.Visibility, true, 0xff9dbf6e, "knowledge"),
     GameEntry("game_fasting_rules", "فقه الصيام", "أحكام الصيام: صح أم خطأ بدليلها", Icons.Default.LocalFireDepartment, true, 0xffc98b5e, "knowledge"),
     GameEntry("game_kindness_tap", "قطاف الأخلاق", "اختر الخلق النبوي قبل انتهاء الوقت", Icons.Default.TouchApp, true, 0xffd0a93f, "skill"),
     // ===== Batch 3: engine-based games =====
-    GameEntry("game_quiz_doctrine", "اختبار العقيدة", "٣٠ سؤالاً في العقيدة والتوحيد", Icons.Default.School, true, 0xff6fbf8b, "knowledge"),
+    GameEntry("game_quiz_doctrine", "اختبار العقيدة", "٣٠ سؤالاً في العقيدة والتوحيد", Icons.Default.MenuBook, true, 0xff6fbf8b, "knowledge"),
     GameEntry("game_quiz_fiqh", "اختبار الفقه", "أسئلة في فقه العبادات والمعاملات", Icons.Default.MenuBook, true, 0xffc5a028, "knowledge"),
     GameEntry("game_quiz_sirah", "اختبار السيرة", "وقفات وعبر من سيرة الحبيب ﷺ", Icons.Default.Psychology, true, 0xff9dbf6e, "knowledge"),
     GameEntry("game_quiz_companions", "اختبار الصحابة", "٣٠ سؤالاً عن جيل الصحابة الكرام", Icons.Default.EmojiEvents, true, 0xff8ecfc4, "knowledge"),
@@ -121,11 +121,11 @@ private val games = listOf(
     GameEntry("game_match_athkar_times", "مطابقة الأذكار وأوقاتها", "ذكر الصباح والمساء وأوقاته", Icons.Default.WbTwilight, true, 0xff86b79b, "memory"),
     GameEntry("game_match_mosque_cities", "مطابقة المساجد ومدنها", "المساجد العريقة ومدنها حول العالم", Icons.Default.LocationOn, true, 0xffc98b5e, "memory"),
     GameEntry("game_match_islamic_months", "مطابقة الأشهر ومناسباتها", "طابق الشهر الهجري بمناسبته", Icons.Default.CalendarMonth, true, 0xff8ecfc4, "memory"),
-    GameEntry("game_scramble_prophets", "حروف الأنبياء", "رتّب حروف أسماء الأنبياء عليهم السلام", Icons.Default.School, true, 0xffc7a85b, "letters"),
+    GameEntry("game_scramble_prophets", "حروف الأنبياء", "رتّب حروف أسماء الأنبياء عليهم السلام", Icons.Default.MenuBook, true, 0xffc7a85b, "letters"),
     GameEntry("game_scramble_surahs", "حروف السور", "رتّب حروف أسماء سور القرآن", Icons.Default.MenuBook, true, 0xff6fbf8b, "letters"),
     GameEntry("game_scramble_names_allah", "حروف الأسماء الحسنى", "رتّب حروف أسماء الله الحسنى", Icons.Default.AutoAwesome, true, 0xffd0a93f, "letters"),
     GameEntry("game_scramble_ramadan", "حروف رمضان", "كلمات رمضانية تنتظر ترتيبك", Icons.Default.LocalFireDepartment, true, 0xff9dbf6e, "letters"),
-    GameEntry("game_quiz_prophets", "اختبار الأنبياء", "٣٠ سؤالاً عن قصص الأنبياء ورسائلهم", Icons.Default.School, true, 0xffd0a93f, "knowledge"),
+    GameEntry("game_quiz_prophets", "اختبار الأنبياء", "٣٠ سؤالاً عن قصص الأنبياء ورسائلهم", Icons.Default.MenuBook, true, 0xffd0a93f, "knowledge"),
     GameEntry("game_quiz_quran_stories", "اختبار قصص القرآن", "أسئلة عن قصص القرآن الكريم وعبرها", Icons.Default.MenuBook, true, 0xff7fb2a6, "knowledge"),
     GameEntry("game_quiz_manners", "اختبار الأخلاق والآداب", "آداب الإسلام وأخلاقيات اليوم", Icons.Default.EmojiEvents, true, 0xffc5a028, "knowledge"),
     GameEntry("game_quiz_prayer", "اختبار الصلاة", "٣٠ سؤالاً في أحكام الصلاة ووقتها", Icons.Default.Schedule, true, 0xff6fbf8b, "knowledge"),

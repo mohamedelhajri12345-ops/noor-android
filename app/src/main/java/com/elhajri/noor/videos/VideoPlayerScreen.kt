@@ -5,7 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import android.content.Context
-import androidx.compose.material.icons.filled.PlayCircleFill
+import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.ui.text.style.TextAlign
 import android.app.Activity
 import android.content.res.Configuration
@@ -915,7 +915,7 @@ private fun YouTubeSignInOverlay(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.PlayCircleFill,
+                    imageVector = Icons.Default.PlayCircleFilled,
                     contentDescription = "تشغيل في تطبيق يوتيوب",
                     tint = Gold,
                     modifier = Modifier.size(26.dp)

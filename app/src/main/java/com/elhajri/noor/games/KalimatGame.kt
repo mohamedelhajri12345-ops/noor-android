@@ -573,7 +573,7 @@ private fun KalimatPlayScreen(
     val context = LocalContext.current
     val wordChars = remember(level) { level.word.toCharArray() }
 
-    val revealedIndices = remember(level) { mutableStateSetOf<Int>() }
+    val revealedIndices = remember(level) { mutableStateMapOf<Int, Boolean>() }
     val guessedLetters = remember(level) { mutableStateMapOf<String, Boolean>() }
     var remainingLanterns by remember(level) { mutableIntStateOf(6) }
 
@@ -597,7 +597,7 @@ private fun KalimatPlayScreen(
 
         if (matches.isNotEmpty()) {
             guessedLetters[letterStr] = true
-            matches.forEach { revealedIndices.add(it) }
+            matches.forEach { revealedIndices[it] = true }
 
             if (revealedIndices.size == wordChars.size) {
                 showWinDialog = true
@@ -626,7 +626,7 @@ private fun KalimatPlayScreen(
         val targetNorm = normalizeArabicChar(wordChars[pickIdx])
 
         wordChars.indices.filter { normalizeArabicChar(wordChars[it]) == targetNorm }.forEach {
-            revealedIndices.add(it)
+            revealedIndices[it] = true
         }
 
         if (revealedIndices.size == wordChars.size) {

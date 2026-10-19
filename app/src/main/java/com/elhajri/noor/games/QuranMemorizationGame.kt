@@ -47,15 +47,6 @@ import kotlinx.coroutines.delay
 import org.json.JSONObject
 import com.elhajri.noor.ui.TextMain
 
-private fun Int.toArabicDigits(): String {
-    val arDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
-    val str = this.toString()
-    val builder = StringBuilder()
-    for (ch in str) {
-        if (ch in '0'..'9') builder.append(arDigits[ch - '0']) else builder.append(ch)
-    }
-    return builder.toString()
-}
 
 // Memorization status: 0 = NOT_STARTED, 1 = IN_PROGRESS, 2 = MEMORIZED
 enum class MemStatus { NOT_STARTED, IN_PROGRESS, MEMORIZED }

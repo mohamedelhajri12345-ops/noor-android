@@ -43,7 +43,7 @@ import com.elhajri.noor.ui.TextMain
  * "رباط معاني الله" — ذاكرة ومطابقة: طابق اسم الله الحسنى مع معناه الإيماني.
  * 20 مرحلة بتزايد في عدد الأزواج والشبكة من 4 أزواج حتى 10 أزواج.
  */
-private data class MatchCard(val pairId: Int, val label: String, val isMeaning: Boolean)
+private data class NameMatchCard(val pairId: Int, val label: String, val isMeaning: Boolean)
 
 @Composable
 fun NamesMatchGameScreen(onBack: () -> Unit) {
@@ -171,7 +171,7 @@ private fun NamesMatchPlayScreen(
         else -> 10
     }
 
-    var cards by remember(levelIdx) { mutableStateOf(listOf<MatchCard>()) }
+    var cards by remember(levelIdx) { mutableStateOf(listOf<NameMatchCard>()) }
     var flipped by remember(levelIdx) { mutableStateOf(setOf<Int>()) }
     var matched by remember(levelIdx) { mutableStateOf(setOf<Int>()) }
     var moves by remember(levelIdx) { mutableIntStateOf(0) }
@@ -184,8 +184,8 @@ private fun NamesMatchPlayScreen(
         val picks = names.shuffled(Random((l + 1) * 17 + 3)).take(pairCount)
         val deck = picks.flatMapIndexed { i, n ->
             listOf(
-                MatchCard(i, n.name, isMeaning = false),
-                MatchCard(i, n.meaning, isMeaning = true)
+                NameMatchCard(i, n.name, isMeaning = false),
+                NameMatchCard(i, n.meaning, isMeaning = true)
             )
         }.shuffled(Random((l + 1) * 29 + 11))
         cards = deck

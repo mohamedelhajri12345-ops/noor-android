@@ -2,6 +2,7 @@ package com.elhajri.noor.games
 
 import android.content.Context
 import androidx.compose.animation.*
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,15 +48,6 @@ data class QuizItem(
     val fact: String
 )
 
-private fun Int.toArabicDigits(): String {
-    val arDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
-    val str = this.toString()
-    val builder = StringBuilder()
-    for (ch in str) {
-        if (ch in '0'..'9') builder.append(arDigits[ch - '0']) else builder.append(ch)
-    }
-    return builder.toString()
-}
 
 @Composable
 fun GenericQuizGameScreen(

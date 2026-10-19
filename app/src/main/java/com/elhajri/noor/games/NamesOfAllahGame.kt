@@ -33,15 +33,6 @@ import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.delay
 import com.elhajri.noor.ui.TextMain
 
-private fun Int.toArabicDigits(): String {
-    val arDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
-    val str = this.toString()
-    val builder = StringBuilder()
-    for (ch in str) {
-        if (ch in '0'..'9') builder.append(arDigits[ch - '0']) else builder.append(ch)
-    }
-    return builder.toString()
-}
 
 // Quiz question built at runtime from the 99 names dataset
 private data class NamesQuizQuestion(
