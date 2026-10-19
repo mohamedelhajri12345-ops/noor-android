@@ -533,8 +533,8 @@ fun KalimatGameScreen(onBack: () -> Unit) {
                     level = kalimatLevels[currentLevelIdx],
                     onLevelComplete = { remainingLanterns ->
                         val stars = when {
-                            remainingLanterns >= 5 -> 3
-                            remainingLanterns >= 3 -> 2
+                            remainingLanterns == 3 -> 3
+                            remainingLanterns == 2 -> 2
                             else -> 1
                         }
                         val pts = 100 + (remainingLanterns * 20)
@@ -575,7 +575,10 @@ private fun KalimatPlayScreen(
 
     val revealedIndices = remember(level) { mutableStateMapOf<Int, Boolean>() }
     val guessedLetters = remember(level) { mutableStateMapOf<String, Boolean>() }
-    var remainingLanterns by remember(level) { mutableIntStateOf(6) }
+    var remainingLanterns by remember(level) { mutableIntStateOf(3) }
+    var hintCount by remember(level) { mutableIntStateOf(0) }
+    var lastHintTime by remember(level) { mutableLongStateOf(0L) }
+    var hintToastMessage by remember(level) { mutableStateOf<String?>(null) }
 
     var showWinDialog by remember(level) { mutableStateOf(false) }
     var showFailDialog by remember(level) { mutableStateOf(false) }
@@ -617,11 +620,24 @@ private fun KalimatPlayScreen(
 
     fun useWhisperHint() {
         if (showWinDialog || showFailDialog || remainingLanterns <= 0) return
+        if (hintCount >= 2) {
+            hintToastMessage = "الحد الأقصى للتلميحات في هذه المرحلة هو ٢"
+            return
+        }
+        val now = System.currentTimeMillis()
+        if (now - lastHintTime < 15000L && lastHintTime != 0L) {
+            val remainingSecs = ((15000L - (now - lastHintTime)) / 1000L) + 1
+            hintToastMessage = "انتظر $remainingSecs ثوانٍ لاستخدام التلميح التالي"
+            return
+        }
 
         val unrevealed = wordChars.indices.filter { it !in revealedIndices }
         if (unrevealed.isEmpty()) return
 
-        remainingLanterns--
+        hintCount++
+        lastHintTime = now
+        hintToastMessage = null
+
         val pickIdx = unrevealed.random()
         val targetNorm = normalizeArabicChar(wordChars[pickIdx])
 
@@ -632,9 +648,6 @@ private fun KalimatPlayScreen(
         if (revealedIndices.size == wordChars.size) {
             showWinDialog = true
             onLevelComplete(remainingLanterns)
-        } else if (remainingLanterns <= 0) {
-            KalimatStorage.resetStreak(context)
-            showFailDialog = true
         }
     }
 
@@ -693,7 +706,7 @@ private fun KalimatPlayScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "الفوانيس المتبقية: $remainingLanterns / 6",
+                        text = "الفوانيس المتبقية: $remainingLanterns / 3",
                         color = GoldSoft,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
@@ -703,7 +716,7 @@ private fun KalimatPlayScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        for (i in 1..6) {
+                        for (i in 1..3) {
                             LanternIcon(isActive = i <= remainingLanterns)
                         }
                     }

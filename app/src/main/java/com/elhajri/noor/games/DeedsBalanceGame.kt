@@ -244,12 +244,12 @@ private fun DeedsBalancePlayScreen(
         ALL_DEEDS_COMPARISONS.subList(start, start + 5)
     }
 
-    var roundInStageIdx by remember { mutableIntStateOf(0) }
-    var selectedSide by remember { mutableStateOf<Boolean?>(null) } // true = Deed A, false = Deed B
-    var isAnswered by remember { mutableStateOf(false) }
-    var correctCount by remember { mutableIntStateOf(0) }
-    var showWinDialog by remember { mutableStateOf(false) }
-    var earnedStars by remember { mutableIntStateOf(3) }
+    var roundInStageIdx by remember(stageIdx) { mutableIntStateOf(0) }
+    var selectedSide by remember(stageIdx) { mutableStateOf<Boolean?>(null) } // true = Deed A, false = Deed B
+    var isAnswered by remember(stageIdx) { mutableStateOf(false) }
+    var correctCount by remember(stageIdx) { mutableIntStateOf(0) }
+    var showWinDialog by remember(stageIdx) { mutableStateOf(false) }
+    var earnedStars by remember(stageIdx) { mutableIntStateOf(3) }
 
     val activeRound = stageComparisons[roundInStageIdx]
 

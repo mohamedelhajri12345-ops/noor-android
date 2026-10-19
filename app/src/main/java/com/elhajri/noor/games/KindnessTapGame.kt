@@ -242,20 +242,20 @@ private fun KindnessPlayScreen(
         ALL_KINDNESS_SCENARIOS.subList(start, start + 5)
     }
 
-    var scenarioInStageIdx by remember { mutableIntStateOf(0) }
-    var selectedOption by remember { mutableStateOf<String?>(null) }
-    var isAnswered by remember { mutableStateOf(false) }
-    var correctCount by remember { mutableIntStateOf(0) }
-    var showWinDialog by remember { mutableStateOf(false) }
-    var earnedStars by remember { mutableIntStateOf(3) }
+    var scenarioInStageIdx by remember(stageIdx) { mutableIntStateOf(0) }
+    var selectedOption by remember(stageIdx) { mutableStateOf<String?>(null) }
+    var isAnswered by remember(stageIdx) { mutableStateOf(false) }
+    var correctCount by remember(stageIdx) { mutableIntStateOf(0) }
+    var showWinDialog by remember(stageIdx) { mutableStateOf(false) }
+    var earnedStars by remember(stageIdx) { mutableIntStateOf(3) }
 
     // Timer shrinks as stages rise (from 10s at stage 1 down to 4.3s at stage 20)
     val roundTimerMs = remember(stageIdx) {
         (10000L - stageIdx * 300L).coerceAtLeast(3500L)
     }
 
-    var timeLeftMillis by remember { mutableLongStateOf(roundTimerMs) }
-    var isTimerRunning by remember { mutableStateOf(true) }
+    var timeLeftMillis by remember(stageIdx) { mutableLongStateOf(roundTimerMs) }
+    var isTimerRunning by remember(stageIdx) { mutableStateOf(true) }
 
     val currentScenario = stageScenarios[scenarioInStageIdx]
     val shuffledOptions = remember(stageIdx, scenarioInStageIdx) {

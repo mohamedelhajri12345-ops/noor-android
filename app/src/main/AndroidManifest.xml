@@ -22,8 +22,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Noor">
-        <!-- AdMob: معرّف تطبيق اختباري رسمي من Google — استبدله بمعرّفك الحقيقي
-             من AdMob Console قبل النشر الإنتاجي على Google Play -->
+        <!-- AdMob: معرّف تطبيق اختباري رسمي من Google -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-8701459895741919~8785357436" />
@@ -42,6 +41,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="noor" android:host="auth" android:path="/callback" />
+            </intent-filter>
+            <!-- Share target for YouTube links -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
         <receiver

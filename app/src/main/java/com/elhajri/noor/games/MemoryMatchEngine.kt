@@ -147,8 +147,8 @@ fun MemoryMatchEngine(
     val earnedStars = remember(moves, pairCount, isStageCompleted) {
         if (!isStageCompleted) 0
         else when {
-            moves <= pairCount + 2 -> 3
-            moves <= pairCount + 6 -> 2
+            moves <= pairCount + 1 -> 3
+            moves <= pairCount + 3 -> 2
             else -> 1
         }
     }

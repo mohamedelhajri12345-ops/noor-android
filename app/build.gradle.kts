@@ -106,6 +106,8 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.media:media:1.7.0")
+    implementation("androidx.media3:media3-exoplayer:1.2.1")
+    implementation("androidx.media3:media3-ui:1.2.1")
     // الذكاء الاصطناعي المحلي: نموذج Gemma يعمل على هاتف المستخدم (MediaPipe GenAI)
     implementation("com.google.mediapipe:tasks-genai:0.10.35")
     // إعلانات AdMob الرسمية — تُستعمل معرّفات الاختبار حتى يزوّد المالك معرّفاته الحقيقية

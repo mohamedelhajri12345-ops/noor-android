@@ -114,9 +114,35 @@ import com.elhajri.noor.zakat.ZakatScreen
 
 class MainActivity : ComponentActivity() {
 
+    var pendingSharedVideoId by mutableStateOf<String?>(null)
+        private set
+
+    fun clearSharedVideoId() {
+        pendingSharedVideoId = null
+    }
+
+    private fun checkShareIntent(intent: android.content.Intent?) {
+        if (intent == null || intent.action != android.content.Intent.ACTION_SEND) return
+        if (intent.type != "text/plain") return
+        val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT) ?: return
+
+        val patterns = listOf(
+            Regex("""(?:v=|/v/|/embed/|youtu\.be/|/shorts/)([a-zA-Z0-9_-]{11})"""),
+            Regex("""^[a-zA-Z0-9_-]{11}$""")
+        )
+        for (pattern in patterns) {
+            val match = pattern.find(text)
+            if (match != null) {
+                pendingSharedVideoId = match.groupValues[1]
+                break
+            }
+        }
+    }
+
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         handleAuthRedirect(intent)
+        checkShareIntent(intent)
     }
 
     /** Google sign-in deep link removed (broken flow) — kept as no-op for safety. */
@@ -126,6 +152,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkShareIntent(intent)
         com.elhajri.noor.auth.Base44Auth.init(applicationContext)
         com.elhajri.noor.settings.NoorLocale.init(applicationContext)
         com.elhajri.noor.audio.player.QuranPlayerManager.ensure(applicationContext)
@@ -183,6 +210,15 @@ fun NoorApp() {
     val appCtx = androidx.compose.ui.platform.LocalContext.current
     LaunchedEffect(Unit) {
         com.elhajri.noor.ads.InterstitialAds.preload(appCtx)
+    }
+    val sharedVideoId = (appCtx as? MainActivity)?.pendingSharedVideoId
+    LaunchedEffect(sharedVideoId) {
+        if (!sharedVideoId.isNullOrEmpty()) {
+            navController.navigate("videoPlayer/$sharedVideoId") {
+                launchSingleTop = true
+            }
+            (appCtx as? MainActivity)?.clearSharedVideoId()
+        }
     }
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
@@ -292,7 +328,7 @@ fun NoorApp() {
                 composable("more") { MoreScreen(onNavigate = { navigateSafe(it) }) }
 
                 composable("qibla") { QiblaScreen() }
-                composable("tasbih") { TasbihScreen() }
+                composable("tasbih") { TasbihScreen(onBack = { navController.popBackStack() }) }
                 composable("names") { NamesOfAllahScreen() }
                 composable("quiz") { QuizScreen() }
                 composable("stories") { StoriesScreen(onOpenStory = { id -> navController.navigate("story/$id") }) }

@@ -110,13 +110,13 @@ private fun LanternMemoryPlayScreen(
         List(sequenceLength) { rand.nextInt(4) }
     }
 
-    var gameState by remember { mutableStateOf(LanternGameState.READY) }
-    var userIndex by remember { mutableIntStateOf(0) }
-    var activeLitLantern by remember { mutableStateOf<Int?>(null) }
-    var mistakesCount by remember { mutableIntStateOf(0) }
-    var statusText by remember { mutableStateOf("اضغط ابدأ لمشاهدة التسلسل") }
-    var showWinDialog by remember { mutableStateOf(false) }
-    var earnedStars by remember { mutableIntStateOf(3) }
+    var gameState by remember(stageIdx) { mutableStateOf(LanternGameState.READY) }
+    var userIndex by remember(stageIdx) { mutableIntStateOf(0) }
+    var activeLitLantern by remember(stageIdx) { mutableStateOf<Int?>(null) }
+    var mistakesCount by remember(stageIdx) { mutableIntStateOf(0) }
+    var statusText by remember(stageIdx) { mutableStateOf("اضغط ابدأ لمشاهدة التسلسل") }
+    var showWinDialog by remember(stageIdx) { mutableStateOf(false) }
+    var earnedStars by remember(stageIdx) { mutableIntStateOf(3) }
 
     fun startShowingSequence() {
         gameState = LanternGameState.SHOWING_SEQUENCE

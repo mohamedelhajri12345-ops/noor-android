@@ -76,12 +76,12 @@ object KidsVideoStore {
     }
 
     /**
-     * Returns "الكل" followed by all unique sorted category names derived from the data.
+     * Returns "الكل", "فيديوهات التطبيق" followed by all unique sorted category names derived from the data.
      */
     fun getCategories(context: Context): List<String> {
         val videos = loadVideos(context)
-        val categories = videos.map { it.category }.distinct().sorted()
-        return listOf("الكل") + categories
+        val categories = videos.map { it.category }.filter { it != "فيديوهات التطبيق" }.distinct().sorted()
+        return listOf("الكل", "فيديوهات التطبيق") + categories
     }
 
     /**
@@ -91,7 +91,11 @@ object KidsVideoStore {
         var result = loadVideos(context)
 
         if (!category.isNullOrEmpty() && category != "الكل") {
-            result = result.filter { it.category == category }
+            if (category == "فيديوهات التطبيق") {
+                result = result.filter { it.mp4Url != null || it.id.startsWith("mp4_") }
+            } else {
+                result = result.filter { it.category == category }
+            }
         }
 
         if (!query.isNullOrBlank()) {
@@ -122,7 +126,6 @@ object KidsVideoStore {
         return if (currentIndex in 0 until categoryVideos.size - 1) {
             categoryVideos[currentIndex + 1]
         } else {
-            // Loop or fallback to first of category or next in global list
             val globalIndex = all.indexOfFirst { it.id == currentVideoId }
             if (globalIndex in 0 until all.size - 1) all[globalIndex + 1] else categoryVideos.firstOrNull()
         }

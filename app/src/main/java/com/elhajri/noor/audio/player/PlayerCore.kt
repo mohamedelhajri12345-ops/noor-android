@@ -8,24 +8,28 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.AudioAttributes
+import android.media.AudioFocusRequest
+import android.media.AudioManager
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.elhajri.noor.R
 import com.elhajri.noor.audio.AudioSessionManager
 import com.elhajri.noor.audio.AudioSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 data class PlayerTrack(
     val id: String,
@@ -70,6 +74,68 @@ interface PlayerFacade {
     fun clearSleepTimer()
 }
 
+/**
+ * MediaUrlResolver: Pre-resolves audio URLs (e.g. Archive.org 302 redirects) asynchronously using OkHttp.
+ * Bypasses Android MediaPlayer cross-domain 302 redirect issues, passes Mobile User-Agent,
+ * and maintains an in-memory cache for 0ms tap-to-sound latency on pre-fetched tracks.
+ */
+object MediaUrlResolver {
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .readTimeout(5, TimeUnit.SECONDS)
+        .followRedirects(true)
+        .followSslRedirects(true)
+        .build()
+
+    private val cache = ConcurrentHashMap<String, String>()
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    fun getCached(url: String): String? = cache[url]
+
+    fun resolveAsync(url: String, onResolved: (String) -> Unit) {
+        val cached = cache[url]
+        if (cached != null) {
+            onResolved(cached)
+            return
+        }
+        scope.launch {
+            val resolved = resolveSync(url)
+            cache[url] = resolved
+            withContext(Dispatchers.Main) {
+                onResolved(resolved)
+            }
+        }
+    }
+
+    fun resolveSync(url: String): String {
+        cache[url]?.let { return it }
+        return try {
+            val req = Request.Builder()
+                .url(url)
+                .header("User-Agent", "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36")
+                .head()
+                .build()
+            client.newCall(req).execute().use { resp ->
+                val finalUrl = resp.request.url.toString()
+                cache[url] = finalUrl
+                finalUrl
+            }
+        } catch (_: Exception) {
+            url
+        }
+    }
+
+    fun prefetchQueue(urls: List<String>) {
+        scope.launch {
+            for (u in urls.take(15)) {
+                if (!cache.containsKey(u)) {
+                    resolveSync(u)
+                }
+            }
+        }
+    }
+}
+
 /** يبقي مشغلاً واحداً فقط يعزف صوتاً في نفس اللحظة — يوقف الآخر تلقائياً عند بدء أحدهما */
 private object AudioFocusCoordinator {
     private val engines = mutableListOf<BasePlayerEngine>()
@@ -101,6 +167,93 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
     private var sleepRunnable: Runnable? = null
     private var gapRunnable: Runnable? = null
     private var tickRunnable: Runnable? = null
+
+    // System Audio Focus & WakeLock
+    private var audioManager: AudioManager? = null
+    private var audioFocusRequest: AudioFocusRequest? = null
+    private var focusTransientlyLost = false
+    private var wakeLock: PowerManager.WakeLock? = null
+
+    private val audioFocusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
+        when (focusChange) {
+            AudioManager.AUDIOFOCUS_LOSS -> {
+                focusTransientlyLost = false
+                pauseIfPlaying()
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                if (state.value.isPlaying) {
+                    focusTransientlyLost = true
+                    pauseIfPlaying()
+                }
+            }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                try { player?.setVolume(0.2f, 0.2f) } catch (_: Exception) {}
+            }
+            AudioManager.AUDIOFOCUS_GAIN -> {
+                try { player?.setVolume(1.0f, 1.0f) } catch (_: Exception) {}
+                if (focusTransientlyLost) {
+                    focusTransientlyLost = false
+                    toggle()
+                }
+            }
+        }
+    }
+
+    private fun requestSystemAudioFocus(): Boolean {
+        val ctx = appContext ?: return false
+        val am = audioManager ?: (ctx.getSystemService(Context.AUDIO_SERVICE) as? AudioManager).also { audioManager = it }
+        if (am == null) return false
+
+        val res = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val req = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                .setAcceptsDelayedFocusGain(true)
+                .setOnAudioFocusChangeListener(audioFocusChangeListener, handler)
+                .build()
+            audioFocusRequest = req
+            am.requestAudioFocus(req)
+        } else {
+            @Suppress("DEPRECATION")
+            am.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
+        }
+        return res == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+    }
+
+    private fun abandonSystemAudioFocus() {
+        val am = audioManager ?: return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioFocusRequest?.let { am.abandonAudioFocusRequest(it) }
+        } else {
+            @Suppress("DEPRECATION")
+            am.abandonAudioFocus(audioFocusChangeListener)
+        }
+    }
+
+    private fun acquireWakeLock() {
+        val ctx = appContext ?: return
+        if (wakeLock?.isHeld == true) return
+        try {
+            val pm = ctx.getSystemService(Context.POWER_SERVICE) as? PowerManager
+            wakeLock = pm?.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NOOR:${this.javaClass.simpleName}:Playback")?.apply {
+                setReferenceCounted(false)
+                acquire(10 * 60 * 1000L)
+            }
+        } catch (_: Exception) {}
+    }
+
+    private fun releaseWakeLock() {
+        try {
+            if (wakeLock?.isHeld == true) {
+                wakeLock?.release()
+            }
+        } catch (_: Exception) {}
+        wakeLock = null
+    }
 
     private val _state = MutableStateFlow(PlayerState())
     override val state: StateFlow<PlayerState> = _state.asStateFlow()
@@ -136,54 +289,35 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
         val track = queue.getOrNull(currentIndex) ?: return
         val ctx = appContext ?: return
 
-        // Notify central AudioSessionManager to stop all competing audio sources
+        // 1. Central audio session & audio focus coordination
         AudioSessionManager.onPlaybackStarted(ctx, getAudioSource())
         AudioFocusCoordinator.pauseOthers(this)
+        requestSystemAudioFocus()
+        acquireWakeLock()
         gapRunnable?.let { handler.removeCallbacks(it) }; gapRunnable = null
 
+        // 2. Instant UI feedback
         isLoading = true
         isBuffering = true
         fallbackIndex = 0
         sameUrlRetries = 0
-        publish()
-        try {
-            val mp = player ?: MediaPlayer().also { created -> wire(created); player = created }
-            mp.reset()
-            mp.setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
-            )
-            mp.setDataSource(track.url)
-            mp.prepareAsync()
-            startForegroundService(ctx)
-        } catch (_: Exception) {
-            onPlaybackFailed()
+        publish(error = null)
+
+        // 3. Resolve URL asynchronously via OkHttp (bypasses 302 cross-domain redirect issues)
+        MediaUrlResolver.resolveAsync(track.url) { directUrl ->
+            if (queue.getOrNull(currentIndex)?.id == track.id) {
+                prepareAndPlay(directUrl)
+            }
+        }
+
+        // 4. Prefetch upcoming tracks in queue for 0ms transition
+        val upcomingUrls = queue.drop(currentIndex + 1).take(3).map { it.url }
+        if (upcomingUrls.isNotEmpty()) {
+            MediaUrlResolver.prefetchQueue(upcomingUrls)
         }
     }
 
-    /**
-     * Archive.org and similar hosts occasionally answer 500 transiently.
-     * Retry the SAME url twice with a short delay before falling back.
-     */
-    private fun onPlaybackFailed() {
-        retryRunnable?.let { handler.removeCallbacks(it) }
-        if (sameUrlRetries < 2) {
-            sameUrlRetries++
-            isBuffering = true
-            publish()
-            retryRunnable = Runnable { playCurrentTrackUrl() }.also { handler.postDelayed(it, 800L * sameUrlRetries) }
-        } else if (!retryWithFallback()) {
-            isLoading = false
-            isBuffering = false
-            publish(error = "تعذّر تشغيل الملف — تحقق من الاتصال")
-        }
-    }
-
-    /** Re-attempts the current track url (used by the transient-error retry). */
-    private fun playCurrentTrackUrl() {
-        val track = queue.getOrNull(currentIndex) ?: return
+    private fun prepareAndPlay(url: String) {
         val ctx = appContext ?: return
         try {
             val mp = player ?: MediaPlayer().also { created -> wire(created); player = created }
@@ -194,11 +328,46 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build()
             )
-            mp.setDataSource(track.url)
+            val headers = mapOf(
+                "User-Agent" to "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "Accept" to "*/*",
+                "Accept-Encoding" to "identity"
+            )
+            mp.setDataSource(ctx, Uri.parse(url), headers)
             mp.prepareAsync()
             startForegroundService(ctx)
         } catch (_: Exception) {
             onPlaybackFailed()
+        }
+    }
+
+    /**
+     * Archive.org and remote audio hosts occasionally drop connection or 500 transiently.
+     * Retry the SAME url twice with a short delay before falling back.
+     */
+    private fun onPlaybackFailed() {
+        retryRunnable?.let { handler.removeCallbacks(it) }
+        if (sameUrlRetries < 2) {
+            sameUrlRetries++
+            isBuffering = true
+            publish()
+            retryRunnable = Runnable { playCurrentTrackUrl() }.also { handler.postDelayed(it, 600L * sameUrlRetries) }
+        } else if (!retryWithFallback()) {
+            isLoading = false
+            isBuffering = false
+            releaseWakeLock()
+            abandonSystemAudioFocus()
+            publish(error = "تعذّر تشغيل النشيد حالياً — يرجى التحقق من الاتصال بالإنترنت وإعادة المحاولة")
+        }
+    }
+
+    /** Re-attempts the current track url (used by the transient-error retry). */
+    private fun playCurrentTrackUrl() {
+        val track = queue.getOrNull(currentIndex) ?: return
+        MediaUrlResolver.resolveAsync(track.url) { directUrl ->
+            if (queue.getOrNull(currentIndex)?.id == track.id) {
+                prepareAndPlay(directUrl)
+            }
         }
     }
 
@@ -214,7 +383,7 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
                 p.start()
                 startTicking()
             } catch (_: Exception) {}
-            publish()
+            publish(error = null)
         }
         mp.setOnCompletionListener { onTrackEnd() }
         mp.setOnErrorListener { p, _, _ ->
@@ -223,7 +392,7 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
             true
         }
         mp.setOnBufferingUpdateListener { _, percent ->
-            isBuffering = percent < 95
+            isBuffering = percent < 90
             publish()
         }
     }
@@ -235,6 +404,7 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
         fallbackIndex++
         isBuffering = true
         publish()
+        val directUrl = MediaUrlResolver.resolveSync(url)
         return try {
             val mp = player ?: return false
             mp.reset()
@@ -244,7 +414,11 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build()
             )
-            mp.setDataSource(url)
+            val headers = mapOf(
+                "User-Agent" to "Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "Accept" to "*/*"
+            )
+            mp.setDataSource(appContext ?: return false, Uri.parse(directUrl), headers)
             mp.prepareAsync()
             true
         } catch (_: Exception) {
@@ -263,7 +437,7 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
             playCurrent()
             return
         }
-        gapRunnable = Runnable { next() }.also { handler.postDelayed(it, 300L) }
+        gapRunnable = Runnable { next() }.also { handler.postDelayed(it, 200L) }
     }
 
     override fun next() {
@@ -309,9 +483,13 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
         try {
             if (mp.isPlaying) {
                 mp.pause()
+                releaseWakeLock()
+                abandonSystemAudioFocus()
                 if (ctx != null) AudioSessionManager.onPlaybackStopped(ctx, getAudioSource())
             } else {
                 if (ctx != null) AudioSessionManager.onPlaybackStarted(ctx, getAudioSource())
+                requestSystemAudioFocus()
+                acquireWakeLock()
                 if (Build.VERSION.SDK_INT >= 23) {
                     mp.playbackParams = mp.playbackParams.setSpeed(rate)
                 }
@@ -320,13 +498,14 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
                 AudioFocusCoordinator.pauseOthers(this)
             }
         } catch (_: Exception) {}
-        publish()
+        publish(error = null)
     }
 
     fun pauseIfPlaying() {
         try {
             player?.let { if (it.isPlaying) it.pause() }
         } catch (_: Exception) {}
+        releaseWakeLock()
         publish()
     }
 
@@ -337,7 +516,7 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
         clearSleepTimer()
         queue = emptyList()
         currentIndex = -1
-        publish(clearTrack = true)
+        publish(clearTrack = true, error = null)
         appContext?.let {
             stopForegroundService(it)
             AudioSessionManager.onPlaybackStopped(it, getAudioSource())
@@ -348,6 +527,8 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
         tickRunnable?.let { handler.removeCallbacks(it) }; tickRunnable = null
         try { player?.stop(); player?.release() } catch (_: Exception) {}
         player = null
+        releaseWakeLock()
+        abandonSystemAudioFocus()
     }
 
     override fun seek(seconds: Float) {
@@ -505,8 +686,6 @@ private fun buildPlaybackNotification(
         BitmapFactory.decodeResource(context.resources, com.elhajri.noor.R.mipmap.ic_launcher)
     } catch (_: Exception) { null }
 
-    // == مواصفات محمد الحجري: إشعار أزرق كامل بلون التطبيق، أيقونة التطبيق الرسمية،
-    //    شريط تقدم طويل من اليمين لليسار مع الدقائق، وأزرار سميكة ثابتة في الوسط ==
     val dur = if (s.duration.isFinite() && s.duration > 0f) s.duration.toInt() else 0
     val pos = if (s.currentTime.isFinite()) s.currentTime.toInt().coerceAtLeast(0) else 0
     val fmt = { sec: Int ->
@@ -515,26 +694,25 @@ private fun buildPlaybackNotification(
         "%d:%02d".format(m, r)
     }
     val timeText = if (dur > 0) "${fmt(pos)} / ${fmt(dur)}" else fmt(pos)
-    val artistLine = s.artist.ifBlank { "تطبيق نور - القرآن الكريم" }
+    val artistLine = s.artist.ifBlank { "تطبيق نور - الأناشيد الإسلامية" }
 
     return NotificationCompat.Builder(context, channelId)
         .setContentTitle(s.title.ifBlank { fallbackTitle })
         .setContentText(artistLine)
-        .setSmallIcon(R.mipmap.ic_launcher)          // أيقونة التطبيق الرسمية بدل أيقونة الكتاب
+        .setSmallIcon(R.mipmap.ic_launcher)
         .setLargeIcon(largeIcon)
         .setContentIntent(openAppIntent)
         .setOngoing(s.isPlaying)
         .setOnlyAlertOnce(true)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
-        .setColor(0xFF004090.toInt())                // الأزرق الرسمي للتطبيق (لون الأيقونة)
-        .setColorized(true)                          // الإشعار كله أزرق
-        .setProgress(dur, pos, false)                // شريط تقدم طويل مع الدقائق
-        .setSubText(timeText)                        // المدة الحالية / الكلية
+        .setColor(0xFF004090.toInt())
+        .setColorized(true)
+        .setProgress(dur, pos, false)
+        .setSubText(timeText)
         .addAction(R.drawable.ic_notif_prev, "السابق", actionIntent(NotificationActions.ACTION_PREV))
         .addAction(playPauseIcon, if (s.isPlaying) "إيقاف مؤقت" else "تشغيل", actionIntent(NotificationActions.ACTION_TOGGLE))
         .addAction(R.drawable.ic_notif_next, "التالي", actionIntent(NotificationActions.ACTION_NEXT))
-        .addAction(R.drawable.ic_notif_close, "إغلاق", actionIntent(NotificationActions.ACTION_STOP))
         .setStyle(
             androidx.media.app.NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2)
@@ -542,7 +720,7 @@ private fun buildPlaybackNotification(
         .build()
 }
 
-/** خدمة إشعار مستقلة لمشغّل القرآن */
+/** خدمة إشعار لمشغّل القرآن الكريم */
 class QuranPlaybackService : Service() {
     private var observeScope: CoroutineScope? = null
     private var lastStateKey = ""

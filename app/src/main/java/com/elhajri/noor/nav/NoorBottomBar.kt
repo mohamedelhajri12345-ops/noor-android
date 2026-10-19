@@ -21,16 +21,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.SportsEsports
-import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.SportsEsports
-import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -40,8 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,8 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
-import com.elhajri.noor.ui.Navy
-import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NoorGradients
 import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.TajawalFamily
@@ -66,7 +62,7 @@ data class BottomBarTab(
 fun bottomBarTabs() = listOf(
     BottomBarTab("home", t("الرئيسية", "Home"), Icons.Filled.Home, Icons.Outlined.Home),
     BottomBarTab("quran", t("القرآن", "Quran"), Icons.Filled.MenuBook, Icons.Outlined.MenuBook),
-    BottomBarTab("tasbih", t("السبحة", "Tasbih"), Icons.Filled.TouchApp, Icons.Outlined.TouchApp),
+    BottomBarTab("library", t("المكتبة", "Library"), Icons.Filled.Book, Icons.Outlined.Book),
     BottomBarTab("games", t("الألعاب", "Games"), Icons.Filled.SportsEsports, Icons.Outlined.SportsEsports),
     BottomBarTab("more", t("المزيد", "More"), Icons.Filled.GridView, Icons.Outlined.GridView)
 )

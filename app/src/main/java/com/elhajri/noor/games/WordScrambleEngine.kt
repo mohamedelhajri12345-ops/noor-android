@@ -246,14 +246,19 @@ private fun WordScrambleStagePlayScreen(
                 )
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = {
-                        hintUsedCount += 1
-                        showHintDialog = true
-                    }) {
+                    IconButton(
+                        onClick = {
+                            if (hintUsedCount < 2) {
+                                hintUsedCount += 1
+                                showHintDialog = true
+                            }
+                        },
+                        enabled = hintUsedCount < 2
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Lightbulb,
                             contentDescription = "تلميح",
-                            tint = Gold
+                            tint = if (hintUsedCount < 2) Gold else GoldSoft.copy(alpha = 0.3f)
                         )
                     }
                     IconButton(onClick = {

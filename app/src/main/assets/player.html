@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>noor-player</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; width: 100%; height: 100%; overflow: hidden; }
+  #player-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+  #player { width: 100%; height: 100%; }
+  iframe { width: 100%; height: 100%; border: none; pointer-events: none; }
+  #native-video { width: 100%; height: 100%; background: #000; }
+</style>
+</head>
+<body>
+<div id="player-container"><div id="player"></div></div>
+<script>
+  // NOOR embedded player. Two modes:
+  //  ?v=VIDEOID          -> YouTube IFrame API (real https origin, no related videos)
+  //  ?mode=mp4&src=URL   -> Native HTML5 <video> (direct file, zero login, zero tracking)
+  var first = true;
+  var currentId = null;
+  var player = null;
+  var nativeVideo = null;
+  var mode = qs('mode') || 'yt';
+
+  function qs(name) {
+    var m = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : null;
+  }
+
+  function report(title) { document.title = title; }
+
+  function bridge(fn) {
+    try { if (window.AndroidBridge && window.AndroidBridge[fn]) window.AndroidBridge[fn](); } catch (e) {}
+  }
+  function bridgeState(state) {
+    try {
+      if (window.AndroidBridge) {
+        if (window.AndroidBridge.sendState) window.AndroidBridge.sendState(state);
+        if (window.AndroidBridge.sendStateChange) window.AndroidBridge.sendStateChange(state);
+      }
+    } catch (e) {}
+  }
+  function bridgeProgress(t, d) {
+    try { if (window.AndroidBridge && window.AndroidBridge.sendProgress) window.AndroidBridge.sendProgress(t, d, !!(nativeVideo && nativeVideo.paused)); } catch (e) {}
+  }
+
+  // ---------------- MP4 (native) mode ----------------
+  function setupNative(src) {
+    report('LOADING');
+    var container = document.getElementById('player');
+    nativeVideo = document.createElement('video');
+    nativeVideo.id = 'native-video';
+    nativeVideo.src = src;
+    nativeVideo.playsInline = true;
+    nativeVideo.setAttribute('playsinline', '');
+    nativeVideo.setAttribute('webkit-playsinline', '');
+    nativeVideo.preload = 'auto';
+    nativeVideo.onready = function () { report('READY'); bridge('sendPlayerReady'); };
+    nativeVideo.oncanplay = function () { report('READY'); bridge('sendPlayerReady'); };
+    nativeVideo.onplay = function () { report('PLAYING'); bridgeState(1); };
+    nativeVideo.onpause = function () { report('PAUSED'); bridgeState(2); };
+    nativeVideo.onended = function () { bridge('sendVideoEnded'); };
+    nativeVideo.onerror = function () { report('ERROR101'); try { if (window.AndroidBridge && window.AndroidBridge.sendVideoError) window.AndroidBridge.sendVideoError(101); } catch (e) {} };
+    container.appendChild(nativeVideo);
+    var t = setInterval(function () {
+      if (!nativeVideo || nativeVideo.readyState < 1) return;
+      bridgeProgress(nativeVideo.currentTime || 0, nativeVideo.duration || 0);
+    }, 500);
+    nativeVideo.play().catch(function () { /* autoplay block: user taps play */ });
+  }
+
+  // ---------------- YouTube mode ----------------
+  function onReady() {
+    report('READY');
+    if (window.AndroidBridge && window.AndroidBridge.sendPlayerReady) {
+      window.AndroidBridge.sendPlayerReady();
+    }
+    try {
+      if (window.__rate) player.setPlaybackRate(window.__rate);
+      player.playVideo();
+    } catch (e) {}
+    startProgressTimer();
+  }
+
+  function onStateChange(e) {
+    // 1 PLAYING, 2 PAUSED, 0 ENDED, 3 BUFFERING
+    if (e.data === 1) report('PLAYING');
+    bridgeState(e.data);
+    if (e.data === 0) {
+      if (window.AndroidBridge && window.AndroidBridge.sendVideoEnded) window.AndroidBridge.sendVideoEnded();
+    }
+  }
+
+  function onError(e) {
+    report('ERROR' + e.data);
+    if (window.AndroidBridge && window.AndroidBridge.sendVideoError) window.AndroidBridge.sendVideoError(e.data);
+  }
+
+  function startProgressTimer() {
+    if (window.__timer) clearInterval(window.__timer);
+    window.__timer = setInterval(function () {
+      if (!player || !player.getCurrentTime) return;
+      try {
+        var t = player.getCurrentTime() || 0;
+        var d = player.getDuration() || 0;
+        if (window.AndroidBridge && window.AndroidBridge.sendProgress) {
+          window.AndroidBridge.sendProgress(t, d, false);
+        }
+      } catch (err) {}
+    }, 500);
+  }
+
+  window.onYouTubeIframeAPIReady = function () {
+    if (mode === 'mp4') return; // native mode doesn't need the YT API
+    currentId = qs('v');
+    report('LOADING');
+    player = new YT.Player('player', {
+      videoId: currentId,
+      host: 'https://www.youtube.com',
+      playerVars: {
+        autoplay: 1,
+        controls: 0,
+        rel: 0,
+        modestbranding: 1,
+        playsinline: 1,
+        fs: 0,
+        iv_load_policy: 3,
+        disablekb: 1,
+        cc_load_policy: 0,
+        origin: 'https://www.youtube.com',
+        enablejsapi: 1
+      },
+      events: {
+        onReady: onReady,
+        onStateChange: onStateChange,
+        onError: onError
+      }
+    });
+  };
+
+  // Functions called from the Android side via evaluateJavascript
+  function playVideo() {
+    if (mode === 'mp4') { if (nativeVideo) nativeVideo.play().catch(function(){}); report('PLAYING'); return; }
+    if (player && player.playVideo) { player.playVideo(); report('PLAYING'); }
+  }
+  function pauseVideo() {
+    if (mode === 'mp4') { if (nativeVideo) nativeVideo.pause(); report('PAUSED'); return; }
+    if (player && player.pauseVideo) { player.pauseVideo(); report('PAUSED'); }
+  }
+  function seekTo(t) {
+    if (mode === 'mp4') { if (nativeVideo) nativeVideo.currentTime = t; return; }
+    if (player && player.seekTo) player.seekTo(t, true);
+  }
+  function setRate(r) {
+    window.__rate = r;
+    if (mode === 'mp4') { if (nativeVideo) nativeVideo.playbackRate = r; return; }
+    if (player && player.setPlaybackRate) player.setPlaybackRate(r);
+  }
+  function loadNewVideo(id, src) {
+    // YouTube -> id; native mp4 -> src
+    if (src) {
+      mode = 'mp4';
+      if (nativeVideo) { nativeVideo.pause(); nativeVideo.src = src; nativeVideo.load(); nativeVideo.play().catch(function(){}); }
+      else setupNative(src);
+      report('LOADING');
+      return;
+    }
+    mode = 'yt';
+    currentId = id;
+    if (player && player.loadVideoById) {
+      player.loadVideoById(id);
+      try { if (window.__rate) player.setPlaybackRate(window.__rate); } catch (e) {}
+      report('LOADING');
+    }
+  }
+
+  if (mode === 'mp4') {
+    setupNative(qs('src'));
+  } else {
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+  }
+</script>
+</body>
+</html>
