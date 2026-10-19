@@ -1,6 +1,7 @@
 package com.elhajri.noor.home
 
 import android.icu.util.IslamicCalendar
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -24,29 +26,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import com.elhajri.noor.R
+import com.elhajri.noor.data.Prefs
 import com.elhajri.noor.prayer.PrayerRepository
+import com.elhajri.noor.prayer.PrayerTimings
 import com.elhajri.noor.theme.ThemeStore
+import com.elhajri.noor.theme.noorGlassCard
 import com.elhajri.noor.ui.AmiriFamily
+import com.elhajri.noor.ui.TextMain
 import com.elhajri.noor.ui.themeScreenBackground
 import java.util.Calendar
+import java.util.Locale
 import kotlinx.coroutines.delay
-import com.elhajri.noor.theme.noorGlassCard
-import com.elhajri.noor.ui.TextMain
 
 // ألوان الشاشة تتبع الثيم النشط حرفياً — تغيير الثيم يغيّرها فوراً
 private val Gold8 get() = com.elhajri.noor.ui.Gold
@@ -100,14 +103,220 @@ private fun pressScale(interactionSource: MutableInteractionSource): Float {
     return scale
 }
 
-/** بطاقة الصلاة — صورة الموقع الأصلية تغطي البطاقة كاملة، تحية وهجري فوقها، إطار ذهبي */
+/** مربع خانات الوقت الزجاجي للعداد الذهبي */
+@Composable
+private fun DigitGlassBox(value: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(width = 36.dp, height = 34.dp)
+                .clip(RoundedCornerShape(9.dp))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Gold8.copy(alpha = 0.28f),
+                            Gold8.copy(alpha = 0.10f)
+                        )
+                    )
+                )
+                .border(1.dp, Gold8.copy(alpha = 0.6f), RoundedCornerShape(9.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = value,
+                color = Color.White,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = label,
+            color = Color.White.copy(alpha = 0.75f),
+            fontSize = 8.5.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+/** عداد ذهبي أنيق تنازلي للصلاة القادمة */
+@Composable
+private fun GoldCountdownTimer(
+    hours: String,
+    minutes: String,
+    seconds: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0x77112B20), // زجاج زبرجدي داكن
+                        Color(0xCC081510)
+                    )
+                )
+            )
+            .border(
+                width = 1.5.dp,
+                brush = Brush.sweepGradient(
+                    listOf(
+                        Gold8,
+                        Gold8Soft,
+                        Color(0xFFFFD700),
+                        Gold8,
+                        Gold8Soft
+                    )
+                ),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 10.dp, vertical = 6.dp)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "الوقت المتبقي للأذان",
+                color = Gold8Soft,
+                fontSize = 9.5.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(3.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                DigitGlassBox(value = hours, label = "ساعة")
+                Text(
+                    text = ":",
+                    color = Gold8,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 2.dp)
+                )
+                DigitGlassBox(value = minutes, label = "دقيقة")
+                Text(
+                    text = ":",
+                    color = Gold8,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 2.dp)
+                )
+                DigitGlassBox(value = seconds, label = "ثانية")
+            }
+        }
+    }
+}
+
+private data class HomePrayerDisplayItem(
+    val name: String,
+    val timeLabel: String,
+    val isNext: Boolean
+)
+
+/** شريط الأوقات التالية لمواقيت الصلاة اليومية */
+@Composable
+private fun NextPrayerTimesRow(
+    prayers: List<HomePrayerDisplayItem>,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(Color.Black.copy(alpha = 0.45f))
+            .border(1.dp, Gold8.copy(alpha = 0.30f), RoundedCornerShape(14.dp))
+            .padding(vertical = 6.dp, horizontal = 6.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(Gold8)
+                )
+                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = "الأوقات التالية",
+                    color = Gold8Soft,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Text(
+                text = "مواقيت اليوم",
+                color = Color.White.copy(alpha = 0.60f),
+                fontSize = 9.sp
+            )
+        }
+        Spacer(Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            prayers.forEach { item ->
+                val bg = if (item.isNext) {
+                    Brush.verticalGradient(
+                        listOf(Gold8.copy(alpha = 0.35f), Gold8.copy(alpha = 0.15f))
+                    )
+                } else {
+                    Brush.verticalGradient(
+                        listOf(Color.White.copy(alpha = 0.08f), Color.Transparent)
+                    )
+                }
+                val borderColor = if (item.isNext) Gold8 else Color.White.copy(alpha = 0.12f)
+                val textColor = if (item.isNext) Gold8Soft else Color.White.copy(alpha = 0.85f)
+                val nameColor = if (item.isNext) Gold8 else Color.White.copy(alpha = 0.65f)
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 2.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(bg)
+                        .border(1.dp, borderColor, RoundedCornerShape(10.dp))
+                        .padding(vertical = 5.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = item.name,
+                        color = nameColor,
+                        fontSize = 11.sp,
+                        fontWeight = if (item.isNext) FontWeight.Bold else FontWeight.Normal,
+                        fontFamily = AmiriFamily
+                    )
+                    Spacer(Modifier.height(1.dp))
+                    Text(
+                        text = item.timeLabel,
+                        color = textColor,
+                        fontSize = 9.5.sp,
+                        fontWeight = if (item.isNext) FontWeight.Bold else FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** بطاقة الصلاة الرئيسية — خلفية المسجد مع عداد ذهبي أنيق وشريط الأوقات التالية */
 @Composable
 private fun HeroPrayerCard(
     greeting: String,
     hijri: String,
+    cityName: String,
     nextPrayerName: String,
     nextPrayerTimeLabel: String,
-    countdown: String,
+    hoursStr: String,
+    minutesStr: String,
+    secondsStr: String,
+    dailyPrayers: List<HomePrayerDisplayItem>,
     onNavigate: (String) -> Unit
 ) {
     val heroInteraction = remember { MutableInteractionSource() }
@@ -115,15 +324,14 @@ private fun HeroPrayerCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(238.dp)
+            .heightIn(min = 280.dp)
             .graphicsLayer { scaleX = heroScale; scaleY = heroScale }
             .clip(RoundedCornerShape(22.dp))
             .background(Color.Black)
-            .border(1.5.dp, Gold8.copy(alpha = 0.35f), RoundedCornerShape(22.dp))
+            .border(1.5.dp, Gold8.copy(alpha = 0.45f), RoundedCornerShape(22.dp))
             .clickable(interactionSource = heroInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate("prayer") }
     ) {
         // Offline-first hero: bundled drawable renders instantly and works with no internet.
-        // The remote render stays as a higher-detail layer when the network is available.
         Image(
             painter = painterResource(R.drawable.hero_mosque),
             contentDescription = null,
@@ -140,53 +348,87 @@ private fun HeroPrayerCard(
         Box(
             Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
-                    listOf(Color.Black.copy(alpha = 0.25f), Color.Black.copy(alpha = 0.55f), Color.Black.copy(alpha = 0.80f))
+                    listOf(
+                        Color.Black.copy(alpha = 0.35f),
+                        Color.Black.copy(alpha = 0.60f),
+                        Color.Black.copy(alpha = 0.88f)
+                    )
                 )
             )
         )
         // إضاءة علوية للعمق ثلاثي الأبعاد
         Box(
             Modifier.fillMaxWidth().height(60.dp).background(
-                Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.10f), Color.Transparent))
+                Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.12f), Color.Transparent))
             )
         )
+
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.End
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // التحية + التاريخ الهجري — كما في الموقع
-            Column(horizontalAlignment = Alignment.End) {
-                Text(greeting, color = Gold8Soft, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
-                if (hijri.isNotEmpty()) {
-                    Text(hijri, color = Color.White.copy(alpha = 0.75f), fontSize = 10.sp)
-                }
-            }
+            // شريط العنوان: المدينة (يسار) + التحية والتاريخ الهجري (يمين)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+                verticalAlignment = Alignment.Top
             ) {
-                // الصلاة القادمة — جهة اليمين
-                Column(horizontalAlignment = Alignment.Start) {
-                    Text("الصلاة التالية", color = Gold8.copy(alpha = 0.85f), fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-                    Text(nextPrayerName, color = Gold8Soft, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
-                    Text(nextPrayerTimeLabel, color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                // شارة المدينة جهة اليسار
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.Black.copy(alpha = 0.45f))
+                        .border(1.dp, Gold8.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.LocationOn,
+                        contentDescription = null,
+                        tint = Gold8,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(cityName, color = Color.White.copy(alpha = 0.9f), fontSize = 10.sp)
                 }
-                // حلقة العد التنازلي — جهة اليسار مع تسميتها
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, Gold8.copy(alpha = 0.75f), CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(countdown, color = TextMain, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+
+                // التحية والتاريخ الهجري جهة اليمين
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(greeting, color = Gold8Soft, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
+                    if (hijri.isNotEmpty()) {
+                        Text(hijri, color = Color.White.copy(alpha = 0.75f), fontSize = 10.sp)
                     }
-                    Spacer(Modifier.height(4.dp))
-                    Text("حتى الأذان", color = Color.White.copy(alpha = 0.85f), fontSize = 9.sp)
                 }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // القسم الأوسط: الصلاة القادمة (يمين) + العداد الذهبي الأنيق (يسار)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(horizontalAlignment = Alignment.Start) {
+                    Text("الصلاة التالية", color = Gold8.copy(alpha = 0.85f), fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold)
+                    Text(nextPrayerName, color = Gold8Soft, fontSize = 23.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
+                    Text(nextPrayerTimeLabel, color = TextMain, fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold)
+                }
+
+                GoldCountdownTimer(
+                    hours = hoursStr,
+                    minutes = minutesStr,
+                    seconds = secondsStr
+                )
+            }
+
+            Spacer(Modifier.height(10.dp))
+
+            // القسم السفلي: الأوقات التالية للمواقيت
+            if (dailyPrayers.isNotEmpty()) {
+                NextPrayerTimesRow(prayers = dailyPrayers)
             }
         }
     }
@@ -233,7 +475,12 @@ private fun ExploreCard(item: Explore, modifier: Modifier = Modifier, onNavigate
 @Composable
 fun HomeScreen(onNavigate: (String) -> Unit) {
     val context = LocalContext.current
-    val timings = remember { PrayerRepository.getCachedTimings(context) }
+    val city = remember { Prefs.getCity(context) ?: com.elhajri.noor.data.City("مكة المكرمة", 21.4225, 39.8262, "السعودية") }
+    var timings by remember { mutableStateOf<PrayerTimings?>(PrayerRepository.getCachedTimings(context)) }
+
+    LaunchedEffect(city) {
+        timings = PrayerRepository.getTimings(context, lat = city.lat, lng = city.lng, country = city.country)
+    }
 
     val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
     val greeting = when {
@@ -247,42 +494,94 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
     var nextPrayerName by remember { mutableStateOf("...") }
     var nextPrayerTimeLabel by remember { mutableStateOf("") }
-    var countdown by remember { mutableStateOf("--:--") }
+    var hoursStr by remember { mutableStateOf("٠٠") }
+    var minutesStr by remember { mutableStateOf("٠٠") }
+    var secondsStr by remember { mutableStateOf("٠٠") }
+    var dailyPrayers by remember { mutableStateOf<List<HomePrayerDisplayItem>>(emptyList()) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(timings) {
         while (true) {
-            val t = timings
-            if (t != null) {
-                val now = Calendar.getInstance()
-                val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
-                val prayers = listOf(
-                    "الفجر" to t.fajr, "الظهر" to t.dhuhr, "العصر" to t.asr,
-                    "المغرب" to t.maghrib, "العشاء" to t.isha
-                )
-                var chosenName = "الفجر"
-                var chosenTime = t.fajr
-                for ((name, time) in prayers) {
-                    val parts = time.split(":")
-                    val h = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: continue
-                    val m = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: continue
-                    if (h * 60 + m > currentMinutes) { chosenName = name; chosenTime = time; break }
-                }
-                nextPrayerName = chosenName
-                val tp = chosenTime.split(":")
-                val th = tp.getOrNull(0)?.trim()?.toIntOrNull() ?: 0
-                val tm = tp.getOrNull(1)?.trim()?.toIntOrNull() ?: 0
-                val h12 = if (th % 12 == 0) 12 else th % 12
-                val ampm = if (th >= 12) "م" else "ص"
-                nextPrayerTimeLabel = toArabicDigits(String.format("%02d", h12)) + ":" +
-                    toArabicDigits(String.format("%02d", tm)) + " " + ampm
+            val t = timings ?: PrayerRepository.getCachedTimings(context)
+            val now = Calendar.getInstance()
+            val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
+            val prayers = listOf(
+                "الفجر" to t.fajr,
+                "الظهر" to t.dhuhr,
+                "العصر" to t.asr,
+                "المغرب" to t.maghrib,
+                "العشاء" to t.isha
+            )
+            var chosenName = "الفجر"
+            var chosenTime = t.fajr
+            var foundNext = false
+            var targetCal: Calendar? = null
 
-                val target = Calendar.getInstance().apply {
-                    set(Calendar.HOUR_OF_DAY, th); set(Calendar.MINUTE, tm); set(Calendar.SECOND, 0)
-                    if (timeInMillis <= now.timeInMillis) add(Calendar.DAY_OF_YEAR, 1)
+            for ((name, time) in prayers) {
+                val parts = time.split(":")
+                val h = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: continue
+                val m = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: continue
+                if (h * 60 + m > currentMinutes) {
+                    chosenName = name
+                    chosenTime = time
+                    targetCal = Calendar.getInstance().apply {
+                        set(Calendar.HOUR_OF_DAY, h)
+                        set(Calendar.MINUTE, m)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
+                    foundNext = true
+                    break
                 }
-                val diff = ((target.timeInMillis - now.timeInMillis) / 1000).coerceAtLeast(0)
-                countdown = String.format("%d:%02d", diff / 3600, (diff % 3600) / 60).let { toArabicDigits(it) }
             }
+
+            if (!foundNext) {
+                chosenName = "الفجر"
+                chosenTime = t.fajr
+                val parts = t.fajr.split(":")
+                val h = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: 5
+                val m = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: 0
+                targetCal = Calendar.getInstance().apply {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                    set(Calendar.HOUR_OF_DAY, h)
+                    set(Calendar.MINUTE, m)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+            }
+
+            nextPrayerName = chosenName
+            val tp = chosenTime.split(":")
+            val th = tp.getOrNull(0)?.trim()?.toIntOrNull() ?: 0
+            val tm = tp.getOrNull(1)?.trim()?.toIntOrNull() ?: 0
+            val h12Val = if (th % 12 == 0) 12 else th % 12
+            val ampmVal = if (th >= 12) "م" else "ص"
+            nextPrayerTimeLabel = toArabicDigits(String.format("%02d", h12Val)) + ":" +
+                toArabicDigits(String.format("%02d", tm)) + " " + ampmVal
+
+            targetCal?.let { target ->
+                val diffSec = ((target.timeInMillis - now.timeInMillis) / 1000).coerceAtLeast(0)
+                val h = (diffSec / 3600) % 24
+                val m = (diffSec % 3600) / 60
+                val s = diffSec % 60
+                hoursStr = toArabicDigits(String.format(Locale.US, "%02d", h))
+                minutesStr = toArabicDigits(String.format(Locale.US, "%02d", m))
+                secondsStr = toArabicDigits(String.format(Locale.US, "%02d", s))
+            }
+
+            dailyPrayers = prayers.map { (pName, pTime) ->
+                val parts = pTime.split(":")
+                val h = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: 0
+                val m = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: 0
+                val itemH12 = if (h % 12 == 0) 12 else h % 12
+                val itemAmpm = if (h >= 12) "م" else "ص"
+                val label = "${toArabicDigits(String.format("%02d", itemH12))}:${toArabicDigits(String.format("%02d", m))} $itemAmpm"
+                HomePrayerDisplayItem(
+                    name = pName,
+                    timeLabel = label,
+                    isNext = (pName == chosenName)
+                )
+            }
+
             delay(1000)
         }
     }
@@ -292,7 +591,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
     // استكشف نور — ستة أبواب كما في التصميم المعتمد
     val explore = listOf(
-        Explore("quran", "القرآن الكريم", "تلاوة، حفظ، تفسير", Icons.Filled.MenuBook),
+        Explore("quran", "القرآن الكريم", "تلاوة، حفظ، تفسير", Icons.AutoMirrored.Filled.MenuBook),
         Explore("athkar", "الأذكار", "أذكار اليوم والليلة", Icons.Filled.Favorite),
         Explore("qibla", "القبلة", "اتجاه القبلة بدقة", Icons.Filled.Explore),
         Explore("library", "الأناشيد", "إيقاع بلا آلات", Icons.Filled.MusicNote),
@@ -308,8 +607,19 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            // بطاقة الصلاة — صورة الموقع الأصلية
-            HeroPrayerCard(greeting, hijri, nextPrayerName, nextPrayerTimeLabel, countdown, onNavigate)
+            // بطاقة الصلاة — خلفية المسجد مع عداد ذهبي أنيق وشريط الأوقات التالية
+            HeroPrayerCard(
+                greeting = greeting,
+                hijri = hijri,
+                cityName = city.name,
+                nextPrayerName = nextPrayerName,
+                nextPrayerTimeLabel = nextPrayerTimeLabel,
+                hoursStr = hoursStr,
+                minutesStr = minutesStr,
+                secondsStr = secondsStr,
+                dailyPrayers = dailyPrayers,
+                onNavigate = onNavigate
+            )
 
             Spacer(Modifier.height(10.dp))
 
