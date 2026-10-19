@@ -302,7 +302,7 @@ fun StageMapScreen(
 }
 
 /**
- * Reusable stage win dialog showing 3 stars, title, next level & retry buttons.
+ * Reusable stage win dialog delegating to WinCelebrationOverlay with gold star burst & confetti.
  */
 @Composable
 fun StageWinDialog(
@@ -314,106 +314,13 @@ fun StageWinDialog(
     onReplayStage: () -> Unit,
     onStageMap: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.75f))
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .noorGlassCard(cornerRadius = 24.dp)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "أحسنت! أتممت المرحلة ${stageNumber.toArabicDigits()}",
-                color = Gold,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stageTitle,
-                color = TextSecondaryLinen,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Stars
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                for (s in 1..3) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = if (s <= stars) Gold else GoldSoft.copy(alpha = 0.3f),
-                        modifier = Modifier
-                            .size(44.dp)
-                            .padding(4.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Action Buttons
-            if (stageNumber < totalStages) {
-                Button(
-                    onClick = onNextStage,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Gold)
-                ) {
-                    Text(
-                        text = "المرحلة التالية",
-                        color = Navy,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-
-            OutlinedButton(
-                onClick = onReplayStage,
-                modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(1.dp, Gold)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = null,
-                    tint = Gold,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "إعادة اللعب",
-                    color = Gold,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            TextButton(
-                onClick = onStageMap
-            ) {
-                Text(
-                    text = "خريطة المراحل",
-                    color = GoldSoft,
-                    fontSize = 14.sp
-                )
-            }
-        }
-    }
+    WinCelebrationOverlay(
+        stageNumber = stageNumber,
+        totalStages = totalStages,
+        stars = stars,
+        stageTitle = stageTitle,
+        onNextStage = onNextStage,
+        onReplayStage = onReplayStage,
+        onStageMap = onStageMap
+    )
 }

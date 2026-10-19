@@ -38,6 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -315,14 +317,14 @@ private object KalimatStorage {
 
     fun getLevelStars(context: Context, levelIdx: Int): Int {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getInt("$KEY_STARS", 0)
+            .getInt("$KEY_STARS$levelIdx", 0)
     }
 
     fun saveLevelStars(context: Context, levelIdx: Int, stars: Int) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val current = prefs.getInt("$KEY_STARS", 0)
+        val current = prefs.getInt("$KEY_STARS$levelIdx", 0)
         if (stars > current) {
-            prefs.edit().putInt("$KEY_STARS", stars).apply()
+            prefs.edit().putInt("$KEY_STARS$levelIdx", stars).apply()
         }
     }
 
@@ -532,17 +534,20 @@ fun KalimatGameScreen(onBack: () -> Unit) {
                 KalimatPlayScreen(
                     level = kalimatLevels[currentLevelIdx],
                     onLevelComplete = { remainingLanterns ->
-                        val stars = when {
-                            remainingLanterns == 3 -> 3
-                            remainingLanterns == 2 -> 2
+                        val starsEarnedThisRun = when (remainingLanterns) {
+                            3 -> 3
+                            2 -> 2
                             else -> 1
                         }
-                        val pts = 100 + (remainingLanterns * 20)
+                        val previousStars = KalimatStorage.getLevelStars(context, currentLevelIdx)
+                        val pts = if (previousStars > 0 && starsEarnedThisRun <= previousStars) 0 else (100 + (remainingLanterns * 20))
                         KalimatStorage.saveUnlockedLevel(context, currentLevelIdx + 1)
-                        KalimatStorage.saveLevelStars(context, currentLevelIdx, stars)
-                        KalimatStorage.addScore(context, pts)
+                        KalimatStorage.saveLevelStars(context, currentLevelIdx, starsEarnedThisRun)
+                        if (pts > 0) {
+                            KalimatStorage.addScore(context, pts)
+                        }
                         KalimatStorage.incrementStreak(context)
-                        GameProgressStore.rewardPoints(context, GameProgressStore.GAME_KALIMAT, currentLevelIdx, stars, pts)
+                        GameProgressStore.rewardPoints(context, GameProgressStore.GAME_KALIMAT, currentLevelIdx, starsEarnedThisRun, pts)
                         refreshKey++
                     },
                     onNextLevel = {
@@ -583,17 +588,13 @@ private fun KalimatPlayScreen(
     var showWinDialog by remember(level) { mutableStateOf(false) }
     var showFailDialog by remember(level) { mutableStateOf(false) }
 
-    var shakeOffset by remember { mutableFloatStateOf(0f) }
-
-    LaunchedEffect(shakeOffset) {
-        if (shakeOffset != 0f) {
-            delay(300)
-            shakeOffset = 0f
-        }
-    }
+    val haptics = LocalHapticFeedback.current
+    var shakeTrigger by remember { mutableLongStateOf(0L) }
 
     fun handleLetterInput(letterStr: String) {
         if (showWinDialog || showFailDialog || remainingLanterns <= 0) return
+
+        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
         val normChar = normalizeArabicChar(letterStr[0])
         val matches = wordChars.indices.filter { normalizeArabicChar(wordChars[it]) == normChar }
@@ -603,13 +604,15 @@ private fun KalimatPlayScreen(
             matches.forEach { revealedIndices[it] = true }
 
             if (revealedIndices.size == wordChars.size) {
+                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 showWinDialog = true
                 onLevelComplete(remainingLanterns)
             }
         } else {
             guessedLetters[letterStr] = false
             remainingLanterns--
-            shakeOffset = 10f
+            shakeTrigger = System.currentTimeMillis()
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
 
             if (remainingLanterns <= 0) {
                 KalimatStorage.resetStreak(context)
@@ -695,25 +698,31 @@ private fun KalimatPlayScreen(
                 }
             }
 
-            // Lanterns Allowance Row (6 Glowing Lanterns with Shake)
+            // Lanterns Allowance Row (3 Glowing Lanterns with Wrong Answer Shake & Attempt Counter)
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .offset(x = shakeOffset.dp)
+                    .wrongAnswerShake(shakeTrigger)
                     .noorGlassCard(cornerRadius = 18.dp)
                     .padding(vertical = 8.dp, horizontal = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "الفوانيس المتبقية: $remainingLanterns / 3",
+                        text = "المحاولات المتبقية: $remainingLanterns من ٣",
                         color = GoldSoft,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(3.dp))
+                    Text(
+                        text = "خصم نجمة واحدة لكل محاولة خاطئة",
+                        color = TextSecondaryLinen.copy(alpha = 0.8f),
+                        fontSize = 11.sp
                     )
                     Spacer(Modifier.height(6.dp))
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         for (i in 1..3) {
@@ -891,120 +900,27 @@ private fun KalimatPlayScreen(
             }
         }
 
-        // Gold Confetti Effect on Win
+        // Win Celebration Overlay
         if (showWinDialog) {
-            GoldConfettiEffect(active = true)
-        }
-
-        // Win Screen Overlay
-        if (showWinDialog) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(Navy.copy(alpha = 0.85f))
-                    .clickable(enabled = false) {},
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    Modifier
-                        .fillMaxWidth(0.9f)
-                        .noorGlassCard(cornerRadius = 24.dp)
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = if (level.id == 25) "مبارك! أكملت جميع المراحل 🏆✨" else "أحسنت! إجابة صحيحة 🎉",
-                            color = Gold,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Text(
-                            text = level.vocalized,
-                            color = Gold,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        Surface(
-                            color = Gold.copy(alpha = 0.15f),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.border(1.dp, Gold.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
-                        ) {
-                            Text(
-                                text = level.category,
-                                color = GoldSoft,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                            )
-                        }
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Text(
-                            text = level.meaning,
-                            color = TextMain,
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 22.sp
-                        )
-
-                        Spacer(Modifier.height(16.dp))
-
-                        // Stars Display
-                        val starsCount = when {
-                            remainingLanterns >= 5 -> 3
-                            remainingLanterns >= 3 -> 2
-                            else -> 1
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            for (s in 1..3) {
-                                Icon(
-                                    imageVector = Icons.Default.Star,
-                                    contentDescription = null,
-                                    tint = if (s <= starsCount) Gold else Color.Gray.copy(alpha = 0.4f),
-                                    modifier = Modifier.size(28.dp)
-                                )
-                            }
-                        }
-
-                        Spacer(Modifier.height(20.dp))
-
-                        Button(
-                            onClick = {
-                                showWinDialog = false
-                                if (level.id == 25) {
-                                    onBackToMap()
-                                } else {
-                                    onNextLevel()
-                                }
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy),
-                            shape = RoundedCornerShape(14.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp)
-                        ) {
-                            Text(
-                                text = if (level.id == 25) "إنهاء اللعبة وتصفح الخريطة 🌟" else "المرحلة التالية ➔",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
+            WinCelebrationOverlay(
+                stageNumber = level.id,
+                totalStages = kalimatLevels.size,
+                stars = when (remainingLanterns) {
+                    3 -> 3
+                    2 -> 2
+                    else -> 1
+                },
+                stageTitle = level.vocalized,
+                onNextStage = if (level.id < kalimatLevels.size) { { onNextLevel() } } else null,
+                onReplayStage = {
+                    revealedIndices.clear()
+                    guessedLetters.clear()
+                    remainingLanterns = 3
+                    hintCount = 0
+                    showWinDialog = false
+                },
+                onStageMap = onBackToMap
+            )
         }
 
         // Fail Overlay
@@ -1043,7 +959,7 @@ private fun KalimatPlayScreen(
                                 showFailDialog = false
                                 revealedIndices.clear()
                                 guessedLetters.clear()
-                                remainingLanterns = 6
+                                remainingLanterns = 3
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy),
                             shape = RoundedCornerShape(12.dp),
