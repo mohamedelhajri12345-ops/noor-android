@@ -1,34 +1,41 @@
 package com.elhajri.noor.games
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import android.app.Activity
-import android.content.pm.ActivityInfo
+import android.content.Context
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -40,54 +47,322 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
+import com.elhajri.noor.ui.TextSecondaryLinen
+import com.elhajri.noor.ui.noorGlassCard
+import com.elhajri.noor.ui.themeScreenBackground
+import kotlinx.coroutines.delay
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.random.Random
 
 /**
- * "كلمة من الذكر" — لغز إيماني متعدد المستويات بأسلوب Wordle.
- * تخمين أسماء الله الحسنى والكلمات القرآنية بتدرج الصعوبة (20 مستوى).
+ * KalimatGame.kt — "كلمة من الذكر"
+ * Redesigned 25-level Islamic Arabic word guessing game with curated levels,
+ * word length hints, meaning hints, category badges, fixed pre-shown diacritics,
+ * 6 glowing lantern allowances with shake animations, reveal whispers (همسة),
+ * and gold confetti win celebrations. Progress saved in SharedPreferences("noor_games").
  */
+
 private data class KalimaLevel(
-    val levelNum: Int,
+    val id: Int,
     val word: String,
+    val vocalized: String,
+    val category: String,
     val meaning: String,
-    val dalil: String
+    val diacritics: List<String>
 )
 
 private val kalimatLevels = listOf(
-    // 4 حروف - سهل (1 - 5)
-    KalimaLevel(1, "الحق", "الذي لا يرتاب في وجوده ولا في إلهيته", "فَتَعَالَى اللَّهُ الْمَلِكُ الْحَقُّ"),
-    KalimaLevel(2, "العلي", "الذي له العلو المطلق في ذاته وصفاته", "وَهُوَ الْعَلِيُّ الْعَظِيمُ"),
-    KalimaLevel(3, "الصمد", "المقصود في الحوائج كلها ولا يُستغنى عنه", "اللَّهُ الصَّمَدُ"),
-    KalimaLevel(4, "الأول", "الذي ليس قبله شيء والآخر الذي ليس بعده شيء", "هُوَ الْأَوَّلُ وَالْآخِرُ"),
-    KalimaLevel(5, "البر", "كثير الإحسان واللطف بعباده", "إِنَّهُ هُوَ الْبَرُّ الرَّحِيمُ"),
-
-    // 5 حروف - متوسط (6 - 10)
-    KalimaLevel(6, "الوهاب", "كثير العطاء بلا مقابل ولا عوض", "إِنَّكَ أَنتَ الْوَهَّابُ"),
-    KalimaLevel(7, "العليم", "المحيط علمه بكل شيء ظاهراً وباطناً", "وَهُوَ الْعَلِيمُ الْحَكِيمُ"),
-    KalimaLevel(8, "الكريم", "الذي يعطي بلا سؤال ويغفر الذنوب", "يَا أَيُّهَا الْإِنسَانُ مَا غَرَّكَ بِرَبِّكَ الْكَرِيمِ"),
-    KalimaLevel(9, "الودود", "يحب عباده الصالحين ويحبونه", "وَهُوَ الْغَفُورُ الْوَدُودُ"),
-    KalimaLevel(10, "الحفيظ", "يحفظ عباده وأعمالهم من الضياع", "إِنَّ رَبِّي عَلَىٰ كُلِّ شَيْءٍ حَفِيظٌ"),
-
-    // 6 حروف - متقدم (11 - 15)
-    KalimaLevel(11, "الرزاق", "المتكفل بأرزاق الخلائق أجمعين", "إِنَّ اللَّهَ هُوَ الرَّزَّاقُ ذُو الْقُوَّةِ الْمَتِينُ"),
-    KalimaLevel(12, "الفتاح", "يفتح أبواب الرحمة والرزق والفرَج", "وَهُوَ الْفَتَّاحُ الْعَلِيمُ"),
-    KalimaLevel(13, "الحكيم", "يضع الأمور في مواضعها الصحيحة بحكمة", "وَكَانَ اللَّهُ عَلِيمًا حَكِيمًا"),
-    KalimaLevel(14, "الخبير", "الذي يعلم دقائق الأمور وبواطنها", "وَهُوَ الْحَكِيمُ الْخَبِيرُ"),
-    KalimaLevel(15, "اللطيف", "يصل لطفه إلى عباده من حيث لا يشعرون", "اللَّهُ لَطِيفٌ بِعِبَادِهِ"),
-
-    // 7+ حروف - خبير (16 - 20)
-    KalimaLevel(16, "السلام", "السالم من كل نقص وأمان عباده", "السَّلَامُ الْمُؤْمِنُ الْمُهَيْمِنُ"),
-    KalimaLevel(17, "العزيز", "القوي الغالب الذي لا يُقهر", "وَهُوَ الْعَزِيزُ الْحَكِيمُ"),
-    KalimaLevel(18, "الجبار", "يجبر الكسير ويقهر العتاة", "الْجَبَّارُ الْمُتَكَبِّرُ"),
-    KalimaLevel(19, "الرؤوف", "المتصف بعظيم الرحمة والعطف", "وَأَنَّ اللَّهَ رَؤُوفٌ رَّحِيمٌ"),
-    KalimaLevel(20, "المتكبر", "المتعالي عن السوء والنقص والخلق", "الْعَزِيزُ الْجَبَّارُ الْمُتَكَبِّرُ")
+    KalimaLevel(
+        id = 1,
+        word = "الرحيم",
+        vocalized = "الرَّحِيمُ",
+        category = "اسم من أسماء الله الحسنى",
+        meaning = "ذو الرحمة الواسعة الشاملة لجميع خلقه والخاصة بالمؤمنين",
+        diacritics = listOf("", "ْ", "َّ", "ِ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 2,
+        word = "الكعبة",
+        vocalized = "الْكَعْبَةُ",
+        category = "معلم إسلامي",
+        meaning = "قبلة المسلمين وبيته الحرام المبارك في مكة المكرمة",
+        diacritics = listOf("", "ْ", "َ", "ْ", "َ", "ُ")
+    ),
+    KalimaLevel(
+        id = 3,
+        word = "الكهف",
+        vocalized = "الْكَهْفُ",
+        category = "سورة قرآنية",
+        meaning = "سورة قرآنية مباركة تُقرأ يوم الجمعة وتُعصم من الفتن",
+        diacritics = listOf("", "ْ", "َ", "ْ", "ُ")
+    ),
+    KalimaLevel(
+        id = 4,
+        word = "إبراهيم",
+        vocalized = "إِبْرَاهِيمُ",
+        category = "نبي ورسول",
+        meaning = "خليل الله وأبو الأنبياء عليه السلام وباني البيت الحرام",
+        diacritics = listOf("ِ", "ْ", "َ", "", "ِ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 5,
+        word = "القدوس",
+        vocalized = "الْقُدُّوسُ",
+        category = "اسم من أسماء الله الحسنى",
+        meaning = "المنزه عن كل نقص وعيب، الطاهر المنزه العلي",
+        diacritics = listOf("", "ْ", "ُ", "ُّ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 6,
+        word = "الفرقان",
+        vocalized = "الْفُرْقَانُ",
+        category = "اسم للقرآن الكريم",
+        meaning = "الكتاب المبارك الذي يفرق الله به بين الحق والباطل",
+        diacritics = listOf("", "ْ", "ُ", "ْ", "َ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 7,
+        word = "الزمزم",
+        vocalized = "الزَّمْزَمُ",
+        category = "معلم إسلامي",
+        meaning = "الماء المبارك بمكة المكرمة الذي نبع لإسماعيل عليه السلام",
+        diacritics = listOf("", "ْ", "َّ", "ْ", "َ", "ُ")
+    ),
+    KalimaLevel(
+        id = 8,
+        word = "البر",
+        vocalized = "الْبِرُّ",
+        category = "خلق إسلامي",
+        meaning = "جماع الخير والطاعة وحسن الخلق والإحسان إلى الناس",
+        diacritics = listOf("", "ْ", "ِ", "ُّ")
+    ),
+    KalimaLevel(
+        id = 9,
+        word = "الرحمن",
+        vocalized = "الرَّحْمَنُ",
+        category = "اسم من أسماء الله الحسنى",
+        meaning = "الذي وسعت رحمته كل شيء في السماوات والأرض",
+        diacritics = listOf("", "ْ", "َّ", "ْ", "َ", "ُ")
+    ),
+    KalimaLevel(
+        id = 10,
+        word = "محمد",
+        vocalized = "مُحَمَّدٌ",
+        category = "نبي ورسول",
+        meaning = "خاتم الأنبياء والمرسلين والرحمة المهداة للعالمين ﷺ",
+        diacritics = listOf("ُ", "َ", "َّ", "ٌ")
+    ),
+    KalimaLevel(
+        id = 11,
+        word = "السلام",
+        vocalized = "السَّلَامُ",
+        category = "اسم من أسماء الله الحسنى",
+        meaning = "السالم من كل عيب والنقص والمفيض بالأمان والسكينة على خلقه",
+        diacritics = listOf("", "ْ", "َّ", "َ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 12,
+        word = "الفاتحة",
+        vocalized = "الْفَاتِحَةُ",
+        category = "سورة قرآنية",
+        meaning = "أعظم سورة في القرآن الكريم وتسمى أم الكتاب ورقية المريض",
+        diacritics = listOf("", "ْ", "َ", "", "ِ", "َ", "ُ")
+    ),
+    KalimaLevel(
+        id = 13,
+        word = "الأقصى",
+        vocalized = "الأَقْصَى",
+        category = "معلم إسلامي",
+        meaning = "المسجد المبارك في فلسطين أولى القبلتين ومسرى النبي ﷺ",
+        diacritics = listOf("", "ْ", "َ", "ْ", "َ", "ى")
+    ),
+    KalimaLevel(
+        id = 14,
+        word = "يوسف",
+        vocalized = "يُوسُفُ",
+        category = "نبي ورسول",
+        meaning = "نبي الله الصديق صاحب الأحلام وتفسير الرؤى عليه السلام",
+        diacritics = listOf("ُ", "", "ُ", "ُ")
+    ),
+    KalimaLevel(
+        id = 15,
+        word = "السميع",
+        vocalized = "السَّمِيعُ",
+        category = "اسم من أسماء الله الحسنى",
+        meaning = "الذي يسمع كل أصوات المخلوقات ودعاء الداعين بلا خفاء",
+        diacritics = listOf("", "ْ", "َّ", "ِ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 16,
+        word = "التقوى",
+        vocalized = "التَّقْوَى",
+        category = "مفهوم إسلامي",
+        meaning = "امتثال أوامر الله واجتناب نواهيه خشية ورجاءً",
+        diacritics = listOf("", "ْ", "َّ", "ْ", "َ", "ى")
+    ),
+    KalimaLevel(
+        id = 17,
+        word = "الكوثر",
+        vocalized = "الْكَوْثَرُ",
+        category = "سورة قرآنية",
+        meaning = "نهر الخيرات العظيمة المُعطى للنبي ﷺ وأقصر سورة بالقرآن",
+        diacritics = listOf("", "ْ", "َ", "ْ", "َ", "ُ")
+    ),
+    KalimaLevel(
+        id = 18,
+        word = "موسى",
+        vocalized = "مُوسَى",
+        category = "نبي ورسول",
+        meaning = "كليم الله الذي أيده الله بالمعجزات العظيمة وآتاه التوراة",
+        diacritics = listOf("ُ", "", "َ", "ى")
+    ),
+    KalimaLevel(
+        id = 19,
+        word = "الرزاق",
+        vocalized = "الرَّزَّاقُ",
+        category = "اسم من أسماء الله الحسنى",
+        meaning = "المتكفل بأرزاق العباد والخلائق أجمعين واسع الفضل",
+        diacritics = listOf("", "ْ", "َّ", "َّ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 20,
+        word = "الروضة",
+        vocalized = "الرَّوْضَةُ",
+        category = "معلم إسلامي",
+        meaning = "المكان الشريف في المسجد النبوي بين البيت والمنبر المبارك",
+        diacritics = listOf("", "ْ", "َّ", "ْ", "َ", "ُ")
+    ),
+    KalimaLevel(
+        id = 21,
+        word = "الإخلاص",
+        vocalized = "الإِخْلَاصُ",
+        category = "سورة قرآنية",
+        meaning = "سورة التوحيد الخالص التي تعدل ثلث القرآن الكريم",
+        diacritics = listOf("", "ْ", "ِ", "ْ", "َ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 22,
+        word = "الغفور",
+        vocalized = "الْغَفُورُ",
+        category = "اسم من أسماء الله الحسنى",
+        meaning = "كثير المغفرة والستر لذنوب عباده التائبين النادمين",
+        diacritics = listOf("", "ْ", "َ", "ُ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 23,
+        word = "المدينة",
+        vocalized = "الْمَدِينَةُ",
+        category = "معلم إسلامي",
+        meaning = "طيبة الطيبة دار الهجرة النبوية ومثوى الرسول الكريم ﷺ",
+        diacritics = listOf("", "ْ", "َ", "ِ", "", "َ", "ُ")
+    ),
+    KalimaLevel(
+        id = 24,
+        word = "اللطيف",
+        vocalized = "اللَّطِيفُ",
+        category = "اسم من أسماء الله الحسنى",
+        meaning = "المحسن إلى عباده في خفاء ورفق ويوصل إليهم منافعهم بدقة",
+        diacritics = listOf("", "ْ", "َّ", "ِ", "", "ُ")
+    ),
+    KalimaLevel(
+        id = 25,
+        word = "القرآن",
+        vocalized = "الْقُرْآنُ",
+        category = "كتاب الله الخالد",
+        meaning = "كلام الله المعجز المنزل على نبينا محمد ﷺ المتعبد بتلاوته",
+        diacritics = listOf("", "ْ", "ُ", "ْ", "آ", "ُ")
+    )
 )
 
-// صفوف لوحة المفاتيح العربية
-private val row1Letters = "ضصثقفغعهخحجد".map { it.toString() }
-private val row2Letters = "شسيبلاتنمكط".map { it.toString() }
-private val row3Letters = listOf("ئ", "ء", "ؤ", "ر", "ى", "ة", "و", "ز", "ظ")
+// Keyboard letters in 3 rows (28 letters)
+private val row1Letters = listOf("ض", "ص", "ث", "ق", "ف", "غ", "ع", "ه", "خ", "ح")
+private val row2Letters = listOf("ج", "ش", "س", "ي", "ب", "ل", "ا", "ت", "ن", "م")
+private val row3Letters = listOf("ك", "ط", "د", "ذ", "ر", "ز", "و", "ء")
 
-enum class LetterState { UNGUESSED, NOT_IN_WORD, IN_WORD_WRONG_SPOT, CORRECT_SPOT }
+private fun normalizeArabicChar(c: Char): Char {
+    return when (c) {
+        'أ', 'إ', 'آ', 'ٱ' -> 'ا'
+        'ى' -> 'ي'
+        'ة' -> 'ه'
+        'ؤ', 'ئ' -> 'ء'
+        else -> c
+    }
+}
+
+/**
+ * Storage manager using SharedPreferences('noor_games')
+ */
+private object KalimatStorage {
+    private const val PREFS_NAME = "noor_games"
+    private const val KEY_UNLOCKED = "kalimat_unlocked_level"
+    private const val KEY_STARS = "kalimat_stars_lvl_"
+    private const val KEY_SCORE = "kalimat_total_score"
+    private const val KEY_STREAK = "kalimat_streak"
+
+    fun getUnlockedLevel(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_UNLOCKED, 0)
+    }
+
+    fun saveUnlockedLevel(context: Context, levelIdx: Int) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val current = prefs.getInt(KEY_UNLOCKED, 0)
+        if (levelIdx > current) {
+            prefs.edit().putInt(KEY_UNLOCKED, levelIdx).apply()
+        }
+    }
+
+    fun getLevelStars(context: Context, levelIdx: Int): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt("$KEY_STARS", 0)
+    }
+
+    fun saveLevelStars(context: Context, levelIdx: Int, stars: Int) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val current = prefs.getInt("$KEY_STARS", 0)
+        if (stars > current) {
+            prefs.edit().putInt("$KEY_STARS", stars).apply()
+        }
+    }
+
+    fun getTotalStars(context: Context, totalLevels: Int): Int {
+        var sum = 0
+        for (i in 0 until totalLevels) {
+            sum += getLevelStars(context, i)
+        }
+        return sum
+    }
+
+    fun getTotalScore(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_SCORE, 0)
+    }
+
+    fun addScore(context: Context, points: Int): Int {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val newScore = prefs.getInt(KEY_SCORE, 0) + points
+        prefs.edit().putInt(KEY_SCORE, newScore).apply()
+        return newScore
+    }
+
+    fun getStreak(context: Context): Int {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(KEY_STREAK, 0)
+    }
+
+    fun incrementStreak(context: Context): Int {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val newStreak = prefs.getInt(KEY_STREAK, 0) + 1
+        prefs.edit().putInt(KEY_STREAK, newStreak).apply()
+        return newStreak
+    }
+
+    fun resetStreak(context: Context) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putInt(KEY_STREAK, 0).apply()
+    }
+}
 
 @Composable
 fun KalimatGameScreen(onBack: () -> Unit) {
@@ -96,109 +371,192 @@ fun KalimatGameScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     var currentLevelIdx by remember { mutableIntStateOf(0) }
     var inPlay by remember { mutableStateOf(false) }
-
-    // Refresh state key to update stats after finishing a level
     var refreshKey by remember { mutableIntStateOf(0) }
 
-    val highestLevel = remember(refreshKey) { GameProgressStore.getHighestLevel(context, GameProgressStore.GAME_KALIMAT) }
-    val totalStars = remember(refreshKey) { GameProgressStore.getTotalStars(context, GameProgressStore.GAME_KALIMAT, kalimatLevels.size) }
-    val totalScore = remember(refreshKey) { GameProgressStore.getTotalScore(context, GameProgressStore.GAME_KALIMAT) }
-    val streak = remember(refreshKey) { GameProgressStore.getStreak(context, GameProgressStore.GAME_KALIMAT) }
+    val unlockedLevel = remember(refreshKey) { KalimatStorage.getUnlockedLevel(context) }
+    val totalStars = remember(refreshKey) { KalimatStorage.getTotalStars(context, kalimatLevels.size) }
+    val totalScore = remember(refreshKey) { KalimatStorage.getTotalScore(context) }
+    val streak = remember(refreshKey) { KalimatStorage.getStreak(context) }
 
-    Box(Modifier.fillMaxSize().background(Navy)) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .themeScreenBackground()
+    ) {
         Column(Modifier.fillMaxSize()) {
-            // Header
+            // Header Top Bar
             Row(
-                Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = {
-                    if (inPlay) inPlay = false else onBack()
+                    if (inPlay) {
+                        inPlay = false
+                        refreshKey++
+                    } else {
+                        onBack()
+                    }
                 }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "رجوع",
+                        tint = Gold
+                    )
                 }
                 Column(Modifier.weight(1f)) {
-                    Text("كلمة من الذكر", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Text("المستوى ${currentLevelIdx + 1} / ${kalimatLevels.size} | ⭐ $totalStars | 🌙 $totalScore | 🔥 $streak أعياد", color = GoldSoft, fontSize = 11.sp)
+                    Text(
+                        text = "كلمة من الذكر",
+                        color = Gold,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "المرحلة ${currentLevelIdx + 1} / ${kalimatLevels.size} | ⭐ $totalStars | 🌙 $totalScore | 🔥 $streak أعياد",
+                        color = GoldSoft,
+                        fontSize = 11.sp
+                    )
                 }
             }
 
             if (!inPlay) {
-                // خريطة المراحل
-                Text(
-                    "المراحل الإيمانية",
-                    color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                )
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    contentPadding = PaddingValues(14.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.weight(1f)
+                // Level Map View (25 Levels)
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 14.dp, vertical = 4.dp)
                 ) {
-                    itemsIndexed(kalimatLevels) { index, lvl ->
-                        val isUnlocked = index <= highestLevel
-                        val starsEarned = GameProgressStore.getLevelStars(context, GameProgressStore.GAME_KALIMAT, index)
-
-                        Box(
-                            Modifier
-                                .aspectRatio(1f)
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(if (isUnlocked) NavyCard else NavyCard.copy(alpha = 0.4f))
-                                .border(
-                                    1.dp,
-                                    if (starsEarned > 0) Gold else if (isUnlocked) Gold.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.1f),
-                                    RoundedCornerShape(14.dp)
-                                )
-                                .clickable(enabled = isUnlocked) {
-                                    currentLevelIdx = index
-                                    inPlay = true
-                                },
-                            contentAlignment = Alignment.Center
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .noorGlassCard(cornerRadius = 18.dp)
+                            .padding(14.dp)
+                    ) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                if (isUnlocked) {
-                                    Text("${lvl.levelNum}", color = TextMain, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                                    Spacer(Modifier.height(2.dp))
-                                    Row {
-                                        for (s in 1..3) {
-                                            Icon(
-                                                Icons.Default.Star,
-                                                contentDescription = null,
-                                                tint = if (s <= starsEarned) Gold else Color.White.copy(alpha = 0.2f),
-                                                modifier = Modifier.size(11.dp)
-                                            )
+                            Column {
+                                Text(
+                                    text = "خريطة المراحل الإيمانية",
+                                    color = Gold,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = "خمن الكلمة الإيمانية عبر ٢٥ مرحلة شيقة",
+                                    color = TextSecondaryLinen,
+                                    fontSize = 12.sp
+                                )
+                            }
+                            Surface(
+                                color = Gold.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.border(1.dp, Gold.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                            ) {
+                                Text(
+                                    text = "🔥 $streak",
+                                    color = Gold,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(10.dp))
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(4),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        itemsIndexed(kalimatLevels) { index, lvl ->
+                            val isUnlocked = index <= unlockedLevel
+                            val starsEarned = KalimatStorage.getLevelStars(context, index)
+
+                            Box(
+                                Modifier
+                                    .aspectRatio(1f)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(if (isUnlocked) NavyCard else NavyCard.copy(alpha = 0.3f))
+                                    .border(
+                                        1.dp,
+                                        if (starsEarned > 0) Gold else if (isUnlocked) Gold.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.08f),
+                                        RoundedCornerShape(16.dp)
+                                    )
+                                    .clickable(enabled = isUnlocked) {
+                                        currentLevelIdx = index
+                                        inPlay = true
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    if (isUnlocked) {
+                                        Text(
+                                            text = "${lvl.id}",
+                                            color = TextMain,
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Spacer(Modifier.height(2.dp))
+                                        Row {
+                                            for (s in 1..3) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Star,
+                                                    contentDescription = null,
+                                                    tint = if (s <= starsEarned) Gold else Color.White.copy(alpha = 0.2f),
+                                                    modifier = Modifier.size(10.dp)
+                                                )
+                                            }
                                         }
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Default.Lock,
+                                            contentDescription = "مقفل",
+                                            tint = GoldSoft.copy(alpha = 0.35f),
+                                            modifier = Modifier.size(18.dp)
+                                        )
                                     }
-                                } else {
-                                    Icon(Icons.Default.Lock, contentDescription = "مقفل", tint = GoldSoft.copy(alpha = 0.4f), modifier = Modifier.size(18.dp))
                                 }
                             }
                         }
                     }
                 }
             } else {
+                // Game Play Screen
                 KalimatPlayScreen(
                     level = kalimatLevels[currentLevelIdx],
-                    onLevelComplete = { triesUsed ->
+                    onLevelComplete = { remainingLanterns ->
                         val stars = when {
-                            triesUsed <= 3 -> 3
-                            triesUsed <= 5 -> 2
+                            remainingLanterns >= 5 -> 3
+                            remainingLanterns >= 3 -> 2
                             else -> 1
                         }
-                        val pts = (6 - triesUsed + 1) * 20
+                        val pts = 100 + (remainingLanterns * 20)
+                        KalimatStorage.saveUnlockedLevel(context, currentLevelIdx + 1)
+                        KalimatStorage.saveLevelStars(context, currentLevelIdx, stars)
+                        KalimatStorage.addScore(context, pts)
+                        KalimatStorage.incrementStreak(context)
                         GameProgressStore.rewardPoints(context, GameProgressStore.GAME_KALIMAT, currentLevelIdx, stars, pts)
                         refreshKey++
                     },
                     onNextLevel = {
-                        if (currentLevelIdx + 1 < kalimatLevels.size) {
+                        if (currentLevelIdx < kalimatLevels.size - 1) {
                             currentLevelIdx++
                         } else {
                             inPlay = false
                         }
+                        refreshKey++
                     },
-                    onExit = { inPlay = false }
+                    onBackToMap = {
+                        inPlay = false
+                        refreshKey++
+                    }
                 )
             }
         }
@@ -208,223 +566,552 @@ fun KalimatGameScreen(onBack: () -> Unit) {
 @Composable
 private fun KalimatPlayScreen(
     level: KalimaLevel,
-    onLevelComplete: (triesUsed: Int) -> Unit,
+    onLevelComplete: (remainingLanterns: Int) -> Unit,
     onNextLevel: () -> Unit,
-    onExit: () -> Unit
+    onBackToMap: () -> Unit
 ) {
-    val target = level.word
-    val len = target.length
-    val maxTries = 6
+    val context = LocalContext.current
+    val wordChars = remember(level) { level.word.toCharArray() }
 
-    var guesses by remember(level) { mutableStateOf(listOf<String>()) }
-    var current by remember(level) { mutableStateOf("") }
-    var won by remember(level) { mutableStateOf(false) }
-    var lost by remember(level) { mutableStateOf(false) }
+    val revealedIndices = remember(level) { mutableStateSetOf<Int>() }
+    val guessedLetters = remember(level) { mutableStateMapOf<String, Boolean>() }
+    var remainingLanterns by remember(level) { mutableIntStateOf(6) }
 
-    fun submit() {
-        if (current.length != len) return
-        val newGuesses = guesses + current
-        guesses = newGuesses
-        if (current == target) {
-            won = true
-            onLevelComplete(newGuesses.size)
-        } else if (newGuesses.size >= maxTries) {
-            lost = true
+    var showWinDialog by remember(level) { mutableStateOf(false) }
+    var showFailDialog by remember(level) { mutableStateOf(false) }
+
+    var shakeOffset by remember { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(shakeOffset) {
+        if (shakeOffset != 0f) {
+            delay(300)
+            shakeOffset = 0f
         }
-        current = ""
     }
 
-    Column(
-        Modifier.fillMaxSize().padding(horizontal = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("المستوى ${level.levelNum}: كلمة من ${len} حروف", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(10.dp))
+    fun handleLetterInput(letterStr: String) {
+        if (showWinDialog || showFailDialog || remainingLanterns <= 0) return
 
-        // شبكة التخمين
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            for (r in 0 until maxTries) {
-                val rowWord = when {
-                    r < guesses.size -> guesses[r]
-                    r == guesses.size && !won && !lost -> current
-                    else -> ""
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (c in 0 until len) {
-                        val ch = rowWord.getOrNull(c)?.toString() ?: ""
-                        val (bg, fg) = when {
-                            r < guesses.size -> {
-                                val t = target
-                                when {
-                                    t.getOrNull(c)?.toString() == ch -> Color(0xFFD4AF37) to Navy
-                                    ch.isNotEmpty() && t.contains(ch) -> Color(0xFFF3E5AB) to Navy
-                                    ch.isNotEmpty() -> NavyCard.copy(alpha = 0.5f) to Color.White.copy(alpha = 0.35f)
-                                    else -> NavyCard to Color.Transparent
-                                }
-                            }
-                            else -> NavyCard to if (ch.isEmpty()) Color.Transparent else Color.White
-                        }
-                        val flip by animateFloatAsState(
-                            targetValue = if (r < guesses.size) 1f else 0f,
-                            animationSpec = tween(350), label = "flip"
-                        )
-                        Box(
-                            Modifier
-                                .size(44.dp)
-                                .graphicsLayer { rotationX = (1f - flip) * 90f }
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(bg)
-                                .border(1.dp, Gold.copy(alpha = 0.35f), RoundedCornerShape(10.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(ch, color = fg, fontSize = 19.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-                Spacer(Modifier.height(5.dp))
-            }
-        }
+        val normChar = normalizeArabicChar(letterStr[0])
+        val matches = wordChars.indices.filter { normalizeArabicChar(wordChars[it]) == normChar }
 
-        Spacer(Modifier.weight(1f))
+        if (matches.isNotEmpty()) {
+            guessedLetters[letterStr] = true
+            matches.forEach { revealedIndices.add(it) }
 
-        if (won || lost) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(NavyCard)
-                    .border(1.dp, Gold, RoundedCornerShape(16.dp))
-                    .padding(16.dp)
-            ) {
-                Text(
-                    if (won) "ما شاء الله! أحسنت 🌙" else "الكلمة هي: ${target}",
-                    color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(level.meaning, color = TextMain, fontSize = 13.sp, textAlign = TextAlign.Center)
-                Text("﴿${level.dalil}﴾", color = GoldSoft, fontSize = 11.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 4.dp))
-
-                Spacer(Modifier.height(14.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(
-                        Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Gold.copy(alpha = 0.2f))
-                            .border(1.dp, Gold, RoundedCornerShape(10.dp))
-                            .clickable { onExit() }
-                            .padding(horizontal = 20.dp, vertical = 8.dp)
-                    ) {
-                        Text("قائمة المراحل", color = Gold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                    }
-                    if (won) {
-                        Box(
-                            Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Gold)
-                                .clickable { onNextLevel() }
-                                .padding(horizontal = 24.dp, vertical = 8.dp)
-                        ) {
-                            Text("المستوى التالي", color = Navy, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                        }
-                    }
-                }
+            if (revealedIndices.size == wordChars.size) {
+                showWinDialog = true
+                onLevelComplete(remainingLanterns)
             }
         } else {
-            // لوحة المفاتيح العربية الاحترافية
-            BeautifulArabicKeyboard(
-                onLetter = { if (current.length < len) current += it },
-                onDelete = { if (current.isNotEmpty()) current = current.dropLast(1) },
-                onEnter = { submit() },
-                target = target,
-                guesses = guesses
-            )
+            guessedLetters[letterStr] = false
+            remainingLanterns--
+            shakeOffset = 10f
+
+            if (remainingLanterns <= 0) {
+                KalimatStorage.resetStreak(context)
+                showFailDialog = true
+            }
         }
-        Spacer(Modifier.height(10.dp))
+    }
+
+    fun useWhisperHint() {
+        if (showWinDialog || showFailDialog || remainingLanterns <= 0) return
+
+        val unrevealed = wordChars.indices.filter { it !in revealedIndices }
+        if (unrevealed.isEmpty()) return
+
+        remainingLanterns--
+        val pickIdx = unrevealed.random()
+        val targetNorm = normalizeArabicChar(wordChars[pickIdx])
+
+        wordChars.indices.filter { normalizeArabicChar(wordChars[it]) == targetNorm }.forEach {
+            revealedIndices.add(it)
+        }
+
+        if (revealedIndices.size == wordChars.size) {
+            showWinDialog = true
+            onLevelComplete(remainingLanterns)
+        } else if (remainingLanterns <= 0) {
+            KalimatStorage.resetStreak(context)
+            showFailDialog = true
+        }
+    }
+
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 14.dp, vertical = 6.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            // Level Badge & Title
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    color = Gold.copy(alpha = 0.18f),
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.border(1.dp, Gold.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                ) {
+                    Text(
+                        text = "المرحلة ${level.id}",
+                        color = Gold,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                    )
+                }
+
+                Surface(
+                    color = NavyCard,
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.border(1.dp, GoldSoft.copy(alpha = 0.3f), RoundedCornerShape(14.dp))
+                ) {
+                    Text(
+                        text = level.category,
+                        color = TextMain,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                    )
+                }
+            }
+
+            // Lanterns Allowance Row (6 Glowing Lanterns with Shake)
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .offset(x = shakeOffset.dp)
+                    .noorGlassCard(cornerRadius = 18.dp)
+                    .padding(vertical = 8.dp, horizontal = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "الفوانيس المتبقية: $remainingLanterns / 6",
+                        color = GoldSoft,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        for (i in 1..6) {
+                            LanternIcon(isActive = i <= remainingLanterns)
+                        }
+                    }
+                }
+            }
+
+            // Meaning Hint Card ('معنى')
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .noorGlassCard(cornerRadius = 18.dp)
+                    .padding(14.dp)
+            ) {
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Lightbulb,
+                            contentDescription = null,
+                            tint = Gold,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = "المعنى الإيماني:",
+                            color = Gold,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = level.meaning,
+                        color = TextMain,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Start,
+                        lineHeight = 20.sp
+                    )
+                }
+            }
+
+            // Word Length Hint + Letter Tiles Row
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .noorGlassCard(cornerRadius = 18.dp)
+                    .padding(vertical = 12.dp, horizontal = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "الكلمة تتكون من ${wordChars.size} حروف",
+                        color = GoldSoft,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Spacer(Modifier.height(10.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        wordChars.forEachIndexed { idx, ch ->
+                            val isRevealed = idx in revealedIndices
+                            val diacritic = level.diacritics.getOrNull(idx) ?: ""
+
+                            Box(
+                                Modifier
+                                    .size(width = 42.dp, height = 52.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(if (isRevealed) Gold.copy(alpha = 0.25f) else NavyCard)
+                                    .border(
+                                        1.5.dp,
+                                        if (isRevealed) Gold else GoldSoft.copy(alpha = 0.35f),
+                                        RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    if (isRevealed) {
+                                        Text(
+                                            text = "$ch$diacritic",
+                                            color = Gold,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    } else {
+                                        Text(
+                                            text = diacritic.ifEmpty { " " },
+                                            color = GoldSoft,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Box(
+                                            Modifier
+                                                .width(18.dp)
+                                                .height(3.dp)
+                                                .background(Gold.copy(alpha = 0.5f), RoundedCornerShape(2.dp))
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Action Button: Whisper Hint ('همسة')
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    onClick = { useWhisperHint() },
+                    enabled = remainingLanterns > 0 && revealedIndices.size < wordChars.size,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Gold.copy(alpha = 0.2f),
+                        contentColor = Gold,
+                        disabledContainerColor = Color.White.copy(alpha = 0.05f),
+                        disabledContentColor = Color.White.copy(alpha = 0.2f)
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.border(1.dp, Gold.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Lightbulb,
+                            contentDescription = null,
+                            tint = Gold,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = "همسة (كشف حرف)",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            // On-screen 28-letter Arabic Keyboard
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .noorGlassCard(cornerRadius = 18.dp)
+                    .padding(8.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    KeyboardRow(
+                        letters = row1Letters,
+                        guessedLetters = guessedLetters,
+                        onLetterSelect = { handleLetterInput(it) }
+                    )
+                    KeyboardRow(
+                        letters = row2Letters,
+                        guessedLetters = guessedLetters,
+                        onLetterSelect = { handleLetterInput(it) }
+                    )
+                    KeyboardRow(
+                        letters = row3Letters,
+                        guessedLetters = guessedLetters,
+                        onLetterSelect = { handleLetterInput(it) }
+                    )
+                }
+            }
+        }
+
+        // Gold Confetti Effect on Win
+        if (showWinDialog) {
+            GoldConfettiEffect(active = true)
+        }
+
+        // Win Screen Overlay
+        if (showWinDialog) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(Navy.copy(alpha = 0.85f))
+                    .clickable(enabled = false) {},
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxWidth(0.9f)
+                        .noorGlassCard(cornerRadius = 24.dp)
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = if (level.id == 25) "مبارك! أكملت جميع المراحل 🏆✨" else "أحسنت! إجابة صحيحة 🎉",
+                            color = Gold,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Text(
+                            text = level.vocalized,
+                            color = Gold,
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Surface(
+                            color = Gold.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.border(1.dp, Gold.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                        ) {
+                            Text(
+                                text = level.category,
+                                color = GoldSoft,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                            )
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Text(
+                            text = level.meaning,
+                            color = TextMain,
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 22.sp
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
+                        // Stars Display
+                        val starsCount = when {
+                            remainingLanterns >= 5 -> 3
+                            remainingLanterns >= 3 -> 2
+                            else -> 1
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            for (s in 1..3) {
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = null,
+                                    tint = if (s <= starsCount) Gold else Color.Gray.copy(alpha = 0.4f),
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Button(
+                            onClick = {
+                                showWinDialog = false
+                                if (level.id == 25) {
+                                    onBackToMap()
+                                } else {
+                                    onNextLevel()
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy),
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                        ) {
+                            Text(
+                                text = if (level.id == 25) "إنهاء اللعبة وتصفح الخريطة 🌟" else "المرحلة التالية ➔",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Fail Overlay
+        if (showFailDialog) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(Navy.copy(alpha = 0.85f))
+                    .clickable(enabled = false) {},
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxWidth(0.85f)
+                        .noorGlassCard(cornerRadius = 22.dp)
+                        .padding(22.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "انتهت الفوانيس! 🌙",
+                            color = Gold,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = "الكلمة هي: ${level.vocalized}",
+                            color = TextMain,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                showFailDialog = false
+                                revealedIndices.clear()
+                                guessedLetters.clear()
+                                remainingLanterns = 6
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Text(
+                                    text = "إعادة المحاولة",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
-/**
- * Beautiful Custom Arabic Keyboard matching the app theme:
- * Glass keys, subtle 3D depth, ripple press, 3-row layout + control bar, professional spacing.
- */
 @Composable
-private fun BeautifulArabicKeyboard(
-    onLetter: (String) -> Unit,
-    onDelete: () -> Unit,
-    onEnter: () -> Unit,
-    target: String,
-    guesses: List<String>
-) {
-    fun letterState(ch: String): LetterState {
-        if (guesses.isEmpty()) return LetterState.UNGUESSED
-        val inTarget = target.contains(ch)
-        val inCorrectSpot = guesses.any { g ->
-            g.mapIndexedNotNull { i, c ->
-                if (c.toString() == ch && target.getOrNull(i)?.toString() == ch) ch else null
-            }.isNotEmpty()
-        }
-        val inAnyGuess = guesses.any { it.contains(ch) }
+private fun LanternIcon(isActive: Boolean) {
+    val alphaAnim by animateFloatAsState(
+        targetValue = if (isActive) 1f else 0.25f,
+        animationSpec = tween(300),
+        label = "lanternAlpha"
+    )
 
-        return when {
-            inCorrectSpot -> LetterState.CORRECT_SPOT
-            inTarget && inAnyGuess -> LetterState.IN_WORD_WRONG_SPOT
-            inAnyGuess -> LetterState.NOT_IN_WORD
-            else -> LetterState.UNGUESSED
-        }
-    }
-
-    Column(
+    Box(
         Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(NavyCard.copy(alpha = 0.6f))
-            .border(1.dp, Gold.copy(alpha = 0.25f), RoundedCornerShape(18.dp))
-            .padding(vertical = 10.dp, horizontal = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+            .size(32.dp, 40.dp)
+            .graphicsLayer { alpha = alphaAnim },
+        contentAlignment = Alignment.Center
     ) {
-        // Row 1
-        KeyboardRow(letters = row1Letters, letterStateProvider = { letterState(it) }, onLetter = onLetter)
-        // Row 2
-        KeyboardRow(letters = row2Letters, letterStateProvider = { letterState(it) }, onLetter = onLetter)
-        // Row 3
-        KeyboardRow(letters = row3Letters, letterStateProvider = { letterState(it) }, onLetter = onLetter)
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val w = size.width
+            val h = size.height
 
-        // Bottom Controls Bar (Backspace + Guess Button)
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 6.dp, end = 6.dp, top = 2.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Delete Key (Glass Style with 3D border)
-            Box(
-                Modifier
-                    .weight(1f)
-                    .height(42.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Navy.copy(alpha = 0.7f))
-                    .border(1.dp, Gold.copy(alpha = 0.3f), RoundedCornerShape(10.dp))
-                    .clickable { onDelete() },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Backspace, contentDescription = "حذف", tint = Gold, modifier = Modifier.size(20.dp))
+            // Ring
+            drawCircle(
+                color = if (isActive) Gold else Color.Gray,
+                radius = w * 0.12f,
+                center = Offset(w * 0.5f, h * 0.12f)
+            )
+
+            // Lantern Path
+            val path = Path().apply {
+                moveTo(w * 0.30f, h * 0.22f)
+                lineTo(w * 0.70f, h * 0.22f)
+                lineTo(w * 0.85f, h * 0.55f)
+                lineTo(w * 0.70f, h * 0.88f)
+                lineTo(w * 0.30f, h * 0.88f)
+                lineTo(w * 0.15f, h * 0.55f)
+                close()
             }
 
-            // Guess Key (Gold Glass Button)
-            Box(
-                Modifier
-                    .weight(2f)
-                    .height(42.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Gold)
-                    .clickable { onEnter() },
-                contentAlignment = Alignment.Center
-            ) {
-                Text("تخمين الكلمة 🌙", color = Navy, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            drawPath(
+                path = path,
+                brush = Brush.verticalGradient(
+                    colors = if (isActive) {
+                        listOf(GoldSoft, Gold, Color(0xFFD4AF37))
+                    } else {
+                        listOf(Color(0xFF4A4A4A), Color(0xFF2A2A2A))
+                    }
+                )
+            )
+
+            if (isActive) {
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.9f),
+                    radius = w * 0.14f,
+                    center = Offset(w * 0.5f, h * 0.55f)
+                )
             }
         }
     }
@@ -433,39 +1120,102 @@ private fun BeautifulArabicKeyboard(
 @Composable
 private fun KeyboardRow(
     letters: List<String>,
-    letterStateProvider: (String) -> LetterState,
-    onLetter: (String) -> Unit
+    guessedLetters: Map<String, Boolean>,
+    onLetterSelect: (String) -> Unit
 ) {
     Row(
         Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterHorizontally)
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
     ) {
         letters.forEach { ch ->
-            val state = letterStateProvider(ch)
-            val (bgColor, textColor, borderColor) = when (state) {
-                LetterState.CORRECT_SPOT -> Triple(Gold, Navy, Gold)
-                LetterState.IN_WORD_WRONG_SPOT -> Triple(Color(0xFFF3E5AB), Navy, Gold)
-                LetterState.NOT_IN_WORD -> Triple(Navy.copy(alpha = 0.4f), Color.White.copy(alpha = 0.25f), Color.Transparent)
-                LetterState.UNGUESSED -> Triple(NavyCard.copy(alpha = 0.6f), Color.White, Gold.copy(alpha = 0.2f))
+            val isGuessed = guessedLetters.containsKey(ch)
+            val isCorrect = guessedLetters[ch] == true
+
+            val (bgColor, textColor, borderColor) = when {
+                isGuessed && isCorrect -> Triple(Gold, Navy, Gold)
+                isGuessed && !isCorrect -> Triple(Navy.copy(alpha = 0.3f), Color.White.copy(alpha = 0.25f), Color.Transparent)
+                else -> Triple(NavyCard.copy(alpha = 0.7f), Color.White, GoldSoft.copy(alpha = 0.3f))
             }
 
             Box(
                 Modifier
                     .weight(1f, fill = false)
-                    .widthIn(min = 26.dp, max = 34.dp)
-                    .height(40.dp)
+                    .widthIn(min = 28.dp, max = 36.dp)
+                    .height(42.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(bgColor)
                     .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = rememberRipple(bounded = true, color = Gold),
-                        onClick = { onLetter(ch) }
-                    ),
+                    .clickable(enabled = !isGuessed) { onLetterSelect(ch) },
                 contentAlignment = Alignment.Center
             ) {
-                Text(ch, color = textColor, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = ch,
+                    color = textColor,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
+        }
+    }
+}
+
+private data class Particle(
+    val x: Float,
+    val y: Float,
+    val size: Float,
+    val color: Color,
+    val vx: Float,
+    val vy: Float
+)
+
+@Composable
+private fun GoldConfettiEffect(
+    modifier: Modifier = Modifier,
+    active: Boolean
+) {
+    if (!active) return
+
+    val particles = remember {
+        val colors = listOf(Gold, GoldSoft, Color(0xFFFFD700), Color(0xFFFFA500), Color(0xFFFFF8DC))
+        List(35) {
+            val angle = Random.nextFloat() * 2f * Math.PI.toFloat()
+            val speed = Random.nextFloat() * 6f + 3f
+            Particle(
+                x = 0.5f,
+                y = 0.4f,
+                size = Random.nextFloat() * 10f + 5f,
+                color = colors.random(),
+                vx = cos(angle) * speed,
+                vy = sin(angle) * speed - 4f
+            )
+        }
+    }
+
+    var progress by remember { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(active) {
+        val anim = Animatable(0f)
+        anim.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 1600, easing = LinearOutSlowInEasing)
+        ) {
+            progress = value
+        }
+    }
+
+    Canvas(modifier = modifier.fillMaxSize()) {
+        val w = size.width
+        val h = size.height
+        val alpha = (1f - progress).coerceIn(0f, 1f)
+
+        particles.forEach { p ->
+            val px = (p.x * w) + (p.vx * progress * 35f)
+            val py = (p.y * h) + (p.vy * progress * 35f) + (0.5f * 9.8f * progress * progress * 40f)
+            drawCircle(
+                color = p.color.copy(alpha = alpha),
+                radius = p.size * (1f - progress * 0.3f),
+                center = Offset(px, py)
+            )
         }
     }
 }
