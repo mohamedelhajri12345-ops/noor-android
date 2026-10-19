@@ -1,0 +1,201 @@
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:272:14 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:272:42 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:272:43 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:273:13 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:273:14 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:273:37 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:274:9 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:275:5 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:275:6 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:276:5 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:276:22 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:277:9 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:277:12 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:277:14 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:277:16 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:278:9 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:278:15 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:278:17 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:278:18 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:278:55 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:278:56 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:279:9 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:279:21 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:279:23 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:279:24 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:279:78 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:279:79 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:280:9 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:280:15 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:280:17 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:280:23 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:281:13 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:281:14 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:281:39 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:281:40 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:282:13 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:282:14 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:282:54 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:282:55 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:283:13 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:283:14 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:283:42 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:283:43 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:284:13 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:284:14 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:284:51 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:284:52 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:285:13 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:285:14 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:285:39 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:285:40 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:286:13 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:286:14 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:286:53 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:287:9 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:288:5 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:289:1 Expecting a top level declaration
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:124:13 Too many arguments for public constructor GameOrderingStage(id: Int, title: String, description: String, steps: List<String>) defined in com.elhajri.noor.games.GameOrderingStage
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:125:13 Too many arguments for public constructor GameOrderingStage(id: Int, title: String, description: String, steps: List<String>) defined in com.elhajri.noor.games.GameOrderingStage
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/PrayerOrderGame.kt:126:13 Too many arguments for public constructor GameOrderingStage(id: Int, title: String, description: String, steps: List<String>) defined in com.elhajri.noor.games.GameOrderingStage
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsJourneyGame.kt:34:1 Conflicting overloads: public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file GenericQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file MemoryMatchEngine.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NamesOfAllahGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NumbersQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsJourneyGame.kt:244:37 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsJourneyGame.kt:276:42 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsJourneyGame.kt:309:51 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsJourneyGame.kt:311:51 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsJourneyGame.kt:347:44 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsJourneyGame.kt:365:50 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsOrderGame.kt:44:1 Conflicting overloads: public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file GenericQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file MemoryMatchEngine.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NamesOfAllahGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NumbersQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsOrderGame.kt:102:37 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsOrderGame.kt:133:49 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsOrderGame.kt:143:49 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsOrderGame.kt:175:49 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsOrderGame.kt:176:60 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ProphetsOrderGame.kt:205:57 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:50:1 Conflicting overloads: public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file GenericQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file MemoryMatchEngine.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NamesOfAllahGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NumbersQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:228:53 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:232:54 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:236:79 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:297:59 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:302:77 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:366:53 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:369:53 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:397:56 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/QuranMemorizationGame.kt:467:56 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/StageProgression.kt:46:1 Conflicting overloads: public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file GenericQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file MemoryMatchEngine.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NamesOfAllahGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NumbersQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TawafOrderGame.kt:440:30 Unresolved reference: BorderStroke
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TawafOrderGame.kt:525:33 Unresolved reference: BorderStroke
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TawafOrderGame.kt:526:34 Unresolved reference: BorderStroke
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TawafOrderGame.kt:527:33 Unresolved reference: BorderStroke
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TrueFalseGame.kt:43:1 Conflicting overloads: public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file GenericQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file MemoryMatchEngine.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NamesOfAllahGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NumbersQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TrueFalseGame.kt:115:37 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TrueFalseGame.kt:146:49 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TrueFalseGame.kt:156:49 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TrueFalseGame.kt:190:57 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TrueFalseGame.kt:196:64 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TrueFalseGame.kt:298:59 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/TrueFalseGame.kt:300:66 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WisdomPearlsGame.kt:498:30 Unresolved reference: clip
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:54:1 Conflicting overloads: public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file GenericQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file MemoryMatchEngine.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NamesOfAllahGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file NumbersQuizGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsJourneyGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file ProphetsOrderGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file QuranMemorizationGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file TrueFalseGame.kt, private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:628:44 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:634:43 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:639:40 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:676:47 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:709:58 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:768:48 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:790:49 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:836:69 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:836:108 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/WordSearchGame.kt:1090:57 Overload resolution ambiguity: 
+private fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file WordSearchGame.kt
+public fun Int.toArabicDigits(): String defined in com.elhajri.noor.games in file StageProgression.kt
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/games/ZakatCalcGame.kt:472:30 Unresolved reference: clip
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/videos/VideoPlayerScreen.kt:8:47 Unresolved reference: PlayCircleFill
+e: file:///home/runner/work/noor-android/noor-android/app/src/main/java/com/elhajri/noor/videos/VideoPlayerScreen.kt:918:49 Unresolved reference: PlayCircleFill
+
+> Task :app:compileReleaseKotlin FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --info or --debug option to get more log output.
+Build failed at Mon Oct 19 13:27:03 UTC 2026
