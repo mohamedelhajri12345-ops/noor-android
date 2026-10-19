@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Book
@@ -74,7 +75,7 @@ private fun features() = listOf(
     MoreFeature("ai", t("المساعد الذكي", "Smart Assistant"), t("ذكاء اصطناعي إسلامي", "Islamic AI"), Icons.Filled.AutoAwesome),
     MoreFeature("zakat", t("حاسبة الزكاة", "Zakat Calculator"), t("احسب زكاتك", "Calculate your zakat"), Icons.Filled.Paid),
     MoreFeature("hajj", t("الحج والعمرة", "Hajj & Umrah"), t("دليل المصطافين", "Pilgrim guide"), Icons.Filled.Bookmark),
-    MoreFeature("tracker", t("ورد القرآن", "Quran Tracker"), t("متتبع التلاوة", "Recitation tracker"), Icons.Filled.TaskAlt),
+    MoreFeature("tracker", t("بياناتي وإحصائياتي", "My Data & Stats"), t("لوحة إحصائيات النشاط والإنجاز الشاملة", "Activity and stats dashboard"), Icons.Filled.BarChart),
     MoreFeature("themes", t("متجر الثيمات", "Theme Store"), t("ثيمات إسلامية بالنقاط", "Islamic themes with points"), Icons.Filled.Palette),
     MoreFeature("settings", t("الإعدادات", "Settings"), t("إعدادات التطبيق", "App settings"), Icons.Filled.Settings),
 )

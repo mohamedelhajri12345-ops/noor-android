@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,7 +59,7 @@ private fun toArabicDigits(value: Any): String {
 }
 
 @Composable
-fun AnalyticsDashboardScreen() {
+fun AnalyticsDashboardScreen(onBack: (() -> Unit)? = null) {
     val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) } // 0: نشاطي (Main), 1: تقدمي (Stars/XP), 2: الحفظ والإنجاز, 3: سلاسل ومقارنات, 4: ورد القرآن
 
@@ -74,10 +76,19 @@ fun AnalyticsDashboardScreen() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            if (onBack != null) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "رجوع",
+                        tint = Gold
+                    )
+                }
+                Spacer(Modifier.width(4.dp))
+            }
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "بياناتي وإحصائياتي",
                     fontSize = 22.sp,

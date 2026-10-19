@@ -100,7 +100,7 @@ import com.elhajri.noor.prayer.PrayerScreen
 import com.elhajri.noor.privacy.PrivacyPolicyScreen
 import com.elhajri.noor.qibla.QiblaScreen
 import com.elhajri.noor.quran.QuranReaderScreen
-import com.elhajri.noor.quran.TrackerScreen
+import com.elhajri.noor.analytics.AnalyticsDashboardScreen
 import com.elhajri.noor.quiz.QuizScreen
 import com.elhajri.noor.settings.SettingsScreen
 import com.elhajri.noor.stories.StoriesScreen
@@ -210,6 +210,11 @@ fun NoorApp() {
     val appCtx = androidx.compose.ui.platform.LocalContext.current
     LaunchedEffect(Unit) {
         com.elhajri.noor.ads.InterstitialAds.preload(appCtx)
+        com.elhajri.noor.analytics.AnalyticsTracker.trackSessionStart(appCtx)
+        while (true) {
+            kotlinx.coroutines.delay(60000L)
+            com.elhajri.noor.analytics.AnalyticsTracker.trackUsageMinutes(appCtx, 1)
+        }
     }
     val sharedVideoId = (appCtx as? MainActivity)?.pendingSharedVideoId
     LaunchedEffect(sharedVideoId) {
@@ -323,16 +328,16 @@ fun NoorApp() {
             ) {
                 composable("home") { HomeScreen(onNavigate = { navigateSafe(it) }) }
                 composable("prayer") { PrayerScreen() }
-                composable("quran") { com.elhajri.noor.quran.QuranScreen(onSurahClick = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") }) }
+                composable("quran") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "quran"); com.elhajri.noor.quran.QuranScreen(onSurahClick = { surah -> navController.navigate("reader/${surah.number}/${surah.name}") }) }
                 composable("athkar") { AthkarScreen(onOpenCategory = { cat, title -> navController.navigate("athkarDetail/$cat/$title") }) }
                 composable("more") { MoreScreen(onNavigate = { navigateSafe(it) }) }
 
                 composable("qibla") { QiblaScreen() }
-                composable("tasbih") { TasbihScreen(onBack = { navController.popBackStack() }) }
+                composable("tasbih") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "tasbih"); TasbihScreen(onBack = { navController.popBackStack() }) }
                 composable("names") { NamesOfAllahScreen() }
                 composable("quiz") { QuizScreen() }
                 composable("stories") { StoriesScreen(onOpenStory = { id -> navController.navigate("story/$id") }) }
-                composable("settings") { SettingsScreen(onOpenPrivacy = { navController.navigate("privacy") }) }
+                composable("settings") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "settings"); SettingsScreen(onOpenPrivacy = { navController.navigate("privacy") }) }
                 composable("themes") { com.elhajri.noor.theme.ThemeStoreScreen(onOpenEarnPoints = { navController.navigate("earn") }) }
                 composable("earn") { com.elhajri.noor.theme.EarnPointsScreen(onBack = { navController.popBackStack() }) }
 
@@ -381,10 +386,11 @@ fun NoorApp() {
                 ) }
                 composable("donation") { DonationScreen(onBack = { navController.popBackStack() }) }
                 composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
-                composable("library") { com.elhajri.noor.quran.LibraryScreen(onBack = { navController.popBackStack() }) }
-                composable("tracker") { TrackerScreen() }
+                composable("library") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "nasheeds"); com.elhajri.noor.quran.LibraryScreen(onBack = { navController.popBackStack() }) }
+                composable("tracker") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "tracker"); AnalyticsDashboardScreen(onBack = { navController.popBackStack() }) }
+                composable("analytics") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "analytics"); AnalyticsDashboardScreen(onBack = { navController.popBackStack() }) }
                 composable("games") { NoorGameHubScreen(onBack = { navController.popBackStack() }, onNavigate = { navController.navigate(it) }) }
-                composable("videos") { com.elhajri.noor.videos.VideosScreen(onBack = { navController.popBackStack() }, onOpenVideo = { videoId -> navController.navigate("videoPlayer/$videoId") }) }
+                composable("videos") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "videos"); com.elhajri.noor.videos.VideosScreen(onBack = { navController.popBackStack() }, onOpenVideo = { videoId -> navController.navigate("videoPlayer/$videoId") }) }
                 composable("videoPlayer/{videoId}") { entry ->
                     val videoId = entry.arguments?.getString("videoId") ?: ""
                     com.elhajri.noor.videos.VideoPlayerScreen(initialVideoId = videoId, onBack = { navController.popBackStack() })

@@ -57,7 +57,7 @@
     nativeVideo.setAttribute('playsinline', '');
     nativeVideo.setAttribute('webkit-playsinline', '');
     nativeVideo.preload = 'auto';
-    nativeVideo.onready = function () { report('READY'); bridge('sendPlayerReady'); };
+    nativeVideo.onloadedmetadata = function () { report('READY'); bridge('sendPlayerReady'); };
     nativeVideo.oncanplay = function () { report('READY'); bridge('sendPlayerReady'); };
     nativeVideo.onplay = function () { report('PLAYING'); bridgeState(1); };
     nativeVideo.onpause = function () { report('PAUSED'); bridgeState(2); };
