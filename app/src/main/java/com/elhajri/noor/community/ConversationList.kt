@@ -2,6 +2,7 @@ package com.elhajri.noor.community
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -24,11 +26,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.elhajri.noor.theme.GlassRecipe
 import com.elhajri.noor.ui.AmiriFamily
+import com.elhajri.noor.ui.AntiqueGoldDeep
 import com.elhajri.noor.ui.Gold
+import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
+import com.elhajri.noor.ui.noorGlassCard
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -91,18 +97,18 @@ fun ConversationList(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .padding(horizontal = 16.dp, vertical = 4.dp)
         ) {
             // Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 12.dp),
+                    .padding(vertical = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "مجتمع القرآن الكريم",
+                    text = "المحادثات والرسائل",
                     color = Gold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -117,7 +123,8 @@ fun ConversationList(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(Gold.copy(alpha = 0.15f)),
+                            .background(NavyCard)
+                            .border(1.dp, GlassRecipe.borderGradient, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         if (currentUser.avatar.isNotEmpty()) {
@@ -129,7 +136,7 @@ fun ConversationList(
                             )
                         } else {
                             Text(
-                                text = currentUser.name.take(1),
+                                text = currentUser.name.take(1).ifEmpty { "ن" },
                                 color = Gold,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp
@@ -146,7 +153,7 @@ fun ConversationList(
                         )
                         Text(
                             text = "@${currentUser.handle}",
-                            color = Gold,
+                            color = GoldSoft,
                             fontSize = 10.sp
                         )
                     }
@@ -161,21 +168,29 @@ fun ConversationList(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ChatBubbleOutline,
-                        contentDescription = null,
-                        tint = Gold.copy(alpha = 0.3f),
-                        modifier = Modifier.size(56.dp)
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .noorGlassCard(cornerRadius = 24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChatBubbleOutline,
+                            contentDescription = null,
+                            tint = Gold.copy(alpha = 0.6f),
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(14.dp))
                     Text(
                         text = "لا توجد محادثات بعد",
-                        color = TextMain.copy(alpha = 0.6f),
-                        fontSize = 14.sp
+                        color = TextMain.copy(alpha = 0.8f),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "ابدأ محادثة جديدة بمعرف صديقك",
-                        color = TextMain.copy(alpha = 0.4f),
+                        text = "اضغط على زر (+) لبدء محادثة خاصة أو مجموعة جديدة",
+                        color = GoldSoft.copy(alpha = 0.7f),
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -190,13 +205,11 @@ fun ConversationList(
                         val avatarUrl = getConvAvatar(conv)
                         val timeStr = formatTime(conv.lastMessageTime.ifEmpty { conv.createdDate })
 
-                        Surface(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { onSelectConv(conv) },
-                            shape = RoundedCornerShape(16.dp),
-                            color = NavyCard,
-                            border = BorderStroke(1.dp, Gold.copy(alpha = 0.15f))
+                                .noorGlassCard(cornerRadius = 16.dp)
+                                .clickable { onSelectConv(conv) }
                         ) {
                             Row(
                                 modifier = Modifier.padding(12.dp),
@@ -207,7 +220,8 @@ fun ConversationList(
                                     modifier = Modifier
                                         .size(48.dp)
                                         .clip(CircleShape)
-                                        .background(Gold.copy(alpha = 0.15f)),
+                                        .background(NavyCard)
+                                        .border(1.dp, GlassRecipe.borderGradient, CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     if (avatarUrl.isNotEmpty()) {
@@ -226,7 +240,7 @@ fun ConversationList(
                                         )
                                     } else {
                                         Text(
-                                            text = convName.take(1),
+                                            text = convName.take(1).ifEmpty { "ن" },
                                             color = Gold,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.Bold
@@ -237,22 +251,21 @@ fun ConversationList(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = convName,
-                                        color = TextMain,
+                                        color = Gold,
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
-                                    Spacer(modifier = Modifier.height(2.dp))
                                     val subtitle = buildString {
-                                        if (conv.lastSender.isNotEmpty() && conv.lastSender != currentUser.name) {
+                                        if (conv.lastSender.isNotEmpty()) {
                                             append("${conv.lastSender}: ")
                                         }
                                         append(conv.lastMessage.ifEmpty { "ابدأ المحادثة" })
                                     }
                                     Text(
                                         text = subtitle,
-                                        color = TextMain.copy(alpha = 0.6f),
+                                        color = TextMain.copy(alpha = 0.7f),
                                         fontSize = 12.sp,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
@@ -262,8 +275,8 @@ fun ConversationList(
                                 if (timeStr.isNotEmpty()) {
                                     Text(
                                         text = timeStr,
-                                        color = TextMain.copy(alpha = 0.4f),
-                                        fontSize = 10.sp
+                                        color = GoldSoft.copy(alpha = 0.7f),
+                                        fontSize = 11.sp
                                     )
                                 }
                             }
@@ -273,18 +286,25 @@ fun ConversationList(
             }
         }
 
-        // Floating Action Button
-        FloatingActionButton(
-            onClick = onNewChat,
-            containerColor = Gold,
-            contentColor = Navy,
-            shape = CircleShape,
+        // Floating Action Button with warm gold gradient
+        Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 24.dp)
-                .size(56.dp)
+                .size(58.dp)
+                .clip(CircleShape)
+                .background(
+                    Brush.linearGradient(listOf(GoldSoft, Gold, AntiqueGoldDeep))
+                )
+                .clickable { onNewChat() },
+            contentAlignment = Alignment.Center
         ) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "محادثة جديدة", modifier = Modifier.size(28.dp))
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "محادثة جديدة",
+                tint = Navy,
+                modifier = Modifier.size(30.dp)
+            )
         }
     }
 }

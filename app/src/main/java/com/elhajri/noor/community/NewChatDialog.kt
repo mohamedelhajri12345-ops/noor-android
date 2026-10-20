@@ -2,6 +2,7 @@ package com.elhajri.noor.community
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,15 +20,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elhajri.noor.theme.GlassRecipe
+import com.elhajri.noor.ui.AntiqueGoldDeep
 import com.elhajri.noor.ui.Gold
+import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
+import com.elhajri.noor.ui.noorGlassCard
 import kotlinx.coroutines.launch
 
 data class ContactItem(
@@ -188,10 +194,10 @@ fun NewChatDialog(
         modifier = Modifier.fillMaxWidth(0.92f),
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = NavyCard,
-            border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .noorGlassCard(cornerRadius = 22.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -208,85 +214,135 @@ fun NewChatDialog(
                     Text(
                         text = "محادثة جديدة",
                         color = Gold,
-                        fontSize = 16.sp,
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold
                     )
                     IconButton(onClick = onClose, modifier = Modifier.size(28.dp)) {
-                        Icon(Icons.Default.Close, contentDescription = "إغلاق", tint = TextMain.copy(alpha = 0.6f))
+                        Icon(Icons.Default.Close, contentDescription = "إغلاق", tint = GoldSoft.copy(alpha = 0.8f))
                     }
                 }
 
-                // Mode Tabs
+                // Mode Tabs (Direct vs Group)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Button(
-                        onClick = { mode = "direct"; error = "" },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (mode == "direct") Gold else Color(0xFF0A0F1A),
-                            contentColor = if (mode == "direct") Navy else TextMain
-                        )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(42.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                if (mode == "direct") Brush.horizontalGradient(listOf(GoldSoft, Gold))
+                                else Brush.horizontalGradient(listOf(NavyCard, NavyCard))
+                            )
+                            .border(
+                                1.dp,
+                                if (mode == "direct") GlassRecipe.borderGradient else BorderStroke(1.dp, Gold.copy(alpha = 0.2f)).brush,
+                                RoundedCornerShape(12.dp)
+                            )
+                            .clickable { mode = "direct"; error = "" },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.PersonAdd, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "محادثة خاصة", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                            Icon(Icons.Default.PersonAdd, contentDescription = null, tint = if (mode == "direct") Navy else Gold, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(text = "محادثة خاصة", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (mode == "direct") Navy else TextMain)
+                        }
                     }
 
-                    Button(
-                        onClick = { mode = "group"; error = "" },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (mode == "group") Gold else Color(0xFF0A0F1A),
-                            contentColor = if (mode == "group") Navy else TextMain
-                        )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(42.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                if (mode == "group") Brush.horizontalGradient(listOf(GoldSoft, Gold))
+                                else Brush.horizontalGradient(listOf(NavyCard, NavyCard))
+                            )
+                            .border(
+                                1.dp,
+                                if (mode == "group") GlassRecipe.borderGradient else BorderStroke(1.dp, Gold.copy(alpha = 0.2f)).brush,
+                                RoundedCornerShape(12.dp)
+                            )
+                            .clickable { mode = "group"; error = "" },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.GroupAdd, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "مجموعة", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                            Icon(Icons.Default.GroupAdd, contentDescription = null, tint = if (mode == "group") Navy else Gold, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(text = "مجموعة جديدة", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (mode == "group") Navy else TextMain)
+                        }
                     }
                 }
 
                 if (mode == "direct") {
-                    // Search toggle
+                    // Search mode filter chips
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         FilterChip(
                             selected = searchMode == "handle",
                             onClick = { searchMode = "handle"; error = "" },
-                            label = { Text("بالمعرف", fontSize = 11.sp) },
+                            label = { Text("بواسطة المعرف", fontSize = 11.sp) },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Gold.copy(alpha = 0.2f),
+                                selectedContainerColor = Gold.copy(alpha = 0.25f),
                                 selectedLabelColor = Gold
                             )
                         )
                         FilterChip(
                             selected = searchMode == "email",
                             onClick = { searchMode = "email"; error = "" },
-                            label = { Text("بالبريد الإلكتروني", fontSize = 11.sp) },
+                            label = { Text("بواسطة البريد", fontSize = 11.sp) },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Gold.copy(alpha = 0.2f),
+                                selectedContainerColor = Gold.copy(alpha = 0.25f),
                                 selectedLabelColor = Gold
                             )
                         )
                     }
 
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFF0A0F1A),
-                        border = BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
-                    ) {
-                        if (searchMode == "email") {
+                    if (searchMode == "handle") {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp),
+                            color = NavyCard,
+                            border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text("@", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                TextField(
+                                    value = handleInput,
+                                    onValueChange = { handleInput = it.replace(" ", "").lowercase(); error = "" },
+                                    placeholder = { Text("أدخل معرف الصديق...", color = TextMain.copy(alpha = 0.4f), fontSize = 12.sp) },
+                                    colors = TextFieldDefaults.colors(
+                                        focusedContainerColor = Color.Transparent,
+                                        unfocusedContainerColor = Color.Transparent,
+                                        focusedIndicatorColor = Color.Transparent,
+                                        unfocusedIndicatorColor = Color.Transparent,
+                                        focusedTextColor = TextMain,
+                                        unfocusedTextColor = TextMain
+                                    ),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true
+                                )
+                            }
+                        }
+                    } else {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp),
+                            color = NavyCard,
+                            border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
+                        ) {
                             TextField(
                                 value = emailInput,
-                                onValueChange = { emailInput = it },
-                                placeholder = { Text("أدخل البريد الإلكتروني...", color = TextMain.copy(alpha = 0.3f), fontSize = 12.sp) },
+                                onValueChange = { emailInput = it; error = "" },
+                                placeholder = { Text("أدخل البريد الإلكتروني للصديق...", color = TextMain.copy(alpha = 0.4f), fontSize = 12.sp) },
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent,
@@ -298,57 +354,36 @@ fun NewChatDialog(
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true
                             )
-                        } else {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text("@", color = Gold, fontWeight = FontWeight.Bold)
-                                Spacer(modifier = Modifier.width(4.dp))
-                                TextField(
-                                    value = handleInput,
-                                    onValueChange = { handleInput = it.replace(" ", "").lowercase() },
-                                    placeholder = { Text("المعرف...", color = TextMain.copy(alpha = 0.3f), fontSize = 12.sp) },
-                                    colors = TextFieldDefaults.colors(
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent,
-                                        focusedIndicatorColor = Color.Transparent,
-                                        unfocusedIndicatorColor = Color.Transparent,
-                                        focusedTextColor = TextMain,
-                                        unfocusedTextColor = TextMain
-                                    ),
-                                    modifier = Modifier.weight(1f),
-                                    singleLine = true
-                                )
-                            }
                         }
                     }
 
-                    Button(
-                        onClick = { createDirect() },
-                        enabled = !loading,
-                        modifier = Modifier.fillMaxWidth().height(44.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(46.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Brush.horizontalGradient(listOf(GoldSoft, Gold, AntiqueGoldDeep)))
+                            .clickable(enabled = !loading) { createDirect() },
+                        contentAlignment = Alignment.Center
                     ) {
                         if (loading) {
-                            CircularProgressIndicator(color = Navy, modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                            CircularProgressIndicator(color = Navy, modifier = Modifier.size(20.dp))
                         } else {
-                            Text("بدء المحادثة", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text("بدء المحادثة", color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 } else {
                     // Group mode
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFF0A0F1A),
-                        border = BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
+                        shape = RoundedCornerShape(14.dp),
+                        color = NavyCard,
+                        border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
                     ) {
                         TextField(
                             value = groupName,
-                            onValueChange = { groupName = it },
-                            placeholder = { Text("اسم المجموعة...", color = TextMain.copy(alpha = 0.3f), fontSize = 12.sp) },
+                            onValueChange = { groupName = it; error = "" },
+                            placeholder = { Text("اسم المجموعة...", color = TextMain.copy(alpha = 0.4f), fontSize = 12.sp) },
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -362,152 +397,112 @@ fun NewChatDialog(
                         )
                     }
 
-                    // Add custom handle field
-                    Row(
+                    // Add member by handle directly
+                    Text("أضف عضو بالمعرف:", color = GoldSoft, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        color = NavyCard,
+                        border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
                     ) {
-                        Surface(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFF0A0F1A),
-                            border = BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text("@", color = Gold, fontSize = 12.sp)
-                                TextField(
-                                    value = newHandleInput,
-                                    onValueChange = { newHandleInput = it.replace(" ", "").lowercase() },
-                                    placeholder = { Text("إضافة معرف عضو", color = TextMain.copy(alpha = 0.3f), fontSize = 11.sp) },
-                                    colors = TextFieldDefaults.colors(
-                                        focusedContainerColor = Color.Transparent,
-                                        unfocusedContainerColor = Color.Transparent,
-                                        focusedIndicatorColor = Color.Transparent,
-                                        unfocusedIndicatorColor = Color.Transparent,
-                                        focusedTextColor = TextMain,
-                                        unfocusedTextColor = TextMain
-                                    ),
-                                    modifier = Modifier.weight(1f),
-                                    singleLine = true
-                                )
-                            }
-                        }
-
-                        IconButton(
-                            onClick = {
-                                val clean = newHandleInput.trim().lowercase().removePrefix("@")
-                                if (clean.length >= 3 && clean != currentUser.handle) {
-                                    selectedContacts = selectedContacts + clean
-                                    newHandleInput = ""
-                                }
-                            },
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(Gold)
-                        ) {
-                            Icon(Icons.Default.Add, contentDescription = "إضافة", tint = Navy, modifier = Modifier.size(18.dp))
-                        }
-                    }
-
-                    // Selected contact badges
-                    if (selectedContacts.isNotEmpty()) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(max = 60.dp),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            selectedContacts.forEach { handle ->
-                                Surface(
-                                    shape = RoundedCornerShape(20.dp),
-                                    color = Gold.copy(alpha = 0.2f),
-                                    border = BorderStroke(1.dp, Gold.copy(alpha = 0.4f))
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                    ) {
-                                        Text("@$handle", color = Gold, fontSize = 11.sp)
-                                        Icon(
-                                            Icons.Default.Close,
-                                            contentDescription = "إزالة",
-                                            tint = Gold,
-                                            modifier = Modifier
-                                                .size(14.dp)
-                                                .clickable { selectedContacts = selectedContacts - handle }
-                                        )
+                            Text("@", color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            TextField(
+                                value = newHandleInput,
+                                onValueChange = { newHandleInput = it.replace(" ", "").lowercase() },
+                                placeholder = { Text("معرف الصديق لأضافته...", color = TextMain.copy(alpha = 0.4f), fontSize = 12.sp) },
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    focusedTextColor = TextMain,
+                                    unfocusedTextColor = TextMain
+                                ),
+                                modifier = Modifier.weight(1f),
+                                singleLine = true
+                            )
+                            IconButton(
+                                onClick = {
+                                    val clean = newHandleInput.trim().lowercase().removePrefix("@")
+                                    if (clean.length >= 3 && clean != currentUser.handle) {
+                                        selectedContacts = selectedContacts + clean
+                                        newHandleInput = ""
                                     }
                                 }
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = "إضافة", tint = Gold)
                             }
                         }
                     }
 
-                    // Contacts list checkable
                     if (contacts.isNotEmpty()) {
-                        Text("الأصدقاء:", color = TextMain.copy(alpha = 0.7f), fontSize = 11.sp)
+                        Text("أو اختر من أصدقائك السابقين:", color = GoldSoft, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         LazyColumn(
-                            modifier = Modifier.heightIn(max = 140.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            modifier = Modifier.heightIn(max = 160.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            items(contacts) { contact ->
-                                val isSelected = selectedContacts.contains(contact.handle)
-                                Surface(
+                            items(contacts, key = { it.handle }) { c ->
+                                val isSelected = selectedContacts.contains(c.handle)
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .clip(RoundedCornerShape(10.dp))
+                                        .background(if (isSelected) Gold.copy(alpha = 0.2f) else NavyCard)
+                                        .border(1.dp, if (isSelected) Gold else Color.Transparent, RoundedCornerShape(10.dp))
                                         .clickable {
-                                            selectedContacts = if (isSelected) selectedContacts - contact.handle
-                                            else selectedContacts + contact.handle
-                                        },
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = if (isSelected) Gold.copy(alpha = 0.15f) else Color.Transparent
+                                            selectedContacts = if (isSelected) selectedContacts - c.handle else selectedContacts + c.handle
+                                        }
+                                        .padding(8.dp)
                                 ) {
                                     Row(
-                                        modifier = Modifier.padding(8.dp),
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth()
                                     ) {
+                                        Column {
+                                            Text(c.name, color = TextMain, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                            Text("@${c.handle}", color = GoldSoft, fontSize = 10.sp)
+                                        }
                                         Checkbox(
                                             checked = isSelected,
-                                            onCheckedChange = { checked ->
-                                                selectedContacts = if (checked) selectedContacts + contact.handle
-                                                else selectedContacts - contact.handle
+                                            onCheckedChange = {
+                                                selectedContacts = if (it) selectedContacts + c.handle else selectedContacts - c.handle
                                             },
                                             colors = CheckboxDefaults.colors(
                                                 checkedColor = Gold,
                                                 uncheckedColor = Gold.copy(alpha = 0.4f)
                                             )
                                         )
-                                        Text(contact.name, color = TextMain, fontSize = 12.sp)
-                                        Text("@${contact.handle}", color = Gold, fontSize = 10.sp)
                                     }
                                 }
                             }
                         }
                     }
 
-                    Button(
-                        onClick = { createGroup() },
-                        enabled = !loading,
-                        modifier = Modifier.fillMaxWidth().height(44.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(46.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Brush.horizontalGradient(listOf(GoldSoft, Gold, AntiqueGoldDeep)))
+                            .clickable(enabled = !loading) { createGroup() },
+                        contentAlignment = Alignment.Center
                     ) {
                         if (loading) {
-                            CircularProgressIndicator(color = Navy, modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                            CircularProgressIndicator(color = Navy, modifier = Modifier.size(20.dp))
                         } else {
-                            Text("إنشاء المجموعة", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text("إنشاء المجموعة", color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
 
                 if (error.isNotEmpty()) {
-                    Text(error, color = Color.Red, fontSize = 11.sp)
+                    Text(error, color = MaterialTheme.colorScheme.error, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

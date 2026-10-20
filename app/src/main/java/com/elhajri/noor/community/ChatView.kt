@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -35,6 +36,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -44,11 +46,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
+import com.elhajri.noor.theme.GlassRecipe
 import com.elhajri.noor.ui.AmiriFamily
+import com.elhajri.noor.ui.AntiqueGoldDeep
 import com.elhajri.noor.ui.Gold
+import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
+import com.elhajri.noor.ui.NoorGoldenDivider
 import com.elhajri.noor.ui.TextMain
+import com.elhajri.noor.ui.noorGlassCard
+import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -267,15 +275,14 @@ fun ChatView(
                         val uploadRes = CommunityApi.uploadFile(bytes, file.name, "audio/m4a")
                         uploadRes.onSuccess { url ->
                             val nowIso = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).format(Date())
-                            val createRes = CommunityApi.createMessage(
+                            CommunityApi.createMessage(
                                 conversationId = conversation.id,
                                 nickname = currentUser.name,
                                 text = "🎙️ رسالة صوتية",
                                 avatarUrl = currentUser.avatar,
                                 fileUrl = url,
                                 fileType = "voice"
-                            )
-                            createRes.onSuccess {
+                            ).onSuccess {
                                 CommunityApi.updateConversation(conversation.id, "🎙️ رسالة صوتية", currentUser.name, nowIso)
                                 loadMessages()
                             }
@@ -284,7 +291,8 @@ fun ChatView(
                 }
             }
         } else {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            val hasPerm = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+            if (hasPerm) {
                 try {
                     val file = File(context.cacheDir, "voice_${System.currentTimeMillis()}.m4a")
                     voiceFile = file
@@ -352,47 +360,52 @@ fun ChatView(
     }
 
     Scaffold(
-        containerColor = com.elhajri.noor.ui.Navy,
+        modifier = Modifier.themeScreenBackground(),
+        containerColor = Color.Transparent,
         topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(Gold.copy(alpha = 0.15f)),
-                            contentAlignment = Alignment.Center
+            Column {
+                TopAppBar(
+                    title = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Text(convName.take(1), color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        }
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(CircleShape)
+                                    .background(NavyCard)
+                                    .border(1.dp, GlassRecipe.borderGradient, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(convName.take(1).ifEmpty { "ن" }, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            }
 
-                        Column {
-                            Text(
-                                text = convName,
-                                color = Gold,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = AmiriFamily
-                            )
-                            Text(
-                                text = if (conversation.type == "group") "${conversation.memberHandles.size} أعضاء" else "محادثة خاصة",
-                                color = TextMain.copy(alpha = 0.6f),
-                                fontSize = 10.sp
-                            )
+                            Column {
+                                Text(
+                                    text = convName,
+                                    color = Gold,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = AmiriFamily
+                                )
+                                Text(
+                                    text = if (conversation.type == "group") "${conversation.memberHandles.size} أعضاء" else "محادثة خاصة",
+                                    color = GoldSoft.copy(alpha = 0.7f),
+                                    fontSize = 10.sp
+                                )
+                            }
                         }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = com.elhajri.noor.ui.Navy)
-            )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                )
+                NoorGoldenDivider()
+            }
         }
     ) { padding ->
         Column(
@@ -407,13 +420,13 @@ fun ChatView(
                 }
             } else if (messages.isEmpty()) {
                 Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Text("لا توجد رسائل بعد\nابدأ المحادثة الآن", color = TextMain.copy(alpha = 0.5f), fontSize = 13.sp)
+                    Text("لا توجد رسائل بعد\nابدأ المحادثة الآن", color = GoldSoft.copy(alpha = 0.7f), fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 }
             } else {
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.weight(1f).fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(messages, key = { it.id }) { msg ->
                         val isMine = msg.nickname == currentUser.name
@@ -425,23 +438,38 @@ fun ChatView(
                             if (!isMine) {
                                 Box(
                                     modifier = Modifier
-                                        .size(32.dp)
+                                        .size(34.dp)
                                         .clip(CircleShape)
-                                        .background(Gold.copy(alpha = 0.15f)),
+                                        .background(NavyCard)
+                                        .border(1.dp, GlassRecipe.borderGradient, CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     if (msg.avatarUrl.isNotEmpty()) {
                                         AsyncImage(model = msg.avatarUrl, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                                     } else {
-                                        Text(msg.nickname.take(1), color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        Text(msg.nickname.take(1).ifEmpty { "ن" }, color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                     }
                                 }
                                 Spacer(modifier = Modifier.width(6.dp))
                             }
 
-                            Surface(
+                            Box(
                                 modifier = Modifier
                                     .widthIn(max = 280.dp)
+                                    .then(
+                                        if (isMine) {
+                                            Modifier
+                                                .clip(RoundedCornerShape(18.dp))
+                                                .background(
+                                                    Brush.horizontalGradient(
+                                                        listOf(GoldSoft, Gold, AntiqueGoldDeep)
+                                                    )
+                                                )
+                                                .border(1.dp, GoldSoft.copy(alpha = 0.5f), RoundedCornerShape(18.dp))
+                                        } else {
+                                            Modifier.noorGlassCard(cornerRadius = 18.dp)
+                                        }
+                                    )
                                     .combinedClickable(
                                         onClick = {},
                                         onLongClick = {
@@ -449,19 +477,16 @@ fun ChatView(
                                                 messageToDelete = msg
                                             }
                                         }
-                                    ),
-                                shape = RoundedCornerShape(16.dp),
-                                color = if (isMine) Gold else NavyCard,
-                                border = if (isMine) null else BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
+                                    )
                             ) {
-                                Column(modifier = Modifier.padding(10.dp)) {
+                                Column(modifier = Modifier.padding(12.dp)) {
                                     if (!isMine && msg.nickname.isNotEmpty()) {
                                         Text(
                                             text = msg.nickname,
                                             color = Gold,
-                                            fontSize = 10.sp,
+                                            fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(bottom = 2.dp)
+                                            modifier = Modifier.padding(bottom = 4.dp)
                                         )
                                     }
 
@@ -471,8 +496,9 @@ fun ChatView(
                                             contentDescription = "صورة",
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .heightIn(max = 200.dp)
-                                                .clip(RoundedCornerShape(10.dp))
+                                                .heightIn(max = 220.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(NavyCard)
                                                 .clickable { fullScreenImageUrl = msg.fileUrl },
                                             contentScale = ContentScale.Crop
                                         )
@@ -482,12 +508,16 @@ fun ChatView(
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                                             modifier = Modifier.padding(vertical = 4.dp)
                                         ) {
-                                            IconButton(
-                                                onClick = { playVoice(msg.fileUrl, msg.id) },
+                                            Box(
                                                 modifier = Modifier
-                                                    .size(36.dp)
+                                                    .size(38.dp)
                                                     .clip(CircleShape)
-                                                    .background(if (isMine) Navy else Gold)
+                                                    .background(
+                                                        if (isMine) Brush.linearGradient(listOf(Navy, NavyCard))
+                                                        else Brush.linearGradient(listOf(GoldSoft, Gold))
+                                                    )
+                                                    .clickable { playVoice(msg.fileUrl, msg.id) },
+                                                contentAlignment = Alignment.Center
                                             ) {
                                                 Icon(
                                                     imageVector = if (playingMsgId == msg.id) Icons.Default.Pause else Icons.Default.PlayArrow,
@@ -497,9 +527,10 @@ fun ChatView(
                                                 )
                                             }
                                             Text(
-                                                text = if (playingMsgId == msg.id) "جاري التشغيل..." else "رسالة صوتية 🎙️",
+                                                text = if (playingMsgId == msg.id) "جاري التشغيل..." else "رسالة صوتية",
                                                 color = if (isMine) Navy else TextMain,
-                                                fontSize = 12.sp
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold
                                             )
                                         }
                                     }
@@ -514,7 +545,7 @@ fun ChatView(
                                     }
 
                                     Row(
-                                        modifier = Modifier.align(Alignment.End).padding(top = 2.dp),
+                                        modifier = Modifier.align(Alignment.End).padding(top = 4.dp),
                                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
@@ -531,12 +562,12 @@ fun ChatView(
                 }
             }
 
-            // Input Bar
-            Surface(
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                shape = RoundedCornerShape(20.dp),
-                color = NavyCard,
-                border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
+            // Input Bar Container
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 6.dp)
+                    .noorGlassCard(cornerRadius = 22.dp)
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -545,20 +576,20 @@ fun ChatView(
                 ) {
                     IconButton(
                         onClick = { imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(38.dp)
                     ) {
-                        Icon(Icons.Default.Image, contentDescription = "إرفاق صورة", tint = Gold, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.Image, contentDescription = "إرفاق صورة", tint = Gold, modifier = Modifier.size(22.dp))
                     }
 
                     IconButton(
                         onClick = { toggleVoiceRecord() },
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(38.dp)
                     ) {
                         Icon(
                             imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
                             contentDescription = "تسجيل صوتي",
                             tint = if (isRecording) Color.Red else Gold,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(22.dp)
                         )
                     }
 
@@ -567,13 +598,14 @@ fun ChatView(
                             text = "جاري التسجيل (${recDuration}s)...",
                             color = Color.Red,
                             fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
                             modifier = Modifier.weight(1f)
                         )
                     } else {
                         TextField(
                             value = textInput,
                             onValueChange = { textInput = it },
-                            placeholder = { Text("اكتب رسالتك...", color = TextMain.copy(alpha = 0.4f), fontSize = 12.sp) },
+                            placeholder = { Text("اكتب رسالتك...", color = TextMain.copy(alpha = 0.45f), fontSize = 13.sp) },
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -589,15 +621,23 @@ fun ChatView(
                         )
                     }
 
-                    IconButton(
-                        onClick = { sendMessage() },
-                        enabled = textInput.isNotBlank() && !isRecording,
+                    Box(
                         modifier = Modifier
-                            .size(38.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
-                            .background(if (textInput.isNotBlank() && !isRecording) Gold else Gold.copy(alpha = 0.3f))
+                            .background(
+                                if (textInput.isNotBlank() && !isRecording) Brush.linearGradient(listOf(GoldSoft, Gold, AntiqueGoldDeep))
+                                else Brush.linearGradient(listOf(Gold.copy(alpha = 0.3f), Gold.copy(alpha = 0.2f)))
+                            )
+                            .clickable(enabled = textInput.isNotBlank() && !isRecording) { sendMessage() },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "إرسال", tint = Navy, modifier = Modifier.size(18.dp))
+                        Icon(
+                            Icons.AutoMirrored.Filled.Send,
+                            contentDescription = "إرسال",
+                            tint = if (textInput.isNotBlank() && !isRecording) Navy else Navy.copy(alpha = 0.5f),
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                 }
             }
@@ -611,16 +651,26 @@ fun ChatView(
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = { fullScreenImageUrl = null }) {
-                    Text("إغلاق", color = Gold)
+                    Text("إغلاق", color = Gold, fontWeight = FontWeight.Bold)
                 }
             },
             text = {
-                AsyncImage(
-                    model = fullScreenImageUrl,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 400.dp),
-                    contentScale = ContentScale.Fit
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .noorGlassCard(cornerRadius = 16.dp)
+                        .padding(8.dp)
+                ) {
+                    AsyncImage(
+                        model = fullScreenImageUrl,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 400.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Fit
+                    )
+                }
             },
             containerColor = NavyCard
         )
@@ -631,7 +681,7 @@ fun ChatView(
         val target = messageToDelete!!
         AlertDialog(
             onDismissRequest = { messageToDelete = null },
-            title = { Text("حذف الرسالة", color = Gold, fontSize = 16.sp) },
+            title = { Text("حذف الرسالة", color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold) },
             text = { Text("هل تريد حذف هذه الرسالة؟", color = TextMain, fontSize = 13.sp) },
             confirmButton = {
                 TextButton(

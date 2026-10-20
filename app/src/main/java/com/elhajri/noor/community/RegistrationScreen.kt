@@ -6,6 +6,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -20,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -27,12 +29,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.elhajri.noor.theme.GlassRecipe
 import com.elhajri.noor.ui.AmiriFamily
+import com.elhajri.noor.ui.AntiqueGoldDeep
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
+import com.elhajri.noor.ui.noorGlassCard
+import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,22 +133,22 @@ fun RegistrationScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .themeScreenBackground()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Box(
             modifier = Modifier
-                .size(64.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(Gold.copy(alpha = 0.15f)),
+                .size(68.dp)
+                .noorGlassCard(cornerRadius = 22.dp),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Group,
                 contentDescription = null,
                 tint = Gold,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(34.dp)
             )
         }
 
@@ -151,25 +157,24 @@ fun RegistrationScreen(
         Text(
             text = "التسجيل في المجتمع",
             color = Gold,
-            fontSize = 20.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = AmiriFamily
         )
 
         Text(
-            text = "أنشئ معرفك الخاص للمشاركة",
-            color = TextMain.copy(alpha = 0.7f),
+            text = "أنشئ معرفك الخاص للمشاركة في مجتمع نور",
+            color = GoldSoft.copy(alpha = 0.85f),
             fontSize = 13.sp,
             modifier = Modifier.padding(top = 4.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            color = NavyCard,
-            border = BorderStroke(1.dp, Gold.copy(alpha = 0.25f))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .noorGlassCard(cornerRadius = 22.dp)
         ) {
             Column(
                 modifier = Modifier.padding(20.dp),
@@ -182,7 +187,8 @@ fun RegistrationScreen(
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .background(Gold.copy(alpha = 0.15f))
+                            .background(NavyCard)
+                            .border(1.5.dp, GlassRecipe.borderGradient, CircleShape)
                             .clickable {
                                 imagePickerLauncher.launch(
                                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -210,8 +216,8 @@ fun RegistrationScreen(
                     }
                     Text(
                         text = "صورة شخصية (اختياري)",
-                        color = TextMain.copy(alpha = 0.6f),
-                        fontSize = 10.sp,
+                        color = GoldSoft.copy(alpha = 0.7f),
+                        fontSize = 11.sp,
                         modifier = Modifier.padding(top = 6.dp)
                     )
                 }
@@ -220,22 +226,23 @@ fun RegistrationScreen(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "المعرف (اسم فريد لك)",
-                        color = TextMain.copy(alpha = 0.8f),
+                        color = GoldSoft,
                         fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
 
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFF0A0F1A),
-                        border = BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
+                        shape = RoundedCornerShape(14.dp),
+                        color = NavyCard,
+                        border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "@", color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text(text = "@", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.width(6.dp))
                             TextField(
                                 value = handle,
@@ -244,7 +251,7 @@ fun RegistrationScreen(
                                     handle = clean
                                     checkHandle(clean)
                                 },
-                                placeholder = { Text("مثال: ahmed", color = TextMain.copy(alpha = 0.3f), fontSize = 13.sp) },
+                                placeholder = { Text("مثال: ahmed", color = TextMain.copy(alpha = 0.35f), fontSize = 13.sp) },
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent,
@@ -258,41 +265,44 @@ fun RegistrationScreen(
                             )
 
                             if (checkingHandle) {
-                                CircularProgressIndicator(color = Gold, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                                CircularProgressIndicator(color = Gold, modifier = Modifier.size(16.dp))
                             } else if (handleAvailable == true) {
-                                Icon(Icons.Default.Check, contentDescription = null, tint = Color.Green, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Check, contentDescription = "متاح", tint = Color(0xFF4CAF50), modifier = Modifier.size(18.dp))
                             } else if (handleAvailable == false) {
-                                Icon(Icons.Default.Close, contentDescription = null, tint = Color.Red, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Close, contentDescription = "غير متاح", tint = Color.Red, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
-                    Text(
-                        text = "شارك هذا المعرف مع أصدقائك ليبدؤوا محادثة معك",
-                        color = TextMain.copy(alpha = 0.5f),
-                        fontSize = 10.sp,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+                    if (handleAvailable == false) {
+                        Text(
+                            text = "هذا المعرف مستخدم بالفعل",
+                            color = Color.Red,
+                            fontSize = 10.sp,
+                            modifier = Modifier.padding(top = 2.dp, start = 4.dp)
+                        )
+                    }
                 }
 
                 // Display Name Input
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "الاسم المعروض",
-                        color = TextMain.copy(alpha = 0.8f),
+                        text = "الاسم الظاهر",
+                        color = GoldSoft,
                         fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
 
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFF0A0F1A),
-                        border = BorderStroke(1.dp, Gold.copy(alpha = 0.2f))
+                        shape = RoundedCornerShape(14.dp),
+                        color = NavyCard,
+                        border = BorderStroke(1.dp, Gold.copy(alpha = 0.3f))
                     ) {
                         TextField(
                             value = name,
                             onValueChange = { name = it },
-                            placeholder = { Text("اسمك", color = TextMain.copy(alpha = 0.3f), fontSize = 13.sp) },
+                            placeholder = { Text("مثال: أحمد محمد", color = TextMain.copy(alpha = 0.35f), fontSize = 13.sp) },
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -307,33 +317,33 @@ fun RegistrationScreen(
                     }
                 }
 
-                Button(
-                    onClick = { register() },
-                    enabled = !loading && handleAvailable == true && name.trim().isNotEmpty(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Gold,
-                        contentColor = Navy,
-                        disabledContainerColor = Gold.copy(alpha = 0.4f),
-                        disabledContentColor = Navy.copy(alpha = 0.5f)
-                    )
-                ) {
-                    if (loading) {
-                        CircularProgressIndicator(color = Navy, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                    } else {
-                        Text(text = "إنشاء الحساب", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                    }
+                if (error.isNotEmpty()) {
+                    Text(text = error, color = Color.Red, fontSize = 12.sp)
                 }
 
-                if (error.isNotEmpty()) {
-                    Text(
-                        text = error,
-                        color = Color.Red,
-                        fontSize = 12.sp
-                    )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(
+                            Brush.horizontalGradient(listOf(GoldSoft, Gold, AntiqueGoldDeep))
+                        )
+                        .clickable(enabled = !loading && handleAvailable != false) { register() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (loading) {
+                        CircularProgressIndicator(color = Navy, modifier = Modifier.size(22.dp))
+                    } else {
+                        Text(
+                            text = "إتمام التسجيل",
+                            color = Navy,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
