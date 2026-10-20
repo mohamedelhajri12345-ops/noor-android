@@ -192,7 +192,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             NoorTheme {
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                CompositionLocalProvider(LocalLayoutDirection provides if (com.elhajri.noor.settings.NoorLocale.isEnglish) LayoutDirection.Ltr else LayoutDirection.Rtl) {
                     // حجم الخط من الإعدادات — يتغير فوراً عند اختياره
                     val density = androidx.compose.ui.platform.LocalDensity.current
                     val fontScale = com.elhajri.noor.settings.FontScaleHolder.scale

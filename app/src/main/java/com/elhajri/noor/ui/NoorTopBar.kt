@@ -1,5 +1,7 @@
 package com.elhajri.noor.ui
 
+import com.elhajri.noor.settings.t
+
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -68,7 +70,7 @@ fun NoorTopBar(
                     // أيقونة التطبيق الرسمية الحالية — بنفس هوية المشغّل
                     androidx.compose.foundation.Image(
                         painter = androidx.compose.ui.res.painterResource(com.elhajri.noor.R.mipmap.ic_launcher),
-                        contentDescription = "أيقونة التطبيق",
+                        contentDescription = t("أيقونة التطبيق", "App Icon"),
                         modifier = Modifier
                             .size(34.dp)
                             .clip(RoundedCornerShape(10.dp))
@@ -76,7 +78,7 @@ fun NoorTopBar(
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
-                        text = "القرآن الكريم",
+                        text = t("القرآن الكريم", "The Holy Qur'an"),
                         color = Gold,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
@@ -86,14 +88,14 @@ fun NoorTopBar(
 
                 // Action buttons
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    TopBarAction(icon = { Icon(Icons.Filled.Groups, contentDescription = "المجتمع", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onCommunity)
-                    TopBarAction(icon = { Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "واتساب", tint = Gold, modifier = Modifier.size(18.dp)) }) {
+                    TopBarAction(icon = { Icon(Icons.Filled.Groups, contentDescription = t("المجتمع", "Community"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onCommunity)
+                    TopBarAction(icon = { Icon(Icons.AutoMirrored.Filled.Send, contentDescription = t("واتساب", "WhatsApp"), tint = Gold, modifier = Modifier.size(18.dp)) }) {
                         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/212726626546")))
                     }
-                    TopBarAction(icon = { Icon(Icons.Filled.Favorite, contentDescription = "تبرع", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onDonate)
-                    TopBarAction(icon = { Icon(Icons.Filled.AutoAwesome, contentDescription = "المساعد الذكي", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onAssistant)
-                    TopBarAction(icon = { Icon(Icons.Filled.Person, contentDescription = "ملفي الشخصي", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onProfile)
-                    TopBarAction(icon = { Icon(Icons.Filled.Settings, contentDescription = "الإعدادات", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onSettings)
+                    TopBarAction(icon = { Icon(Icons.Filled.Favorite, contentDescription = t("تبرع", "Donate"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onDonate)
+                    TopBarAction(icon = { Icon(Icons.Filled.AutoAwesome, contentDescription = t("المساعد الذكي", "Smart Assistant"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onAssistant)
+                    TopBarAction(icon = { Icon(Icons.Filled.Person, contentDescription = t("ملفي الشخصي", "My Profile"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onProfile)
+                    TopBarAction(icon = { Icon(Icons.Filled.Settings, contentDescription = t("الإعدادات", "Settings"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onSettings)
                 }
             }
             // hairline gold separator, like the web header bottom border

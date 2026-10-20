@@ -92,12 +92,12 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        Text("الإعدادات", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
+        Text(t("الإعدادات", "Settings"), color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
         Spacer(Modifier.height(16.dp))
 
         // ============ البيانات ============
-        SettingsSection(icon = Icons.Filled.Wifi, title = "البيانات") {
-            SettingsRow(label = "وضع توفير البيانات", desc = "يقلل جودة الصوت ويحفظ الردود محلياً (يوفر ~٦٠٪)") {
+        SettingsSection(icon = Icons.Filled.Wifi, title = t("البيانات", "Data & Storage")) {
+            SettingsRow(label = t("وضع توفير البيانات", "Data Saver Mode"), desc = t("يقلل جودة الصوت ويحفظ الردود محلياً (يوفر ~٦٠٪)", "Reduces audio quality and saves responses locally (saves ~60%)")) {
                 GoldToggle(
                     on = dataSaver,
                     onToggle = {
@@ -158,8 +158,8 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("التحديد التلقائي للموقع", color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                        Text("انتقال تلقائي حسب الموقع الجغرافي (GPS)", color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
+                        Text(t("التحديد التلقائي للموقع", "Auto Location Detection"), color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text(t("انتقال تلقائي حسب الموقع الجغرافي (GPS)", "Auto switch prayer times based on GPS location"), color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
                     }
                     GoldToggle(
                         on = isAutoLocation,
@@ -202,12 +202,12 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                             Text(city.name, color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                             if (isAutoLocation) {
                                 Spacer(Modifier.width(6.dp))
-                                Text("(تلقائي)", color = Gold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(t("(تلقائي)", "(Auto)"), color = Gold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                         Text(city.country, color = GoldSoft, fontSize = 11.sp)
                     }
-                    Text("تغيير", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(t("تغيير", "Change"), color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -220,12 +220,12 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
         Spacer(Modifier.height(12.dp))
 
         // ============ القرآن الكريم — القارئ الافتراضي ============
-        SettingsSection(icon = Icons.Filled.VolumeUp, title = "القرآن الكريم") {
+        SettingsSection(icon = Icons.Filled.VolumeUp, title = t("القرآن الكريم", "Holy Qur'an")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                Text("القارئ الافتراضي", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
+                Text(t("القارئ الافتراضي", "Default Reciter"), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("alafasy" to "مشاري العفاسي", "dossari" to "ياسر الدوسري").forEach { (id, name) ->
+                    listOf("alafasy" to t("مشاري العفاسي", "Mishary Alafasy"), "dossari" to t("ياسر الدوسري", "Yasser Al-Dosari")).forEach { (id, name) ->
                         Text(
                             name,
                             color = if (reciter == id) Navy else TextMain,
@@ -271,12 +271,12 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
         Spacer(Modifier.height(12.dp))
 
         // ============ جودة الصوت ============
-        SettingsSection(icon = Icons.Filled.Equalizer, title = "جودة الصوت") {
+        SettingsSection(icon = Icons.Filled.Equalizer, title = t("جودة الصوت", "Audio Quality")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                Text("جودة التلاوة والأناشيد", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
+                Text(t("جودة التلاوة والأناشيد", "Recitation & Nasheed Quality"), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("normal" to "عادية (٦٤kbps)", "high" to "عالية (١٢٨kbps)").forEach { (id, name) ->
+                    listOf("normal" to t("عادية (٦٤kbps)", "Standard (64 kbps)"), "high" to t("عالية (١٢٨kbps)", "High (128 kbps)")).forEach { (id, name) ->
                         Text(
                             name,
                             color = if (audioQuality == id) Navy else TextMain,
@@ -301,14 +301,14 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
         Spacer(Modifier.height(12.dp))
 
         // ============ حجم الخط ============
-        SettingsSection(icon = Icons.Filled.Tune, title = "حجم الخط") {
+        SettingsSection(icon = Icons.Filled.Tune, title = t("حجم الخط", "Font Size")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                Text("حجم نص التطبيق", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
+                Text(t("حجم نص التطبيق", "App Text Size"), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        "small" to "صغير", "medium" to "متوسط",
-                        "large" to "كبير", "xlarge" to "كبير جداً"
+                        "small" to t("صغير", "Small"), "medium" to t("متوسط", "Medium"),
+                        "large" to t("كبير", "Large"), "xlarge" to t("كبير جداً", "Extra Large")
                     ).forEach { (id, name) ->
                         Text(
                             name,
@@ -335,15 +335,15 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
         Spacer(Modifier.height(12.dp))
 
         // ============ حول التطبيق ============
-        SettingsSection(icon = Icons.Filled.Info, title = "حول التطبيق") {
+        SettingsSection(icon = Icons.Filled.Info, title = t("حول التطبيق", "About App")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                Text("نور", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("تطبيق الإسلام الشامل", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
-                Text("القرآن · الأذكار · الصلاة · القبلة · القصص · الألعاب · الذكاء الاصطناعي", color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
-                Text("النسخة " + context.packageManager.getPackageInfo(context.packageName, 0).versionName.toString(), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
+                Text(t("نور", "NOOR"), color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(t("تطبيق الإسلام الشامل", "Comprehensive Islamic App"), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
+                Text(t("القرآن · الأذكار · الصلاة · القبلة · القصص · الألعاب · الذكاء الاصطناعي", "Qur'an · Adhkar · Prayer · Qibla · Stories · Games · Smart AI"), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
+                Text(t("النسخة ", "Version ") + context.packageManager.getPackageInfo(context.packageName, 0).versionName.toString(), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "سياسة الخصوصية ←",
+                    t("سياسة الخصوصية ←", "Privacy Policy ←"),
                     color = Gold, fontSize = 12.sp,
                     modifier = Modifier.clickable { onOpenPrivacy() }
                 )
@@ -370,7 +370,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
         ) {
             Icon(Icons.Filled.Refresh, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(8.dp))
-            Text("إعادة الإعدادات الافتراضية", color = Color(0xFFEF4444), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            Text(t("إعادة الإعدادات الافتراضية", "Reset to Default Settings"), color = Color(0xFFEF4444), fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(Modifier.height(24.dp))
@@ -380,7 +380,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
     if (showCityPicker) {
         AlertDialog(
             onDismissRequest = { showCityPicker = false },
-            title = { Text("اختر مدينتك أو التحديد التلقائي", color = Gold, fontWeight = FontWeight.Bold) },
+            title = { Text(t("اختر مدينتك أو التحديد التلقائي", "Select City or Auto Detect"), color = Gold, fontWeight = FontWeight.Bold) },
             text = {
                 Column {
                     Row(
@@ -428,7 +428,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                     OutlinedTextField(
                         value = citySearch,
                         onValueChange = { citySearch = it },
-                        placeholder = { Text("ابحث عن مدينة (300+ مدينة عالمية)...", fontSize = 12.sp) },
+                        placeholder = { Text(t("ابحث عن مدينة (300+ مدينة عالمية)...", "Search city (300+ world cities)..."), fontSize = 12.sp) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -471,7 +471,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showCityPicker = false }) { Text("إغلاق", color = GoldSoft) }
+                TextButton(onClick = { showCityPicker = false }) { Text(t("إغلاق", "Close"), color = GoldSoft) }
             },
             containerColor = NavyCard
         )
@@ -561,11 +561,11 @@ private fun AdhanCustomizationSection() {
     var preReminderEnabled by remember { mutableStateOf(AdhanSettingsStore.isPreAdhanReminderEnabled(context)) }
     var preMinutes by remember { mutableIntStateOf(AdhanSettingsStore.getPreAdhanMinutes(context)) }
 
-    var fajrEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "الفجر")) }
-    var dhuhrEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "الظهر")) }
-    var asrEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "العصر")) }
-    var maghribEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "المغرب")) }
-    var ishaEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "العشاء")) }
+    var fajrEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, t("الفجر", "Fajr"))) }
+    var dhuhrEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, t("الظهر", "Dhuhr"))) }
+    var asrEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, t("العصر", "Asr"))) }
+    var maghribEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, t("المغرب", "Maghrib"))) }
+    var ishaEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, t("العشاء", "Isha"))) }
 
     var previewPlayer by remember { mutableStateOf<android.media.MediaPlayer?>(null) }
     var previewSoundId by remember { mutableStateOf<String?>(null) }
@@ -582,7 +582,7 @@ private fun AdhanCustomizationSection() {
 
     SettingsSection(
         icon = Icons.Filled.NotificationsActive,
-        title = "تخصيص الأذان والتنبيهات"
+        title = t("تخصيص الأذان والتنبيهات", "Adhan Customization & Reminders")
     ) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
             // 1. Master Toggle
@@ -592,8 +592,8 @@ private fun AdhanCustomizationSection() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("تفعيل إشعارات الأذان", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                    Text("تشغيل الأذان الصوتي والتنبيهات عند دخول وقت الصلاة", color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
+                    Text(t("تفعيل إشعارات الأذان", "Enable Adhan Notifications"), color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(t("تشغيل الأذان الصوتي والتنبيهات عند دخول وقت الصلاة", "Play audio Adhan and alert at prayer times"), color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
                 }
                 GoldToggle(
                     on = masterEnabled,
@@ -615,7 +615,7 @@ private fun AdhanCustomizationSection() {
                 Spacer(Modifier.height(14.dp))
 
                 // 2. Adhan Sound Picker
-                Text("صوت الأذان المفضل", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(t("صوت الأذان المفضل", "Preferred Adhan Audio"), color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
 
                 AdhanSoundOptions.options.forEach { opt ->
@@ -722,25 +722,25 @@ private fun AdhanCustomizationSection() {
                 Spacer(Modifier.height(10.dp))
 
                 val prayers = listOf(
-                    Triple("الفجر", fajrEnabled) { v: Boolean ->
+                    Triple(t("الفجر", "Fajr"), fajrEnabled) { v: Boolean ->
                         fajrEnabled = v
-                        AdhanSettingsStore.setPrayerEnabled(context, "الفجر", v)
+                        AdhanSettingsStore.setPrayerEnabled(context, t("الفجر", "Fajr"), v)
                     },
-                    Triple("الظهر", dhuhrEnabled) { v: Boolean ->
+                    Triple(t("الظهر", "Dhuhr"), dhuhrEnabled) { v: Boolean ->
                         dhuhrEnabled = v
-                        AdhanSettingsStore.setPrayerEnabled(context, "الظهر", v)
+                        AdhanSettingsStore.setPrayerEnabled(context, t("الظهر", "Dhuhr"), v)
                     },
-                    Triple("العصر", asrEnabled) { v: Boolean ->
+                    Triple(t("العصر", "Asr"), asrEnabled) { v: Boolean ->
                         asrEnabled = v
-                        AdhanSettingsStore.setPrayerEnabled(context, "العصر", v)
+                        AdhanSettingsStore.setPrayerEnabled(context, t("العصر", "Asr"), v)
                     },
-                    Triple("المغرب", maghribEnabled) { v: Boolean ->
+                    Triple(t("المغرب", "Maghrib"), maghribEnabled) { v: Boolean ->
                         maghribEnabled = v
-                        AdhanSettingsStore.setPrayerEnabled(context, "المغرب", v)
+                        AdhanSettingsStore.setPrayerEnabled(context, t("المغرب", "Maghrib"), v)
                     },
-                    Triple("العشاء", ishaEnabled) { v: Boolean ->
+                    Triple(t("العشاء", "Isha"), ishaEnabled) { v: Boolean ->
                         ishaEnabled = v
-                        AdhanSettingsStore.setPrayerEnabled(context, "العشاء", v)
+                        AdhanSettingsStore.setPrayerEnabled(context, t("العشاء", "Isha"), v)
                     }
                 )
 
