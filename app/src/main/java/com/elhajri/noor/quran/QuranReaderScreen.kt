@@ -218,6 +218,7 @@ fun QuranReaderScreen(
 
     // Load ayahs text and bookmark
     LaunchedEffect(currentSurahNum) {
+        com.elhajri.noor.audio.SfxManager.playPageTurn(context)
         isLoadingText = true
         ayahs = fetchOrLoadSurahAyahs(context, currentSurahNum)
         isLoadingText = false

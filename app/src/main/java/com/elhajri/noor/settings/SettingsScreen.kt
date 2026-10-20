@@ -64,6 +64,7 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
     var lang by remember { mutableStateOf(NoorSettings.getLang(context)) }
     var reciter by remember { mutableStateOf(NoorSettings.getReciter(context)) }
     var audioQuality by remember { mutableStateOf(NoorSettings.getAudioQuality(context)) }
+    var sfxEnabled by remember { mutableStateOf(com.elhajri.noor.audio.SfxManager.isEnabled(context)) }
     var fontSize by remember { mutableStateOf(NoorSettings.getFontSize(context)) }
     var city by remember { mutableStateOf(com.elhajri.noor.data.Prefs.getCity(context) ?: com.elhajri.noor.data.City("مكة المكرمة", 21.4225, 39.8262, "السعودية", "Asia/Riyadh")) }
     var isAutoLocation by remember { mutableStateOf(com.elhajri.noor.data.Prefs.isAutoLocation(context)) }
@@ -216,6 +217,27 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                         )
                     }
                 }
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        // ============ تأثيرات الصوت ============
+        SettingsSection(icon = Icons.Filled.VolumeUp, title = t("تأثيرات الصوت", "Sound Effects")) {
+            SettingsRow(
+                label = t("تأثيرات الصوت والتفاعل", "Sound Effects"),
+                desc = t("أصوات أزرار وتفاعلات هادئة وأصوات إنجاز للألعاب", "Gentle button clicks and achievement sounds")
+            ) {
+                GoldToggle(
+                    on = sfxEnabled,
+                    onToggle = { enabled ->
+                        sfxEnabled = enabled
+                        com.elhajri.noor.audio.SfxManager.setEnabled(context, enabled)
+                        if (enabled) {
+                            com.elhajri.noor.audio.SfxManager.playTap(context)
+                        }
+                    }
+                )
             }
         }
 

@@ -49,7 +49,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
 
 /**
- * Exact port of the web More.jsx: 17 feature cards in a 2-column grid,
+ * Exact port of the web More.jsx: 18 feature cards in a 2-column grid,
  * each with a gold icon chip, bold label and muted description.
  * 100% native Compose — zero WebView.
  */
@@ -65,11 +65,12 @@ private fun features() = listOf(
     MoreFeature("community", t("المجتمع", "Community"), t("دردشة الأعضاء", "Members chat"), Icons.Filled.Groups),
     MoreFeature("prayer", t("الصلاة", "Prayer"), t("أوقات الصلاة", "Prayer times"), Icons.Filled.Schedule),
     MoreFeature("qibla", t("القبلة", "Qibla"), t("اتجاه القبلة", "Qibla direction"), Icons.Filled.Explore),
-    MoreFeature("library", t("المكتبة", "Library"), t("الأناشيد", "Nasheeds"), Icons.Filled.MusicNote),
+    MoreFeature("library", t("المكتبة", "Library"), t("٥٥٥ كتاب وقصة إسلامية معتمدة", "555 verified Islamic books"), Icons.Filled.Book),
+    MoreFeature("nasheeds", t("الأناشيد", "Nasheeds"), t("أناشيد إسلامية بدون موسيقى", "Islamic nasheeds"), Icons.Filled.MusicNote),
     MoreFeature("journal", t("المفكرة", "Journal"), t("تدوين الخواطر", "Write your thoughts"), Icons.Filled.EditNote),
     MoreFeature("calendar", t("التقويم", "Calendar"), t("المناسبات الإسلامية", "Islamic occasions"), Icons.Filled.EditCalendar),
     MoreFeature("stories", t("قصص الأنبياء", "Prophet Stories"), t("قصص ملهمة", "Inspiring stories"), Icons.Filled.HistoryEdu),
-    MoreFeature("exams", t("الاختبار الديني", "Religious Exam"), t("مسارات واختبارات معتمدة وشهادات", "Tracks, timed exams & certificates"), Icons.Filled.Help),
+    MoreFeature("exams", t("الاختبار الديني", "Religious Exam"), t("مسارات وااختبارات معتمدة وشهادات", "Tracks, timed exams & certificates"), Icons.Filled.Help),
     MoreFeature("tasbih", t("السبحة", "Tasbih"), t("أنماط التسبيح التفاعلية الخمسة", "5 Interactive Tasbih Styles"), Icons.Filled.Repeat),
     MoreFeature("games", t("الألعاب", "Games"), t("ألعاب إسلامية", "Islamic games"), Icons.Filled.Casino),
     MoreFeature("ai", t("المساعد الذكي", "Smart Assistant"), t("ذكاء اصطناعي إسلامي", "Islamic AI"), Icons.Filled.AutoAwesome),

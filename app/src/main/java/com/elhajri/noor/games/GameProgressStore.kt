@@ -165,6 +165,9 @@ object GameProgressStore {
         if (reward > 0) {
             ThemeStore.addPoints(context, reward)
         }
+        if (stars > 0) {
+            com.elhajri.noor.audio.SfxManager.playSuccess(context)
+        }
         return reward
     }
 

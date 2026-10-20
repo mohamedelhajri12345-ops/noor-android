@@ -81,6 +81,7 @@ fun NoorBottomBar(
     onTabSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -133,7 +134,10 @@ fun NoorBottomBar(
                         .clickable(
                             interactionSource = interactionSource,
                             indication = rememberRipple(bounded = true, color = Gold.copy(alpha = 0.25f)),
-                            onClick = { onTabSelected(tab.route) }
+                            onClick = {
+                                com.elhajri.noor.audio.SfxManager.playTap(context)
+                                onTabSelected(tab.route)
+                            }
                         )
                         .padding(vertical = 4.dp),
                     contentAlignment = Alignment.Center

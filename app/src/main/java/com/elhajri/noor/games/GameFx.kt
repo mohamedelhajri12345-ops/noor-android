@@ -11,12 +11,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -38,9 +40,11 @@ import kotlin.random.Random
  * Modifier extension to apply a wrong-answer horizontal shake effect.
  */
 fun Modifier.wrongAnswerShake(shakeTrigger: Long): Modifier = this.composed {
+    val context = LocalContext.current
     val shakeOffset = remember { Animatable(0f) }
     LaunchedEffect(shakeTrigger) {
         if (shakeTrigger > 0L) {
+            com.elhajri.noor.audio.SfxManager.playWrong(context)
             shakeOffset.animateTo(
                 targetValue = 0f,
                 animationSpec = keyframes {
@@ -124,7 +128,8 @@ fun GentleConfettiOverlay(modifier: Modifier = Modifier) {
 }
 
 /**
- * Shared Win Celebration composable with star burst, gentle confetti overlay, and dark-green glass + gold design.
+ * Shared Win Celebration composable with star burst, gentle confetti overlay,
+ * one-tap WhatsApp achievement card sharing, and dark-green glass + gold design.
  */
 @Composable
 fun WinCelebrationOverlay(
@@ -136,11 +141,19 @@ fun WinCelebrationOverlay(
     onReplayStage: () -> Unit,
     onStageMap: () -> Unit
 ) {
+    val context = LocalContext.current
     val starScale1 = remember { Animatable(0f) }
     val starScale2 = remember { Animatable(0f) }
     val starScale3 = remember { Animatable(0f) }
 
     LaunchedEffect(stars) {
+        if (stars > 0) {
+            com.elhajri.noor.audio.SfxManager.playCelebration(context)
+            // Reward XP and stars
+            XpRankStore.rewardLevelCompletion(context, stageTitle.ifBlank { "game_level" }, stageNumber, stars)
+            // Check daily challenge completion
+            DailyChallengeManager.completeDailyChallenge(context)
+        }
         starScale1.snapTo(0f)
         starScale2.snapTo(0f)
         starScale3.snapTo(0f)
@@ -238,99 +251,98 @@ fun WinCelebrationOverlay(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Actions
-            if (onNextStage != null && (stageNumber < totalStages || totalStages == 0)) {
-                Button(
-                    onClick = onNextStage,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Gold)
-                ) {
-                    Text(
-                        text = "المرحلة التالية",
-                        color = Navy,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+            // 1-Tap Achievement Share Button
+            Button(
+                onClick = {
+                    AchievementCardGenerator.shareAchievementCard(
+                        context = context,
+                        gameTitle = stageTitle.ifBlank { "ألعاب نور الإيمانية" },
+                        levelNumber = stageNumber,
+                        starsEarned = stars,
+                        scoreGained = 50,
+                        xpGained = 20 + (stars * 5)
                     )
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-
-            OutlinedButton(
-                onClick = onReplayStage,
+                },
                 modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(1.dp, Gold)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)), // WhatsApp Green
+                shape = RoundedCornerShape(14.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Refresh,
+                    imageVector = Icons.Default.Share,
                     contentDescription = null,
-                    tint = Gold,
+                    tint = Color.White,
                     modifier = Modifier.size(18.dp)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "إعادة اللعب",
-                    color = Gold,
-                    fontSize = 15.sp,
+                    text = "مشاركة الإنجاز إلى واتساب 📲",
+                    color = Color.White,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            TextButton(onClick = onStageMap) {
-                Text(
-                    text = "خريطة المراحل",
-                    color = GoldSoft,
-                    fontSize = 14.sp
-                )
+            // Navigation Actions
+            if (onNextStage != null && (stageNumber < totalStages || totalStages == 0)) {
+                Button(
+                    onClick = onNextStage,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Text(
+                        text = "المرحلة التالية",
+                        color = Navy,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onReplayStage,
+                    modifier = Modifier.weight(1f),
+                    border = BorderStroke(1.dp, Gold),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        tint = Gold,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "إعادة",
+                        color = Gold,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                OutlinedButton(
+                    onClick = onStageMap,
+                    modifier = Modifier.weight(1f),
+                    border = BorderStroke(1.dp, GoldSoft),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Text(
+                        text = "المراحل",
+                        color = GoldSoft,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
-    }
-}
-
-/**
- * Animated Flame Streak counter header element.
- */
-@Composable
-fun StreakCounterFlameHeader(
-    streak: Int,
-    modifier: Modifier = Modifier
-) {
-    val infiniteTransition = rememberInfiniteTransition(label = "FlameTransition")
-    val flameScale by infiniteTransition.animateFloat(
-        initialValue = 0.95f,
-        targetValue = 1.15f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "FlameScale"
-    )
-
-    Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFF1B3022))
-            .border(1.dp, Gold.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
-            .padding(horizontal = 10.dp, vertical = 5.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.LocalFireDepartment,
-            contentDescription = "سلسلة الإنجاز",
-            tint = Color(0xFFFF9800),
-            modifier = Modifier
-                .size(20.dp)
-                .scale(flameScale)
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = "🔥 ${streak.toArabicDigits()}",
-            color = Gold,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 }
