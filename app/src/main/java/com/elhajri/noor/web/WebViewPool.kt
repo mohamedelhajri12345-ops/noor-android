@@ -122,12 +122,15 @@ object WebViewPool {
             WebPlayerBus.bind(this)
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
+            settings.databaseEnabled = true
+            settings.allowFileAccess = true
+            settings.allowContentAccess = true
             settings.loadWithOverviewMode = true
             settings.useWideViewPort = true
             settings.setSupportZoom(false)
             settings.mediaPlaybackRequiresUserGesture = false
             // تحميل فوري: الكاش أولاً ثم تحديث الشبكة في الخلفية
-            settings.cacheMode = android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
+            settings.cacheMode = if (isOnline(context)) android.webkit.WebSettings.LOAD_DEFAULT else android.webkit.WebSettings.LOAD_CACHE_ELSE_NETWORK
             isVerticalScrollBarEnabled = false
             isHorizontalScrollBarEnabled = false
             overScrollMode = View.OVER_SCROLL_NEVER

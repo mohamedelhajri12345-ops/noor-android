@@ -43,7 +43,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.draw.alpha
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.Gold
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import kotlinx.coroutines.delay
@@ -271,7 +275,7 @@ fun NoorWebView(
                 }
             }
 
-            // شاشة خطأ احترافية مع إعادة المحاولة
+            // شاشة خطأ احترافية مع إعادة المحاولة عند انقطاع الاتصال
             if (hasError) {
                 Box(
                     modifier = Modifier
@@ -281,26 +285,29 @@ fun NoorWebView(
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
+                        modifier = Modifier.padding(24.dp)
                     ) {
                         Icon(
                             Icons.Filled.WifiOff,
                             contentDescription = null,
-                            tint = GoldSoft.copy(alpha = 0.6f),
+                            tint = Gold,
                             modifier = Modifier.size(52.dp)
                         )
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            "تعذّر تحميل الصفحة",
+                            text = t("تعذّر تحميل الصفحة — غير متصل بالإنترنت", "Page Load Failed — Offline"),
                             color = Gold,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = AmiriFamily
                         )
-                        Spacer(Modifier.height(6.dp))
+                        Spacer(Modifier.height(8.dp))
                         Text(
-                            "تحقّق من اتصالك بالإنترنت وحاول مجدداً",
-                            color = GoldSoft.copy(alpha = 0.7f),
-                            fontSize = 13.sp
+                            text = t("يتطلب تصفح الموقع (holyquran2.base44.app) اتصالا بالإنترنت. يرجى التحقق من الاتصال وإعادة المحاولة.", "Browsing holyquran2 requires an internet connection. Please check your network and retry."),
+                            color = GoldSoft.copy(alpha = 0.8f),
+                            fontSize = 13.sp,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                         Spacer(Modifier.height(20.dp))
                         Button(
@@ -312,11 +319,11 @@ fun NoorWebView(
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Gold,
-                                contentColor = Color(0xFF0A0F1A)
+                                contentColor = Navy
                             ),
                             shape = RoundedCornerShape(14.dp)
                         ) {
-                            Text("إعادة المحاولة", fontWeight = FontWeight.Bold)
+                            Text(t("إعادة المحاولة", "Retry"), fontWeight = FontWeight.Bold)
                         }
                     }
                 }
