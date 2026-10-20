@@ -381,7 +381,8 @@ fun NoorApp() {
                 composable("reset") { ResetPasswordScreen(onBack = { navController.popBackStack() }) }
 
                 composable("journal") { JournalScreen() }
-                composable("calendar") { CalendarScreen() }
+                composable("calendar") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "calendar"); CalendarScreen() }
+                composable("hijri_calendar") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "calendar"); CalendarScreen() }
                 composable("privacy") { PrivacyPolicyScreen(onBack = { navController.popBackStack() }) }
                 composable("community") { CommunityScreen(
                     onBack = { navController.popBackStack() },
@@ -409,6 +410,7 @@ fun NoorApp() {
                     val bookId = entry.arguments?.getString("bookId") ?: ""
                     com.elhajri.noor.library.InAppBookReaderScreen(bookId = bookId, onBack = { navController.popBackStack() })
                 }
+                composable("downloads") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "downloads"); com.elhajri.noor.offline.DownloadsScreen(onBack = { navController.popBackStack() }, onOpenBookReader = { bookId -> navController.navigate("book_reader/$bookId") }) }
                 composable("tracker") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "tracker"); AnalyticsDashboardScreen(onBack = { navController.popBackStack() }) }
                 composable("mychild") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "mychild"); com.elhajri.noor.mychild.MyChildRootScreen(onBack = { navController.popBackStack() }, onNavigate = { route -> navController.navigate(route) }) }
                 composable("podcasts") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "podcasts"); com.elhajri.noor.audio.sections.PodcastsScreen(onBack = { navController.popBackStack() }) }

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.HistoryEdu
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Paid
 import androidx.compose.material.icons.filled.Repeat
@@ -86,6 +87,7 @@ private fun features() = listOf(
     MoreFeature("podcasts", t("البودكاست الإسلامي", "Islamic Podcasts"), t("برامج ودروس صوتية هادئة بدون موسيقى", "Calm voice-only shows and lessons"), Icons.Filled.SpatialAudio),
     MoreFeature("ruqyah", t("الرقية الشرعية المسموعة", "Audio Ruqyah"), t("رقية العين والسحر والشعوذة بصوت هادئ", "Eye, sorcery and sihr ruqyah audio"), Icons.Filled.MenuBook),
     MoreFeature("mychild", t("طفلي", "My Child"), t("ملف طفلك، الوضع الآمن، قصة قبل النوم، الحفظ والتحدي العائلي", "Child profile, safe mode, bedtime story, memorization & family quiz"), Icons.Filled.Face),
+    MoreFeature("downloads", t("التنزيلات", "Downloads"), t("إدارة المحتوى المحمل بدون إنترنت", "Offline downloaded content manager"), Icons.Filled.Download),
     MoreFeature("settings", t("الإعدادات", "Settings"), t("إعدادات التطبيق", "App settings"), Icons.Filled.Settings),
 )
 
