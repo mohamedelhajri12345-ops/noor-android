@@ -75,7 +75,7 @@ private fun features() = listOf(
     MoreFeature("journal", t("المفكرة", "Journal"), t("تدوين الخواطر", "Write your thoughts"), Icons.Filled.EditNote),
     MoreFeature("calendar", t("التقويم", "Calendar"), t("المناسبات الإسلامية", "Islamic occasions"), Icons.Filled.EditCalendar),
     MoreFeature("stories", t("قصص الأنبياء", "Prophet Stories"), t("قصص ملهمة", "Inspiring stories"), Icons.Filled.HistoryEdu),
-    MoreFeature("exams", t("الاختبار الديني", "Religious Exam"), t("مسارات وااختبارات معتمدة وشهادات", "Tracks, timed exams & certificates"), Icons.Filled.Help),
+    MoreFeature("exams", t("الاختبار الديني", "Religious Exam"), t("مسارات واختبارات معتمدة وشهادات", "Tracks, timed exams & certificates"), Icons.Filled.Help),
     MoreFeature("tasbih", t("السبحة", "Tasbih"), t("أنماط التسبيح التفاعلية الخمسة", "5 Interactive Tasbih Styles"), Icons.Filled.Repeat),
     MoreFeature("games", t("الألعاب", "Games"), t("ألعاب إسلامية", "Islamic games"), Icons.Filled.Casino),
     MoreFeature("ai", t("المساعد الذكي", "Smart Assistant"), t("ذكاء اصطناعي إسلامي", "Islamic AI"), Icons.Filled.AutoAwesome),
@@ -97,7 +97,7 @@ fun MoreScreen(onNavigate: (String) -> Unit) {
             .padding(horizontal = 12.dp)
     ) {
         Text(
-            "الأقسام",
+            t("الأقسام", "Sections"),
             color = Gold,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
