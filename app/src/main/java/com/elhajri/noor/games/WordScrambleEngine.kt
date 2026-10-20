@@ -149,6 +149,7 @@ private fun WordScrambleStagePlayScreen(
     var showHintDialog by remember(stageIdx, replaySeed) { mutableStateOf(false) }
     var wordSolved by remember(stageIdx, replaySeed) { mutableStateOf(false) }
     var showWinDialog by remember(stageIdx, replaySeed) { mutableStateOf(false) }
+    val context = LocalContext.current
     val haptics = LocalHapticFeedback.current
     var shakeTrigger by remember(stageIdx, replaySeed) { mutableLongStateOf(0L) }
 
@@ -261,8 +262,10 @@ private fun WordScrambleStagePlayScreen(
                     IconButton(
                         onClick = {
                             if (hintUsedCount < 2) {
-                                hintUsedCount += 1
-                                showHintDialog = true
+                                if (StarEconomyStore.consumeHintOrBuyRefill(context)) {
+                                    hintUsedCount += 1
+                                    showHintDialog = true
+                                }
                             }
                         },
                         enabled = hintUsedCount < 2

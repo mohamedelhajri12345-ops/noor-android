@@ -184,7 +184,8 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 com.elhajri.noor.notification.AdhanScheduler.scheduleNextAdhan(this@MainActivity)
-                    com.elhajri.noor.notification.NoorReminders.schedule(this@MainActivity)
+                com.elhajri.noor.notification.NoorReminders.schedule(this@MainActivity)
+                com.elhajri.noor.games.DailyChallengeNotificationManager.scheduleNotification(this@MainActivity)
             } catch (_: Exception) {}
         }.start()
         handleAuthRedirect(intent)

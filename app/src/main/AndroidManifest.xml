@@ -56,6 +56,9 @@
             android:name=".notification.AdhanReceiver"
             android:exported="false" />
         <receiver
+            android:name=".games.DailyChallengeNotificationReceiver"
+            android:exported="false" />
+        <receiver
             android:name=".notification.BootReceiver"
             android:exported="true">
             <intent-filter>
@@ -63,6 +66,17 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <service
             android:name=".audio.player.QuranPlaybackService"
             android:exported="false"

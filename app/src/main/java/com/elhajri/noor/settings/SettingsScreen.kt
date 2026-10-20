@@ -1,4 +1,17 @@
 package com.elhajri.noor.settings
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableIntStateOf
+import com.elhajri.noor.notification.AdhanScheduler
+import com.elhajri.noor.notification.AdhanSettingsStore
+import com.elhajri.noor.notification.AdhanSoundOptions
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -127,6 +140,15 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
 
         Spacer(Modifier.height(12.dp))
 
+        // ============ تحدي اليوم والإشعارات ============
+        SettingsSection(icon = Icons.Filled.NotificationsActive, title = t("تنبيهات تحدي اليوم", "Daily Challenge Reminders")) {
+            Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                com.elhajri.noor.games.DailyChallengeNotificationSettingsCard()
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
         // ============ المدينة والموقع ============
         SettingsSection(icon = Icons.Filled.LocationOn, title = t("المدينة والموقع", "City & Location")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
@@ -189,6 +211,11 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                 }
             }
         }
+
+        Spacer(Modifier.height(12.dp))
+
+        // ============ تخصيص الأذان والتنبيهات ============
+        AdhanCustomizationSection()
 
         Spacer(Modifier.height(12.dp))
 
@@ -524,3 +551,309 @@ private fun GoldToggle(on: Boolean, onToggle: (Boolean) -> Unit) {
 }
 
 
+
+@Composable
+private fun AdhanCustomizationSection() {
+    val context = LocalContext.current
+
+    var masterEnabled by remember { mutableStateOf(AdhanSettingsStore.isAdhanEnabled(context)) }
+    var selectedSound by remember { mutableStateOf(AdhanSettingsStore.getSelectedAdhanSound(context)) }
+    var preReminderEnabled by remember { mutableStateOf(AdhanSettingsStore.isPreAdhanReminderEnabled(context)) }
+    var preMinutes by remember { mutableIntStateOf(AdhanSettingsStore.getPreAdhanMinutes(context)) }
+
+    var fajrEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "الفجر")) }
+    var dhuhrEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "الظهر")) }
+    var asrEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "العصر")) }
+    var maghribEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "المغرب")) }
+    var ishaEnabled by remember { mutableStateOf(AdhanSettingsStore.isPrayerEnabled(context, "العشاء")) }
+
+    var previewPlayer by remember { mutableStateOf<android.media.MediaPlayer?>(null) }
+    var previewSoundId by remember { mutableStateOf<String?>(null) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            try {
+                previewPlayer?.stop()
+                previewPlayer?.release()
+            } catch (_: Exception) {}
+            previewPlayer = null
+        }
+    }
+
+    SettingsSection(
+        icon = Icons.Filled.NotificationsActive,
+        title = "تخصيص الأذان والتنبيهات"
+    ) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            // 1. Master Toggle
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("تفعيل إشعارات الأذان", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text("تشغيل الأذان الصوتي والتنبيهات عند دخول وقت الصلاة", color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
+                }
+                GoldToggle(
+                    on = masterEnabled,
+                    onToggle = { enabled ->
+                        masterEnabled = enabled
+                        AdhanSettingsStore.setAdhanEnabled(context, enabled)
+                        if (enabled) {
+                            AdhanScheduler.scheduleNextAdhan(context)
+                        } else {
+                            AdhanScheduler.cancel(context)
+                        }
+                    }
+                )
+            }
+
+            if (masterEnabled) {
+                Spacer(Modifier.height(14.dp))
+                HorizontalDivider(color = Gold.copy(alpha = 0.15f))
+                Spacer(Modifier.height(14.dp))
+
+                // 2. Adhan Sound Picker
+                Text("صوت الأذان المفضل", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
+
+                AdhanSoundOptions.options.forEach { opt ->
+                    val isSelected = selectedSound == opt.id
+                    val isPreviewing = previewSoundId == opt.id
+
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(
+                                1.dp,
+                                if (isSelected) Gold else Gold.copy(alpha = 0.15f),
+                                RoundedCornerShape(12.dp)
+                            )
+                            .clickable {
+                                selectedSound = opt.id
+                                AdhanSettingsStore.setSelectedAdhanSound(context, opt.id)
+                                AdhanScheduler.scheduleNextAdhan(context)
+                            },
+                        color = if (isSelected) NavyCard else NavyLight.copy(alpha = 0.3f)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    RadioButton(
+                                        selected = isSelected,
+                                        onClick = {
+                                            selectedSound = opt.id
+                                            AdhanSettingsStore.setSelectedAdhanSound(context, opt.id)
+                                            AdhanScheduler.scheduleNextAdhan(context)
+                                        },
+                                        colors = RadioButtonDefaults.colors(
+                                            selectedColor = Gold,
+                                            unselectedColor = TextMain.copy(alpha = 0.4f)
+                                        )
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                    Text(opt.nameAr, color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                                }
+                                Text(
+                                    opt.descriptionAr,
+                                    color = TextMain.copy(alpha = 0.6f),
+                                    fontSize = 11.sp,
+                                    modifier = Modifier.padding(start = 32.dp)
+                                )
+                            }
+
+                            // Audio Preview button
+                            TextButton(
+                                onClick = {
+                                    try {
+                                        previewPlayer?.stop()
+                                        previewPlayer?.release()
+                                    } catch (_: Exception) {}
+                                    previewPlayer = null
+
+                                    if (isPreviewing) {
+                                        previewSoundId = null
+                                    } else {
+                                        previewSoundId = opt.id
+                                        try {
+                                            val mp = android.media.MediaPlayer.create(context, opt.resId)
+                                            mp?.setOnCompletionListener {
+                                                previewSoundId = null
+                                            }
+                                            mp?.start()
+                                            previewPlayer = mp
+                                        } catch (_: Exception) {
+                                            previewSoundId = null
+                                        }
+                                    }
+                                },
+                                colors = ButtonDefaults.textButtonColors(
+                                    contentColor = if (isPreviewing) Gold else GoldSoft
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = if (isPreviewing) Icons.Default.Stop else Icons.Default.PlayArrow,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(if (isPreviewing) "إيقاف" else "استماع", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(14.dp))
+                HorizontalDivider(color = Gold.copy(alpha = 0.15f))
+                Spacer(Modifier.height(14.dp))
+
+                // 3. Per-Prayer Toggles
+                Text("أذان الصلوات الخمس", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text("تفعيل أو إيقاف الأذان لكل صلاة بشكل منفصل", color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
+                Spacer(Modifier.height(10.dp))
+
+                val prayers = listOf(
+                    Triple("الفجر", fajrEnabled) { v: Boolean ->
+                        fajrEnabled = v
+                        AdhanSettingsStore.setPrayerEnabled(context, "الفجر", v)
+                    },
+                    Triple("الظهر", dhuhrEnabled) { v: Boolean ->
+                        dhuhrEnabled = v
+                        AdhanSettingsStore.setPrayerEnabled(context, "الظهر", v)
+                    },
+                    Triple("العصر", asrEnabled) { v: Boolean ->
+                        asrEnabled = v
+                        AdhanSettingsStore.setPrayerEnabled(context, "العصر", v)
+                    },
+                    Triple("المغرب", maghribEnabled) { v: Boolean ->
+                        maghribEnabled = v
+                        AdhanSettingsStore.setPrayerEnabled(context, "المغرب", v)
+                    },
+                    Triple("العشاء", ishaEnabled) { v: Boolean ->
+                        ishaEnabled = v
+                        AdhanSettingsStore.setPrayerEnabled(context, "العشاء", v)
+                    }
+                )
+
+                prayers.forEach { (pName, pState, pToggle) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("صلاة $pName", color = TextMain, fontSize = 13.sp)
+                        GoldToggle(
+                            on = pState,
+                            onToggle = { enabled ->
+                                pToggle(enabled)
+                                AdhanScheduler.scheduleNextAdhan(context)
+                            }
+                        )
+                    }
+                }
+
+                Spacer(Modifier.height(14.dp))
+                HorizontalDivider(color = Gold.copy(alpha = 0.15f))
+                Spacer(Modifier.height(14.dp))
+
+                // 4. Pre-Adhan Reminder
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("التذكير المسبق قبل الأذان", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text("إرسال تنبيه مؤدب قبل حلول وقت الصلاة للاستعداد", color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
+                    }
+                    GoldToggle(
+                        on = preReminderEnabled,
+                        onToggle = { enabled ->
+                            preReminderEnabled = enabled
+                            AdhanSettingsStore.setPreAdhanReminderEnabled(context, enabled)
+                            AdhanScheduler.scheduleNextAdhan(context)
+                        }
+                    )
+                }
+
+                if (preReminderEnabled) {
+                    Spacer(Modifier.height(10.dp))
+                    Text("الوقت قبل الأذان (بالدقائق):", color = TextMain, fontSize = 12.sp)
+                    Spacer(Modifier.height(6.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        listOf(5, 10, 15, 20, 30).forEach { mins ->
+                            val isSelected = preMinutes == mins
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (isSelected) Gold else NavyLight.copy(alpha = 0.4f))
+                                    .border(1.dp, if (isSelected) Gold else Gold.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+                                    .clickable {
+                                        preMinutes = mins
+                                        AdhanSettingsStore.setPreAdhanMinutes(context, mins)
+                                        AdhanScheduler.scheduleNextAdhan(context)
+                                    }
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    "$mins د",
+                                    color = if (isSelected) Navy else TextMain,
+                                    fontSize = 12.sp,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    // Live Arabic Notification Preview Box
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(1.dp, Gold.copy(alpha = 0.3f), RoundedCornerShape(12.dp)),
+                        color = NavyCard
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.NotificationsActive,
+                                    contentDescription = null,
+                                    tint = Gold,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Text("معاينة نص التنبيه المسبق:", color = Gold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Spacer(Modifier.height(6.dp))
+                            Text("🕌 اقترب موعد صلاة الظهر", color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                "باقي $preMinutes دقائق على أذان صلاة الظهر — استعد للصلاة والوضوء",
+                                color = TextMain.copy(alpha = 0.8f),
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

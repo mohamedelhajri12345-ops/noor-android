@@ -196,6 +196,7 @@ private fun TriviaLadderPlayScreen(
     var pickedIdx by remember(levelIdx) { mutableStateOf<Int?>(null) }
     var helpsUsed by remember(levelIdx) { mutableStateOf(setOf<String>()) }
     var wrongFlash by remember(levelIdx) { mutableStateOf<Int?>(null) }
+    val context = LocalContext.current
     val haptics = LocalHapticFeedback.current
 
     val q = ladderQuestions.getOrNull(step)
@@ -234,6 +235,7 @@ private fun TriviaLadderPlayScreen(
 
     fun useHelp(h: String) {
         if (h in helpsUsed || state != "playing") return
+        if (!StarEconomyStore.consumeHintOrBuyRefill(context)) return
         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         helpsUsed = helpsUsed + h
         when (h) {

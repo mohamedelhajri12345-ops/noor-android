@@ -634,6 +634,11 @@ private fun KalimatPlayScreen(
             return
         }
 
+        if (!StarEconomyStore.consumeHintOrBuyRefill(context)) {
+            hintToastMessage = "لا توجد تلميحات متبقية! يلزم ١٠ نجوم لشراء تلميح إضافي"
+            return
+        }
+
         val unrevealed = wordChars.indices.filter { it !in revealedIndices }
         if (unrevealed.isEmpty()) return
 

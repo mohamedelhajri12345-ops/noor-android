@@ -648,6 +648,13 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 )
             }
 
+            Spacer(Modifier.height(10.dp))
+
+            // تحدي اليوم الإيماني
+            com.elhajri.noor.games.DailyChallengeHubCard(
+                onPlayChallenge = { route -> onNavigate(route) }
+            )
+
             // استكشف نور — العناصر فوق الآية
             Spacer(Modifier.height(12.dp))
             // عنوان استكشف نور

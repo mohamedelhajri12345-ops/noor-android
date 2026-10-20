@@ -5,9 +5,8 @@ import android.content.Context
 import android.content.Intent
 
 /**
- * Re-schedules the next Adhan alarm after the phone reboots, or right
- * after the app is updated — without this, all scheduled prayer-time
- * notifications would be silently lost on restart.
+ * Re-schedules the next Adhan alarm and daily challenge notification after the phone reboots,
+ * or right after the app is updated.
  */
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -16,6 +15,7 @@ class BootReceiver : BroadcastReceiver() {
         ) {
             AdhanScheduler.scheduleNextAdhan(context)
             NoorReminders.schedule(context)
+            com.elhajri.noor.games.DailyChallengeNotificationManager.scheduleNotification(context)
         }
     }
 }

@@ -175,6 +175,14 @@ object StarEconomyStore {
         return false
     }
 
+    fun consumeHintOrBuyRefill(context: Context): Boolean {
+        if (useHint(context)) return true
+        if (buyHintRefill(context, 1, HINT_REFILL_COST)) {
+            return useHint(context)
+        }
+        return false
+    }
+
     // ───────────────────────── Cosmetic Frames ─────────────────────────
 
     fun getPurchasedFrames(context: Context): Set<String> {

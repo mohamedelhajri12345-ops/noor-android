@@ -11,12 +11,23 @@ import java.util.Calendar
 object AdhanScheduler {
     private const val REQUEST_CODE = 1001
 
-    /** أسماء الصلوات الخمس بالترتيب مع مواقيتها — يُستخدم الأذون في إشعار وتشغيل الأذان */
-    fun scheduleNextAdhan(context: Context) {
-        val timings = PrayerRepository.getCachedTimings(context) ?: return
+    private data class ScheduledAdhanEvent(
+        val timeMillis: Long,
+        val type: String, // "ADHAN" or "PRE_ADHAN"
+        val prayerName: String,
+        val prayerTime: String,
+        val preMinutes: Int
+    )
 
-        val now = Calendar.getInstance()
-        val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
+    /** جدول التنبيهات القادمة (الأذان والتذكير المسبق) حسَب تفضيلات المستخدم */
+    fun scheduleNextAdhan(context: Context) {
+        if (!AdhanSettingsStore.isAdhanEnabled(context)) {
+            cancel(context)
+            return
+        }
+
+        val timings = PrayerRepository.getCachedTimings(context) ?: return
+        val nowMillis = System.currentTimeMillis()
 
         val prayerTimes = listOf(
             Pair("الفجر", timings.fajr),
@@ -26,64 +37,88 @@ object AdhanScheduler {
             Pair("العشاء", timings.isha)
         )
 
-        var nextCal: Calendar? = null
-        var nextPrayerName = "الفجر"
+        val preReminderEnabled = AdhanSettingsStore.isPreAdhanReminderEnabled(context)
+        val preMinutes = AdhanSettingsStore.getPreAdhanMinutes(context)
 
-        for ((name, timeStr) in prayerTimes) {
-            val parts = timeStr.split(":")
-            if (parts.size >= 2) {
-                val h = parts[0].trim().toIntOrNull() ?: continue
-                val m = parts[1].trim()?.toIntOrNull() ?: continue
-                val pMinutes = h * 60 + m
+        val candidateEvents = mutableListOf<ScheduledAdhanEvent>()
 
-                if (pMinutes > currentMinutes) {
-                    val cal = Calendar.getInstance().apply {
+        for (dayOffset in 0..1) {
+            for ((name, timeStr) in prayerTimes) {
+                if (!AdhanSettingsStore.isPrayerEnabled(context, name)) continue
+
+                val parts = timeStr.split(":")
+                if (parts.size >= 2) {
+                    val h = parts[0].trim().toIntOrNull() ?: continue
+                    val m = parts[1].trim().toIntOrNull() ?: continue
+
+                    val prayerCal = Calendar.getInstance().apply {
+                        if (dayOffset > 0) add(Calendar.DAY_OF_YEAR, dayOffset)
                         set(Calendar.HOUR_OF_DAY, h)
                         set(Calendar.MINUTE, m)
                         set(Calendar.SECOND, 0)
                         set(Calendar.MILLISECOND, 0)
                     }
-                    nextCal = cal
-                    nextPrayerName = name
-                    break
+
+                    val pMillis = prayerCal.timeInMillis
+
+                    // 1. Pre-Adhan reminder event
+                    if (preReminderEnabled && preMinutes > 0) {
+                        val preMillis = pMillis - (preMinutes * 60 * 1000L)
+                        if (preMillis > nowMillis) {
+                            candidateEvents.add(
+                                ScheduledAdhanEvent(
+                                    timeMillis = preMillis,
+                                    type = "PRE_ADHAN",
+                                    prayerName = name,
+                                    prayerTime = timeStr,
+                                    preMinutes = preMinutes
+                                )
+                            )
+                        }
+                    }
+
+                    // 2. Main Adhan event
+                    if (pMillis > nowMillis) {
+                        candidateEvents.add(
+                            ScheduledAdhanEvent(
+                                timeMillis = pMillis,
+                                type = "ADHAN",
+                                prayerName = name,
+                                prayerTime = timeStr,
+                                preMinutes = 0
+                            )
+                        )
+                    }
                 }
             }
         }
 
-        if (nextCal == null) {
-            val parts = timings.fajr.split(":")
-            val h = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: 5
-            val m = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: 0
-            nextCal = Calendar.getInstance().apply {
-                add(Calendar.DAY_OF_YEAR, 1)
-                set(Calendar.HOUR_OF_DAY, h)
-                set(Calendar.MINUTE, m)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }
-            nextPrayerName = "الفجر"
+        val nextEvent = candidateEvents.minByOrNull { it.timeMillis } ?: return
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AdhanReceiver::class.java).apply {
+            putExtra("event_type", nextEvent.type)
+            putExtra("prayer_name", nextEvent.prayerName)
+            putExtra("prayer_time", nextEvent.prayerTime)
+            putExtra("pre_minutes", nextEvent.preMinutes)
+            putExtra("sound_id", AdhanSettingsStore.getSelectedAdhanSound(context))
         }
 
-        val triggerAtMillis = (nextCal ?: Calendar.getInstance().apply { add(Calendar.MINUTE, 60) }).timeInMillis
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AdhanReceiver::class.java)
-            .putExtra("prayer_name", nextPrayerName)
-            .putExtra("prayer_time", prayerTimes.firstOrNull { it.first == nextPrayerName }?.second ?: "")
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         val pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, intent, flags)
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextEvent.timeMillis, pendingIntent)
                 } else {
-                    alarmManager.setWindow(AlarmManager.RTC_WAKEUP, triggerAtMillis, 60000L, pendingIntent)
+                    alarmManager.setWindow(AlarmManager.RTC_WAKEUP, nextEvent.timeMillis, 60000L, pendingIntent)
                 }
             } else {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextEvent.timeMillis, pendingIntent)
             }
         } catch (_: SecurityException) {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            alarmManager.set(AlarmManager.RTC_WAKEUP, nextEvent.timeMillis, pendingIntent)
         }
     }
 
