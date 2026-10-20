@@ -127,6 +127,14 @@ fun LibraryScreen(onBack: () -> Unit) {
     val currentlyPlayingId = playerState.currentId
     val isPlayingAudio = playerState.isPlaying
 
+    LaunchedEffect(playerState.lastError) {
+        playerState.lastError?.let { err ->
+            if (err.isNotBlank()) {
+                android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     // Category Visuals Mapping
     val categoryVisuals = mapOf(
         "prophet" to Pair("⭐", "عن النبي ﷺ"),

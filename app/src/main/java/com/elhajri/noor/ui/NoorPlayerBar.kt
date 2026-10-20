@@ -89,6 +89,20 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
     }
     if (dismissedId == active.state.currentId) return
     val context = LocalContext.current
+    LaunchedEffect(quranState.lastError) {
+        quranState.lastError?.let { err ->
+            if (err.isNotBlank()) {
+                android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+    LaunchedEffect(nasheedState.lastError) {
+        nasheedState.lastError?.let { err ->
+            if (err.isNotBlank()) {
+                android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     fun manager(): com.elhajri.noor.audio.player.PlayerFacade = if (active.isQuran) QuranPlayerManager else NasheedPlayerManager
 
