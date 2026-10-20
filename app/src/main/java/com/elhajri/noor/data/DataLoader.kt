@@ -4,8 +4,8 @@ import org.json.JSONObject
 
 data class Surah(val number: Int, val name: String, val englishName: String, val type: String, val ayahs: Int)
 data class Reciter(val id: String, val name: String, val servers: List<String>, val image: String = "")
-data class AthkarCategory(val id: String, val name: String, val subtitle: String, val icon: String, val count: Int)
-data class Dhikr(val text: String, val count: Int, val ref: String)
+data class AthkarCategory(val id: String, val name: String, val subtitle: String, val icon: String, val count: Int, val audioUrl: String = "")
+data class Dhikr(val text: String, val count: Int, val ref: String, val audioUrl: String = "")
 data class TasbihPreset(val text: String, val target: Int)
 data class City(val name: String, val lat: Double, val lng: Double, val country: String, val timezone: String = "")
 data class QuizQuestion(val q: String, val options: List<String>, val correct: Int, val ref: String)
@@ -41,7 +41,7 @@ object DataLoader {
         val arr = read(context, "athkar.json").getJSONArray("athkarCategories")
         return List(arr.length()) { i ->
             val o = arr.getJSONObject(i)
-            AthkarCategory(o.getString("id"), o.getString("name"), o.getString("subtitle"), o.optString("icon"), o.getInt("count"))
+            AthkarCategory(o.getString("id"), o.getString("name"), o.getString("subtitle"), o.optString("icon"), o.getInt("count"), o.optString("audioUrl", ""))
         }
     }
 
@@ -49,7 +49,7 @@ object DataLoader {
         val arr = read(context, "athkar.json").getJSONObject("athkar").getJSONArray(category)
         return List(arr.length()) { i ->
             val o = arr.getJSONObject(i)
-            Dhikr(o.getString("text"), o.optInt("count", 1), o.optString("ref"))
+            Dhikr(o.getString("text"), o.optInt("count", 1), o.optString("ref"), o.optString("audioUrl", ""))
         }
     }
 
