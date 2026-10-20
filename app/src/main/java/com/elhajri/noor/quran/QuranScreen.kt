@@ -1,5 +1,7 @@
 package com.elhajri.noor.quran
 
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.themeScreenBackground
 import com.elhajri.noor.ui.noorGlassCard
 import androidx.compose.foundation.background
@@ -36,11 +38,24 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
-import com.elhajri.noor.ui.NoorGradients
 
 fun toArabicNumber(number: Int): String {
-    val arabicDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
-    return number.toString().map { if (it.isDigit()) arabicDigits[it - '0'] else it }.joinToString("")
+    return NoorLocale.formatDigits(number)
+}
+
+private fun translateReciterName(name: String): String = when (name) {
+    "مشاري العفاسي" -> t("مشاري العفاسي", "Mishary Alafasy")
+    "عبد الباسط عبد الصمد" -> t("عبد الباسط عبد الصمد", "Abdul Basit Abdul Samad")
+    "ياسر الدوسري" -> t("ياسر الدوسري", "Yasser Al-Dosari")
+    "سعود الشريم" -> t("سعود الشريم", "Sa'ud Al-Shuraim")
+    "عبد الرحمن السدیس", "عبد الرحمن السديس" -> t("عبد الرحمن السديس", "Abdul Rahman Al-Sudais")
+    "ماهر المعيقلي" -> t("ماهر المعيقلي", "Maher Al-Muaiqly")
+    "محمود خليل الحصري" -> t("محمود خليل الحصري", "Mahmoud Khalil Al-Husary")
+    "محمد صديق المنشاوي" -> t("محمد صديق المنشاوي", "Mohamed Siddiq Al-Minshawi")
+    "أحمد العجمي" -> t("أحمد العجمي", "Ahmed Al-Ajmi")
+    "أبو بكر الشاطري" -> t("أبو بكر الشاطري", "Abu Bakr Al-Shatri")
+    "سعد الغامدي" -> t("سعد الغامدي", "Saad Al-Ghamdi")
+    else -> name
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,8 +94,8 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
 
         // Title
         com.elhajri.noor.ui.NoorSectionTitle(
-            title = "القرآن الكريم",
-            subtitle = "١١٤ سورة · ٦٢٣٦ آية"
+            title = t("القرآن الكريم", "The Holy Qur'an"),
+            subtitle = t("١١٤ سورة · ٦٢٣٦ آية", "114 Surahs · 6,236 Verses")
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -89,8 +104,8 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("ابحث عن سورة...", color = GoldSoft.copy(alpha = 0.5f), fontSize = 14.sp) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "بحث", tint = GoldSoft) },
+            placeholder = { Text(t("ابحث عن سورة...", "Search Surah..."), color = GoldSoft.copy(alpha = 0.5f), fontSize = 14.sp) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = t("بحث", "Search"), tint = GoldSoft) },
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = NavyCard,
@@ -106,7 +121,6 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // ===== شريط القارئ المدمج — اختيار المقرئ والتنزيل بلا إنترنت من الشاشة الرئيسية =====
         CompactReciterStrip()
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -119,7 +133,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
             FilterChip(
                 selected = !showFavoritesOnly,
                 onClick = { showFavoritesOnly = false },
-                label = { Text("جميع السور (114)", fontSize = 12.sp) },
+                label = { Text(t("جميع السور (114)", "All Surahs (114)"), fontSize = 12.sp) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = Gold,
                     selectedLabelColor = Navy,
@@ -138,7 +152,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("المفضلة (${favorites.size})", fontSize = 12.sp)
+                        Text(t("المفضلة (${favorites.size})", "Favorites (${favorites.size})"), fontSize = 12.sp)
                     }
                 },
                 colors = FilterChipDefaults.filterChipColors(
@@ -161,7 +175,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (showFavoritesOnly) "لا توجد سور في المفضلة" else "لا توجد نتائج بحث",
+                    text = if (showFavoritesOnly) t("لا توجد سور في المفضلة", "No favorite surahs yet") else t("لا توجد نتائج بحث", "No search results found"),
                     color = GoldSoft.copy(alpha = 0.6f),
                     fontSize = 14.sp
                 )
@@ -182,7 +196,6 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                            // Surah Number Medallion
                             Box(
                                 modifier = Modifier
                                     .size(40.dp)
@@ -200,37 +213,38 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
 
                             Spacer(modifier = Modifier.width(12.dp))
 
-                            // Surah Info
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "سورة ${surah.name}",
+                                    text = if (NoorLocale.isEnglish) surah.englishName else "سورة ${surah.name}",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
                                 )
+                                val surahTypeTranslated = when (surah.type) {
+                                    "مكية", "Meccan" -> t("مكية", "Meccan")
+                                    else -> t("مدنية", "Medinan")
+                                }
                                 Text(
-                                    text = "${surah.type} · ${toArabicNumber(surah.ayahs)} آية",
+                                    text = "$surahTypeTranslated · ${toArabicNumber(surah.ayahs)} " + t("آية", "verses"),
                                     fontSize = 12.sp,
                                     color = GoldSoft.copy(alpha = 0.7f)
                                 )
                             }
 
-                            // Favorite Toggle Button
                             IconButton(
                                 onClick = { FavoritesStore.toggleFavorite(context, surah.number) },
                                 modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
                                     imageVector = if (isFav) Icons.Default.Star else Icons.Default.StarBorder,
-                                    contentDescription = "مفضلة",
+                                    contentDescription = t("مفضلة", "Favorite"),
                                     tint = if (isFav) Gold else GoldSoft.copy(alpha = 0.4f)
                                 )
                             }
 
-                            // Open Book Icon
                             Icon(
                                 imageVector = Icons.Default.Book,
-                                contentDescription = "قراءة",
+                                contentDescription = t("قراءة", "Read"),
                                 tint = GoldSoft.copy(alpha = 0.5f),
                                 modifier = Modifier.size(18.dp)
                             )
@@ -241,10 +255,6 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
     }
 }
 
-/**
- * شريط القارئ المدمج: اسم المقرئ المختار + شريحة صغيرة لكل مقرئ + تنزيل دون إنترنت للمختار.
- * يعرض بطاقة رفيعة واحدة لا تستهلك مساحة كبيرة.
- */
 @Composable
 private fun CompactReciterStrip() {
     val context = LocalContext.current
@@ -264,7 +274,7 @@ private fun CompactReciterStrip() {
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("القارئ", color = GoldSoft, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+        Text(t("القارئ", "Reciter"), color = GoldSoft, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
         Spacer(modifier = Modifier.width(8.dp))
         androidx.compose.foundation.lazy.LazyRow(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -286,7 +296,7 @@ private fun CompactReciterStrip() {
                         .padding(horizontal = 10.dp, vertical = 5.dp)
                 ) {
                     Text(
-                        text = reciter.name,
+                        text = translateReciterName(reciter.name),
                         color = if (selected) Color(0xFF0D2B1F) else GoldSoft,
                         fontSize = 11.sp,
                         fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
@@ -294,14 +304,13 @@ private fun CompactReciterStrip() {
                 }
             }
         }
-        // تنزيل دون إنترنت للمقرئ المختار — أيقونة مدمجة بلا مساحة كبيرة
         IconButton(
             onClick = {
                 com.elhajri.noor.quran.ReciterOffline.downloadAll(context, currentReciter, currentReciter.servers)
             },
             modifier = Modifier.size(30.dp)
         ) {
-            Icon(Icons.Default.Download, contentDescription = "تنزيل التلاوات دون إنترنت", tint = Gold, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.Download, contentDescription = t("تنزيل التلاوات دون إنترنت", "Download recitations offline"), tint = Gold, modifier = Modifier.size(16.dp))
         }
     }
 }

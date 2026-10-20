@@ -37,6 +37,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
@@ -56,7 +58,7 @@ fun LibraryScreen(
 
     var selectedCategory by remember { mutableStateOf("all") }
     var searchQuery by remember { mutableStateOf("") }
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: الكتالوج, 1: متابعة القراءة, 2: رف التنزيلات
+    var selectedTab by remember { mutableIntStateOf(0) }
 
     var selectedBookForDetail by remember { mutableStateOf<Book?>(null) }
 
@@ -65,20 +67,20 @@ fun LibraryScreen(
 
     val filteredBooks = remember(selectedCategory, searchQuery, selectedTab, allBooks) {
         when (selectedTab) {
-            1 -> { // متابعة القراءة
+            1 -> {
                 val progressIds = readingProgressList.map { it.bookId }.toSet()
                 allBooks.filter { b ->
                     progressIds.contains(b.id) &&
                             (searchQuery.isBlank() || b.title.contains(searchQuery, true) || b.author.contains(searchQuery, true))
                 }
             }
-            2 -> { // رف التنزيلات
+            2 -> {
                 allBooks.filter { b ->
                     LibraryStore.isBookAvailableLocally(context, b) &&
                             (searchQuery.isBlank() || b.title.contains(searchQuery, true) || b.author.contains(searchQuery, true))
                 }
             }
-            else -> { // جميع الكتب
+            else -> {
                 allBooks.filter { b ->
                     val matchesCat = selectedCategory == "all" || b.category == selectedCategory
                     val matchesQuery = searchQuery.isBlank() ||
@@ -93,10 +95,10 @@ fun LibraryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("المكتبة الإسلامية", color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = AmiriFamily) },
+                title = { Text(t("المكتبة الإسلامية", "Islamic Library"), color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = AmiriFamily) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ChevronRight, contentDescription = "رجوع", tint = Gold)
+                        Icon(Icons.Default.ChevronRight, contentDescription = t("رجوع", "Back"), tint = Gold)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NavyCard)
@@ -112,19 +114,17 @@ fun LibraryScreen(
         ) {
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Banner
             com.elhajri.noor.ui.NoorSectionTitle(
-                title = "المكتبة",
-                subtitle = "٥٥٥ كتاب وقصة إسلامية معتمدة — بدون إعلانات",
+                title = t("المكتبة", "Library"),
+                subtitle = t("٥٥٥ كتاب وقصة إسلامية معتمدة — بدون إعلانات", "555 verified Islamic books & stories — Ad free"),
                 modifier = Modifier.padding(bottom = 6.dp)
             )
 
-            // Search box
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("ابحث باسم الكتاب أو المؤلف...", color = GoldSoft.copy(alpha = 0.5f), fontSize = 13.sp) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "بحث", tint = GoldSoft) },
+                placeholder = { Text(t("ابحث باسم الكتاب أو المؤلف...", "Search title or author..."), color = GoldSoft.copy(alpha = 0.5f), fontSize = 13.sp) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = t("بحث", "Search"), tint = GoldSoft) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = NavyCard,
@@ -140,7 +140,6 @@ fun LibraryScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Section Tabs (جميع الكتب / متابعة القراءة / رف التنزيلات)
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = NavyCard,
@@ -152,23 +151,22 @@ fun LibraryScreen(
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("جميع الكتب (${allBooks.size})", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                    text = { Text(t("جميع الكتب (${allBooks.size})", "All Books (${allBooks.size})"), fontSize = 12.sp, fontWeight = FontWeight.Bold) }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("متابعة القراءة", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                    text = { Text(t("متابعة القراءة", "Continue Reading"), fontSize = 12.sp, fontWeight = FontWeight.Bold) }
                 )
                 Tab(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    text = { Text("التنزيلات", fontSize = 12.sp, fontWeight = FontWeight.Bold) }
+                    text = { Text(t("التنزيلات", "Downloads"), fontSize = 12.sp, fontWeight = FontWeight.Bold) }
                 )
             }
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Category Chips Row (Shown for "جميع الكتب" tab)
             if (selectedTab == 0) {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -177,10 +175,11 @@ fun LibraryScreen(
                     items(LibraryCategories.LIST) { cat ->
                         val isSelected = cat.id == selectedCategory
                         val count = LibraryCatalogLoader.getCategoryCount(allBooks, cat.id)
+                        val catLabel = if (NoorLocale.isEnglish) cat.nameEn else cat.nameAr
                         FilterChip(
                             selected = isSelected,
                             onClick = { selectedCategory = cat.id },
-                            label = { Text("${cat.iconEmoji} ${cat.nameAr} ($count)", fontSize = 11.sp) },
+                            label = { Text("${cat.iconEmoji} $catLabel ($count)", fontSize = 11.sp) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = Gold,
                                 selectedLabelColor = Navy,
@@ -193,7 +192,6 @@ fun LibraryScreen(
                 Spacer(modifier = Modifier.height(10.dp))
             }
 
-            // Continue Reading Carousel (if on Tab 0 and has progress)
             if (selectedTab == 0 && readingProgressList.isNotEmpty() && searchQuery.isBlank()) {
                 val inProgressBooks = remember(readingProgressList, allBooks) {
                     readingProgressList.mapNotNull { prog ->
@@ -202,7 +200,7 @@ fun LibraryScreen(
                 }
 
                 if (inProgressBooks.isNotEmpty()) {
-                    Text("استكمال القراءة", color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
+                    Text(t("استكمال القراءة", "Resume Reading"), color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
                     Spacer(Modifier.height(6.dp))
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -220,32 +218,44 @@ fun LibraryScreen(
                                     modifier = Modifier.padding(10.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(Icons.Default.MenuBook, contentDescription = null, tint = Gold, modifier = Modifier.size(24.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .size(45.dp, 60.dp)
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(NavyLight),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (book.coverUrl.isNotBlank()) {
+                                            AsyncImage(
+                                                model = book.coverUrl,
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier.fillMaxSize()
+                                            )
+                                        } else {
+                                            Icon(Icons.Default.Book, contentDescription = null, tint = Gold)
+                                        }
+                                    }
                                     Spacer(Modifier.width(8.dp))
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(book.title, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        Spacer(Modifier.height(2.dp))
-                                        Text("صفحة ${prog.lastPage + 1} من ${prog.totalPages}", color = GoldSoft, fontSize = 10.sp)
+                                        Text(t("صفحة ${prog.lastPage} من ${prog.totalPages}", "Page ${prog.lastPage} of ${prog.totalPages}"), color = GoldSoft, fontSize = 10.sp)
                                         Spacer(Modifier.height(4.dp))
                                         LinearProgressIndicator(
-                                            progress = prog.progressPercentage / 100f,
+                                            progress = { prog.progressPercentage / 100f },
+                                            modifier = Modifier.fillMaxWidth().height(4.dp).clip(CircleShape),
                                             color = Gold,
-                                            trackColor = NavyLight,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(4.dp)
-                                                .clip(RoundedCornerShape(2.dp))
+                                            trackColor = NavyLight
                                         )
                                     }
                                 }
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(Modifier.height(10.dp))
                 }
             }
 
-            // Book Cover Grid
             if (filteredBooks.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -254,26 +264,28 @@ fun LibraryScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (selectedTab == 2) "لا توجد كتب منزّلة حالياً" else if (selectedTab == 1) "لم تبدأ قراءة أي كتاب بعد" else "لا توجد كتب تطابق البحث",
-                        color = GoldSoft,
+                        text = when (selectedTab) {
+                            1 -> t("لا توجد كتب قيد القراءة حالياً", "No books in progress")
+                            2 -> t("لم تقم بتنزيل أي كتاب بعد", "No downloaded books yet")
+                            else -> t("لا توجد نتائج مطابقة للبحث", "No matching books found")
+                        },
+                        color = GoldSoft.copy(alpha = 0.6f),
                         fontSize = 14.sp
                     )
                 }
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    items(filteredBooks) { book ->
-                        val isLocal = LibraryStore.isBookAvailableLocally(context, book)
-                        val prog = LibraryStore.getProgress(context, book.id)
-
-                        BookGridCard(
+                    items(filteredBooks, key = { it.id }) { book ->
+                        val isDownloaded = downloadedMap.containsKey(book.id) || LibraryStore.isBookAvailableLocally(context, book)
+                        BookCard(
                             book = book,
-                            isDownloaded = isLocal,
-                            readingProgress = prog,
+                            isDownloaded = isDownloaded,
                             onClick = { selectedBookForDetail = book }
                         )
                     }
@@ -282,24 +294,22 @@ fun LibraryScreen(
         }
     }
 
-    // Detail Modal Sheet
     selectedBookForDetail?.let { book ->
         BookDetailSheet(
             book = book,
             onDismiss = { selectedBookForDetail = null },
-            onReadClick = { b ->
+            onReadClick = { readBook ->
                 selectedBookForDetail = null
-                onOpenReader(b.id)
+                onOpenReader(readBook.id)
             }
         )
     }
 }
 
 @Composable
-private fun BookGridCard(
+private fun BookCard(
     book: Book,
     isDownloaded: Boolean,
-    readingProgress: ReadingProgress?,
     onClick: () -> Unit
 ) {
     Card(
@@ -307,122 +317,98 @@ private fun BookGridCard(
         shape = RoundedCornerShape(14.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable { onClick() }
             .noorGlassCard(cornerRadius = 14.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-        ) {
-            // Book Cover Aspect Box
+        Column(modifier = Modifier.padding(10.dp)) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(130.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(Color(0xFF13281E), Color(0xFF09120D))
-                        )
-                    )
-                    .border(1.dp, Gold.copy(alpha = 0.35f), RoundedCornerShape(10.dp)),
+                    .background(NavyLight),
                 contentAlignment = Alignment.Center
             ) {
                 if (book.coverUrl.isNotBlank()) {
                     AsyncImage(
                         model = book.coverUrl,
                         contentDescription = book.title,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
                     )
                 } else {
                     Column(
-                        modifier = Modifier.padding(8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.padding(8.dp)
                     ) {
-                        Icon(Icons.Default.Book, contentDescription = null, tint = Gold, modifier = Modifier.size(32.dp))
+                        Icon(Icons.Default.MenuBook, contentDescription = null, tint = Gold, modifier = Modifier.size(32.dp))
                         Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = book.title,
-                            color = Color.White,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            fontFamily = AmiriFamily
-                        )
+                        Text(book.title, color = GoldSoft, fontSize = 11.sp, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
                 }
 
-                // Downloaded Badge
-                if (isDownloaded || book.bundledAsset != null) {
+                if (isDownloaded) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(6.dp)
-                            .background(Gold, shape = CircleShape)
+                            .background(Color(0xCC0D2B1F), CircleShape)
                             .padding(4.dp)
                     ) {
-                        Icon(
-                            Icons.Default.CheckCircle,
-                            contentDescription = "أوفلاين",
-                            tint = Navy,
-                            modifier = Modifier.size(12.dp)
-                        )
+                        Icon(Icons.Default.CheckCircle, contentDescription = t("محمل محلياً", "Downloaded"), tint = Gold, modifier = Modifier.size(14.dp))
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
 
-            // Title
             Text(
                 text = book.title,
                 color = Color.White,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
-                fontFamily = AmiriFamily,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                lineHeight = 16.sp
+                modifier = Modifier.height(36.dp)
             )
 
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(Modifier.height(4.dp))
 
-            // Author
             Text(
-                text = book.author,
-                color = GoldSoft,
+                text = book.author.ifBlank { t("غير معروف", "Unknown Author") },
+                color = GoldSoft.copy(alpha = 0.7f),
                 fontSize = 11.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(Modifier.height(6.dp))
 
-            // Page count & Progress
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "${book.pages} ص",
-                    color = Color.White.copy(alpha = 0.6f),
-                    fontSize = 10.sp
-                )
-
-                if (readingProgress != null && readingProgress.progressPercentage > 0) {
+                Surface(
+                    color = Gold.copy(alpha = 0.12f),
+                    shape = RoundedCornerShape(6.dp)
+                ) {
+                    val catLabel = if (NoorLocale.isEnglish) LibraryCategories.LIST.find { it.id == book.category }?.nameEn ?: book.category else LibraryCategories.getCategoryNameAr(book.category)
                     Text(
-                        text = "${readingProgress.progressPercentage}%",
+                        text = catLabel,
                         color = Gold,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 9.5.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
                 }
+
+                Text(
+                    text = "${book.pages} " + t("ص", "p"),
+                    color = Color.White.copy(alpha = 0.5f),
+                    fontSize = 10.sp
+                )
             }
         }
     }
