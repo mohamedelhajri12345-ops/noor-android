@@ -28,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -102,6 +104,8 @@ fun GenericQuizGameScreen(
     var isStageCompleted by remember(currentStageIndex, currentScreen) { mutableStateOf(false) }
     var isStageFailed by remember(currentStageIndex, currentScreen) { mutableStateOf(false) }
     var earnedStars by remember(currentStageIndex, currentScreen) { mutableIntStateOf(0) }
+    val haptics = LocalHapticFeedback.current
+    var shakeTrigger by remember(currentStageIndex, currentScreen) { mutableLongStateOf(0L) }
 
     fun startStage(index: Int) {
         currentStageIndex = index
@@ -155,6 +159,8 @@ fun GenericQuizGameScreen(
                 )
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    StreakCounterFlameHeader(streak = (bestStage - 1).coerceAtLeast(0))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
@@ -304,6 +310,7 @@ fun GenericQuizGameScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
+                                    .wrongAnswerShake(shakeTrigger)
                                     .noorGlassCard(cornerRadius = 18.dp)
                                     .padding(20.dp)
                             ) {
@@ -346,6 +353,7 @@ fun GenericQuizGameScreen(
                                         .clickable(enabled = !isStageCompleted && !isStageFailed && !isWrong) {
                                             selectedOptionIndex = index
                                             if (index == currentQ.correctIndex) {
+                                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                                 isStageCompleted = true
                                                 earnedStars = when (wrongAttempts.size) {
                                                     0 -> 3
@@ -361,6 +369,8 @@ fun GenericQuizGameScreen(
                                                     .coerceAtMost(totalStages + 1)
                                                 saveProgress(updatedBest, updatedStars)
                                             } else {
+                                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                shakeTrigger = System.currentTimeMillis()
                                                 val newWrong = wrongAttempts + index
                                                 wrongAttempts = newWrong
                                                 if (newWrong.size >= 2) {
@@ -671,6 +681,26 @@ fun GenericQuizGameScreen(
                     }
                 }
             }
+        }
+
+        if (isStageCompleted) {
+            WinCelebrationOverlay(
+                stageNumber = currentStageIndex + 1,
+                totalStages = totalStages,
+                stars = earnedStars,
+                stageTitle = currentQ?.fact?.ifBlank { "المرحلة ${(currentStageIndex + 1).toArabicDigits()}" } ?: "",
+                onNextStage = if (currentStageIndex < totalStages - 1) {
+                    {
+                        startStage(currentStageIndex + 1)
+                    }
+                } else null,
+                onReplayStage = {
+                    startStage(currentStageIndex)
+                },
+                onStageMap = {
+                    currentScreen = 0
+                }
+            )
         }
     }
 }

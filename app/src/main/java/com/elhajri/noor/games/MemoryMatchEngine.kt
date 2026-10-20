@@ -28,6 +28,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -129,6 +131,8 @@ fun MemoryMatchEngine(
     var matchedCardIds by remember(currentStageIndex, currentScreen) { mutableStateOf<Set<Int>>(emptySet()) }
     var moves by remember(currentStageIndex, currentScreen) { mutableIntStateOf(0) }
     var isChecking by remember(currentStageIndex, currentScreen) { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
+    var shakeTrigger by remember(currentStageIndex, currentScreen) { mutableLongStateOf(0L) }
 
     fun startStage(stageIdx: Int) {
         currentStageIndex = stageIdx
@@ -170,10 +174,13 @@ fun MemoryMatchEngine(
             val card2 = cards.firstOrNull { it.id == flippedCardIds[1] }
 
             if (card1 != null && card2 != null && card1.pairId == card2.pairId) {
+                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 matchedCardIds = matchedCardIds + setOf(card1.id, card2.id)
                 flippedCardIds = emptyList()
                 isChecking = false
             } else {
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                shakeTrigger = System.currentTimeMillis()
                 delay(900)
                 flippedCardIds = emptyList()
                 isChecking = false
@@ -222,6 +229,8 @@ fun MemoryMatchEngine(
                 )
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    StreakCounterFlameHeader(streak = (bestStage - 1).coerceAtLeast(0))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
@@ -514,6 +523,7 @@ fun MemoryMatchEngine(
                                         .clickable(
                                             enabled = !isFlipped && !isMatched && !isChecking && flippedCardIds.size < 2
                                         ) {
+                                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                             flippedCardIds = flippedCardIds + card.id
                                         }
                                         .padding(4.dp),
@@ -658,6 +668,20 @@ fun MemoryMatchEngine(
                     }
                 }
             }
+        }
+
+        if (isStageCompleted && currentScreen == 1) {
+            WinCelebrationOverlay(
+                stageNumber = currentStageIndex + 1,
+                totalStages = totalStages,
+                stars = earnedStars,
+                stageTitle = "المرحلة ${(currentStageIndex + 1).toArabicDigits()}",
+                onNextStage = if (currentStageIndex < totalStages - 1) {
+                    { startStage(currentStageIndex + 1) }
+                } else null,
+                onReplayStage = { startStage(currentStageIndex) },
+                onStageMap = { currentScreen = 0 }
+            )
         }
     }
 }

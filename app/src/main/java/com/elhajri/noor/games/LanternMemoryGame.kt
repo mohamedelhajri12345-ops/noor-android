@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -117,6 +119,8 @@ private fun LanternMemoryPlayScreen(
     var statusText by remember(stageIdx) { mutableStateOf("اضغط ابدأ لمشاهدة التسلسل") }
     var showWinDialog by remember(stageIdx) { mutableStateOf(false) }
     var earnedStars by remember(stageIdx) { mutableIntStateOf(3) }
+    val haptics = LocalHapticFeedback.current
+    var shakeTrigger by remember(stageIdx) { mutableLongStateOf(0L) }
 
     fun startShowingSequence() {
         gameState = LanternGameState.SHOWING_SEQUENCE
@@ -143,12 +147,14 @@ private fun LanternMemoryPlayScreen(
 
         activeLitLantern = lanternId
 
+        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         val expectedId = sequence[userIndex]
         if (lanternId == expectedId) {
             val nextIdx = userIndex + 1
             userIndex = nextIdx
 
             if (nextIdx == sequence.size) {
+                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 val stars = when (mistakesCount) {
                     0 -> 3
                     1 -> 2
@@ -161,6 +167,8 @@ private fun LanternMemoryPlayScreen(
                 showWinDialog = true
             }
         } else {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            shakeTrigger = System.currentTimeMillis()
             mistakesCount += 1
             statusText = "خطأ في الترتيب! أعد التركيز واشهد التسلسل مجدداً"
             gameState = LanternGameState.READY
@@ -204,11 +212,14 @@ private fun LanternMemoryPlayScreen(
                         fontSize = 12.sp
                     )
                 }
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = NavyCard,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.4f))
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    StreakCounterFlameHeader(streak = (stageIdx).coerceAtLeast(0))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = NavyCard,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.4f))
+                    ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -227,6 +238,7 @@ private fun LanternMemoryPlayScreen(
                             fontWeight = FontWeight.Bold
                         )
                     }
+                }
                 }
             }
 
@@ -253,6 +265,7 @@ private fun LanternMemoryPlayScreen(
 
             // Lanterns 2x2 Grid
             Column(
+                modifier = Modifier.wrongAnswerShake(shakeTrigger),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

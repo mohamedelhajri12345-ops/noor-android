@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -147,6 +149,8 @@ private fun WordScrambleStagePlayScreen(
     var showHintDialog by remember(stageIdx, replaySeed) { mutableStateOf(false) }
     var wordSolved by remember(stageIdx, replaySeed) { mutableStateOf(false) }
     var showWinDialog by remember(stageIdx, replaySeed) { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
+    var shakeTrigger by remember(stageIdx, replaySeed) { mutableLongStateOf(0L) }
 
     LaunchedEffect(tiles) {
         val currentStr = tiles.joinToString("")
@@ -165,11 +169,15 @@ private fun WordScrambleStagePlayScreen(
 
     fun swapTiles(i: Int, j: Int) {
         if (i == j) return
+        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         val list = tiles.toMutableList()
         val temp = list[i]
         list[i] = list[j]
         list[j] = temp
         tiles = list
+        if (list.joinToString("") != targetWord) {
+            shakeTrigger = System.currentTimeMillis()
+        }
     }
 
     Box(
@@ -201,11 +209,14 @@ private fun WordScrambleStagePlayScreen(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = NavyCard,
-                    border = BorderStroke(1.dp, Gold.copy(alpha = 0.4f))
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    StreakCounterFlameHeader(streak = (stageIdx).coerceAtLeast(0))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = NavyCard,
+                        border = BorderStroke(1.dp, Gold.copy(alpha = 0.4f))
+                    ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -225,6 +236,7 @@ private fun WordScrambleStagePlayScreen(
                         )
                     }
                 }
+            }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
