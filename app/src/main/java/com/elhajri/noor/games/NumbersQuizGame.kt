@@ -1,4 +1,6 @@
 package com.elhajri.noor.games
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
@@ -170,6 +172,8 @@ fun NumbersQuizGameScreen(onBack: () -> Unit) {
                 var levelScore by remember(lvl) { mutableStateOf(0) }
                 var selectedOption by remember(lvl, qIndex) { mutableStateOf<Int?>(null) }
                 var isCompleted by remember(lvl) { mutableStateOf(false) }
+                val haptics = LocalHapticFeedback.current
+                var shakeTrigger by remember(lvl) { mutableLongStateOf(0L) }
 
                 val currentQ = levelQuestions.getOrNull(qIndex)
 
@@ -190,7 +194,7 @@ fun NumbersQuizGameScreen(onBack: () -> Unit) {
 
                         // Question container
                         Card(
-                            Modifier.fillMaxWidth().noorGlassCard(cornerRadius = 18.dp).padding(20.dp),
+                            Modifier.fillMaxWidth().wrongAnswerShake(shakeTrigger).noorGlassCard(cornerRadius = 18.dp).padding(20.dp),
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                         ) {
                             Box(Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
@@ -239,7 +243,13 @@ fun NumbersQuizGameScreen(onBack: () -> Unit) {
                                         )
                                         .clickable(enabled = selectedOption == null) {
                                             selectedOption = optIdx
-                                            if (isCorrect) levelScore += 1
+                                            if (isCorrect) {
+                                                levelScore += 1
+                                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            } else {
+                                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                shakeTrigger = System.currentTimeMillis()
+                                            }
                                         }
                                         .padding(horizontal = 16.dp),
                                     contentAlignment = Alignment.CenterStart

@@ -1,4 +1,6 @@
 package com.elhajri.noor.games
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
@@ -164,6 +166,8 @@ fun TrueFalseGameScreen(onBack: () -> Unit) {
                 var lives by remember(lvl) { mutableStateOf(3) }
                 var selectedAnswer by remember(lvl, qIndex) { mutableStateOf<Boolean?>(null) }
                 var isCompleted by remember(lvl) { mutableStateOf(false) }
+                val haptics = LocalHapticFeedback.current
+                var shakeTrigger by remember(lvl) { mutableLongStateOf(0L) }
 
                 val currentQ = levelQuestions.getOrNull(qIndex)
 
@@ -191,7 +195,7 @@ fun TrueFalseGameScreen(onBack: () -> Unit) {
 
                         // Question card
                         Card(
-                            Modifier.fillMaxWidth().weight(1f).noorGlassCard(cornerRadius = 20.dp).padding(20.dp),
+                            Modifier.fillMaxWidth().weight(1f).wrongAnswerShake(shakeTrigger).noorGlassCard(cornerRadius = 20.dp).padding(20.dp),
                             colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                         ) {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -216,7 +220,14 @@ fun TrueFalseGameScreen(onBack: () -> Unit) {
                                     if (selectedAnswer != null) return@Button
                                     selectedAnswer = true
                                     val isCorrect = (currentQ.a == true)
-                                    if (isCorrect) levelScore += 1 else lives -= 1
+                                    if (isCorrect) {
+                                        levelScore += 1
+                                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    } else {
+                                        lives -= 1
+                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        shakeTrigger = System.currentTimeMillis()
+                                    }
                                 },
                                 modifier = Modifier.weight(1f).height(64.dp),
                                 shape = RoundedCornerShape(16.dp),
@@ -237,7 +248,14 @@ fun TrueFalseGameScreen(onBack: () -> Unit) {
                                     if (selectedAnswer != null) return@Button
                                     selectedAnswer = false
                                     val isCorrect = (currentQ.a == false)
-                                    if (isCorrect) levelScore += 1 else lives -= 1
+                                    if (isCorrect) {
+                                        levelScore += 1
+                                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    } else {
+                                        lives -= 1
+                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        shakeTrigger = System.currentTimeMillis()
+                                    }
                                 },
                                 modifier = Modifier.weight(1f).height(64.dp),
                                 shape = RoundedCornerShape(16.dp),

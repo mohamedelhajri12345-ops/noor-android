@@ -1,6 +1,6 @@
+package com.elhajri.noor.games
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-package com.elhajri.noor.games
 
 import android.content.Context
 import androidx.compose.animation.*
@@ -609,8 +609,7 @@ private fun TawafOrderingPlayScreen(
 
             Button(
                 onClick = { checkOrder() },
-                modifier = Modifier.wrongAnswerShake(shakeTrigger),
-                modifier = Modifier
+                modifier = Modifier.wrongAnswerShake(shakeTrigger)
                     .fillMaxWidth()
                     .height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Gold),
