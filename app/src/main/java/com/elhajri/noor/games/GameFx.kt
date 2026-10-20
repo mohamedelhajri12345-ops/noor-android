@@ -346,3 +346,49 @@ fun WinCelebrationOverlay(
         }
     }
 }
+
+/**
+ * Animated Flame Streak counter header element.
+ */
+@Composable
+fun StreakCounterFlameHeader(
+    streak: Int,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "FlameTransition")
+    val flameScale by infiniteTransition.animateFloat(
+        initialValue = 0.95f,
+        targetValue = 1.15f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "FlameScale"
+    )
+
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFF1B3022))
+            .border(1.dp, Gold.copy(alpha = 0.4f), RoundedCornerShape(16.dp))
+            .padding(horizontal = 10.dp, vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.LocalFireDepartment,
+            contentDescription = "سلسلة الإنجاز",
+            tint = Color(0xFFFF9800),
+            modifier = Modifier
+                .size(20.dp)
+                .scale(flameScale)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = "🔥 ${streak.toArabicDigits()}",
+            color = Gold,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
