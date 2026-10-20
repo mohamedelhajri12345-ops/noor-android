@@ -49,7 +49,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.NavyCard
 
 /**
- * Exact port of the web More.jsx: 16 feature cards in a 2-column grid,
+ * Exact port of the web More.jsx: 17 feature cards in a 2-column grid,
  * each with a gold icon chip, bold label and muted description.
  * 100% native Compose — zero WebView.
  */
@@ -69,7 +69,7 @@ private fun features() = listOf(
     MoreFeature("journal", t("المفكرة", "Journal"), t("تدوين الخواطر", "Write your thoughts"), Icons.Filled.EditNote),
     MoreFeature("calendar", t("التقويم", "Calendar"), t("المناسبات الإسلامية", "Islamic occasions"), Icons.Filled.EditCalendar),
     MoreFeature("stories", t("قصص الأنبياء", "Prophet Stories"), t("قصص ملهمة", "Inspiring stories"), Icons.Filled.HistoryEdu),
-    MoreFeature("quiz", t("الاختبار الديني", "Religious Quiz"), t("أسئلة وأجوبة", "Questions & answers"), Icons.Filled.Help),
+    MoreFeature("exams", t("الاختبار الديني", "Religious Exam"), t("مسارات واختبارات معتمدة وشهادات", "Tracks, timed exams & certificates"), Icons.Filled.Help),
     MoreFeature("tasbih", t("السبحة", "Tasbih"), t("أنماط التسبيح التفاعلية الخمسة", "5 Interactive Tasbih Styles"), Icons.Filled.Repeat),
     MoreFeature("games", t("الألعاب", "Games"), t("ألعاب إسلامية", "Islamic games"), Icons.Filled.Casino),
     MoreFeature("ai", t("المساعد الذكي", "Smart Assistant"), t("ذكاء اصطناعي إسلامي", "Islamic AI"), Icons.Filled.AutoAwesome),
@@ -142,7 +142,6 @@ fun MoreScreen(onNavigate: (String) -> Unit) {
             }
         }
 
-        // إعلان سفلي آمن — تحت الشبكة داخل التخطيط، لا يغطي أي زر أو محتوى
         com.elhajri.noor.ui.NoorBannerAd()
         Spacer(Modifier.height(10.dp))
     }
