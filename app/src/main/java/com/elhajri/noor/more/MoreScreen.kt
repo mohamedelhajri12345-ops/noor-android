@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Book
@@ -29,6 +30,9 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.ChildCare
+import androidx.compose.material.icons.filled.Headphones
+import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,6 +82,7 @@ private fun features() = listOf(
     MoreFeature("hajj", t("الحج والعمرة", "Hajj & Umrah"), t("دليل المصطافين", "Pilgrim guide"), Icons.Filled.Bookmark),
     MoreFeature("tracker", t("بياناتي وإحصائياتي", "My Data & Stats"), t("لوحة إحصائيات النشاط والإنجاز الشاملة", "Activity and stats dashboard"), Icons.Filled.BarChart),
     MoreFeature("themes", t("متجر الثيمات", "Theme Store"), t("ثيمات إسلامية بالنقاط", "Islamic themes with points"), Icons.Filled.Palette),
+    MoreFeature("mychild", t("طفلي", "My Child"), t("ملف طفلك، الوضع الآمن، قصة قبل النوم، الحفظ والتحدي العائلي", "Child profile, safe mode, bedtime story, memorization & family quiz"), Icons.Filled.Face),
     MoreFeature("settings", t("الإعدادات", "Settings"), t("إعدادات التطبيق", "App settings"), Icons.Filled.Settings),
 )
 

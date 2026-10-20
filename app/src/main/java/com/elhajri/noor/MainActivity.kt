@@ -410,6 +410,7 @@ fun NoorApp() {
                     com.elhajri.noor.library.InAppBookReaderScreen(bookId = bookId, onBack = { navController.popBackStack() })
                 }
                 composable("tracker") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "tracker"); AnalyticsDashboardScreen(onBack = { navController.popBackStack() }) }
+                composable("mychild") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "mychild"); com.elhajri.noor.mychild.MyChildRootScreen(onBack = { navController.popBackStack() }, onNavigate = { route -> navController.navigate(route) }) }
                 composable("analytics") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "analytics"); AnalyticsDashboardScreen(onBack = { navController.popBackStack() }) }
                 composable("games") { NoorGameHubScreen(onBack = { navController.popBackStack() }, onNavigate = { navController.navigate(it) }) }
                 composable("videos") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "videos"); com.elhajri.noor.videos.VideosScreen(onBack = { navController.popBackStack() }, onOpenVideo = { videoId -> navController.navigate("videoPlayer/$videoId") }) }
