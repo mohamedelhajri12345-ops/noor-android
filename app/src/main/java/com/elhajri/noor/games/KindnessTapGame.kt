@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -236,6 +238,7 @@ private fun KindnessPlayScreen(
     onNextStage: () -> Unit,
     onBackToMap: () -> Unit
 ) {
+    val haptics = LocalHapticFeedback.current
     val stageNumber = stageIdx + 1
     val stageScenarios = remember(stageIdx) {
         val start = stageIdx * 5
@@ -283,7 +286,10 @@ private fun KindnessPlayScreen(
         isTimerRunning = false
 
         if (opt == currentScenario.correctResponse) {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             correctCount += 1
+        } else {
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         }
     }
 

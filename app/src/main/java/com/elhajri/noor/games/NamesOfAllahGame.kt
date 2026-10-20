@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -316,6 +318,7 @@ private fun NamesQuiz(
         }
     }
 
+    val haptics = LocalHapticFeedback.current
     var qIndex by remember { mutableStateOf(0) }
     var correctCount by remember { mutableStateOf(0) }
     var selected by remember { mutableStateOf<Int?>(null) }
@@ -330,31 +333,23 @@ private fun NamesQuiz(
             else -> 0
         }
         val earned = correctCount * 20 * level
-        Column(
-            Modifier.fillMaxSize().noorGlassCard(cornerRadius = 18.dp).padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(48.dp))
-            Spacer(Modifier.height(10.dp))
-            Text("اكتمل المستوى ${level.toArabicDigits()}", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text("أجبت ${correctCount.toArabicDigits()} من ٦", color = GoldSoft, fontSize = 13.sp)
-            repeat(3) { s ->
-                Icon(
-                    Icons.Default.Star, contentDescription = null,
-                    tint = if (s < stars) Gold else GoldSoft.copy(alpha = 0.25f),
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-            Spacer(Modifier.height(14.dp))
-            Button(
-                onClick = {
-                    onLevelDone(earned, stars)
-                    onExit()
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Gold.copy(alpha = 0.2f))
-            ) { Text("متابعة", color = Gold) }
-        }
+        WinCelebrationOverlay(
+            stageNumber = level,
+            totalStages = totalLevels,
+            stars = stars,
+            stageTitle = "المستوى ${level.toArabicDigits()}",
+            onNextStage = {
+                onLevelDone(earned, stars)
+                onExit()
+            },
+            onReplayStage = {
+                qIndex = 0
+                correctCount = 0
+                selected = null
+                finished = false
+            },
+            onStageMap = onExit
+        )
         return
     }
 
@@ -393,7 +388,12 @@ private fun NamesQuiz(
                         .clickable {
                             if (selected == null) {
                                 selected = i
-                                if (isCorrect) correctCount++
+                                if (isCorrect) {
+                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    correctCount++
+                                } else {
+                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                }
                                 showResult = true
                             }
                         }

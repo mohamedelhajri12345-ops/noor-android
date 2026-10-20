@@ -27,6 +27,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -164,6 +166,7 @@ private fun NamesMatchPlayScreen(
 ) {
     val context = LocalContext.current
 
+    val haptics = LocalHapticFeedback.current
     val pairCount = when {
         levelIdx < 5 -> 4
         levelIdx < 10 -> 6
@@ -207,12 +210,14 @@ private fun NamesMatchPlayScreen(
 
     fun flip(idx: Int) {
         if (allMatched || idx in matched || idx in flipped || flipped.size >= 2) return
+        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         flipped = flipped + idx
         if (flipped.size == 2) {
             moves++
             val (a, b) = flipped.toList()
             val ca = cards[a]; val cb = cards[b]
             if (ca.pairId == cb.pairId && ca.isMeaning != cb.isMeaning) {
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                 matched = matched + setOf(a, b)
                 flipped = emptySet()
             } else {
@@ -294,34 +299,20 @@ private fun NamesMatchPlayScreen(
         }
 
         if (allMatched) {
-            Column(
-                Modifier.fillMaxWidth().padding(bottom = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("ما شاء الله! أتممت الرباط 🌙", color = Gold, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Spacer(Modifier.height(10.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Box(
-                        Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(NavyCard)
-                            .border(1.dp, Gold, RoundedCornerShape(12.dp))
-                            .clickable { onExit() }
-                            .padding(horizontal = 20.dp, vertical = 10.dp)
-                    ) {
-                        Text("القائمة", color = Gold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                    }
-                    Box(
-                        Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Gold)
-                            .clickable { onNextLevel() }
-                            .padding(horizontal = 26.dp, vertical = 10.dp)
-                    ) {
-                        Text("المستوى التالي", color = Navy, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                    }
-                }
+            val stars = when {
+                moves <= pairCount + 2 -> 3
+                moves <= pairCount + 6 -> 2
+                else -> 1
             }
+            StageWinDialog(
+                stageNumber = levelIdx + 1,
+                totalStages = 20,
+                stars = stars,
+                stageTitle = "المستوى ${(levelIdx + 1).toArabicDigits()}",
+                onNextStage = onNextLevel,
+                onReplayStage = { setup(levelIdx) },
+                onStageMap = onExit
+            )
         }
     }
 }

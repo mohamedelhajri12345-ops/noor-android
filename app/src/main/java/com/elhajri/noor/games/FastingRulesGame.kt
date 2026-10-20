@@ -24,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -349,6 +351,7 @@ private fun FastingRulesPlayScreen(
     onCompleteStage: (Int) -> Unit,
     onNextStage: () -> Unit
 ) {
+    val haptics = LocalHapticFeedback.current
     var currentRuleIdx by remember(stage) { mutableIntStateOf(0) }
     var correctCount by remember(stage) { mutableIntStateOf(0) }
     var selectedAnswer by remember(stage, currentRuleIdx) { mutableStateOf<Boolean?>(null) }
@@ -364,7 +367,10 @@ private fun FastingRulesPlayScreen(
         isAnswered = true
 
         if (ans == currentRule.isTrue) {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             correctCount += 1
+        } else {
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         }
     }
 
