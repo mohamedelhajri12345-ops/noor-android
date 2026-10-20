@@ -1,5 +1,10 @@
 package com.elhajri.noor.quran
 
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
+
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -266,7 +271,7 @@ fun QuranReaderScreen(
             else com.elhajri.noor.audio.player.PlayerTrack(
                 id = "quran-$n",
                 url = local ?: "${servers[0]}${String.format("%03d", n)}.mp3",
-                title = "سورة $name",
+                title = t("سورة ", "Surah ") + name,
                 artist = currentReciter.name,
                 fallbackUrls = if (local != null) emptyList()
                     else servers.map { "${it}${String.format("%03d", n)}.mp3" }
@@ -311,7 +316,7 @@ fun QuranReaderScreen(
         val body = selected.joinToString(" ") { a ->
             "${a.text} ﴿${toArabicNumber(a.number)}﴾"
         }
-        val ref = "﴾ سورة ${currentName}"
+        val ref = "﴾ " + t("سورة ", "Surah ") + "${currentName}"
         return "$body\n$ref"
     }
 
@@ -328,7 +333,7 @@ fun QuranReaderScreen(
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)
         }
-        context.startActivity(Intent.createChooser(send, "مشاركة المصحف"))
+        context.startActivity(Intent.createChooser(send, t("مشاركة المصحف", "Share Qur'an")))
         showCopySheet = false
     }
 
@@ -344,14 +349,14 @@ fun QuranReaderScreen(
                     .padding(bottom = 24.dp)
             ) {
                 Text(
-                    "استنساخ المصحف",
+                    t("نسخ آيات القرآن", "Copy Qur'an Verses"),
                     color = Gold,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Text(
-                    "انسخ آيات سورة $currentName أو شاركها",
+                    t("انسخ آيات سورة ", "Copy verses from Surah ") + currentName,
                     color = GoldSoft,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -402,7 +407,7 @@ fun QuranReaderScreen(
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
                     ) { Text("−", fontSize = 18.sp) }
                     Text(
-                        "من الآية ${toArabicNumber(copyFrom)}",
+                        t("من الآية ", "From Verse ") + "${toArabicNumber(copyFrom)}",
                         color = Gold,
                         fontSize = 13.sp,
                         textAlign = TextAlign.Center,
@@ -426,7 +431,7 @@ fun QuranReaderScreen(
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
                     ) { Text("−", fontSize = 18.sp) }
                     Text(
-                        "إلى الآية ${toArabicNumber(copyTo)}",
+                        t("إلى الآية ", "To Verse ") + "${toArabicNumber(copyTo)}",
                         color = Gold,
                         fontSize = 13.sp,
                         textAlign = TextAlign.Center,
@@ -489,7 +494,7 @@ fun QuranReaderScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "سورة $currentName",
+                            text = t("سورة ", "Surah ") + currentName,
                             color = Gold,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
@@ -499,7 +504,7 @@ fun QuranReaderScreen(
                         currentSurah?.let {
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
-                                text = "${it.type} · ${toArabicNumber(it.ayahs)} آية",
+                                text = (if (NoorLocale.isEnglish) (if (it.type == "مكية") "Meccan" else "Madinan") else it.type) + " · " + toArabicNumber(it.ayahs) + " " + t("آية", "verses"),
                                 color = GoldSoft.copy(alpha = 0.75f),
                                 fontSize = 13.sp
                             )
@@ -520,7 +525,7 @@ fun QuranReaderScreen(
                             } else {
                                 Icon(
                                     imageVector = if (isPlaying && playerState.currentId == "quran-$currentSurahNum") Icons.Default.Pause else Icons.Default.PlayArrow,
-                                    contentDescription = "تشغيل السورة كاملة",
+                                    contentDescription = t("تشغيل السورة كاملة", "Play Full Surah"),
                                     tint = Color(0xFF0D2B1F),
                                     modifier = Modifier.size(40.dp)
                                 )
@@ -528,7 +533,7 @@ fun QuranReaderScreen(
                         }
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "تشغيل السورة كاملة",
+                            text = t("تشغيل السورة كاملة", "Play Full Surah"),
                             color = GoldSoft.copy(alpha = 0.8f),
                             fontSize = 13.sp
                         )
@@ -546,7 +551,7 @@ fun QuranReaderScreen(
                     }
                 } else if (ayahs.isEmpty()) {
                     Text(
-                        text = "تعذر تحميل نص السورة. يرجى الاتصال بالإنترنت.",
+                        text = t("تعذر تحميل نص السورة. يرجى الاتصال بالإنترنت.", "Unable to load surah text. Please check internet connection."),
                         color = TextMain,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 60.dp),
                         textAlign = TextAlign.Center
@@ -610,7 +615,7 @@ fun QuranReaderScreen(
                                 )
                             } else if (translation.isEmpty()) {
                                 Text(
-                                    "تعذر تحميل الترجمة. يرجى الاتصال بالإنترنت مرة واحدة لتحميلها.",
+                                    t("تعذر تحميل الترجمة. يرجى الاتصال بالإنترنت مرة واحدة لتحميلها.", "Unable to load translation. Please connect to internet to download."),
                                     color = TextMain.copy(alpha = 0.8f),
                                     fontSize = 12.sp,
                                     modifier = Modifier.fillMaxWidth(),

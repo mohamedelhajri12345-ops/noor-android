@@ -256,7 +256,7 @@ fun CalendarScreen() {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "اليوم",
+                        text = t("اليوم", "Today"),
                         color = GoldSoft,
                         fontSize = 12.sp
                     )
@@ -307,7 +307,7 @@ fun CalendarScreen() {
                     ) {
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowRight,
-                            contentDescription = "الشهر السابق",
+                            contentDescription = t("الشهر السابق", "Previous Month"),
                             tint = Gold
                         )
                     }
@@ -327,7 +327,7 @@ fun CalendarScreen() {
                     ) {
                         Icon(
                             imageVector = Icons.Filled.KeyboardArrowLeft,
-                            contentDescription = "الشهر التالي",
+                            contentDescription = t("الشهر التالي", "Next Month"),
                             tint = Gold
                         )
                     }
@@ -403,7 +403,7 @@ fun CalendarScreen() {
 
         // Occasions Section
         Text(
-            text = "المناسبات الدينية",
+            text = t("المناسبات الدينية", "Islamic Occasions"),
             color = TextMain,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,

@@ -1,5 +1,10 @@
 package com.elhajri.noor.ai
 
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
+
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -95,7 +100,7 @@ fun AiChatScreen(onBack: () -> Unit) {
             try {
                 LocalAiEngine.ensureInitialized(context)
             } catch (e: Exception) {
-                initError = e.message ?: "تعذّر تشغيل النموذج على هذا الجهاز"
+                initError = e.message ?: t("تعذّر تشغيل النموذج على هذا الجهاز", "Unable to run AI model on this device")
             }
             initializing = false
         }
@@ -145,7 +150,7 @@ fun AiChatScreen(onBack: () -> Unit) {
             }
             if (downloaded) {
                 IconButton(onClick = { showDeleteDialog = true }) {
-                    Icon(Icons.Filled.Delete, contentDescription = "حذف النموذج", tint = TextMain.copy(alpha = 0.6f), modifier = Modifier.size(18.dp))
+                    Icon(Icons.Filled.Delete, contentDescription = t("حذف النموذج", "Delete Model"), tint = TextMain.copy(alpha = 0.6f), modifier = Modifier.size(18.dp))
                 }
             } else { Spacer(Modifier.width(48.dp)) }
         }
@@ -306,10 +311,10 @@ fun AiChatScreen(onBack: () -> Unit) {
                             Text(initError ?: "", color = TextMain.copy(alpha = 0.7f), fontSize = 13.sp, textAlign = TextAlign.Center)
                         } else {
                             val suggestions = listOf(
-                                "ما فضل الصدقة؟",
-                                "اكتب لي دعاء لتفريج الهم",
-                                "ما آداب زيارة المريض؟",
-                                "لخص لي قصة يوسف عليه السلام"
+                                t("ما فضل الصدقة؟", "What is the virtue of charity?"),
+                                t("اكتب لي دعاء لتفريج الهم", "Write me a dua for relief"),
+                                t("ما آداب زيارة المريض؟", "Etiquette of visiting the sick"),
+                                t("لخص لي قصة يوسف عليه السلام", "Summarize Prophet Yusuf's story")
                             )
                             Text("اسأل مساعدك عن دينك", color = Gold, fontSize = 16.sp, fontFamily = AmiriFamily)
                             Spacer(Modifier.height(14.dp))
@@ -362,7 +367,7 @@ fun AiChatScreen(onBack: () -> Unit) {
                                         label = "typingAlpha"
                                     )
                                     Text(
-                                        "المساعد يفكّر…",
+                                        t("المساعد يفكّر…", "Assistant is thinking..."),
                                         color = GoldSoft.copy(alpha = alpha),
                                         fontSize = 12.sp,
                                         modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(NavyLight.copy(alpha = 0.4f)).padding(10.dp)
@@ -407,7 +412,7 @@ fun AiChatScreen(onBack: () -> Unit) {
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.Send,
-                                contentDescription = "إرسال",
+                                contentDescription = t("إرسال", "Send"),
                                 tint = if (input.isNotBlank() && !thinking) Gold else Gold.copy(alpha = 0.3f),
                                 modifier = Modifier.size(22.dp)
                             )
@@ -432,7 +437,7 @@ fun AiChatScreen(onBack: () -> Unit) {
                     Spacer(Modifier.width(8.dp))
                     Text(downloadError ?: "", color = TextMain, fontSize = 12.sp, modifier = Modifier.weight(1f))
                     Text(
-                        "إعادة المحاولة",
+                        t("إعادة المحاولة", "Retry"),
                         color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable { downloadError = null; downloading = true }
                     )

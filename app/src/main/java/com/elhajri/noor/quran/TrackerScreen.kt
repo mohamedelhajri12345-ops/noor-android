@@ -1,5 +1,10 @@
 package com.elhajri.noor.quran
 
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
+
 import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.Canvas
@@ -155,12 +160,12 @@ fun TrackerScreen() {
     }
 
     val badges = listOf(
-        BadgeItem("🔥", "٣ أيام", streak >= 3),
-        BadgeItem("🌟", "٧ أيام", streak >= 7),
-        BadgeItem("🏆", "٣٠ يوم", streak >= 30),
-        BadgeItem("📚", "١٠٠ صفحة", allTimeTotalPages >= 100),
-        BadgeItem("💎", "٥٠٠ صفحة", allTimeTotalPages >= 500),
-        BadgeItem("👑", "٦٠٤ صفحة", allTimeTotalPages >= 604)
+        BadgeItem("🔥", t("٣ أيام", "3 Days"), streak >= 3),
+        BadgeItem("🌟", t("٧ أيام", "7 Days"), streak >= 7),
+        BadgeItem("🏆", t("٣٠ يوم", "30 Days"), streak >= 30),
+        BadgeItem("📚", t("١٠٠ صفحة", "100 Pages"), allTimeTotalPages >= 100),
+        BadgeItem("💎", t("٥٠٠ صفحة", "500 Pages"), allTimeTotalPages >= 500),
+        BadgeItem("👑", t("٦٠٤ صفحة", "604 Pages"), allTimeTotalPages >= 604)
     )
 
     Column(
@@ -178,19 +183,19 @@ fun TrackerScreen() {
                 .padding(4.dp)
         ) {
             TabButton(
-                title = "متابعة اليوم",
+                title = t("متابعة اليوم", "Today's Progress"),
                 selected = selectedTab == 0,
                 onClick = { selectedTab = 0 },
                 modifier = Modifier.weight(1f)
             )
             TabButton(
-                title = "التقارير",
+                title = t("التقارير", "Reports"),
                 selected = selectedTab == 1,
                 onClick = { selectedTab = 1 },
                 modifier = Modifier.weight(1f)
             )
             TabButton(
-                title = "السور المكتملة",
+                title = t("السور المكتملة", "Completed Surahs"),
                 selected = selectedTab == 2,
                 onClick = { selectedTab = 2 },
                 modifier = Modifier.weight(1f)
@@ -220,7 +225,7 @@ fun TrackerScreen() {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "ورد اليوم من القرآن",
+                                    text = t("ورد اليوم من القرآن", "Today's Qur'an Reading"),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Gold
@@ -266,7 +271,7 @@ fun TrackerScreen() {
                                             color = Gold
                                         )
                                         Text(
-                                            text = "${toArabicNumber(todayPages)}/${toArabicNumber(goal)} صفحة",
+                                            text = "${toArabicNumber(todayPages)}/${toArabicNumber(goal)} " + t("صفحة", "pages"),
                                             fontSize = 12.sp,
                                             color = GoldSoft
                                         )
@@ -468,9 +473,9 @@ fun TrackerScreen() {
                                     Spacer(modifier = Modifier.width(16.dp))
 
                                     Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        ReportItem("الختمات المكتملة", toArabicNumber(completedKhatmas))
-                                        ReportItem("إجمالي الصفحات", toArabicNumber(allTimeTotalPages))
-                                        ReportItem("المتبقي للختمة", "${toArabicNumber(TOTAL_QURAN_PAGES - currentKhatmaPages)} صفحة")
+                                        ReportItem(t("الختمات المكتملة", "Completed Khatmas"), toArabicNumber(completedKhatmas))
+                                        ReportItem(t("إجمالي الصفحات", "Total Pages Read"), toArabicNumber(allTimeTotalPages))
+                                        ReportItem(t("المتبقي للختمة", "Remaining for Khatma"), "${toArabicNumber(TOTAL_QURAN_PAGES - currentKhatmaPages)} صفحة")
                                     }
                                 }
                             }
@@ -513,7 +518,7 @@ fun TrackerScreen() {
                 ) {
                     item {
                         Text(
-                            text = "علم على السور التي أتأمت قراءتها (${completedSurahsSet.size}/114)",
+                            text = t("علم على السور التي أتممت قراءتها", "Mark the surahs you have completed reading") + " (${completedSurahsSet.size}/114)",
                             color = Gold,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,

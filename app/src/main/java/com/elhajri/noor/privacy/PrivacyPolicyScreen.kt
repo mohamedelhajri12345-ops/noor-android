@@ -1,5 +1,10 @@
 package com.elhajri.noor.privacy
 
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
+
 import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -107,7 +112,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit = {}) {
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "رجوع",
+                    contentDescription = t("رجوع", "Back"),
                     tint = Gold
                 )
             }
@@ -138,7 +143,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit = {}) {
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "سياسة الخصوصية",
+                text = t("سياسة الخصوصية", "Privacy Policy"),
                 color = Gold,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -146,7 +151,7 @@ fun PrivacyPolicyScreen(onBack: () -> Unit = {}) {
             )
 
             Text(
-                text = "تطبيق القرآن الكريم — آخر تحديث: 2026",
+                text = t("تطبيق القرآن الكريم — آخر تحديث: 2026", "NOOR App — Last Updated: 2026"),
                 color = GoldSoft.copy(alpha = 0.7f),
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,

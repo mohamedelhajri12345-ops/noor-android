@@ -1,5 +1,10 @@
 package com.elhajri.noor.zakat
 
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
+
 import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -71,11 +76,11 @@ fun ZakatScreen() {
 
     val categories = remember {
         listOf(
-            ZakatCategory("gold", "الذهب", "🥇", "زكاة الذهب حسب العيار"),
-            ZakatCategory("silver", "الفضة", "🥈", "زكاة الفضة"),
-            ZakatCategory("cash", "النقود", "💵", "زكاة النقود والمدخرات"),
-            ZakatCategory("merch", "المعروضات", "📦", "زكاة البضائع التجارية"),
-            ZakatCategory("mixed", "المحصّل", "🧮", "حساب شامل لكل ما تملك")
+            ZakatCategory("gold", t("الذهب", "Gold"), "🥇", t("زكاة الذهب حسب العيار", "Zakat on Gold by Carat")),
+            ZakatCategory("silver", t("الفضة", "Silver"), "🥈", t("زكاة الفضة", "Zakat on Silver")),
+            ZakatCategory("cash", t("النقود", "Cash"), "💵", t("زكاة النقود والمدخرات", "Zakat on Cash & Savings")),
+            ZakatCategory("merch", t("المعروضات", "Merchandise"), "📦", t("زكاة البضائع التجارية", "Zakat on Commercial Goods")),
+            ZakatCategory("mixed", t("المحصّل", "Total Net Wealth"), "🧮", t("حساب شامل لكل ما تملك", "Comprehensive Calculation"))
         )
     }
 
@@ -174,7 +179,7 @@ fun ZakatScreen() {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "حاسبة الزكاة",
+                text = t("حاسبة الزكاة", "Zakat Calculator"),
                 style = MaterialTheme.typography.headlineMedium,
                 color = Gold,
                 fontWeight = FontWeight.Bold
@@ -183,7 +188,7 @@ fun ZakatScreen() {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "اختر نوع المال الذي تريد حساب زكاته",
+                text = t("اختر نوع المال الذي تريد حساب زكاته", "Select wealth type to calculate Zakat"),
                 style = MaterialTheme.typography.bodyMedium,
                 color = GoldSoft
             )
@@ -521,7 +526,7 @@ fun ZakatScreen() {
                                     Text("زكاتك المستحقة (٢٫٥٪)", style = MaterialTheme.typography.bodySmall, color = GoldSoft)
                                 } else {
                                     Text(
-                                        "مالك لا يبلغ النصاب، لا زكاة عليك",
+                                        t("مالك لا يبلغ النصاب، لا زكاة عليك", "Your wealth does not reach Nisab; no Zakat due"),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = GoldSoft,
                                         textAlign = TextAlign.Center
