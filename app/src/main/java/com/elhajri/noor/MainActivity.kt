@@ -393,7 +393,21 @@ fun NoorApp() {
                 ) }
                 composable("donation") { DonationScreen(onBack = { navController.popBackStack() }) }
                 composable("notifications") { NotificationCenterScreen(onBack = { navController.popBackStack() }) }
-                composable("library") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "nasheeds"); com.elhajri.noor.quran.LibraryScreen(onBack = { navController.popBackStack() }) }
+                composable("library") {
+                    com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "library")
+                    com.elhajri.noor.library.LibraryScreen(
+                        onBack = { navController.popBackStack() },
+                        onOpenReader = { bookId -> navController.navigate("book_reader/$bookId") }
+                    )
+                }
+                composable("nasheeds") {
+                    com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "nasheeds")
+                    com.elhajri.noor.nasheeds.NasheedsScreen(onBack = { navController.popBackStack() })
+                }
+                composable("book_reader/{bookId}") { entry ->
+                    val bookId = entry.arguments?.getString("bookId") ?: ""
+                    com.elhajri.noor.library.InAppBookReaderScreen(bookId = bookId, onBack = { navController.popBackStack() })
+                }
                 composable("tracker") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "tracker"); AnalyticsDashboardScreen(onBack = { navController.popBackStack() }) }
                 composable("analytics") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "analytics"); AnalyticsDashboardScreen(onBack = { navController.popBackStack() }) }
                 composable("games") { NoorGameHubScreen(onBack = { navController.popBackStack() }, onNavigate = { navController.navigate(it) }) }
