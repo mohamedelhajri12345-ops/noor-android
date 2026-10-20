@@ -1,4 +1,5 @@
 package com.elhajri.noor.exams
+import com.elhajri.noor.settings.t
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext

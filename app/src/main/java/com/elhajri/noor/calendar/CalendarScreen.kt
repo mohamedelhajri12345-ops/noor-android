@@ -104,7 +104,7 @@ private fun computeFallbackHijri(cal: Calendar, months: List<String>, monthDays:
         currentDay += daysInPrev
     }
 
-    val weekdays = listOf("الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت")
+    val weekdays = listOf(t("الأحد", "Sun"), t("الإثنين", "Mon"), t("الثلاثاء", "Tue"), t("الأربعاء", "Wed"), t("الخميس", "Thu"), t("الجمعة", "Fri"), t("السبت", "Sat"))
     val dayOfWeekIdx = (cal.get(Calendar.DAY_OF_WEEK) - 1 + 7) % 7
     val weekdayName = weekdays.getOrElse(dayOfWeekIdx) { "" }
     val mName = months.getOrElse(currentMonthIdx) { "" }
@@ -340,7 +340,7 @@ fun CalendarScreen() {
                         .padding(bottom = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    listOf("الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت").forEach { d ->
+                    listOf(t("الأحد", "Sun"), t("الإثنين", "Mon"), t("الثلاثاء", "Tue"), t("الأربعاء", "Wed"), t("الخميس", "Thu"), t("الجمعة", "Fri"), t("السبت", "Sat")).forEach { d ->
                         Text(
                             text = d,
                             color = GoldSoft,

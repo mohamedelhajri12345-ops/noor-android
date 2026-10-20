@@ -1,5 +1,8 @@
 package com.elhajri.noor.games
 
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
 import android.content.Context
 import androidx.compose.animation.*
 import androidx.compose.ui.draw.clip
@@ -145,13 +148,13 @@ fun GenericQuizGameScreen(
                 }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "رجوع",
+                        contentDescription = t("رجوع", "Back"),
                         tint = Gold
                     )
                 }
 
                 Text(
-                    text = if (currentScreen == 1) "المرحلة ${(currentStageIndex + 1).toArabicDigits()}" else gameTitle,
+                    text = if (currentScreen == 1) t(t(t("المرحلة ${(currentStageIndex + 1).toArabicDigits()}", "Stage ${currentStageIndex + 1}"), "Stage ${currentStageIndex + 1}"), "Stage ${currentStageIndex + 1}") else gameTitle,
                     color = Gold,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -196,13 +199,13 @@ fun GenericQuizGameScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "خريطة المراحل (${totalStages.toArabicDigits()} مرحلة)",
+                                text = t(t(t("خريطة المراحل (${totalStages.toArabicDigits()} مرحلة)", "Stage Map (${totalStages} Stages)"), "Stage Map (${totalStages} Stages)"), "Stage Map (${totalStages} Stages)"),
                                 color = TextMain,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "المفتوحة: ${(bestStage - 1).coerceAtMost(totalStages).toArabicDigits()} / ${totalStages.toArabicDigits()}",
+                                text = t(t(t("المفتوحة: ${(bestStage - 1).coerceAtMost(totalStages).toArabicDigits()} / ${totalStages.toArabicDigits()}", "Unlocked: ${(bestStage - 1).coerceAtMost(totalStages)} / ${totalStages}"), "Unlocked: ${(bestStage - 1).coerceAtMost(totalStages)} / ${totalStages}"), "Unlocked: ${(bestStage - 1).coerceAtMost(totalStages)} / ${totalStages}"),
                                 color = GoldSoft,
                                 fontSize = 13.sp
                             )
@@ -289,7 +292,7 @@ fun GenericQuizGameScreen(
                             modifier = Modifier.fillMaxWidth().height(48.dp)
                         ) {
                             Text(
-                                text = "عرض شاشة الاحتفال والإنجاز",
+                                text = t(t(t("عرض شاشة الاحتفال والإنجاز", "Show Celebration & Achievement"), "Show Celebration & Achievement"), "Show Celebration & Achievement"),
                                 color = Navy,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold
@@ -441,7 +444,7 @@ fun GenericQuizGameScreen(
                                             )
                                             Spacer(modifier = Modifier.width(8.dp))
                                             Text(
-                                                text = if (isStageFailed) "توضيح وفائدة:" else "معلومة ذات صلة:",
+                                                text = if (isStageFailed) t(t(t("توضيح وفائدة:", "Explanation & Benefit:"), "Explanation & Benefit:"), "Explanation & Benefit:") else t(t(t("معلومة ذات صلة:", "Related Benefit:"), "Related Benefit:"), "Related Benefit:"),
                                                 color = if (isStageFailed) Color(0xFFFFB74D) else Gold,
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight.Bold
@@ -471,7 +474,7 @@ fun GenericQuizGameScreen(
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(
-                                            text = "إجابة صحيحة! أحسنت ✨",
+                                            text = t(t(t("إجابة صحيحة! أحسنت ✨", "Correct Answer! Well done ✨"), "Correct Answer! Well done ✨"), "Correct Answer! Well done ✨"),
                                             color = Gold,
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.Bold
@@ -514,7 +517,7 @@ fun GenericQuizGameScreen(
                                                 modifier = Modifier.weight(1.5f).height(46.dp)
                                             ) {
                                                 Text(
-                                                    text = if (currentStageIndex + 1 < totalStages) "المرحلة التالية" else "إنهاء الاختبار",
+                                                    text = if (currentStageIndex + 1 < totalStages) t(t(t("المرحلة التالية", "Next Stage"), "Next Stage"), "Next Stage") else t(t(t("إنهاء الاختبار", "Finish Quiz"), "Finish Quiz"), "Finish Quiz"),
                                                     color = Navy,
                                                     fontSize = 15.sp,
                                                     fontWeight = FontWeight.Bold
@@ -533,14 +536,14 @@ fun GenericQuizGameScreen(
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(
-                                            text = "لم تتجاوز المرحلة!",
+                                            text = t(t(t("لم تتجاوز المرحلة!", "Stage Not Passed!"), "Stage Not Passed!"), "Stage Not Passed!"),
                                             color = Color(0xFFEF5350),
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.Bold
                                         )
                                         Spacer(modifier = Modifier.height(6.dp))
                                         Text(
-                                            text = "استفد من المعلومة وحاول مرة أخرى",
+                                            text = t(t(t("استفد من المعلومة وحاول مرة أخرى", "Review the benefit and try again"), "Review the benefit and try again"), "Review the benefit and try again"),
                                             color = TextSecondaryLinen,
                                             fontSize = 13.sp
                                         )
@@ -565,7 +568,7 @@ fun GenericQuizGameScreen(
                                                 modifier = Modifier.weight(1.5f).height(46.dp)
                                             ) {
                                                 Text(
-                                                    text = "إعادة المحاولة",
+                                                    text = t(t(t("إعادة المحاولة", "Retry"), "Retry"), "Retry"),
                                                     color = Navy,
                                                     fontSize = 15.sp,
                                                     fontWeight = FontWeight.Bold
@@ -606,7 +609,7 @@ fun GenericQuizGameScreen(
                                 Spacer(modifier = Modifier.height(12.dp))
 
                                 Text(
-                                    text = "تهانينا! أكملت جميع المراحل بنجاح!",
+                                    text = t(t(t("تهانينا! أكملت جميع المراحل بنجاح!", "Congratulations! Completed all stages successfully!"), "Congratulations! Completed all stages successfully!"), "Congratulations! Completed all stages successfully!"),
                                     color = Gold,
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold,
@@ -627,7 +630,7 @@ fun GenericQuizGameScreen(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "مجموع النجوم المكتسبة:",
+                                            text = t(t(t("مجموع النجوم المكتسبة:", "Total Stars Earned:"), "Total Stars Earned:"), "Total Stars Earned:"),
                                             color = TextSecondaryLinen,
                                             fontSize = 14.sp
                                         )
@@ -663,7 +666,7 @@ fun GenericQuizGameScreen(
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(
-                                            text = "إعادة من جديد",
+                                            text = t(t(t("إعادة من جديد", "Start Over"), "Start Over"), "Start Over"),
                                             color = Navy,
                                             fontSize = 16.sp,
                                             fontWeight = FontWeight.Bold
@@ -688,7 +691,7 @@ fun GenericQuizGameScreen(
                 stageNumber = currentStageIndex + 1,
                 totalStages = totalStages,
                 stars = earnedStars,
-                stageTitle = currentQ?.fact?.ifBlank { "المرحلة ${(currentStageIndex + 1).toArabicDigits()}" } ?: "",
+                stageTitle = currentQ?.fact?.ifBlank { t(t(t("المرحلة ${(currentStageIndex + 1).toArabicDigits()}", "Stage ${currentStageIndex + 1}"), "Stage ${currentStageIndex + 1}"), "Stage ${currentStageIndex + 1}") } ?: "",
                 onNextStage = if (currentStageIndex < totalStages - 1) {
                     {
                         startStage(currentStageIndex + 1)

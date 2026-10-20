@@ -83,7 +83,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "مرحباً بعودتك",
+                    text = t("مرحباً بعودتك", "Welcome Back"),
                     style = MaterialTheme.typography.headlineLarge,
                     color = Gold,
                     fontWeight = FontWeight.Bold
@@ -200,7 +200,7 @@ fun LoginScreen(
                                     res.fold(
                                         onSuccess = { onSuccess() },
                                         onFailure = { err ->
-                                            errorMessage = err.message ?: "خطأ في تسجيل الدخول"
+                                            errorMessage = err.message ?: t("خطأ في تسجيل الدخول", "Login Error")
                                             snackbarHostState.showSnackbar(errorMessage!!)
                                         }
                                     )

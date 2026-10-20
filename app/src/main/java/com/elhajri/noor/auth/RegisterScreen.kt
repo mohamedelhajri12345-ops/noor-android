@@ -94,7 +94,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "إنشاء حساب جديد",
+                    text = t("إنشاء حساب جديد", "Create New Account"),
                     style = MaterialTheme.typography.headlineLarge,
                     color = Gold,
                     fontWeight = FontWeight.Bold
@@ -203,7 +203,7 @@ fun RegisterScreen(
                                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                     Icon(
                                         imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                        contentDescription = if (passwordVisible) "إخفاء كلمة المرور" else "إظهار كلمة المرور",
+                                        contentDescription = if (passwordVisible) t("إخفاء كلمة المرور", "Hide Password") else t("إظهار كلمة المرور", "Show Password"),
                                         tint = Gold
                                     )
                                 }
@@ -240,7 +240,7 @@ fun RegisterScreen(
                                 IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                                     Icon(
                                         imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                        contentDescription = if (confirmPasswordVisible) "إخفاء كلمة المرور" else "إظهار كلمة المرور",
+                                        contentDescription = if (confirmPasswordVisible) t("إخفاء كلمة المرور", "Hide Password") else t("إظهار كلمة المرور", "Show Password"),
                                         tint = Gold
                                     )
                                 }

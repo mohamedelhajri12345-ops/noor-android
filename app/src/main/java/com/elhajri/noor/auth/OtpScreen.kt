@@ -95,7 +95,7 @@ fun OtpScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "أدخل رمز التحقق",
+                    text = t("أدخل رمز التحقق", "Enter Verification Code"),
                     style = MaterialTheme.typography.headlineLarge,
                     color = Gold,
                     fontWeight = FontWeight.Bold,
@@ -103,7 +103,7 @@ fun OtpScreen(
                 )
 
                 Text(
-                    text = if (email.isNotBlank()) "تم إرسال رمز التحقق إلى $email" else "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
+                    text = if (email.isNotBlank()) "تم إرسال رمز التحقق إلى $email" else t("تم إرسال رمز التحقق إلى بريدك الإلكتروني", "A verification code has been sent to your email"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = GoldSoft.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center,
@@ -138,7 +138,7 @@ fun OtpScreen(
                                     )
                                     Spacer(modifier = Modifier.height(12.dp))
                                     Text(
-                                        text = "تم التحقق بنجاح!",
+                                        text = t("تم التحقق بنجاح!", "Verified successfully!"),
                                         color = Gold,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 18.sp
@@ -296,7 +296,7 @@ fun OtpScreen(
                                     )
                                 } else {
                                     Text(
-                                        text = "إعادة إرسال الرمز",
+                                        text = t("إعادة إرسال الرمز", "Resend Code"),
                                         color = Gold,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 14.sp

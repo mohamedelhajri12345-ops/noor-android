@@ -1,5 +1,8 @@
 package com.elhajri.noor.games
 
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,69 +51,74 @@ import com.elhajri.noor.ui.themeScreenBackground
 
 private data class GameEntry(
     val route: String,
-    val title: String,
-    val desc: String,
+    val titleAr: String,
+    val titleEn: String,
+    val descAr: String,
+    val descEn: String,
     val icon: ImageVector,
     val isNew: Boolean,
     /** Distinct accent per game, chosen from the app's green/gold identity palette. */
     val accent: Long,
     /** Category filter: knowledge, memory, order, letters, skill, content */
     val category: String = "knowledge"
-)
+) {
+    val title: String get() = t(titleAr, titleEn)
+    val desc: String get() = t(descAr, descEn)
+}
 
 private val games = listOf(
-    GameEntry("videos", "مكتبة الفيديو للأطفال", "قصص الأنبياء، الأناشيد، وسير القرآن للأطفال", Icons.Default.OndemandVideo, true, 0xffd9a943, "content"),
-    GameEntry("game_kalimat", "كلمة من الذكر", "لغز اليوم: تخمّن اسم الله الحسنى في ٦ محاولات", Icons.Default.WbTwilight, true, 0xff6fbf8b, "letters"),
-    GameEntry("game_trivia", "ميدان المعرفة", "سلم ذهبي من ١٠ أسئلة بوسائل مساعدة إيمانية", Icons.Default.EmojiEvents, true, 0xffc5a028, "knowledge"),
-    GameEntry("game_ayat", "سلسلة الآيات", "رتّب آيات السورة في مواضعها واستمع للتلاوة", Icons.Default.Timer, true, 0xff8ecfc4, "order"),
-    GameEntry("game_match", "رباط معاني الله", "طابق أسماء الله الحسنى بمعانيها — ذاكرة ومطابقة", Icons.Default.Flip, true, 0xff9dbf6e, "memory"),
-    GameEntry("game_timeline", "خط الزمن النبوي", "رتّب أحداث السيرة والتاريخ الإسلامي زمنياً", Icons.Default.Psychology, true, 0xffc98b5e, "order"),
-    GameEntry("game_tartil", "مرآة الترتيل", "أكمل الكلمة المغطاة وثبّت حفظك بالنجوم", Icons.Default.GridOn, true, 0xff7fb2a6, "knowledge"),
-    GameEntry("game_prophets_order", "ترتيب الأنبياء", "رتّب الأنبياء حسب الترتيب الزمني عبر ٢٥ مستوى", Icons.Default.FormatListNumbered, true, 0xffd4b85c, "order"),
-    GameEntry("game_true_false", "صح أم خطأ", "١٢٠+ سؤالاً إيمانياً مع نظام القلوب والمستويات", Icons.Default.Check, true, 0xff86b79b, "knowledge"),
-    GameEntry("game_numbers_quiz", "اختبار الأرقام", "٥٠+ سؤالاً عن الأعداد في القرآن والسنة", Icons.Default.Calculate, true, 0xffb39a55, "knowledge"),
-    GameEntry("game_quran_mem", "حفظ القرآن", "تابع حفظ ١١٤ سورة واختبر معلوماتك عبر ١٥ مستوى", Icons.Default.MenuBook, true, 0xffa3c9a0, "knowledge"),
-    GameEntry("game_names_allah", "الأسماء الحسنى", "دليل ٩٩ اسماً واختبارات الإتقان والربط", Icons.Default.AutoAwesome, true, 0xffc7a85b, "knowledge"),
-    GameEntry("game_prophets_journey", "رحلة الأنبياء", "١٥ محطة وقصة عن أنبياء الله ورسله", Icons.Default.LocationOn, true, 0xffd0a93f, "knowledge"),
+    GameEntry("videos", "مكتبة الفيديو للأطفال", "Kids Video Library", "قصص الأنبياء، الأناشيد، وسير القرآن للأطفال", "Prophets' stories, nasheeds, and Quranic stories for kids", Icons.Default.OndemandVideo, true, 0xffd9a943, "content"),
+    GameEntry("game_kalimat", "كلمة من الذكر", "Dhikr Word", "لغز اليوم: تخمّن اسم الله الحسنى في ٦ محاولات", "Daily puzzle: Guess Allah's Name in 6 attempts", Icons.Default.WbTwilight, true, 0xff6fbf8b, "letters"),
+    GameEntry("game_trivia", "ميدان المعرفة", "Knowledge Arena", "سلم ذهبي من ١٠ أسئلة بوسائل مساعدة إيمانية", "Golden ladder of 10 questions with lifelines", Icons.Default.EmojiEvents, true, 0xffc5a028, "knowledge"),
+    GameEntry("game_ayat", "سلسلة الآيات", "Ayah Chain", "رتّب آيات السورة في مواضعها واستمع للتلاوة", "Arrange surah verses in order and listen to recitation", Icons.Default.Timer, true, 0xff8ecfc4, "order"),
+    GameEntry("game_match", "رباط معاني الله", "Allah's Names & Meanings", "طابق أسماء الله الحسنى بمعانيها — ذاكرة ومطابقة", "Match Allah's Names with their meanings", Icons.Default.Flip, true, 0xff9dbf6e, "memory"),
+    GameEntry("game_timeline", "خط الزمن النبوي", "Prophetic Timeline", "رتّب أحداث السيرة والتاريخ الإسلامي زمنياً", "Order Seerah & Islamic history events chronologically", Icons.Default.Psychology, true, 0xffc98b5e, "order"),
+    GameEntry("game_tartil", "مرآة الترتيل", "Tartil Mirror", "أكمل الكلمة المغطاة وثبّت حفظك بالنجوم", "Fill in covered words and consolidate memorization", Icons.Default.GridOn, true, 0xff7fb2a6, "knowledge"),
+    GameEntry("game_prophets_order", "ترتيب الأنبياء", "Prophets Order", "رتّب الأنبياء حسب الترتيب الزمني عبر ٢٥ مستوى", "Order prophets chronologically across 25 levels", Icons.Default.FormatListNumbered, true, 0xffd4b85c, "order"),
+    GameEntry("game_true_false", "صح أم خطأ", "True or False", "١٢٠+ سؤالاً إيمانياً مع نظام القلوب والمستويات", "120+ faith questions with hearts & level system", Icons.Default.Check, true, 0xff86b79b, "knowledge"),
+    GameEntry("game_numbers_quiz", "اختبار الأرقام", "Numbers Quiz", "٥٠+ سؤالاً عن الأعداد في القرآن والسنة", "50+ questions on numbers in Quran and Sunnah", Icons.Default.Calculate, true, 0xffb39a55, "knowledge"),
+    GameEntry("game_quran_mem", "حفظ القرآن", "Quran Memorization", "تابع حفظ ١١٤ سورة واختبر معلوماتك عبر ١٥ مستوى", "Track 114 surahs and test knowledge across 15 levels", Icons.Default.MenuBook, true, 0xffa3c9a0, "knowledge"),
+    GameEntry("game_names_allah", "الأسماء الحسنى", "Names of Allah", "دليل ٩٩ اسماً واختبارات الإتقان والربط", "Guide to 99 Names with mastery tests", Icons.Default.AutoAwesome, true, 0xffc7a85b, "knowledge"),
+    GameEntry("game_prophets_journey", "رحلة الأنبياء", "Prophets' Journey", "١٥ محطة وقصة عن أنبياء الله ورسله", "15 stations and stories of Allah's Prophets", Icons.Default.LocationOn, true, 0xffd0a93f, "knowledge"),
     // ===== Batch 2: interactive & knowledge games =====
-    GameEntry("game_word_search", "صيد الكلمات", "ابحث عن كلمات الذكر داخل شبكة الحروف", Icons.Default.Search, true, 0xff8ecfc4, "skill"),
-    GameEntry("game_tawaf", "ترتيب الطواف", "رتّب خطوات الطواف والعمرة بترتيبها الصحيح", Icons.Default.Mosque, true, 0xffd9a943, "order"),
-    GameEntry("game_wudu", "تحدي الوضوء", "رتّب خطوات الوضوء قبل انتهاء الوقت", Icons.Default.WaterDrop, true, 0xff7fb2a6, "order"),
-    GameEntry("game_prayer_order", "ترتيب الصلاة", "رتّب أركان الصلاة خطوة بخطوة", Icons.Default.Schedule, true, 0xffc5a028, "order"),
-    GameEntry("game_duas_chain", "سلسلة الأدعية", "أكمل أدعية النبي ﷺ من بين الخيارات", Icons.Default.Star, true, 0xff9dbf6e, "knowledge"),
-    GameEntry("game_deeds_balance", "ميزان الحسنات", "اختر العمل الأعظم أجراً بدليله", Icons.Default.Balance, true, 0xffc98b5e, "knowledge"),
-    GameEntry("game_hijri_months", "سنة هجرية", "رتّب الأشهر الهجرية في مواضعها", Icons.Default.CalendarMonth, true, 0xff86b79b, "order"),
-    GameEntry("game_juz_order", "ترتيب الأجزاء", "رتّب السور حسب موضعها في المصحف", Icons.Default.MenuBook, true, 0xffa3c9a0, "order"),
-    GameEntry("game_lantern_memory", "فوانيس الذاكرة", "تذكر تتابع الفوانيس وكرّره", Icons.Default.DarkMode, true, 0xffd4b85c, "memory"),
-    GameEntry("game_isra", "رحلة الإسراء والمعراج", "اجتز محطات الرحلة المباركة بترتيبها", Icons.Default.LocationOn, true, 0xffb39a55, "order"),
-    GameEntry("game_wisdom_pearls", "لؤلؤة الحكمة", "طابق الحديث النبوي ببابه وموضوعه", Icons.Default.Psychology, true, 0xff7fb2a6, "knowledge"),
-    GameEntry("game_zakat_calc", "عداد الزكاة", "احسب زكاة المال والذهب بنسبة صحيحة", Icons.Default.Money, true, 0xffc7a85b, "knowledge"),
-    GameEntry("game_hijri_dates", "لغز التواريخ", "طابق المناسبة الإسلامية بشهرها الهجري", Icons.Default.Event, true, 0xff8ecfc4, "knowledge"),
-    GameEntry("game_angels_unseen", "عالم الغيب", "أسئلة عن الملائكة والآخرة وعالم الغيب", Icons.Default.Visibility, true, 0xff9dbf6e, "knowledge"),
-    GameEntry("game_fasting_rules", "فقه الصيام", "أحكام الصيام: صح أم خطأ بدليلها", Icons.Default.LocalFireDepartment, true, 0xffc98b5e, "knowledge"),
-    GameEntry("game_kindness_tap", "قطاف الأخلاق", "اختر الخلق النبوي قبل انتهاء الوقت", Icons.Default.TouchApp, true, 0xffd0a93f, "skill"),
+    GameEntry("game_word_search", "صيد الكلمات", "Word Search", "ابحث عن كلمات الذكر داخل شبكة الحروف", "Find Dhikr words inside the letter grid", Icons.Default.Search, true, 0xff8ecfc4, "skill"),
+    GameEntry("game_tawaf", "ترتيب الطواف", "Tawaf Order", "رتّب خطوات الطواف والعمرة بترتيبها الصحيح", "Arrange Tawaf and Umrah steps in order", Icons.Default.Mosque, true, 0xffd9a943, "order"),
+    GameEntry("game_wudu", "تحدي الوضوء", "Wudu Challenge", "رتّب خطوات الوضوء قبل انتهاء الوقت", "Order Wudu steps before time runs out", Icons.Default.WaterDrop, true, 0xff7fb2a6, "order"),
+    GameEntry("game_prayer_order", "ترتيب الصلاة", "Prayer Order", "رتّب أركان الصلاة خطوة بخطوة", "Arrange prayer pillars step by step", Icons.Default.Schedule, true, 0xffc5a028, "order"),
+    GameEntry("game_duas_chain", "سلسلة الأدعية", "Dua Chain", "أكمل أدعية النبي ﷺ من بين الخيارات", "Complete Prophet's duas from options", Icons.Default.Star, true, 0xff9dbf6e, "knowledge"),
+    GameEntry("game_deeds_balance", "ميزان الحسنات", "Deeds Balance", "اختر العمل الأعظم أجراً بدليله", "Choose the greater reward deed with evidence", Icons.Default.Balance, true, 0xffc98b5e, "knowledge"),
+    GameEntry("game_hijri_months", "سنة هجرية", "Hijri Year", "رتّب الأشهر الهجرية في مواضعها", "Order Hijri months in their positions", Icons.Default.CalendarMonth, true, 0xff86b79b, "order"),
+    GameEntry("game_juz_order", "ترتيب الأجزاء", "Juz Order", "رتّب السور حسب موضعها في المصحف", "Arrange surahs by position in Quran", Icons.Default.MenuBook, true, 0xffa3c9a0, "order"),
+    GameEntry("game_lantern_memory", "فوانيس الذاكرة", "Lantern Memory", "تذكر تتابع الفوانيس وكرّره", "Remember the lantern sequence and repeat it", Icons.Default.DarkMode, true, 0xffd4b85c, "memory"),
+    GameEntry("game_isra", "رحلة الإسراء والمعراج", "Isra & Mi'raj Journey", "اجتز محطات الرحلة المباركة بترتيبها", "Pass stations of the blessed journey in order", Icons.Default.LocationOn, true, 0xffb39a55, "order"),
+    GameEntry("game_wisdom_pearls", "لؤلؤة الحكمة", "Wisdom Pearls", "طابق الحديث النبوي ببابه وموضوعه", "Match Hadith with its chapter and topic", Icons.Default.Psychology, true, 0xff7fb2a6, "knowledge"),
+    GameEntry("game_zakat_calc", "عداد الزكاة", "Zakat Calculator", "احسب زكاة المال والذهب بنسبة صحيحة", "Calculate Zakat on wealth and gold accurately", Icons.Default.Money, true, 0xffc7a85b, "knowledge"),
+    GameEntry("game_hijri_dates", "لغز التواريخ", "Islamic Dates Puzzle", "طابق المناسبة الإسلامية بشهرها الهجري", "Match Islamic occasion with Hijri month", Icons.Default.Event, true, 0xff8ecfc4, "knowledge"),
+    GameEntry("game_angels_unseen", "عالم الغيب", "Realm of the Unseen", "أسئلة عن الملائكة والآخرة وعالم الغيب", "Questions on angels, hereafter & the unseen", Icons.Default.Visibility, true, 0xff9dbf6e, "knowledge"),
+    GameEntry("game_fasting_rules", "فقه الصيام", "Fasting Rules", "أحكام الصيام: صح أم خطأ بدليلها", "Fasting rules: True/False with evidence", Icons.Default.LocalFireDepartment, true, 0xffc98b5e, "knowledge"),
+    GameEntry("game_kindness_tap", "قطاف الأخلاق", "Prophetic Manners", "اختر الخلق النبوي قبل انتهاء الوقت", "Select Prophetic manners before time ends", Icons.Default.TouchApp, true, 0xffd0a93f, "skill"),
     // ===== Batch 3: engine-based games =====
-    GameEntry("game_quiz_doctrine", "اختبار العقيدة", "٣٠ سؤالاً في العقيدة والتوحيد", Icons.Default.MenuBook, true, 0xff6fbf8b, "knowledge"),
-    GameEntry("game_quiz_fiqh", "اختبار الفقه", "أسئلة في فقه العبادات والمعاملات", Icons.Default.MenuBook, true, 0xffc5a028, "knowledge"),
-    GameEntry("game_quiz_sirah", "اختبار السيرة", "وقفات وعبر من سيرة الحبيب ﷺ", Icons.Default.Psychology, true, 0xff9dbf6e, "knowledge"),
-    GameEntry("game_quiz_companions", "اختبار الصحابة", "٣٠ سؤالاً عن جيل الصحابة الكرام", Icons.Default.EmojiEvents, true, 0xff8ecfc4, "knowledge"),
-    GameEntry("game_quiz_ramadan", "اختبار رمضان", "كل ما يخص شهر رمضان المبارك", Icons.Default.LocalFireDepartment, true, 0xffd9a943, "knowledge"),
-    GameEntry("game_quiz_hajj", "اختبار الحج والعمرة", "مناسك الحج والعمرة خطوة بخطوة", Icons.Default.Mosque, true, 0xffb39a55, "knowledge"),
-    GameEntry("game_match_names_meaning", "مطابقة الأسماء ومعانيها", "طابق الاسم بمعناه من ١٥ زوجاً", Icons.Default.Flip, true, 0xff7fb2a6, "memory"),
-    GameEntry("game_match_surah_topics", "مطابقة السور ومقاصدها", "طابق السورة بمقصدها الأساسي", Icons.Default.MenuBook, true, 0xffa3c9a0, "memory"),
-    GameEntry("game_match_worship", "مطابقة العبادات والأركان", "أركان الإسلام والعبادات وأزواجها", Icons.Default.Star, true, 0xffd4b85c, "memory"),
-    GameEntry("game_match_athkar_times", "مطابقة الأذكار وأوقاتها", "ذكر الصباح والمساء وأوقاته", Icons.Default.WbTwilight, true, 0xff86b79b, "memory"),
-    GameEntry("game_match_mosque_cities", "مطابقة المساجد ومدنها", "المساجد العريقة ومدنها حول العالم", Icons.Default.LocationOn, true, 0xffc98b5e, "memory"),
-    GameEntry("game_match_islamic_months", "مطابقة الأشهر ومناسباتها", "طابق الشهر الهجري بمناسبته", Icons.Default.CalendarMonth, true, 0xff8ecfc4, "memory"),
-    GameEntry("game_scramble_prophets", "حروف الأنبياء", "رتّب حروف أسماء الأنبياء عليهم السلام", Icons.Default.MenuBook, true, 0xffc7a85b, "letters"),
-    GameEntry("game_scramble_surahs", "حروف السور", "رتّب حروف أسماء سور القرآن", Icons.Default.MenuBook, true, 0xff6fbf8b, "letters"),
-    GameEntry("game_scramble_names_allah", "حروف الأسماء الحسنى", "رتّب حروف أسماء الله الحسنى", Icons.Default.AutoAwesome, true, 0xffd4b85c, "letters"),
-    GameEntry("game_scramble_ramadan", "حروف رمضان", "رتّب مصطلحات وأحكام شهر الصيام", Icons.Default.LocalFireDepartment, true, 0xffc98b5e, "letters"),
-    GameEntry("game_quiz_athkar", "اختبار الأذكار", "أذكار الصباح والمساء والاستيقاظ", Icons.Default.WbTwilight, true, 0xff86b79b, "knowledge"),
-    GameEntry("game_quiz_manners", "اختبار الآداب", "آداب الطعام والشراب والسلام والاستئذان", Icons.Default.TouchApp, true, 0xffd0a93f, "knowledge"),
-    GameEntry("game_quiz_mosques", "اختبار المساجد", "تاريخ ومعالم المساجد المزارة عبر التاريخ", Icons.Default.Mosque, true, 0xffb39a55, "knowledge"),
-    GameEntry("game_quiz_prophets", "اختبار قصص الأنبياء", "معجزات ومواقف أنبياء الله ورسله", Icons.Default.LocationOn, true, 0xffd0a93f, "knowledge"),
-    GameEntry("game_quiz_quran_stories", "اختبار قصص القرآن", "أصحاب الكهف، ذو القرنين، وقصص العبرة", Icons.Default.MenuBook, true, 0xffa3c9a0, "knowledge")
+    GameEntry("game_quiz_doctrine", "اختبار العقيدة", "Aqeedah Quiz", "٣٠ سؤالاً في العقيدة والتوحيد", "30 questions on Aqeedah and Tawheed", Icons.Default.MenuBook, true, 0xff6fbf8b, "knowledge"),
+    GameEntry("game_quiz_fiqh", "اختبار الفقه", "Fiqh Quiz", "أسئلة في فقه العبادات والمعاملات", "Questions on Fiqh of worship and transactions", Icons.Default.MenuBook, true, 0xffc5a028, "knowledge"),
+    GameEntry("game_quiz_sirah", "اختبار السيرة", "Seerah Quiz", "وقفات وعبر من سيرة الحبيب ﷺ", "Lessons from the life of Prophet Muhammad ﷺ", Icons.Default.Psychology, true, 0xff9dbf6e, "knowledge"),
+    GameEntry("game_quiz_companions", "اختبار الصحابة", "Companions Quiz", "٣٠ سؤالاً عن جيل الصحابة الكرام", "30 questions on the noble Companions", Icons.Default.EmojiEvents, true, 0xff8ecfc4, "knowledge"),
+    GameEntry("game_quiz_ramadan", "اختبار رمضان", "Ramadan Quiz", "كل ما يخص شهر رمضان المبارك", "Everything about the blessed month of Ramadan", Icons.Default.LocalFireDepartment, true, 0xffd9a943, "knowledge"),
+    GameEntry("game_quiz_hajj", "اختبار الحج والعمرة", "Hajj & Umrah Quiz", "مناسك الحج والعمرة خطوة بخطوة", "Rites of Hajj and Umrah step by step", Icons.Default.Mosque, true, 0xffb39a55, "knowledge"),
+    GameEntry("game_match_names_meaning", "مطابقة الأسماء ومعانيها", "Names & Meanings Match", "طابق الاسم بمعناه من ١٥ زوجاً", "Match Allah's Name with meaning across 15 pairs", Icons.Default.Flip, true, 0xff7fb2a6, "memory"),
+    GameEntry("game_match_surah_topics", "مطابقة السور ومقاصدها", "Surah Topics Match", "طابق السورة بمقصدها الأساسي", "Match surah with its main theme", Icons.Default.MenuBook, true, 0xffa3c9a0, "memory"),
+    GameEntry("game_match_worship", "مطابقة العبادات والأركان", "Worship Pillars Match", "أركان الإسلام والعبادات وأزواجها", "Pillars of Islam and worship pairs", Icons.Default.Star, true, 0xffd4b85c, "memory"),
+    GameEntry("game_match_athkar_times", "مطابقة الأذكار وأوقاتها", "Adhkar Times Match", "ذكر الصباح والمساء وأوقاته", "Morning & Evening Adhkar and times", Icons.Default.WbTwilight, true, 0xff86b79b, "memory"),
+    GameEntry("game_match_mosque_cities", "مطابقة المساجد ومدنها", "Mosques & Cities Match", "المساجد العريقة ومدنها حول العالم", "Historic mosques and their cities worldwide", Icons.Default.LocationOn, true, 0xffc98b5e, "memory"),
+    GameEntry("game_match_islamic_months", "مطابقة الأشهر ومناسباتها", "Islamic Months Match", "طابق الشهر الهجري بمناسبته", "Match Hijri month with its occasion", Icons.Default.CalendarMonth, true, 0xff8ecfc4, "memory"),
+    GameEntry("game_scramble_prophets", "حروف الأنبياء", "Prophets Scramble", "رتّب حروف أسماء الأنبياء عليهم السلام", "Unscramble names of the Prophets", Icons.Default.MenuBook, true, 0xffc7a85b, "letters"),
+    GameEntry("game_scramble_surahs", "حروف السور", "Surah Names Scramble", "رتّب حروف أسماء سور القرآن", "Unscramble names of Quran Surahs", Icons.Default.MenuBook, true, 0xff6fbf8b, "letters"),
+    GameEntry("game_scramble_names_allah", "حروف الأسماء الحسنى", "Allah's Names Scramble", "رتّب حروف أسماء الله الحسنى", "Unscramble Allah's Beautiful Names", Icons.Default.AutoAwesome, true, 0xffd4b85c, "letters"),
+    GameEntry("game_scramble_ramadan", "حروف رمضان", "Ramadan Terms Scramble", "رتّب مصطلحات وأحكام شهر الصيام", "Unscramble Ramadan terms & rules", Icons.Default.LocalFireDepartment, true, 0xffc98b5e, "letters"),
+    GameEntry("game_quiz_athkar", "اختبار الأذكار", "Adhkar Quiz", "أذكار الصباح والمساء والاستيقاظ", "Morning, evening and waking Adhkar", Icons.Default.WbTwilight, true, 0xff86b79b, "knowledge"),
+    GameEntry("game_quiz_manners", "اختبار الآداب", "Islamic Manners Quiz", "آداب الطعام والشراب والسلام والاستئذان", "Manners of eating, greeting and seeking permission", Icons.Default.TouchApp, true, 0xffd0a93f, "knowledge"),
+    GameEntry("game_quiz_mosques", "اختبار المساجد", "Mosques Quiz", "تاريخ ومعالم المساجد المزارة عبر التاريخ", "History and landmarks of sacred mosques", Icons.Default.Mosque, true, 0xffb39a55, "knowledge"),
+    GameEntry("game_quiz_prophets", "اختبار قصص الأنبياء", "Prophets Stories Quiz", "معجزات ومواقف أنبياء الله ورسله", "Miracles and stories of Allah's Prophets", Icons.Default.LocationOn, true, 0xffd0a93f, "knowledge"),
+    GameEntry("game_quiz_quran_stories", "اختبار قصص القرآن", "Quran Stories Quiz", "أصحاب الكهف، ذو القرنين، وقصص العبرة", "People of the Cave, Dhul-Qarnayn & lessons", Icons.Default.MenuBook, true, 0xffa3c9a0, "knowledge")
 )
 
 @Composable
@@ -132,8 +140,13 @@ fun NoorGameHub(
     val hintCount = remember(showStarShop) { StarEconomyStore.getHintCount(context) }
 
     val categories = listOf(
-        "الكل" to "", "معرفة" to "knowledge", "ذاكرة ومطابقة" to "memory",
-        "ترتيب" to "order", "حروف" to "letters", "مهارة" to "skill", "فيديو" to "content"
+        t("الكل", "All") to "",
+        t("معرفة", "Knowledge") to "knowledge",
+        t("ذاكرة ومطابقة", "Memory") to "memory",
+        t("ترتيب", "Ordering") to "order",
+        t("حروف", "Letters") to "letters",
+        t("مهارة", "Skill") to "skill",
+        t("فيديو", "Video") to "content"
     )
     var selectedCategory by remember { mutableStateOf("") }
     val visibleGames = if (selectedCategory.isEmpty()) games else games.filter { it.category == selectedCategory }
@@ -168,12 +181,12 @@ fun NoorGameHub(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = t("رجوع", "Back"), tint = Gold)
                         }
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("ميدان نور الإيماني", color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                            Text("ألعاب الذكر والحكمة والتحدي التفاعلي", color = GoldSoft, fontSize = 11.sp)
+                            Text(t("ميدان نور الإيماني", "NOOR Faith Games"), color = Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                            Text(t("ألعاب الذكر والحكمة والتحدي التفاعلي", "Interactive Dhikr, Wisdom & Challenge Games"), color = GoldSoft, fontSize = 11.sp)
                         }
 
                         // Currency Pill (Stars & Hints)
@@ -221,7 +234,7 @@ fun NoorGameHub(
                     ) {
                         Icon(Icons.Default.ShoppingBag, contentDescription = null, tint = Navy, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("متجر النجوم وتفعيل إطارات البطاقات 👑", color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text(t("متجر النجوم وتفعيل إطارات البطاقات 👑", "Star Shop & Frame Customization 👑"), color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(Modifier.height(12.dp))
@@ -293,7 +306,7 @@ fun NoorGameHub(
                                 .background(accent)
                                 .padding(horizontal = 10.dp, vertical = 2.dp)
                         ) {
-                            Text("جديد", color = Color(0xFF0B1120), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            Text(t("جديد", "NEW"), color = Color(0xFF0B1120), fontSize = 9.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }

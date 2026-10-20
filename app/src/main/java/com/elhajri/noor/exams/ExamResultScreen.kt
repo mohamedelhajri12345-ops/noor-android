@@ -1,4 +1,5 @@
 package com.elhajri.noor.exams
+import com.elhajri.noor.settings.t
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -61,12 +62,12 @@ fun ExamResultScreen(
                 IconButton(onClick = onBackToMap) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "العودة للخريطة",
+                        contentDescription = t("العودة للخريطة", "Back to Map"),
                         tint = Gold
                     )
                 }
                 Text(
-                    text = "تحليل نتيجة الاختبار",
+                    text = t("تحليل نتيجة الاختبار", "Exam Result Analysis"),
                     color = Gold,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -100,7 +101,7 @@ fun ExamResultScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = if (result.passed) "مبارك! لقد اجتزت الاختبار بنجاح" else "لم تجتز الاختبار هذه المرة",
+                        text = if (result.passed) t("مبارك! لقد اجتزت الاختبار بنجاح", "Congratulations! You passed the exam successfully") else t("لم تجتز الاختبار هذه المرة", "You did not pass the exam this time"),
                         color = if (result.passed) Gold else Color.Red,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,

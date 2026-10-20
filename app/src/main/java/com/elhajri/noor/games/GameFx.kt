@@ -1,5 +1,7 @@
 package com.elhajri.noor.games
 
+import com.elhajri.noor.settings.t
+
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -189,7 +191,7 @@ fun WinCelebrationOverlay(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "🎉 أحسنت! إنجاز مبارك",
+                text = t("🎉 أحسنت! إنجاز مبارك", "🎉 Well done! Blessed achievement"),
                 color = Gold,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -199,7 +201,7 @@ fun WinCelebrationOverlay(
             if (stageNumber > 0) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "أتممت المرحلة ${stageNumber.toArabicDigits()}" + if (totalStages > 0) " من ${totalStages.toArabicDigits()}" else "",
+                    text = t(t(t("أتممت المرحلة ${stageNumber.toArabicDigits()}", "Completed Stage ${stageNumber.toString()}"), "Completed Stage ${stageNumber.toString()}"), "Completed Stage ${stageNumber.toString()}") + if (totalStages > 0) t(t(t(" من ${totalStages.toArabicDigits()}", " of ${totalStages.toString()}"), " of ${totalStages.toString()}"), " of ${totalStages.toString()}") else "",
                     color = TextMain,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -258,7 +260,7 @@ fun WinCelebrationOverlay(
                 onClick = {
                     AchievementCardGenerator.shareAchievementCard(
                         context = context,
-                        gameTitle = stageTitle.ifBlank { "ألعاب نور الإيمانية" },
+                        gameTitle = stageTitle.ifBlank { t(t(t("ألعاب نور الإيمانية", "NOOR Faith Games"), "NOOR Faith Games"), "NOOR Faith Games") },
                         levelNumber = stageNumber,
                         starsEarned = stars,
                         scoreGained = 50,
@@ -277,7 +279,7 @@ fun WinCelebrationOverlay(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "مشاركة الإنجاز إلى واتساب 📲",
+                    text = t("مشاركة الإنجاز إلى واتساب 📲", "Share Achievement to WhatsApp 📲"),
                     color = Color.White,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -295,7 +297,7 @@ fun WinCelebrationOverlay(
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Text(
-                        text = "المرحلة التالية",
+                        text = t("المرحلة التالية", "Next Level"),
                         color = Navy,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
@@ -322,7 +324,7 @@ fun WinCelebrationOverlay(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "إعادة",
+                        text = t("إعادة", "Replay"),
                         color = Gold,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold
@@ -336,7 +338,7 @@ fun WinCelebrationOverlay(
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Text(
-                        text = "المراحل",
+                        text = t("المراحل", "Levels Map"),
                         color = GoldSoft,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold
@@ -376,7 +378,7 @@ fun StreakCounterFlameHeader(
     ) {
         Icon(
             imageVector = Icons.Default.LocalFireDepartment,
-            contentDescription = "سلسلة الإنجاز",
+            contentDescription = t(t(t("سلسلة الإنجاز", "Streak of Achievement"), "Streak of Achievement"), "Streak of Achievement"),
             tint = Color(0xFFFF9800),
             modifier = Modifier
                 .size(20.dp)

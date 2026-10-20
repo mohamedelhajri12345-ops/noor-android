@@ -1,4 +1,5 @@
 package com.elhajri.noor.exams
+import com.elhajri.noor.settings.t
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -174,7 +175,7 @@ fun ExamPlayScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "إنهاء الاختبار",
+                        contentDescription = t("إنهاء الاختبار", "Finish Exam"),
                         tint = Gold
                     )
                 }
@@ -364,7 +365,7 @@ fun ExamPlayScreen(
                 ) {
                     Column {
                         Text(
-                            text = if (selectedOptionIdx == currentQ.correct) "إجابة صحيحة! أحسنت." else "إجابة خاطئة!",
+                            text = if (selectedOptionIdx == currentQ.correct) t("إجابة صحيحة! أحسنت.", "Correct answer! Well done.") else t("إجابة خاطئة!", "Incorrect answer!"),
                             color = if (selectedOptionIdx == currentQ.correct) Color.Green else Color.Red,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp

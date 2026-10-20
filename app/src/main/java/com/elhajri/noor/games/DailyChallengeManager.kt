@@ -1,5 +1,7 @@
 package com.elhajri.noor.games
 
+import com.elhajri.noor.settings.t
+
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.foundation.background
@@ -61,18 +63,18 @@ object DailyChallengeManager {
 
     // Curated catalog of candidate games for daily challenge rotation
     val DAILY_GAME_CATALOG = listOf(
-        DailyChallengeInfo("game_kalimat", "كلمة من الذكر", "تخمين اسم الله الحسنى لليوم", Icons.Default.WbTwilight, BONUS_STARS, false),
-        DailyChallengeInfo("game_trivia", "ميدان المعرفة", "السلم الذهبي ذو 10 أسئلة إيمانية", Icons.Default.EmojiEvents, BONUS_STARS, false),
-        DailyChallengeInfo("game_ayat", "سلسلة الآيات", "ترتيب آيات السورة واختبار الحفظ", Icons.Default.Timer, BONUS_STARS, false),
-        DailyChallengeInfo("game_match", "رباط معاني الله", "طابق أسماء الله الحسنى بمعانيها", Icons.Default.Flip, BONUS_STARS, false),
-        DailyChallengeInfo("game_timeline", "خط الزمن النبوي", "ترتيب أحداث السيرة زمنياً", Icons.Default.Psychology, BONUS_STARS, false),
-        DailyChallengeInfo("game_tartil", "مرآة الترتيل", "إكمال الكلمة المغطاة في الآية", Icons.Default.GridOn, BONUS_STARS, false),
-        DailyChallengeInfo("game_prophets_order", "ترتيب الأنبياء", "ترتيب الأنبياء حسب التسلسل الزمني", Icons.Default.FormatListNumbered, BONUS_STARS, false),
-        DailyChallengeInfo("game_true_false", "صح أم خطأ", "اختبار التحدي السريع لأسئلة الدين", Icons.Default.Check, BONUS_STARS, false),
-        DailyChallengeInfo("game_quran_mem", "حفظ القرآن", "اختبار متقدم لحفظ سور المصحف", Icons.Default.MenuBook, BONUS_STARS, false),
-        DailyChallengeInfo("game_wudu", "تحدي الوضوء", "ترتيب خطوات الوضوء الصحيحة", Icons.Default.WaterDrop, BONUS_STARS, false),
-        DailyChallengeInfo("game_tawaf", "ترتيب الطواف", "ترتيب مناسك الطواف والعمرة", Icons.Default.Mosque, BONUS_STARS, false),
-        DailyChallengeInfo("game_deeds_balance", "ميزان الحسنات", "اختيار الأعمال الأعظم أجراً", Icons.Default.Balance, BONUS_STARS, false)
+        DailyChallengeInfo("game_kalimat", t("كلمة من الذكر", "Dhikr Word"), t("تخمين اسم الله الحسنى لليوم", "Guess today's Divine Name"), Icons.Default.WbTwilight, BONUS_STARS, false),
+        DailyChallengeInfo("game_trivia", t("ميدان المعرفة", "Knowledge Field"), t("السلم الذهبي ذو 10 أسئلة إيمانية", "Golden ladder with 10 faith questions"), Icons.Default.EmojiEvents, BONUS_STARS, false),
+        DailyChallengeInfo("game_ayat", t("سلسلة الآيات", "Verse Chain"), t("ترتيب آيات السورة واختبار الحفظ", "Arrange surah verses and test memorization"), Icons.Default.Timer, BONUS_STARS, false),
+        DailyChallengeInfo("game_match", t("رباط معاني الله", "Names of Allah Meanings"), t("طابق أسماء الله الحسنى بمعانيها", "Match Names of Allah with their meanings"), Icons.Default.Flip, BONUS_STARS, false),
+        DailyChallengeInfo("game_timeline", t("خط الزمن النبوي", "Prophetic Timeline"), t("ترتيب أحداث السيرة زمنياً", "Order Seerah events chronologically"), Icons.Default.Psychology, BONUS_STARS, false),
+        DailyChallengeInfo("game_tartil", t("مرآة الترتيل", "Tartil Mirror"), t("إكمال الكلمة المغطاة في الآية", "Complete the covered word in the verse"), Icons.Default.GridOn, BONUS_STARS, false),
+        DailyChallengeInfo("game_prophets_order", t("ترتيب الأنبياء", "Order of Prophets"), t("ترتيب الأنبياء حسب التسلسل الزمني", "Order prophets chronologically"), Icons.Default.FormatListNumbered, BONUS_STARS, false),
+        DailyChallengeInfo("game_true_false", t("صح أم خطأ", "True or False"), t("اختبار التحدي السريع لأسئلة الدين", "Quick religion trivia quiz"), Icons.Default.Check, BONUS_STARS, false),
+        DailyChallengeInfo("game_quran_mem", t("حفظ القرآن", "Qur'an Memorization"), t("اختبار متقدم لحفظ سور المصحف", "Advanced surah memorization test"), Icons.Default.MenuBook, BONUS_STARS, false),
+        DailyChallengeInfo("game_wudu", t("تحدي الوضوء", "Wudu Challenge"), t("ترتيب خطوات الوضوء الصحيحة", "Order correct Wudu steps"), Icons.Default.WaterDrop, BONUS_STARS, false),
+        DailyChallengeInfo("game_tawaf", t("ترتيب الطواف", "Tawaf Order"), t("ترتيب مناسك الطواف والعمرة", "Order Tawaf and Umrah rituals"), Icons.Default.Mosque, BONUS_STARS, false),
+        DailyChallengeInfo("game_deeds_balance", t("ميزان الحسنات", "Scale of Good Deeds"), t("اختيار الأعمال الأعظم أجراً", "Choose deeds with higher reward"), Icons.Default.Balance, BONUS_STARS, false)
     )
 
     private fun prefs(context: Context): SharedPreferences =
@@ -183,7 +185,7 @@ fun DailyChallengeHubCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = Gold, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("تحدي اليوم", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(t("تحدي اليوم", "Daily Challenge"), color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
 
@@ -196,7 +198,7 @@ fun DailyChallengeHubCard(
                             .border(1.dp, Color(0xFF50C878), RoundedCornerShape(10.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
-                        Text("+٢٠ 🌟 بونوس", color = Color(0xFF50C878), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(t("+٢٠ 🌟 بونوس", "+20 🌟 Bonus"), color = Color(0xFF50C878), fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -244,7 +246,7 @@ fun DailyChallengeHubCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Check, contentDescription = null, tint = Navy, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("مكتمل ✅", color = Navy, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(t("مكتمل ✅", "Completed ✅"), color = Navy, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 } else {
@@ -254,7 +256,7 @@ fun DailyChallengeHubCard(
                         shape = RoundedCornerShape(12.dp),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
                     ) {
-                        Text("العب الآن ⚔️", color = Navy, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text(t("العب الآن ⚔️", "Play Now ⚔️"), color = Navy, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -328,7 +330,7 @@ fun DailyChallengeHomeCard(
                     .padding(horizontal = 10.dp, vertical = 6.dp)
             ) {
                 Text(
-                    if (challengeInfo.isCompletedToday) "مكتمل ✅" else "ابدأ التحدي",
+                    if (challengeInfo.isCompletedToday) t("مكتمل ✅", "Completed ✅") else t("ابدأ التحدي", "Start Challenge"),
                     color = Navy,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold

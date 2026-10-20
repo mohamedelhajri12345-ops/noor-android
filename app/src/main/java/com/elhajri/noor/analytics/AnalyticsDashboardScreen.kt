@@ -1,5 +1,8 @@
 package com.elhajri.noor.analytics
 
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
 import android.content.Context
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -82,7 +85,7 @@ fun AnalyticsDashboardScreen(onBack: (() -> Unit)? = null) {
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "رجوع",
+                        contentDescription = t("رجوع", "Back"),
                         tint = Gold
                     )
                 }
@@ -90,14 +93,14 @@ fun AnalyticsDashboardScreen(onBack: (() -> Unit)? = null) {
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "بياناتي وإحصائياتي",
+                    text = t("بياناتي وإحصائياتي", "My Data & Stats"),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = AmiriFamily,
                     color = Gold
                 )
                 Text(
-                    text = "لوحة تحكم النشاط والإنجازات الشاملة",
+                    text = t("لوحة تحكم النشاط والإنجازات الشاملة", "Comprehensive activity & achievement dashboard"),
                     fontSize = 12.sp,
                     color = GoldSoft.copy(alpha = 0.7f)
                 )
@@ -114,7 +117,7 @@ fun AnalyticsDashboardScreen(onBack: (() -> Unit)? = null) {
                     Icon(Icons.Filled.LocalFireDepartment, contentDescription = null, tint = Gold, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(4.dp))
                     Text(
-                        text = "${toArabicDigits(summary.activeStreakDays)} أيام",
+                        text = "${toArabicDigits(summary.activeStreakDays)} " + t("أيام", "days"),
                         color = Gold,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
@@ -132,11 +135,11 @@ fun AnalyticsDashboardScreen(onBack: (() -> Unit)? = null) {
         ) {
             items(
                 listOf(
-                    0 to "نشاطي",
-                    1 to "تقدمي (XP)",
-                    2 to "الحفظ والإنجاز",
-                    3 to "سلاسل ومقارنات",
-                    4 to "ورد القرآن"
+                    0 to t("نشاطي", "My Activity"),
+                    1 to t("تقدمي (XP)", "My Progress (XP)"),
+                    2 to t("الحفظ والإنجاز", "Memorization & Achievement"),
+                    3 to t("سلاسل ومقارنات", "Streaks & Comparisons"),
+                    4 to t("ورد القرآن", "Qur'an Wird")
                 )
             ) { (index, title) ->
                 val isSelected = selectedTab == index
@@ -188,16 +191,16 @@ private fun UsageSection(summary: AnalyticsTracker.AnalyticsSummary) {
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 StatCard(
-                    title = "دقائق الاستخدام",
-                    value = "${toArabicDigits(summary.todayUsageMinutes)} دقيقة",
-                    sub = "إجمالي: ${toArabicDigits(summary.totalUsageMinutes)} د",
+                    title = t("دقائق الاستخدام", "Usage Minutes"),
+                    value = "${toArabicDigits(summary.todayUsageMinutes)} " + t("دقيقة", "min"),
+                    sub = t("إجمالي: ", "Total: ") + "${toArabicDigits(summary.totalUsageMinutes)} " + t("د", "m"),
                     icon = Icons.Filled.Timer,
                     modifier = Modifier.weight(1f)
                 )
                 StatCard(
-                    title = "الجلسات",
+                    title = t("الجلسات", "Sessions"),
                     value = toArabicDigits(summary.totalSessions),
-                    sub = "اليوم: ${toArabicDigits(maxOf(1, summary.todayUsageMinutes / 10))}",
+                    sub = t("اليوم: ", "Today: ") + "${toArabicDigits(maxOf(1, summary.todayUsageMinutes / 10))}",
                     icon = Icons.Filled.TouchApp,
                     modifier = Modifier.weight(1f)
                 )
@@ -210,16 +213,16 @@ private fun UsageSection(summary: AnalyticsTracker.AnalyticsSummary) {
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 StatCard(
-                    title = "مجموع النجوم",
+                    title = t("مجموع النجوم", "Total Stars"),
                     value = "${toArabicDigits(summary.totalStars)} 🌟",
-                    sub = "خبرة: ${toArabicDigits(summary.totalXp)} XP",
+                    sub = t("خبرة: ", "XP: ") + "${toArabicDigits(summary.totalXp)} XP",
                     icon = Icons.Filled.Star,
                     modifier = Modifier.weight(1f)
                 )
                 StatCard(
-                    title = "السلسلة النشطة",
-                    value = "${toArabicDigits(summary.activeStreakDays)} أيام 🔥",
-                    sub = "الأفضل: ${toArabicDigits(summary.bestStreakDays)} أيام",
+                    title = t("السلسلة النشطة", "Active Streak"),
+                    value = "${toArabicDigits(summary.activeStreakDays)} " + t("أيام 🔥", "days 🔥"),
+                    sub = t("الأفضل: ", "Best: ") + "${toArabicDigits(summary.bestStreakDays)} " + t("أيام", "days"),
                     icon = Icons.Filled.LocalFireDepartment,
                     modifier = Modifier.weight(1f)
                 )
@@ -241,7 +244,7 @@ private fun UsageSection(summary: AnalyticsTracker.AnalyticsSummary) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("منحنى النشاط اليومي (دقائق)", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        Text(t("منحنى النشاط اليومي (دقائق)", "Daily Activity Curve (minutes)"), color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         Icon(Icons.Filled.ShowChart, contentDescription = null, tint = Gold, modifier = Modifier.size(20.dp))
                     }
                     Spacer(Modifier.height(12.dp))
@@ -265,7 +268,7 @@ private fun UsageSection(summary: AnalyticsTracker.AnalyticsSummary) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("الاستخدام حسب أقسام التطبيق", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        Text(t("الاستخدام حسب أقسام التطبيق", "Usage by App Section"), color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         Icon(Icons.Filled.BarChart, contentDescription = null, tint = Gold, modifier = Modifier.size(20.dp))
                     }
                     Spacer(Modifier.height(12.dp))
@@ -298,7 +301,7 @@ private fun ProgressSection(summary: AnalyticsTracker.AnalyticsSummary) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("نمو النجوم ونقاط الخبرة عبر الأسابيع", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        Text(t("نمو النجوم ونقاط الخبرة عبر الأسابيع", "Stars & XP growth over weeks"), color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         Icon(Icons.Filled.AutoGraph, contentDescription = null, tint = Gold, modifier = Modifier.size(20.dp))
                     }
                     Spacer(Modifier.height(12.dp))
@@ -309,7 +312,7 @@ private fun ProgressSection(summary: AnalyticsTracker.AnalyticsSummary) {
 
         // Game Progress Cards List
         item {
-            Text("تقدم الألعاب والتحديات الإيمانية", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            Text(t("تقدم الألعاب والتحديات الإيمانية", "Faith Games & Challenges Progress"), color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
         }
 
         items(summary.gameProgressMap.toList()) { (gameName, progress) ->
@@ -385,7 +388,7 @@ private fun AchievementsSection(summary: AnalyticsTracker.AnalyticsSummary) {
                     modifier = Modifier.padding(18.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("مؤشر نسب الإنجاز الشامل في التطبيق", color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(t("مؤشر نسب الإنجاز الشامل في التطبيق", "Overall completion index across the app"), color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(16.dp))
 
                     CompletionDonutChart(summary)
@@ -397,10 +400,10 @@ private fun AchievementsSection(summary: AnalyticsTracker.AnalyticsSummary) {
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        LegendRow(color = Gold, label = "سور القرآن المكتملة", value = "${toArabicDigits(summary.quranCompletedSurahsCount)} / ١١٤ سورة")
-                        LegendRow(color = EmeraldSuccess, label = "مراحل الألعاب المنجزة", value = "${toArabicDigits(summary.totalCompletedLevels)} مرحلة")
-                        LegendRow(color = Color(0xFF4FC3F7), label = "التسبيحات المكتملة", value = "${toArabicDigits(summary.tasbihTotalCount)} تسبيحة")
-                        LegendRow(color = Color(0xFFBA68C8), label = "الأناشيد المستمع لها", value = "${toArabicDigits(summary.nasheedTotalPlays)} نشيد")
+                        LegendRow(color = Gold, label = t("سور القرآن المكتملة", "Completed Qur'an Surahs"), value = "${toArabicDigits(summary.quranCompletedSurahsCount)} / ١١٤ سورة")
+                        LegendRow(color = EmeraldSuccess, label = t("مراحل الألعاب المنجزة", "Completed Game Levels"), value = "${toArabicDigits(summary.totalCompletedLevels)} مرحلة")
+                        LegendRow(color = Color(0xFF4FC3F7), label = t("التسبيحات المكتملة", "Completed Tasbihs"), value = "${toArabicDigits(summary.tasbihTotalCount)} تسبيحة")
+                        LegendRow(color = Color(0xFFBA68C8), label = t("الأناشيد المستمع لها", "Nasheeds Listened"), value = "${toArabicDigits(summary.nasheedTotalPlays)} نشيد")
                     }
                 }
             }
@@ -408,35 +411,35 @@ private fun AchievementsSection(summary: AnalyticsTracker.AnalyticsSummary) {
 
         // Completed vs Remaining Breakdown Cards
         item {
-            Text("تفاصيل ما تم إنجازه والمتبقي", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            Text(t("تفاصيل ما تم إنجازه والمتبقي", "Details of completed vs remaining"), color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
         }
 
         item {
             BreakdownProgressCard(
-                title = "ختم القرآن الكريم",
+                title = t("ختم القرآن الكريم", "Qur'an Completion"),
                 completed = summary.quranCompletedSurahsCount,
                 total = 114,
-                unit = "سورة",
+                unit = t("سورة", "Surah"),
                 icon = Icons.Filled.MenuBook
             )
         }
 
         item {
             BreakdownProgressCard(
-                title = "مراحل ميدان الألعاب",
+                title = t("مراحل ميدان الألعاب", "Game Arena Levels"),
                 completed = summary.totalCompletedLevels,
                 total = 100,
-                unit = "مرحلة",
+                unit = t("مرحلة", "Level"),
                 icon = Icons.Filled.Casino
             )
         }
 
         item {
             BreakdownProgressCard(
-                title = "هدف ورد القرآن اليومي",
+                title = t("هدف ورد القرآن اليومي", "Daily Qur'an Portion Goal"),
                 completed = summary.quranPagesToday,
                 total = summary.quranGoalPages,
-                unit = "صفحة اليوم",
+                unit = t("صفحة اليوم", "Today's Page"),
                 icon = Icons.Filled.Bookmark
             )
         }
@@ -465,7 +468,7 @@ private fun StreaksAndComparisonsSection(summary: AnalyticsTracker.AnalyticsSumm
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("سلسلة المواظبة وأعلى الأيام", color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text(t("سلسلة المواظبة وأعلى الأيام", "Consistency streak and peak days"), color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         Icon(Icons.Filled.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(22.dp))
                     }
 
@@ -485,9 +488,9 @@ private fun StreaksAndComparisonsSection(summary: AnalyticsTracker.AnalyticsSumm
                             contentAlignment = Alignment.Center
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("السلسلة الحالية", fontSize = 11.sp, color = GoldSoft.copy(alpha = 0.7f))
+                                Text(t("السلسلة الحالية", "Current Streak"), fontSize = 11.sp, color = GoldSoft.copy(alpha = 0.7f))
                                 Spacer(Modifier.height(4.dp))
-                                Text("${toArabicDigits(summary.activeStreakDays)} أيام", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gold)
+                                Text("${toArabicDigits(summary.activeStreakDays)} " + t("أيام", "days"), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gold)
                                 Text("🔥 مواظبة مستمرة", fontSize = 10.sp, color = TextMain.copy(alpha = 0.6f))
                             }
                         }
@@ -502,7 +505,7 @@ private fun StreaksAndComparisonsSection(summary: AnalyticsTracker.AnalyticsSumm
                             contentAlignment = Alignment.Center
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("أفضل سلسلة", fontSize = 11.sp, color = GoldSoft.copy(alpha = 0.7f))
+                                Text(t("أفضل سلسلة", "Best Streak"), fontSize = 11.sp, color = GoldSoft.copy(alpha = 0.7f))
                                 Spacer(Modifier.height(4.dp))
                                 Text("${toArabicDigits(summary.bestStreakDays)} أيام", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gold)
                                 Text("🏆 الرقم القياسي", fontSize = 10.sp, color = TextMain.copy(alpha = 0.6f))
@@ -524,7 +527,7 @@ private fun StreaksAndComparisonsSection(summary: AnalyticsTracker.AnalyticsSumm
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.Star, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("أعلى يوم استخدماً هذا الأسبوع", color = TextMain, fontSize = 12.5.sp)
+                            Text(t("أعلى يوم استخدماً هذا الأسبوع", "Most active day this week"), color = TextMain, fontSize = 12.5.sp)
                         }
                         Text("${summary.peakUsageDayLabel} (${toArabicDigits(summary.peakUsageMinutes)} دقيقة)", color = Gold, fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
                     }
@@ -542,27 +545,27 @@ private fun StreaksAndComparisonsSection(summary: AnalyticsTracker.AnalyticsSumm
                     .noorGlassCard()
             ) {
                 Column(modifier = Modifier.padding(18.dp)) {
-                    Text("مقارنة هذا الأسبوع بالأسبوع الماضي", color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(t("مقارنة هذا الأسبوع بالأسبوع الماضي", "Comparison: This week vs Last week"), color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(14.dp))
 
                     ComparisonRow(
-                        label = "دقائق الاستخدام",
-                        thisWeekVal = "${toArabicDigits(summary.thisWeekMinutes)} دقيقة",
-                        lastWeekVal = "${toArabicDigits(summary.lastWeekMinutes)} دقيقة",
+                        label = t("دقائق الاستخدام", "Usage Minutes"),
+                        thisWeekVal = "${toArabicDigits(summary.thisWeekMinutes)} " + t("دقيقة", "min"),
+                        lastWeekVal = "${toArabicDigits(summary.lastWeekMinutes)} " + t("دقيقة", "min"),
                         isUp = summary.thisWeekMinutes >= summary.lastWeekMinutes
                     )
                     Spacer(Modifier.height(10.dp))
                     ComparisonRow(
-                        label = "النجوم المكتسبة",
+                        label = t("النجوم المكتسبة", "Stars Earned"),
                         thisWeekVal = "${toArabicDigits(summary.thisWeekStars)} 🌟",
                         lastWeekVal = "${toArabicDigits(summary.lastWeekStars)} 🌟",
                         isUp = summary.thisWeekStars >= summary.lastWeekStars
                     )
                     Spacer(Modifier.height(10.dp))
                     ComparisonRow(
-                        label = "صفحات القرآن المقروءة",
-                        thisWeekVal = "${toArabicDigits(summary.quranPagesToday * 7)} صفحة",
-                        lastWeekVal = "${toArabicDigits(maxOf(5, summary.quranPagesToday * 5))} صفحة",
+                        label = t("صفحات القرآن المقروءة", "Qur'an Pages Read"),
+                        thisWeekVal = "${toArabicDigits(summary.quranPagesToday * 7)} " + t("صفحة", "pages"),
+                        lastWeekVal = "${toArabicDigits(maxOf(5, summary.quranPagesToday * 5))} " + t("صفحة", "pages"),
                         isUp = true
                     )
                 }
@@ -653,7 +656,7 @@ private fun QuranWirdSection() {
                     modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("ورد اليوم من القرآن الكريم", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gold)
+                    Text(t("ورد اليوم من القرآن الكريم", "Today's Qur'an Portion"), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gold)
                     Spacer(Modifier.height(16.dp))
 
                     val progressFraction = if (goal > 0) (todayPages.toFloat() / goal.toFloat()).coerceIn(0f, 1f) else 0f
@@ -690,7 +693,7 @@ private fun QuranWirdSection() {
                                 fontWeight = FontWeight.Bold,
                                 color = TextMain
                             )
-                            Text("صفحة اليوم", fontSize = 11.sp, color = GoldSoft)
+                            Text(t("صفحة اليوم", "Today's Page"), fontSize = 11.sp, color = GoldSoft)
                         }
                     }
 
@@ -733,7 +736,7 @@ private fun QuranWirdSection() {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text("الهدف اليومي:", fontSize = 12.sp, color = GoldSoft)
+                        Text(t("الهدف اليومي:", "Daily goal:"), fontSize = 12.sp, color = GoldSoft)
                         listOf(3, 5, 10, 20).forEach { target ->
                             val active = goal == target
                             Box(
@@ -766,13 +769,13 @@ private fun QuranWirdSection() {
                     .noorGlassCard()
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("إنجازات وأوسمة التلاوة", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                    Text(t("إنجازات وأوسمة التلاوة", "Recitation Achievements & Badges"), color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("إجمالي الصفحات المقروءة:", color = TextMain, fontSize = 13.sp)
+                        Text(t("إجمالي الصفحات المقروءة:", "Total pages read:"), color = TextMain, fontSize = 13.sp)
                         Text("${toArabicDigits(allTimeTotalPages)} صفحة", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
                     Spacer(Modifier.height(6.dp))
@@ -780,7 +783,7 @@ private fun QuranWirdSection() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("أيام المواظبة على الورد:", color = TextMain, fontSize = 13.sp)
+                        Text(t("أيام المواظبة على الورد:", "Wird consistency days:"), color = TextMain, fontSize = 13.sp)
                         Text("${toArabicDigits(streak)} يوم متتالي 🔥", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
                 }
@@ -1014,7 +1017,7 @@ private fun CompletionDonutChart(summary: AnalyticsTracker.AnalyticsSummary) {
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text("٦٨٪", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Gold)
-            Text("نسبة الإنجاز", fontSize = 11.sp, color = GoldSoft)
+            Text(t("نسبة الإنجاز", "Completion Rate"), fontSize = 11.sp, color = GoldSoft)
         }
     }
 }

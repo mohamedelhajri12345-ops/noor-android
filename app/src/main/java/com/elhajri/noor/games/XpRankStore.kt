@@ -1,5 +1,8 @@
 package com.elhajri.noor.games
 
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,10 +37,16 @@ import com.elhajri.noor.ui.noorGlassCard
 data class XpRankTierData(
     val level: Int,
     val titleAr: String,
+    val titleEn: String,
     val minXp: Int,
     val iconSymbol: String,
-    val descAr: String
-)
+    val descAr: String,
+    val descEn: String
+) {
+    val titleArVal: String get() = titleAr
+    val title: String get() = t(titleAr, titleEn)
+    val desc: String get() = t(descAr, descEn)
+}
 
 /**
  * XpRankStore: Manages XP calculation, level win rewards, and rank progression.
@@ -46,15 +55,15 @@ data class XpRankTierData(
 object XpRankStore {
 
     val XP_TIERS = listOf(
-        XpRankTierData(1, "مبتدئ", 0, "🌱", "بداية الرحلة الإيمانية المباركة"),
-        XpRankTierData(2, "متدرب", 100, "📜", "الاستمرار في التعلم والذكر"),
-        XpRankTierData(3, "قارئ", 300, "📖", "المواظبة على تلاوة القرآن وتحديات الألعاب"),
-        XpRankTierData(4, "باحث", 600, "🔍", "التوسع في المعرفة والفقه والسيرة"),
-        XpRankTierData(5, "مجتهد", 1000, "⚡", "الاجتهاد والمنافسة في ميدان الخير"),
-        XpRankTierData(6, "متميز", 1500, "🌟", "التميز والإتقان في العلوم الشرعية"),
-        XpRankTierData(7, "متقن", 2100, "💎", "درجة عالية من الإتقان والتحصيل"),
-        XpRankTierData(8, "حافظ", 3000, "👑", "الارتقاء إلى مرتبة الحفاظ والذاكرين"),
-        XpRankTierData(9, "عالم", 4000, "⚜️", "أعلى مراتب العلم والإنجاز في نور")
+        XpRankTierData(1, "مبتدئ", "Beginner", 0, "🌱", "بداية الرحلة الإيمانية المباركة", "Start of the blessed faith journey"),
+        XpRankTierData(2, "متدرب", "Trainee", 100, "📜", "الاستمرار في التعلم والذكر", "Continuing learning and dhikr"),
+        XpRankTierData(3, "قارئ", "Reciter", 300, "📖", "المواظبة على تلاوة القرآن وتحديات الألعاب", "Regular Quran recitation and game challenges"),
+        XpRankTierData(4, "باحث", "Researcher", 600, "🔍", "التوسع في المعرفة والفقه والسيرة", "Expanding knowledge in Fiqh and Seerah"),
+        XpRankTierData(5, "مجتهد", "Diligent", 1000, "⚡", "الاجتهاد والمنافسة في ميدان الخير", "Diligence in good deeds"),
+        XpRankTierData(6, "متميز", "Distinguished", 1500, "🌟", "التميز والإتقان في العلوم الشرعية", "Excellence in Islamic knowledge"),
+        XpRankTierData(7, "متقن", "Master", 2100, "💎", "درجة عالية من الإتقان والتحصيل", "High level of mastery and achievement"),
+        XpRankTierData(8, "حافظ", "Hafiz", 3000, "👑", "الارتقاء إلى مرتبة الحفاظ والذاكرين", "Elevated rank of Hafiz and rememberers"),
+        XpRankTierData(9, "عالم", "Scholar", 4000, "⚜️", "أعلى مراتب العلم والإنجاز في نور", "Highest rank of knowledge in NOOR")
     )
 
     fun getRankForXp(xp: Int): XpRankTierData {
@@ -134,8 +143,8 @@ fun XpRankProgressBarCard(
                     }
                     Spacer(Modifier.width(8.dp))
                     Column {
-                        Text("الرتبة: ${currentRank.titleAr}", color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                        Text(currentRank.descAr, color = TextSecondaryLinen, fontSize = 10.sp)
+                        Text(t("الرتبة: ", "Rank: ") + currentRank.title, color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text(currentRank.desc, color = TextSecondaryLinen, fontSize = 10.sp)
                     }
                 }
 
@@ -180,19 +189,19 @@ fun XpRankProgressBarCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "الرتبة ${XpRankStore.toArDigits(currentRank.level)}: ${currentRank.titleAr}",
+                    text = t("الرتبة ", "Rank ") + currentRank.level.toArabicDigits() + ": " + currentRank.title,
                     color = TextSecondaryLinen,
                     fontSize = 10.sp
                 )
                 if (nextRank != null) {
                     Text(
-                        text = "الرتبة التالية: ${nextRank.titleAr} (${XpRankStore.toArDigits(nextRank.minXp)} XP)",
+                        text = t("الرتبة التالية: ", "Next Rank: ") + nextRank.title + " (" + nextRank.minXp.toArabicDigits() + " XP)",
                         color = GoldSoft,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 } else {
-                    Text("أعلى رتبة إيمانية! 👑", color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(t("أعلى رتبة إيمانية! 👑", "Highest Faith Rank! 👑"), color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

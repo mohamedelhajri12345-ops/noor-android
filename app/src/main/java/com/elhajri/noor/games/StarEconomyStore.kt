@@ -1,5 +1,8 @@
 package com.elhajri.noor.games
 
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.animation.core.*
@@ -70,8 +73,8 @@ object StarEconomyStore {
     val ALL_FRAMES = listOf(
         CardFrame(
             id = FRAME_CLASSIC,
-            nameAr = "الإطار الأصيل",
-            descAr = "إطار الزجاج والأرجوان التقليدي المميز",
+            nameAr = t(t(t("الإطار الأصيل", "Authentic Frame"), "Authentic Frame"), "Authentic Frame"),
+            descAr = t(t(t("إطار الزجاج والأرجوان التقليدي المميز", "Traditional glass and purple signature frame"), "Traditional glass and purple signature frame"), "Traditional glass and purple signature frame"),
             costStars = 0,
             borderBrush = Brush.horizontalGradient(listOf(Gold.copy(alpha = 0.4f), GoldSoft.copy(alpha = 0.2f))),
             glowColor = GoldSoft.copy(alpha = 0.2f),
@@ -79,8 +82,8 @@ object StarEconomyStore {
         ),
         CardFrame(
             id = FRAME_GOLD,
-            nameAr = "الإطار الذهبي الزمردي",
-            descAr = "إطار فاخر بلمعان الزمرد والذهب الخالص",
+            nameAr = t(t(t("الإطار الذهبي الزمردي", "Golden Emerald Frame"), "Golden Emerald Frame"), "Golden Emerald Frame"),
+            descAr = t(t(t("إطار فاخر بلمعان الزمرد والذهب الخالص", "Luxury frame with emerald shine and pure gold"), "Luxury frame with emerald shine and pure gold"), "Luxury frame with emerald shine and pure gold"),
             costStars = 50,
             borderBrush = Brush.horizontalGradient(listOf(Color(0xFFD4AF37), Color(0xFF50C878), Color(0xFFD4AF37))),
             glowColor = Color(0xFF50C878),
@@ -89,7 +92,7 @@ object StarEconomyStore {
         CardFrame(
             id = FRAME_ROYAL,
             nameAr = "إطار الياقوت الملكي",
-            descAr = "إطار الياقوت الملكي للتفوق والإنجاز العالي",
+            descAr = t(t(t("إطار الياقوت الملكي للتفوق والإنجاز العالي", "Royal ruby frame for excellence and high achievement"), "Royal ruby frame for excellence and high achievement"), "Royal ruby frame for excellence and high achievement"),
             costStars = 100,
             borderBrush = Brush.horizontalGradient(listOf(Color(0xFFE0115F), Color(0xFFFFD700), Color(0xFF990033))),
             glowColor = Color(0xFFE0115F),
@@ -97,8 +100,8 @@ object StarEconomyStore {
         ),
         CardFrame(
             id = FRAME_CELESTIAL,
-            nameAr = "الإطار السماوي الفاخر",
-            descAr = "إطار النور المتلألئ بفيض الأضواء والتبر",
+            nameAr = t(t(t("الإطار السماوي الفاخر", "Celestial Luxury Frame"), "Celestial Luxury Frame"), "Celestial Luxury Frame"),
+            descAr = t(t(t("إطار النور المتلألئ بفيض الأضواء والتبر", "Sparkling light frame with glowing beams"), "Sparkling light frame with glowing beams"), "Sparkling light frame with glowing beams"),
             costStars = 200,
             borderBrush = Brush.horizontalGradient(listOf(Color(0xFF00FFFF), Color(0xFFFFD700), Color(0xFF8A2BE2))),
             glowColor = Color(0xFF00FFFF),
@@ -252,7 +255,7 @@ fun StarShopDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("إغلاق", color = Gold, fontWeight = FontWeight.Bold)
+                Text(t("إغلاق", "Close"), color = Gold, fontWeight = FontWeight.Bold)
             }
         },
         title = {
@@ -261,7 +264,7 @@ fun StarShopDialog(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("متجر النجوم والإطارات 🌟", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(t("متجر النجوم والإطارات 🌟", "Star & Frame Shop 🌟"), color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = NavyCard,
@@ -313,7 +316,7 @@ fun StarShopDialog(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Text("تعبئة التلميحات (الهَمَسَات)", color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text(t("تعبئة التلميحات (الهَمَسَات)", "Refill Hints"), color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                             Text("رصيدك الحالي: ${hintCount.toArabicDigits()} تلميح", color = GoldSoft, fontSize = 11.sp)
                         }
                         Button(
@@ -321,9 +324,9 @@ fun StarShopDialog(
                                 if (StarEconomyStore.buyHintRefill(context, 1)) {
                                     starBalance = StarEconomyStore.getStarBalance(context)
                                     hintCount = StarEconomyStore.getHintCount(context)
-                                    toastMessage = "تم شراء تلميح بنجاح! 💡"
+                                    toastMessage = t(t(t("تم شراء تلميح بنجاح! 💡", "Hint purchased successfully! 💡"), "Hint purchased successfully! 💡"), "Hint purchased successfully! 💡")
                                 } else {
-                                    toastMessage = "رصيد النجوم غير كافٍ! تحتاج ١٠ نجوم."
+                                    toastMessage = t(t(t("رصيد النجوم غير كافٍ! تحتاج ١٠ نجوم.", "Insufficient star balance! Need 10 stars."), "Insufficient star balance! Need 10 stars."), "Insufficient star balance! Need 10 stars.")
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Gold),
@@ -335,7 +338,7 @@ fun StarShopDialog(
                     }
                 }
 
-                Text("إطارات البطاقات التجميلية:", color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(t("إطارات البطاقات التجميلية:", "Cosmetic Card Frames:"), color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold)
 
                 // Section 2: Frames list
                 StarEconomyStore.ALL_FRAMES.forEach { frame ->
@@ -384,21 +387,21 @@ fun StarShopDialog(
                                     color = Gold,
                                     modifier = Modifier.padding(start = 4.dp)
                                 ) {
-                                    Text("مُفعّل", color = Navy, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                                    Text(t("مُفعّل", "Active"), color = Navy, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
                                 }
                             } else if (isPurchased) {
                                 Button(
                                     onClick = {
                                         StarEconomyStore.equipFrame(context, frame.id)
                                         equippedFrameId = frame.id
-                                        toastMessage = "تم تفعيل ${frame.nameAr}!"
+                                        toastMessage = t(t(t("تم تفعيل ${frame.nameAr}!", "Activated ${frame.nameAr}!"), "Activated ${frame.nameAr}!"), "Activated ${frame.nameAr}!")
                                     },
                                     colors = ButtonDefaults.buttonColors(containerColor = NavyCard),
                                     border = androidx.compose.foundation.BorderStroke(1.dp, Gold),
                                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
-                                    Text("تفعيل", color = Gold, fontSize = 11.sp)
+                                    Text(t("تفعيل", "Activate"), color = Gold, fontSize = 11.sp)
                                 }
                             } else {
                                 Button(
@@ -407,9 +410,9 @@ fun StarShopDialog(
                                             starBalance = StarEconomyStore.getStarBalance(context)
                                             purchasedFrames = StarEconomyStore.getPurchasedFrames(context)
                                             equippedFrameId = StarEconomyStore.getEquippedFrameId(context)
-                                            toastMessage = "تم فتح ${frame.nameAr} بنجاح! 👑"
+                                            toastMessage = t(t(t("تم فتح ${frame.nameAr} بنجاح! 👑", "Unlocked ${frame.nameAr} successfully! 👑"), "Unlocked ${frame.nameAr} successfully! 👑"), "Unlocked ${frame.nameAr} successfully! 👑")
                                         } else {
-                                            toastMessage = "نجوم غير كافية! يلزمك ${frame.costStars} نجمة."
+                                            toastMessage = t(t(t("نجوم غير كافية! يلزمك ${frame.costStars} نجمة.", "Insufficient stars! Requires ${frame.costStars} stars."), "Insufficient stars! Requires ${frame.costStars} stars."), "Insufficient stars! Requires ${frame.costStars} stars.")
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(containerColor = Gold),

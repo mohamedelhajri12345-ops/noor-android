@@ -1,4 +1,5 @@
 package com.elhajri.noor.mychild
+import com.elhajri.noor.settings.t
 
 import android.content.Context
 import android.content.Intent
@@ -89,11 +90,11 @@ private val JUZ_30_SURAHS = listOf(
 )
 
 enum class ChildTab(val titleAr: String, val icon: ImageVector) {
-    PARENTS("لوحة الوالدين", Icons.Filled.FamilyRestroom),
+    PARENTS(t("لوحة الوالدين", "Parents Dashboard"), Icons.Filled.FamilyRestroom),
     SAFE_MODE("وضع الطفل الآمن", Icons.Filled.Shield),
-    MEMORIZATION("متابعة الحفظ", Icons.Filled.Star),
-    BEDTIME_STORY("قصة قبل النوم", Icons.Filled.NightsStay),
-    FAMILY_QUIZ("تحدي عائلي", Icons.Filled.SportsEsports)
+    MEMORIZATION(t("متابعة الحفظ", "Memorization Tracker"), Icons.Filled.Star),
+    BEDTIME_STORY(t("قصة قبل النوم", "Bedtime Story"), Icons.Filled.NightsStay),
+    FAMILY_QUIZ(t("تحدي عائلي", "Family Challenge"), Icons.Filled.SportsEsports)
 }
 
 @Composable
@@ -562,21 +563,21 @@ fun ParentsDashboardContent(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 QuickLauncherCard(
-                    title = "متابعة الحفظ",
+                    title = t("متابعة الحفظ", "Memorization Tracker"),
                     desc = "سور الجزء ٣٠",
                     icon = Icons.Filled.Star,
                     onClick = { onNavigateToTab(ChildTab.MEMORIZATION) },
                     modifier = Modifier.weight(1f)
                 )
                 QuickLauncherCard(
-                    title = "قصة قبل النوم",
+                    title = t("قصة قبل النوم", "Bedtime Story"),
                     desc = "قصص الأنبياء",
                     icon = Icons.Filled.NightsStay,
                     onClick = { onNavigateToTab(ChildTab.BEDTIME_STORY) },
                     modifier = Modifier.weight(1f)
                 )
                 QuickLauncherCard(
-                    title = "تحدي عائلي",
+                    title = t("تحدي عائلي", "Family Challenge"),
                     desc = "مسابقة الوالدين",
                     icon = Icons.Filled.SportsEsports,
                     onClick = { onNavigateToTab(ChildTab.FAMILY_QUIZ) },
@@ -1064,7 +1065,7 @@ fun BedtimeStoryContent(
                 .padding(18.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.NightsStay, contentDescription = "قصة قبل النوم", tint = Gold, modifier = Modifier.size(28.dp))
+                Icon(Icons.Filled.NightsStay, contentDescription = t("قصة قبل النوم", "Bedtime Story"), tint = Gold, modifier = Modifier.size(28.dp))
                 Spacer(Modifier.width(10.dp))
                 Text("قصة قبل النوم لـ ${childProfile.name} 🌙", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
             }
@@ -1211,7 +1212,7 @@ fun FamilyChallengeContent(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(Icons.Filled.SportsEsports, contentDescription = "تحدي عائلي", tint = Gold, modifier = Modifier.size(56.dp))
+                Icon(Icons.Filled.SportsEsports, contentDescription = t("تحدي عائلي", "Family Challenge"), tint = Gold, modifier = Modifier.size(56.dp))
                 Spacer(Modifier.height(12.dp))
                 Text("التحدي العائلي ⚔️", color = Gold, fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
                 Spacer(Modifier.height(6.dp))

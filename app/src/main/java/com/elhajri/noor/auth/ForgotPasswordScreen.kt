@@ -1,4 +1,5 @@
 package com.elhajri.noor.auth
+import com.elhajri.noor.settings.t
 
 import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.foundation.background
@@ -48,7 +49,7 @@ fun ForgotPasswordScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "رجوع",
+                            contentDescription = t("رجوع", "Back"),
                             tint = Gold
                         )
                     }
@@ -89,7 +90,7 @@ fun ForgotPasswordScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "نسيت كلمة المرور؟",
+                    text = t("نسيت كلمة المرور؟", "Forgot Password?"),
                     style = MaterialTheme.typography.headlineLarge,
                     color = Gold,
                     fontWeight = FontWeight.Bold

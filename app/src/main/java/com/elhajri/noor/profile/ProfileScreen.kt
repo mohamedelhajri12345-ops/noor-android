@@ -1,5 +1,8 @@
 package com.elhajri.noor.profile
 
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -62,14 +65,14 @@ object UserProfileStore {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun getUserName(context: Context): String =
-        prefs(context).getString(KEY_NAME, "مستخدم نور المميز") ?: "مستخدم نور المميز"
+        prefs(context).getString(KEY_NAME, t(t(t("مستخدم نور المميز", "NOOR Distinguished User"), "NOOR Distinguished User"), "NOOR Distinguished User")) ?: t(t(t("مستخدم نور المميز", "NOOR Distinguished User"), "NOOR Distinguished User"), "NOOR Distinguished User")
 
     fun setUserName(context: Context, name: String) {
-        prefs(context).edit().putString(KEY_NAME, name.ifBlank { "مستخدم نور المميز" }).apply()
+        prefs(context).edit().putString(KEY_NAME, name.ifBlank { t(t(t("مستخدم نور المميز", "NOOR Distinguished User"), "NOOR Distinguished User"), "NOOR Distinguished User") }).apply()
     }
 
     fun getUserBio(context: Context): String =
-        prefs(context).getString(KEY_BIO, "حافظ لكتاب الله وذاكر للمولى 🌙") ?: "حافظ لكتاب الله وذاكر للمولى 🌙"
+        prefs(context).getString(KEY_BIO, t(t(t("حافظ لكتاب الله وذاكر للمولى 🌙", "Memorizer of Allah's Book & Rememberer 🌙"), "Memorizer of Allah's Book & Rememberer 🌙"), "Memorizer of Allah's Book & Rememberer 🌙")) ?: t(t(t("حافظ لكتاب الله وذاكر للمولى 🌙", "Memorizer of Allah's Book & Rememberer 🌙"), "Memorizer of Allah's Book & Rememberer 🌙"), "Memorizer of Allah's Book & Rememberer 🌙")
 
     fun setUserBio(context: Context, bio: String) {
         prefs(context).edit().putString(KEY_BIO, bio).apply()
@@ -88,15 +91,15 @@ data class XpRankTier(
 )
 
 val XP_TIERS = listOf(
-    XpRankTier(1, "مبتدئ", 0, "🌱", "بداية الرحلة الإيمانية المباركة"),
-    XpRankTier(2, "متدرب", 100, "📜", "الاستمرار في التعلم والذكر"),
-    XpRankTier(3, "قارئ", 300, "📖", "المواظبة على تلاوة القرآن وتحديات الألعاب"),
-    XpRankTier(4, "باحث", 600, "🔍", "التوسع في المعرفة والفقه والسيرة"),
-    XpRankTier(5, "مجتهد", 1000, "⚡", "الاجتهاد والمنافسة في ميدان الخير"),
-    XpRankTier(6, "متميز", 1500, "🌟", "التميز والإتقان في العلوم الشرعية"),
-    XpRankTier(7, "متقن", 2100, "💎", "درجة عالية من الإتقان والتحصيل"),
-    XpRankTier(8, "حافظ", 3000, "👑", "الارتقاء إلى مرتبة الحفاظ والذاكرين"),
-    XpRankTier(9, "عالم", 4000, "⚜️", "أعلى مراتب العلم والإنجاز في نور")
+    XpRankTier(1, t("مبتدئ", "Beginner"), 0, "🌱", "بداية الرحلة الإيمانية المباركة"),
+    XpRankTier(2, t("متدرب", "Trainee"), 100, "📜", t("الاستمرار في التعلم والذكر", "Continuing learning and remembrance")),
+    XpRankTier(3, t("قارئ", "Reciter"), 300, "📖", "المواظبة على تلاوة القرآن وتحديات الألعاب"),
+    XpRankTier(4, t("باحث", "Seeker"), 600, "🔍", "التوسع في المعرفة والفقه والسيرة"),
+    XpRankTier(5, t("مجتهد", "Diligent"), 1000, "⚡", t("الاجتهاد والمنافسة في ميدان الخير", "Striving and competing in goodness")),
+    XpRankTier(6, t("متميز", "Distinguished"), 1500, "🌟", "التميز والإتقان في العلوم الشرعية"),
+    XpRankTier(7, t("متقن", "Master"), 2100, "💎", "درجة عالية من الإتقان والتحصيل"),
+    XpRankTier(8, t("حافظ", "Memorizer"), 3000, "👑", t("الارتقاء إلى مرتبة الحفاظ والذاكرين", "Ascending to the rank of memorizers and remembrancers")),
+    XpRankTier(9, t("عالم", "Scholar"), 4000, "⚜️", "أعلى مراتب العلم والإنجاز في نور")
 )
 
 fun getRankForXp(xp: Int): XpRankTier {
@@ -176,8 +179,8 @@ fun ProfileScreen(
     val achievements = listOf(
         ProfileAchievement(
             id = "first_step",
-            title = "خطوة الهداية",
-            description = "إكمال مرحلة واحدة في الألعاب الإيمانية",
+            title = t(t(t("خطوة الهداية", "Step of Guidance"), "Step of Guidance"), "Step of Guidance"),
+            description = t("إكمال مرحلة واحدة في الألعاب الإيمانية", "Complete 1 level in Islamic games"),
             icon = Icons.Filled.CheckCircle,
             isUnlocked = completedLevels >= 1,
             currentProgress = minOf(completedLevels, 1),
@@ -185,8 +188,8 @@ fun ProfileScreen(
         ),
         ProfileAchievement(
             id = "star_gatherer",
-            title = "جامع النجوم",
-            description = "جمع ٣٠ نجمة ذهبية من الألعاب",
+            title = t("جامع النجوم", "Star Collector"),
+            description = t(t(t("جمع ٣٠ نجمة ذهبية من الألعاب", "Collect 30 golden stars from games"), "Collect 30 golden stars from games"), "Collect 30 golden stars from games"),
             icon = Icons.Filled.Star,
             isUnlocked = totalStars >= 30,
             currentProgress = minOf(totalStars, 30),
@@ -194,8 +197,8 @@ fun ProfileScreen(
         ),
         ProfileAchievement(
             id = "constant_dhikr",
-            title = "اللسان الذاكر",
-            description = "إنجاز ١٠٠ تسبيحة في المسبحة الإلكترونية",
+            title = t(t(t("اللسان الذاكر", "Remembering Tongue"), "Remembering Tongue"), "Remembering Tongue"),
+            description = t("إنجاز ١٠٠ تسبيحة في المسبحة الإلكترونية", "Reach 100 tasbih count"),
             icon = Icons.Filled.Favorite,
             isUnlocked = tasbihCount >= 100,
             currentProgress = minOf(tasbihCount, 100),
@@ -203,8 +206,8 @@ fun ProfileScreen(
         ),
         ProfileAchievement(
             id = "faith_streak",
-            title = "سلسلة الإيمان",
-            description = "الحفاظ على تتابع نشاط يومي لمدة ٣ أيام",
+            title = t("سلسلة الإيمان", "Faith Streak"),
+            description = t(t(t("الحفاظ على تتابع نشاط يومي لمدة ٣ أيام", "Maintain a 3-day daily activity streak"), "Maintain a 3-day daily activity streak"), "Maintain a 3-day daily activity streak"),
             icon = Icons.Filled.LocalFireDepartment,
             isUnlocked = streakDays >= 3,
             currentProgress = minOf(streakDays, 3),
@@ -212,8 +215,8 @@ fun ProfileScreen(
         ),
         ProfileAchievement(
             id = "quran_reader",
-            title = "قارئ القرآن",
-            description = "قراءة ومتابعة ورد القرآن في التطبيق",
+            title = t("قارئ القرآن", "Qur'an Reciter"),
+            description = t(t(t("قراءة ومتابعة ورد القرآن في التطبيق", "Reading & tracking Quran wird in app"), "Reading & tracking Quran wird in app"), "Reading & tracking Quran wird in app"),
             icon = Icons.AutoMirrored.Filled.MenuBook,
             isUnlocked = summary.quranTotalPagesAllTime >= 5,
             currentProgress = minOf(summary.quranTotalPagesAllTime, 5),
@@ -221,8 +224,8 @@ fun ProfileScreen(
         ),
         ProfileAchievement(
             id = "noor_champion",
-            title = "بطل الميدان",
-            description = "إكمال ١٥ مرحلة مختلفة في الألعاب",
+            title = t(t(t("بطل الميدان", "Arena Champion"), "Arena Champion"), "Arena Champion"),
+            description = t("إكمال ١٥ مرحلة مختلفة في الألعاب", "Complete 15 different levels in games"),
             icon = Icons.Filled.EmojiEvents,
             isUnlocked = completedLevels >= 15,
             currentProgress = minOf(completedLevels, 15),
@@ -235,37 +238,37 @@ fun ProfileScreen(
     val certificates = listOf(
         ProfileCertificate(
             id = "cert_merit_1",
-            title = "شهادة الجدارة - المستوى الأول",
-            category = "الألعاب والمسابقات الإيمانية",
+            title = t(t(t("شهادة الجدارة - المستوى الأول", "Merit Certificate - Level 1"), "Merit Certificate - Level 1"), "Merit Certificate - Level 1"),
+            category = t("الألعاب والمسابقات الإيمانية", "Faith Games & Quizzes"),
             isUnlocked = totalStars >= 15 || completedLevels >= 5,
-            description = "تُمنح للتميز في اجتياز المراحل التعليمية والإيمانية بنجاح في تطبيق نور.",
+            description = t(t(t("تُمنح للتميز في اجتياز المراحل التعليمية والإيمانية بنجاح في تطبيق نور.", "Awarded for excellence in passing educational and faith stages in NOOR."), "Awarded for excellence in passing educational and faith stages in NOOR."), "Awarded for excellence in passing educational and faith stages in NOOR."),
             issueDate = todayDateStr,
             verificationCode = "NOOR-MERIT-${(totalXp + 1000).toString().take(4)}"
         ),
         ProfileCertificate(
             id = "cert_mastery_1",
-            title = "شهادة التمكن - الثقافة الإسلامية",
-            category = "المعرفة والعلوم الشرعية",
+            title = t(t(t("شهادة التمكن - الثقافة الإسلامية", "Mastery Certificate - Islamic Culture"), "Mastery Certificate - Islamic Culture"), "Mastery Certificate - Islamic Culture"),
+            category = t(t(t("المعرفة والعلوم الشرعية", "Islamic Knowledge & Sciences"), "Islamic Knowledge & Sciences"), "Islamic Knowledge & Sciences"),
             isUnlocked = totalXp >= 300 || completedLevels >= 10,
-            description = "تُمنح لإتقان المفاهيم الفقهية والسيرة النبوية الشريفة واجتياز التحديات.",
+            description = t(t(t("تُمنح لإتقان المفاهيم الفقهية والسيرة النبوية الشريفة واجتياز التحديات.", "Awarded for mastering Fiqh, Seerah, and completing challenges."), "Awarded for mastering Fiqh, Seerah, and completing challenges."), "Awarded for mastering Fiqh, Seerah, and completing challenges."),
             issueDate = todayDateStr,
             verificationCode = "NOOR-MASTERY-${(totalXp + 2500).toString().take(4)}"
         ),
         ProfileCertificate(
             id = "cert_tasbih",
-            title = "شهادة الذاكرين والذاكرات",
-            category = "الأذكار والتسابيح",
+            title = t(t(t("شهادة الذاكرين والذاكرات", "Certificate of Dhikr & Remembrance"), "Certificate of Dhikr & Remembrance"), "Certificate of Dhikr & Remembrance"),
+            category = t("الأذكار والتسابيح", "Adhkar & Tasbih"),
             isUnlocked = tasbihCount >= 100,
-            description = "تُمنح للاعتناء بذكر الله عز وجل والمواظبة على الأذكار والتسابيح.",
+            description = t(t(t("تُمنح للاعتناء بذكر الله عز وجل والمواظبة على الأذكار والتسابيح.", "Awarded for devotion to Dhikr and regular Tasbih."), "Awarded for devotion to Dhikr and regular Tasbih."), "Awarded for devotion to Dhikr and regular Tasbih."),
             issueDate = todayDateStr,
             verificationCode = "NOOR-TASBIH-9981"
         ),
         ProfileCertificate(
             id = "cert_quran",
-            title = "شهادة إتمام ختمات وتلاوة القرآن",
-            category = "تلاوة القرآن الكريم",
+            title = t(t(t("شهادة إتمام ختمات وتلاوة القرآن", "Certificate of Qur'an Recitation"), "Certificate of Qur'an Recitation"), "Certificate of Qur'an Recitation"),
+            category = t(t(t("تلاوة القرآن الكريم", "Qur'an Recitation"), "Qur'an Recitation"), "Qur'an Recitation"),
             isUnlocked = summary.quranTotalPagesAllTime >= 10,
-            description = "تُمنح للاعتناء بتلاوة كتاب الله وتتبع الورد اليومي المبارك.",
+            description = t(t(t("تُمنح للاعتناء بتلاوة كتاب الله وتتبع الورد اليومي المبارك.", "Awarded for dedication to reciting Allah's Book and daily Wird."), "Awarded for dedication to reciting Allah's Book and daily Wird."), "Awarded for dedication to reciting Allah's Book and daily Wird."),
             issueDate = todayDateStr,
             verificationCode = "NOOR-QURAN-7721"
         )
@@ -306,7 +309,7 @@ fun ProfileScreen(
                 }
 
                 Text(
-                    text = "ملفي الشخصي",
+                    text = t(t(t("ملفي الشخصي", "My Profile"), "My Profile"), "My Profile"),
                     color = Gold,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -324,7 +327,7 @@ fun ProfileScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Edit,
-                        contentDescription = "تعديل الملف",
+                        contentDescription = t(t(t("تعديل الملف", "Edit Profile"), "Edit Profile"), "Edit Profile"),
                         tint = Gold,
                         modifier = Modifier.size(20.dp)
                     )
@@ -412,7 +415,7 @@ fun ProfileScreen(
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "الرتبة: ${currentRank.title} (${currentRank.icon})",
+                                text = t("الرتبة: ", "Rank: ") + "${currentRank.title} (${currentRank.icon})",
                                 color = Gold,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
@@ -447,7 +450,7 @@ fun ProfileScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "مستوى الخبرة (XP)",
+                                text = t(t(t("مستوى الخبرة (XP)", "Experience Level (XP)"), "Experience Level (XP)"), "Experience Level (XP)"),
                                 color = Gold,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -493,20 +496,20 @@ fun ProfileScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "الرتبة الحالية: ${currentRank.title}",
+                            text = t("الرتبة الحالية: ", "Current Rank: ") + "${currentRank.title}",
                             color = TextSecondaryLinen,
                             fontSize = 12.sp
                         )
                         if (nextRank != null) {
                             Text(
-                                text = "التالي: ${nextRank.title} (تبقي ${toArDigits(nextTargetXp - totalXp)} XP)",
+                                text = t("التالي: ", "Next: ") + "${nextRank.title} (" + t("تبقي ", "Remaining ") + "${toArDigits(nextTargetXp - totalXp)} XP)",
                                 color = GoldSoft,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                         } else {
                             Text(
-                                text = "وصلت لأعلى رتبة! ⚜️",
+                                text = t(t(t("وصلت لأعلى رتبة! ⚜️", "Reached highest rank! ⚜️"), "Reached highest rank! ⚜️"), "Reached highest rank! ⚜️"),
                                 color = Gold,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold
@@ -520,7 +523,7 @@ fun ProfileScreen(
 
             // 3. Stats Grid (الرصيد والإحصائيات)
             Text(
-                text = "الرصيد والإحصائيات",
+                text = t("الرصيد والإحصائيات", "Balance & Stats"),
                 color = Gold,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
@@ -534,14 +537,14 @@ fun ProfileScreen(
             ) {
                 StatMetricCard(
                     modifier = Modifier.weight(1f),
-                    title = "نجوم الألعاب",
+                    title = t("نجوم الألعاب", "Game Stars"),
                     value = toArDigits(totalStars),
                     icon = Icons.Filled.Star,
                     tint = Gold
                 )
                 StatMetricCard(
                     modifier = Modifier.weight(1f),
-                    title = "نقاط نور",
+                    title = t(t(t("نقاط نور", "NOOR Points"), "NOOR Points"), "NOOR Points"),
                     value = "${toArDigits(points)} 🌙",
                     icon = Icons.Filled.NightlightRound,
                     tint = GoldSoft
@@ -556,15 +559,15 @@ fun ProfileScreen(
             ) {
                 StatMetricCard(
                     modifier = Modifier.weight(1f),
-                    title = "المراحل المكتملة",
+                    title = t(t(t("المراحل المكتملة", "Completed Stages"), "Completed Stages"), "Completed Stages"),
                     value = toArDigits(completedLevels),
                     icon = Icons.Filled.EmojiEvents,
                     tint = Gold
                 )
                 StatMetricCard(
                     modifier = Modifier.weight(1f),
-                    title = "أيام التتابع",
-                    value = "${toArDigits(streakDays)} يوم",
+                    title = t("أيام التتابع", "Streak Days"),
+                    value = "${toArDigits(streakDays)} " + t("يوم", "days"),
                     icon = Icons.Filled.LocalFireDepartment,
                     tint = Color(0xFFFF9800)
                 )
@@ -581,7 +584,7 @@ fun ProfileScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "الإنجازات والوسامات",
+                    text = t("الإنجازات والوسامات", "Achievements & Badges"),
                     color = Gold,
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
@@ -621,7 +624,7 @@ fun ProfileScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "الشهادات والاعتمادات",
+                    text = t("الشهادات والاعتمادات", "Certificates & Credentials"),
                     color = Gold,
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
@@ -671,7 +674,7 @@ fun ProfileScreen(
                     OutlinedTextField(
                         value = tempName,
                         onValueChange = { tempName = it },
-                        label = { Text("الاسم الشخصي", color = GoldSoft) },
+                        label = { Text(t("الاسم الشخصي", "Display Name"), color = GoldSoft) },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Gold,
                             unfocusedBorderColor = Gold.copy(alpha = 0.4f),
@@ -713,7 +716,7 @@ fun ProfileScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showEditDialog = false }) {
-                    Text("إلغاء", color = TextSecondaryLinen)
+                    Text(t("إلغاء", "Cancel"), color = TextSecondaryLinen)
                 }
             }
         )
@@ -837,7 +840,7 @@ fun ProfileScreen(
             },
             dismissButton = {
                 TextButton(onClick = { selectedCertForDialog = null }) {
-                    Text("إغلاق", color = TextSecondaryLinen)
+                    Text(t("إغلاق", "Close"), color = TextSecondaryLinen)
                 }
             }
         )
@@ -1071,7 +1074,7 @@ private fun CertificateItemCard(
 
                 if (isUnlocked) {
                     Text(
-                        text = "اضغط للفتح واستعراض الشهادة 📜",
+                        text = t("اضغط للفتح واستعراض الشهادة 📜", "Tap to open and view certificate 📜"),
                         color = GoldSoft,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.SemiBold

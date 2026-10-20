@@ -1,4 +1,5 @@
 package com.elhajri.noor.auth
+import com.elhajri.noor.settings.t
 
 import com.elhajri.noor.ui.themeScreenBackground
 import androidx.compose.foundation.background
@@ -52,7 +53,7 @@ fun ResetPasswordScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "رجوع",
+                            contentDescription = t("رجوع", "Back"),
                             tint = Gold
                         )
                     }
@@ -93,14 +94,14 @@ fun ResetPasswordScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "إعادة تعيين كلمة المرور",
+                    text = t("إعادة تعيين كلمة المرور", "Reset Password"),
                     style = MaterialTheme.typography.headlineLarge,
                     color = Gold,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = "أدخل رمز التحقق وكلمة المرور الجديدة",
+                    text = t("أدخل رمز التحقق وكلمة المرور الجديدة", "Enter verification code and new password"),
                     style = MaterialTheme.typography.bodyMedium,
                     color = GoldSoft.copy(alpha = 0.8f),
                     modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)

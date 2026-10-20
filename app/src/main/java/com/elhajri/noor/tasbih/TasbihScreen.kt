@@ -1,4 +1,5 @@
 package com.elhajri.noor.tasbih
+import com.elhajri.noor.settings.t
 
 import android.content.Context
 import android.os.Build
