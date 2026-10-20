@@ -1,6 +1,8 @@
 package com.elhajri.noor.nasheeds
 
 import android.content.Context
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -19,11 +21,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
@@ -76,17 +81,17 @@ private fun loadNasheedsData(context: Context): Pair<List<NasheedCategory>, List
 }
 
 private fun toArabicNumber(number: Int): String {
-    val englishDigits = number.toString()
-    val arabicDigits = charArrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
-    val builder = StringBuilder()
-    for (ch in englishDigits) {
-        if (ch in '0'..'9') {
-            builder.append(arabicDigits[ch - '0'])
-        } else {
-            builder.append(ch)
-        }
-    }
-    return builder.toString()
+    return NoorLocale.formatDigits(number)
+}
+
+private fun translateNasheedCategoryName(cat: NasheedCategory): String = when (cat.id) {
+    "all" -> t("الكل", "All")
+    "prophet" -> t("عن النبي ﷺ", "About the Prophet ﷺ")
+    "religious" -> t("دينية", "Religious")
+    "arabic" -> t("عربية", "Arabic")
+    "english" -> t("إنجليزية", "English")
+    "occasions" -> t("مناسبات", "Occasions")
+    else -> cat.name
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,7 +103,6 @@ fun NasheedsScreen(onBack: () -> Unit) {
     var selectedCategory by remember { mutableStateOf("all") }
     var searchQuery by remember { mutableStateOf("") }
 
-    // Favorites
     val sp = remember { context.getSharedPreferences(FAV_PREFS, Context.MODE_PRIVATE) }
     var favIdsStr by remember { mutableStateOf(sp.getString(KEY_FAVS, "[]") ?: "[]") }
     val favorites = remember(favIdsStr) {
@@ -119,7 +123,6 @@ fun NasheedsScreen(onBack: () -> Unit) {
         favIdsStr = arr.toString()
     }
 
-    // Audio player
     val playerState by com.elhajri.noor.audio.player.NasheedPlayerManager.state.collectAsState()
     val currentlyPlayingId = playerState.currentId
     val isPlayingAudio = playerState.isPlaying
@@ -162,10 +165,10 @@ fun NasheedsScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("مكتبة الأناشيد", color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp) },
+                title = { Text(t("مكتبة الأناشيد", "Nasheed Library"), color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ChevronRight, contentDescription = "رجوع", tint = Gold)
+                        Icon(Icons.Default.ChevronRight, contentDescription = t("رجوع", "Back"), tint = Gold)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NavyCard)
@@ -182,16 +185,16 @@ fun NasheedsScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(10.dp))
 
             com.elhajri.noor.ui.NoorSectionTitle(
-                title = "الأناشيد",
-                subtitle = "أناشيد إسلامية بدون موسيقى — ${toArabicNumber(nasheeds.size)} نشيد",
+                title = t("الأناشيد", "Nasheeds"),
+                subtitle = t("أناشيد إسلامية بدون موسيقى — ", "Islamic Nasheeds (vocal only) — ") + "${toArabicNumber(nasheeds.size)} " + t("نشيد", "tracks"),
                 modifier = Modifier.padding(bottom = 6.dp)
             )
 
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("ابحث عن نشيد أو منشد...", color = GoldSoft.copy(alpha = 0.5f), fontSize = 14.sp) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "بحث", tint = GoldSoft) },
+                placeholder = { Text(t("ابحث عن نشيد أو منشد...", "Search track or artist..."), color = GoldSoft.copy(alpha = 0.5f), fontSize = 14.sp) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = t("بحث", "Search"), tint = GoldSoft) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = NavyCard,
@@ -216,7 +219,7 @@ fun NasheedsScreen(onBack: () -> Unit) {
                     FilterChip(
                         selected = isSelected,
                         onClick = { selectedCategory = cat.id },
-                        label = { Text(cat.name, fontSize = 12.sp) },
+                        label = { Text(translateNasheedCategoryName(cat), fontSize = 12.sp) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = Gold,
                             selectedLabelColor = Navy,
@@ -236,22 +239,30 @@ fun NasheedsScreen(onBack: () -> Unit) {
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("لا توجد نتائج طابقة للبحث", color = GoldSoft)
+                    Text(
+                        text = t("لا توجد أناشيد مطابقة للبحث", "No matching nasheeds found"),
+                        color = GoldSoft.copy(alpha = 0.6f),
+                        fontSize = 14.sp
+                    )
                 }
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    items(filteredNasheeds) { track ->
-                        val isPlayingThis = (currentlyPlayingId == track.id) && isPlayingAudio
+                    items(filteredNasheeds, key = { it.id }) { track ->
+                        val isCurrent = track.id == currentlyPlayingId
                         val isFav = favorites.contains(track.id)
 
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = NavyCard),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isCurrent) Gold.copy(alpha = 0.15f) else NavyCard
+                            ),
                             shape = RoundedCornerShape(12.dp),
-                            onClick = { playTrack(track) },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { playTrack(track) }
                         ) {
                             Row(
                                 modifier = Modifier
@@ -259,18 +270,19 @@ fun NasheedsScreen(onBack: () -> Unit) {
                                     .fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Surface(
-                                    shape = CircleShape,
-                                    color = if (isPlayingThis) Gold else NavyLight,
-                                    modifier = Modifier.size(40.dp)
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                        .background(if (isCurrent) Gold else NavyLight),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(
-                                            imageVector = if (isPlayingThis) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                            contentDescription = null,
-                                            tint = if (isPlayingThis) Navy else Gold
-                                        )
-                                    }
+                                    Icon(
+                                        imageVector = if (isCurrent && isPlayingAudio) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                        contentDescription = if (isCurrent && isPlayingAudio) t("إيقاف مؤقت", "Pause") else t("تشغيل", "Play"),
+                                        tint = if (isCurrent) Navy else Gold,
+                                        modifier = Modifier.size(20.dp)
+                                    )
                                 }
 
                                 Spacer(modifier = Modifier.width(12.dp))
@@ -278,13 +290,13 @@ fun NasheedsScreen(onBack: () -> Unit) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = track.title,
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp
+                                        color = if (isCurrent) Gold else Color.White,
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold
                                     )
                                     Text(
                                         text = track.artist,
-                                        color = GoldSoft,
+                                        color = GoldSoft.copy(alpha = 0.7f),
                                         fontSize = 12.sp
                                     )
                                 }
@@ -292,8 +304,8 @@ fun NasheedsScreen(onBack: () -> Unit) {
                                 IconButton(onClick = { toggleFav(track.id) }) {
                                     Icon(
                                         imageVector = if (isFav) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                        contentDescription = "مفضلة",
-                                        tint = if (isFav) Color.Red else GoldSoft
+                                        contentDescription = t("مفضلة", "Favorite"),
+                                        tint = if (isFav) Gold else GoldSoft.copy(alpha = 0.4f)
                                     )
                                 }
                             }
