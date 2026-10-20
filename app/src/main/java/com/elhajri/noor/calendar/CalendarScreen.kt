@@ -1,5 +1,7 @@
 package com.elhajri.noor.calendar
 
+import com.elhajri.noor.settings.t
+
 import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import androidx.compose.foundation.background
@@ -228,7 +230,7 @@ fun CalendarScreen() {
             .padding(16.dp)
     ) {
         Text(
-            text = "التقويم الهجري",
+            text = t("التقويم الهجري", "Hijri Calendar"),
             color = Gold,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
