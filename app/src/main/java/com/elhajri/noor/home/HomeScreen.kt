@@ -42,6 +42,8 @@ import com.elhajri.noor.R
 import com.elhajri.noor.data.Prefs
 import com.elhajri.noor.prayer.PrayerRepository
 import com.elhajri.noor.prayer.PrayerTimings
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.theme.ThemeStore
 import com.elhajri.noor.theme.noorGlassCard
 import com.elhajri.noor.ui.AmiriFamily
@@ -59,37 +61,73 @@ private val TextSoft get() = com.elhajri.noor.ui.TextMain
 // صورة الموقع الأصلية نفسها — من كود PrayerWidget.jsx حرفياً
 private const val HERO_IMG = "https://media.base44.com/images/public/6a833faeb9e42cca9a6576fa/edd00f95f_generated_image.png"
 
-private fun toArabicDigits(value: Any): String {
-    val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
-    return value.toString().map { map[it] ?: it }.joinToString("")
-}
+private fun toArabicDigits(value: Any): String = NoorLocale.formatDigits(value)
 
-// آيات اليوم — من الكود المصدري للموقع حرفياً
-private data class DailyVerse(val text: String, val ref: String)
+// آيات اليوم — القرآن الكريم يبقى بالعربية حرفياً حسب الضوابط الشرعية
+private data class DailyVerse(val text: String, val refAr: String, val refEn: String)
 private val VERSES = listOf(
-    DailyVerse("أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", "سورة الرعد — الآية ٢٨"),
-    DailyVerse("وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا", "سورة الطلاق — الآية ٢"),
-    DailyVerse("إِنَّ مَعَ الْعُسْرِ يُسْرًا", "سورة الشرح — الآية ٦"),
-    DailyVerse("فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ", "سورة البقرة — الآية ١٥٢"),
-    DailyVerse("وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ", "سورة الحديد — الآية ٤"),
-    DailyVerse("رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي", "سورة طه — الآيتان ٢٥-٢٦"),
-    DailyVerse("لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا", "سورة البقرة — الآية ٢٨٦"),
-    DailyVerse("وَبَشِّرِ الصَّابِرِينَ", "سورة البقرة — الآية ١٥٥"),
+    DailyVerse("أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", "سورة الرعد — الآية ٢٨", "Surah Ar-Ra'd — Verse 28"),
+    DailyVerse("وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا", "سورة الطلاق — الآية ٢", "Surah At-Talaq — Verse 2"),
+    DailyVerse("إِنَّ مَعَ الْعُسْرِ يُسْرًا", "سورة الشرح — الآية ٦", "Surah Ash-Sharh — Verse 6"),
+    DailyVerse("فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ", "سورة البقرة — الآية ١٥٢", "Surah Al-Baqarah — Verse 152"),
+    DailyVerse("وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ", "سورة الحديد — الآية ٤", "Surah Al-Hadid — Verse 4"),
+    DailyVerse("رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي", "سورة طه — الآيتان ٢٥-٢٦", "Surah Ta-Ha — Verses 25-26"),
+    DailyVerse("لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا", "سورة البقرة — الآية ٢٨٦", "Surah Al-Baqarah — Verse 286"),
+    DailyVerse("وَبَشِّرِ الصَّابِرِينَ", "سورة البقرة — الآية ١٥٥", "Surah Al-Baqarah — Verse 155"),
 )
 
-private val HIJRI_MONTHS = listOf(
+private val HIJRI_MONTHS_AR = listOf(
     "محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الآخرة",
     "رجب", "شعبان", "رمضان", "شوّال", "ذو القعدة", "ذو الحجة"
+)
+private val HIJRI_MONTHS_EN = listOf(
+    "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani", "Jumada al-Awwal", "Jumada al-Thani",
+    "Rajab", "Sha'ban", "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah"
 )
 
 private fun hijriDateLabel(): String {
     return try {
         val cal = IslamicCalendar()
         val day = cal.get(IslamicCalendar.DAY_OF_MONTH)
-        val month = HIJRI_MONTHS.getOrNull(cal.get(IslamicCalendar.MONTH)) ?: ""
+        val monthIdx = cal.get(IslamicCalendar.MONTH)
+        val month = if (NoorLocale.isEnglish) HIJRI_MONTHS_EN.getOrNull(monthIdx) ?: "" else HIJRI_MONTHS_AR.getOrNull(monthIdx) ?: ""
         val year = cal.get(IslamicCalendar.YEAR)
-        "${toArabicDigits(day)} $month ${toArabicDigits(year)}هـ"
+        if (NoorLocale.isEnglish) {
+            "$day $month $year AH"
+        } else {
+            "${toArabicDigits(day)} $month ${toArabicDigits(year)}هـ"
+        }
     } catch (_: Exception) { "" }
+}
+
+private fun translatePrayerName(name: String): String = when (name) {
+    "الفجر" -> t("الفجر", "Fajr")
+    "الظهر" -> t("الظهر", "Dhuhr")
+    "العصر" -> t("العصر", "Asr")
+    "المغرب" -> t("المغرب", "Maghrib")
+    "العشاء" -> t("العشاء", "Isha")
+    else -> name
+}
+
+private fun translateCityName(name: String): String = when (name) {
+    "مكة المكرمة" -> t("مكة المكرمة", "Makkah Al-Mukarramah")
+    "المدينة المنورة" -> t("المدينة المنورة", "Madinah Al-Munawwarah")
+    "الرياض" -> t("الرياض", "Riyadh")
+    "جدة" -> t("جدة", "Jeddah")
+    "القاهرة" -> t("القاهرة", "Cairo")
+    "الدار البيضاء" -> t("الدار البيضاء", "Casablanca")
+    "الرباط" -> t("الدار البيضاء", "Rabat")
+    "دبي" -> t("دبي", "Dubai")
+    "أبوظبي" -> t("أبوظبي", "Abu Dhabi")
+    "القدس" -> t("القدس", "Jerusalem")
+    "عمان" -> t("عمان", "Amman")
+    "الكويت" -> t("الكويت", "Kuwait City")
+    "الدوحة" -> t("الدوحة", "Doha")
+    "تونس" -> t("تونس", "Tunis")
+    "الجزائر" -> t("الجزائر", "Algiers")
+    "بغداد" -> t("بغداد", "Baghdad")
+    "دمشق" -> t("دمشق", "Damascus")
+    else -> name
 }
 
 @Composable
@@ -153,7 +191,7 @@ private fun GoldCountdownTimer(
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        Color(0x77112B20), // زجاج زبرجدي داكن
+                        Color(0x77112B20),
                         Color(0xCC081510)
                     )
                 )
@@ -175,7 +213,7 @@ private fun GoldCountdownTimer(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "الوقت المتبقي للأذان",
+                text = t("الوقت المتبقي للأذان", "Time until Adhan"),
                 color = Gold8Soft,
                 fontSize = 9.5.sp,
                 fontWeight = FontWeight.Bold
@@ -185,7 +223,7 @@ private fun GoldCountdownTimer(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                DigitGlassBox(value = hours, label = "ساعة")
+                DigitGlassBox(value = hours, label = t("ساعة", "hr"))
                 Text(
                     text = ":",
                     color = Gold8,
@@ -193,7 +231,7 @@ private fun GoldCountdownTimer(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 2.dp)
                 )
-                DigitGlassBox(value = minutes, label = "دقيقة")
+                DigitGlassBox(value = minutes, label = t("دقيقة", "min"))
                 Text(
                     text = ":",
                     color = Gold8,
@@ -201,7 +239,7 @@ private fun GoldCountdownTimer(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 2.dp)
                 )
-                DigitGlassBox(value = seconds, label = "ثانية")
+                DigitGlassBox(value = seconds, label = t("ثانية", "sec"))
             }
         }
     }
@@ -243,14 +281,14 @@ private fun NextPrayerTimesRow(
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text = "الأوقات التالية",
+                    text = t("الأوقات التالية", "Next Prayers"),
                     color = Gold8Soft,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
             Text(
-                text = "مواقيت اليوم",
+                text = t("مواقيت اليوم", "Today's Timings"),
                 color = Color.White.copy(alpha = 0.60f),
                 fontSize = 9.sp
             )
@@ -286,7 +324,7 @@ private fun NextPrayerTimesRow(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = item.name,
+                        text = translatePrayerName(item.name),
                         color = nameColor,
                         fontSize = 11.sp,
                         fontWeight = if (item.isNext) FontWeight.Bold else FontWeight.Normal,
@@ -331,7 +369,6 @@ private fun HeroPrayerCard(
             .border(1.5.dp, Gold8.copy(alpha = 0.45f), RoundedCornerShape(22.dp))
             .clickable(interactionSource = heroInteraction, indication = androidx.compose.foundation.LocalIndication.current) { onNavigate("prayer") }
     ) {
-        // Offline-first hero: bundled drawable renders instantly and works with no internet.
         Image(
             painter = painterResource(R.drawable.hero_mosque),
             contentDescription = null,
@@ -344,7 +381,6 @@ private fun HeroPrayerCard(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        // تعتيم متدرج يثبّت النصوص فوق الصورة
         Box(
             Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
@@ -356,7 +392,6 @@ private fun HeroPrayerCard(
                 )
             )
         )
-        // إضاءة علوية للعمق ثلاثي الأبعاد
         Box(
             Modifier.fillMaxWidth().height(60.dp).background(
                 Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.12f), Color.Transparent))
@@ -369,13 +404,11 @@ private fun HeroPrayerCard(
                 .padding(14.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // شريط العنوان: المدينة (يسار) + التحية والتاريخ الهجري (يمين)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                // شارة المدينة جهة اليسار
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -391,10 +424,9 @@ private fun HeroPrayerCard(
                         modifier = Modifier.size(12.dp)
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text(cityName, color = Color.White.copy(alpha = 0.9f), fontSize = 10.sp)
+                    Text(translateCityName(cityName), color = Color.White.copy(alpha = 0.9f), fontSize = 10.sp)
                 }
 
-                // التحية والتاريخ الهجري جهة اليمين
                 Column(horizontalAlignment = Alignment.End) {
                     Text(greeting, color = Gold8Soft, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
                     if (hijri.isNotEmpty()) {
@@ -405,15 +437,14 @@ private fun HeroPrayerCard(
 
             Spacer(Modifier.height(8.dp))
 
-            // القسم الأوسط: الصلاة القادمة (يمين) + العداد الذهبي الأنيق (يسار)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(horizontalAlignment = Alignment.Start) {
-                    Text("الصلاة التالية", color = Gold8.copy(alpha = 0.85f), fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold)
-                    Text(nextPrayerName, color = Gold8Soft, fontSize = 23.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
+                    Text(t("الصلاة التالية", "Next Prayer"), color = Gold8.copy(alpha = 0.85f), fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold)
+                    Text(translatePrayerName(nextPrayerName), color = Gold8Soft, fontSize = 23.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
                     Text(nextPrayerTimeLabel, color = TextMain, fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold)
                 }
 
@@ -426,7 +457,6 @@ private fun HeroPrayerCard(
 
             Spacer(Modifier.height(10.dp))
 
-            // القسم السفلي: الأوقات التالية للمواقيت
             if (dailyPrayers.isNotEmpty()) {
                 NextPrayerTimesRow(prayers = dailyPrayers)
             }
@@ -434,7 +464,6 @@ private fun HeroPrayerCard(
     }
 }
 
-/** بطاقة استكشاف — 3D بإضاءة علوية وحافة ذهبية، مع تموج عند الضغط */
 private data class Explore(val route: String, val title: String, val sub: String, val icon: ImageVector)
 
 @Composable
@@ -484,22 +513,22 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
     val hour = remember { Calendar.getInstance().get(Calendar.HOUR_OF_DAY) }
     val greeting = when {
-        hour in 5..11 -> "صباح الخير"
-        hour in 12..16 -> "مساء الخير"
-        hour in 17..20 -> "مساء الخير"
-        else -> "ليلة مباركة"
+        hour in 5..11 -> t("صباح الخير", "Good Morning")
+        hour in 12..16 -> t("مساء الخير", "Good Afternoon")
+        hour in 17..20 -> t("مساء الخير", "Good Evening")
+        else -> t("ليلة مباركة", "Blessed Night")
     }
-    val hijri = remember { hijriDateLabel() }
+    val hijri = remember(NoorLocale.lang) { hijriDateLabel() }
     val points = remember { ThemeStore.getPoints(context) }
 
     var nextPrayerName by remember { mutableStateOf("...") }
     var nextPrayerTimeLabel by remember { mutableStateOf("") }
-    var hoursStr by remember { mutableStateOf("٠٠") }
-    var minutesStr by remember { mutableStateOf("٠٠") }
-    var secondsStr by remember { mutableStateOf("٠٠") }
+    var hoursStr by remember { mutableStateOf(toArabicDigits("00")) }
+    var minutesStr by remember { mutableStateOf(toArabicDigits("00")) }
+    var secondsStr by remember { mutableStateOf(toArabicDigits("00")) }
     var dailyPrayers by remember { mutableStateOf<List<HomePrayerDisplayItem>>(emptyList()) }
 
-    LaunchedEffect(timings) {
+    LaunchedEffect(timings, NoorLocale.lang) {
         while (true) {
             val t = timings ?: PrayerRepository.getCachedTimings(context)
             val now = Calendar.getInstance()
@@ -554,7 +583,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
             val th = tp.getOrNull(0)?.trim()?.toIntOrNull() ?: 0
             val tm = tp.getOrNull(1)?.trim()?.toIntOrNull() ?: 0
             val h12Val = if (th % 12 == 0) 12 else th % 12
-            val ampmVal = if (th >= 12) "م" else "ص"
+            val ampmVal = if (th >= 12) t("م", "PM") else t("ص", "AM")
             nextPrayerTimeLabel = toArabicDigits(String.format("%02d", h12Val)) + ":" +
                 toArabicDigits(String.format("%02d", tm)) + " " + ampmVal
 
@@ -573,7 +602,7 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 val h = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: 0
                 val m = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: 0
                 val itemH12 = if (h % 12 == 0) 12 else h % 12
-                val itemAmpm = if (h >= 12) "م" else "ص"
+                val itemAmpm = if (h >= 12) t("م", "PM") else t("ص", "AM")
                 val label = "${toArabicDigits(String.format("%02d", itemH12))}:${toArabicDigits(String.format("%02d", m))} $itemAmpm"
                 HomePrayerDisplayItem(
                     name = pName,
@@ -589,14 +618,13 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
     val dayIndex = remember { Calendar.getInstance().get(Calendar.DAY_OF_MONTH) }
     val verse = VERSES[dayIndex % VERSES.size]
 
-    // استكشف نور — ستة أبواب كما في التصميم المعتمد
     val explore = listOf(
-        Explore("quran", "القرآن الكريم", "تلاوة، حفظ، تفسير", Icons.AutoMirrored.Filled.MenuBook),
-        Explore("athkar", "الأذكار", "أذكار اليوم والليلة", Icons.Filled.Favorite),
-        Explore("qibla", "القبلة", "اتجاه القبلة بدقة", Icons.Filled.Explore),
-        Explore("library", "الأناشيد", "إيقاع بلا آلات", Icons.Filled.MusicNote),
-        Explore("games", "ميدان الألعاب", "٦ تحديات إيمانية", Icons.Filled.SportsEsports),
-        Explore("ai", "المساعد الذكي", "أسئلتك الفقهية", Icons.Filled.AutoAwesome),
+        Explore("quran", t("القرآن الكريم", "Noble Qur'an"), t("تلاوة، حفظ، تفسير", "Recitation, Memorization, Tafseer"), Icons.AutoMirrored.Filled.MenuBook),
+        Explore("athkar", t("الأذكار", "Adhkar"), t("أذكار اليوم والليلة", "Daily Supplications"), Icons.Filled.Favorite),
+        Explore("qibla", t("القبلة", "Qibla"), t("اتجاه القبلة بدقة", "Accurate Qibla Direction"), Icons.Filled.Explore),
+        Explore("nasheeds", t("الأناشيد", "Nasheeds"), t("إيقاع بلا آلات", "Vocal Melodies"), Icons.Filled.MusicNote),
+        Explore("games", t("ميدان الألعاب", "Games Hub"), t("٦ تحديات إيمانية", "Faith Challenges"), Icons.Filled.SportsEsports),
+        Explore("ai", t("المساعد الذكي", "Smart AI Helper"), t("أسئلتك الفقهية", "Islamic Q&A"), Icons.Filled.AutoAwesome),
     )
 
     Box(modifier = Modifier.fillMaxSize().themeScreenBackground()) {
@@ -607,7 +635,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            // بطاقة الصلاة — خلفية المسجد مع عداد ذهبي أنيق وشريط الأوقات التالية
             HeroPrayerCard(
                 greeting = greeting,
                 hijri = hijri,
@@ -623,7 +650,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
             Spacer(Modifier.height(10.dp))
 
-            // شريط الإعلانات — فوق العناصر مباشرة كما طلب محمد
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -638,9 +664,9 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("نقاطك: ${toArabicDigits(points)} 🌙", color = Gold8Soft, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
+                Text(t("نقاطك: ", "Points: ") + "${toArabicDigits(points)} 🌙", color = Gold8Soft, fontSize = 11.5.sp, fontWeight = FontWeight.Bold)
                 Text(
-                    "أكمل ٣ إعلانات واربح ٣٠٠ نقطة ←",
+                    t("أكمل ٣ إعلانات واربح ٣٠٠ نقطة ←", "Watch 3 ads & win 300 pts →"),
                     color = Gold8Soft.copy(alpha = 0.85f),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -650,22 +676,18 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
 
             Spacer(Modifier.height(10.dp))
 
-            // تحدي اليوم الإيماني
             com.elhajri.noor.games.DailyChallengeHubCard(
                 onPlayChallenge = { route -> onNavigate(route) }
             )
 
-            // استكشف نور — العناصر فوق الآية
             Spacer(Modifier.height(12.dp))
-            // عنوان استكشف نور
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.width(4.dp).height(16.dp).clip(RoundedCornerShape(2.dp)).background(Gold8))
                 Spacer(Modifier.width(8.dp))
-                Text("استكشف نور", color = Gold8, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(t("استكشف نور", "Explore NOOR"), color = Gold8, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(10.dp))
 
-            // شبكة الاستكشاف ٢×٣
             for (row in 0..2) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     ExploreCard(explore[row * 2], Modifier.weight(1f), onNavigate)
@@ -674,7 +696,6 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                 Spacer(Modifier.height(10.dp))
             }
 
-            // آية اليوم — بطاقة زجاجية بحافة ذهبية وعمق ثلاثي الأبعاد
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -691,16 +712,28 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
                     .border(1.dp, Gold8.copy(alpha = 0.40f), RoundedCornerShape(16.dp))
                     .padding(horizontal = 15.dp, vertical = 10.dp)
             ) {
-                Text("آية اليوم", color = Gold8, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                Text(t("آية اليوم", "Verse of the Day"), color = Gold8, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(6.dp))
-                Text(verse.text, color = TextSoft, fontSize = 17.sp, fontFamily = AmiriFamily, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                Text(
+                    text = verse.text,
+                    color = TextMain,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = AmiriFamily,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(Modifier.height(4.dp))
-                Text(verse.ref, color = Gold8Soft.copy(alpha = 0.80f), fontSize = 10.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End)
+                Text(
+                    text = if (NoorLocale.isEnglish) verse.refEn else verse.refAr,
+                    color = Gold8Soft,
+                    fontSize = 10.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
-            Spacer(Modifier.height(14.dp))
-
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
         }
     }
 }
