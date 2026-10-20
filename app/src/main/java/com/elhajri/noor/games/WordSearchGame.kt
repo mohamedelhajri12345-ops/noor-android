@@ -34,6 +34,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -371,6 +373,7 @@ private fun rememberShakeOffset(isShaking: Boolean): Float {
 fun WordSearchGame(onBack: () -> Unit) {
     val context = LocalContext.current
 
+    val haptics = LocalHapticFeedback.current
     var currentScreen by remember { mutableStateOf(GameScreen.LEVEL_MAP) }
     var selectedLevelId by remember { mutableIntStateOf(1) }
 
@@ -449,6 +452,7 @@ fun WordSearchGame(onBack: () -> Unit) {
                 }
 
                 fun handleCellTap(r: Int, c: Int) {
+                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     val tapped = Pair(r, c)
                     if (selectedFirstCell == null) {
                         selectedFirstCell = tapped
@@ -464,6 +468,7 @@ fun WordSearchGame(onBack: () -> Unit) {
                         }
 
                         if (matchWord != null) {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                             val updated = foundWords + matchWord.word
                             foundWords = updated
                             selectedFirstCell = null
@@ -482,6 +487,7 @@ fun WordSearchGame(onBack: () -> Unit) {
                                 currentScreen = GameScreen.LEVEL_WIN
                             }
                         } else {
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             shakingCells = setOf(firstCell, tapped)
                             selectedFirstCell = null
                         }
@@ -1014,6 +1020,26 @@ private fun GameplayScreen(
  */
 @Composable
 private fun LevelWinDialog(
+    level: WordSearchLevel,
+    stars: Int,
+    timeTaken: Int,
+    foundWords: List<String>,
+    onNextLevel: () -> Unit,
+    onMap: () -> Unit
+) {
+    WinCelebrationOverlay(
+        stageNumber = level.id,
+        totalStages = 20,
+        stars = stars,
+        stageTitle = level.title,
+        onNextStage = onNextLevel,
+        onReplayStage = onNextLevel,
+        onStageMap = onMap
+    )
+}
+
+@Composable
+private fun LevelWinDialogOriginal(
     level: WordSearchLevel,
     stars: Int,
     timeTaken: Int,

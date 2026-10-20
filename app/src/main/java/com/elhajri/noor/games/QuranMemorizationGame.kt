@@ -28,6 +28,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -368,6 +369,9 @@ fun QuranMemorizationGameScreen(onBack: () -> Unit) {
                     var qIndex by remember(lvl) { mutableStateOf(0) }
                     var score by remember(lvl) { mutableStateOf(0) }
                     var isCompleted by remember(lvl) { mutableStateOf(false) }
+                    val haptics = LocalHapticFeedback.current
+                    var selectedOpt by remember(qIndex) { mutableStateOf<Int?>(null) }
+                    
 
                     val sampleQuestions = remember(lvl) {
                         listOf(
@@ -382,7 +386,7 @@ fun QuranMemorizationGameScreen(onBack: () -> Unit) {
                     val currentQ = sampleQuestions.getOrNull(qIndex)
 
                     if (currentQ != null && !isCompleted) {
-                        var selectedOpt by remember(lvl, qIndex) { mutableStateOf<Int?>(null) }
+                        
 
                         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("اختبار المستوى ${lvl.toArabicDigits()}", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
