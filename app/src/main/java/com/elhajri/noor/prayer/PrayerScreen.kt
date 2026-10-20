@@ -1,5 +1,9 @@
 package com.elhajri.noor.prayer
 
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
 import com.elhajri.noor.ui.themeScreenBackground
 import android.media.AudioAttributes
 import androidx.compose.foundation.background
@@ -205,13 +209,13 @@ fun PrayerScreen() {
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                "الموقع التلقائي (GPS)",
+                                t("الموقع التلقائي (GPS)", "Auto Location (GPS)"),
                                 color = if (isAutoLocation) Navy else Color.White,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                "انتقال تلقائي حسب موقعك الجغرافي",
+                                t("انتقال تلقائي حسب موقعك الجغرافي", "Auto switch based on location"),
                                 color = if (isAutoLocation) Navy.copy(alpha = 0.7f) else GoldSoft.copy(alpha = 0.7f),
                                 fontSize = 11.sp
                             )
@@ -318,7 +322,7 @@ fun PrayerScreen() {
                             color = Gold.copy(alpha = 0.2f)
                         ) {
                             Text(
-                                "تلقائي",
+                                t("تلقائي", "Auto"),
                                 color = Gold,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
@@ -330,7 +334,7 @@ fun PrayerScreen() {
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = if (isAdhanEnabled) "التنبيه مفعل" else "التنبيه معطل",
+                        text = if (isAdhanEnabled) t("التنبيه مفعل", "Adhan Enabled") else t("التنبيه معطل", "Adhan Disabled"),
                         color = GoldSoft,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(end = 4.dp)
@@ -349,7 +353,7 @@ fun PrayerScreen() {
                     ) {
                         Icon(
                             imageVector = if (isAdhanEnabled) Icons.Filled.Notifications else Icons.Filled.NotificationsOff,
-                            contentDescription = "تفعيل الأذان",
+                            contentDescription = t("تفعيل الأذان", "Enable Adhan"),
                             tint = Gold
                         )
                     }
@@ -386,7 +390,7 @@ fun PrayerScreen() {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "مواقيت الصلاة",
+                                text = t("مواقيت الصلاة", "Prayer Times"),
                                 color = GoldSoft,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -405,7 +409,7 @@ fun PrayerScreen() {
                         ) {
                             Column {
                                 Text(
-                                    text = "الوقت المتبقي",
+                                    text = t("الوقت المتبقي", "Time Remaining"),
                                     color = GoldSoft.copy(alpha = 0.8f),
                                     fontSize = 11.sp
                                 )
@@ -420,7 +424,7 @@ fun PrayerScreen() {
 
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(
-                                    text = "الصلاة القادمة",
+                                    text = t("الصلاة القادمة", "Next Prayer"),
                                     color = GoldSoft.copy(alpha = 0.8f),
                                     fontSize = 11.sp
                                 )
@@ -463,7 +467,7 @@ fun PrayerScreen() {
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = if (isAdhanPlaying) "إيقاف الأذان" else "استماع للأذان",
+                                        text = if (isAdhanPlaying) t("إيقاف الأذان", "Stop Adhan") else t("استماع للأذان", "Listen to Adhan"),
                                         color = Gold,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold
@@ -489,12 +493,12 @@ fun PrayerScreen() {
             } else {
                 timings?.let { t ->
                     val prayerList = listOf(
-                        PrayerItem("الفجر", format12Hour(t.fajr), "🌅", isNext = nextPrayerName == "الفجر"),
-                        PrayerItem("الشروق", format12Hour(t.sunrise), "☀️", isSunrise = true),
-                        PrayerItem("الظهر", format12Hour(t.dhuhr), "☀️", isNext = nextPrayerName == "الظهر"),
-                        PrayerItem("العصر", format12Hour(t.asr), "🌤️", isNext = nextPrayerName == "العصر"),
-                        PrayerItem("المغرب", format12Hour(t.maghrib), "🌇", isNext = nextPrayerName == "المغرب"),
-                        PrayerItem("العشاء", format12Hour(t.isha), "🌙", isNext = nextPrayerName == "العشاء")
+                        PrayerItem(t("الفجر", "Fajr"), format12Hour(t.fajr), "🌅", isNext = nextPrayerName == "الفجر"),
+                        PrayerItem(t("الشروق", "Sunrise"), format12Hour(t.sunrise), "☀️", isSunrise = true),
+                        PrayerItem(t("الظهر", "Dhuhr"), format12Hour(t.dhuhr), "☀️", isNext = nextPrayerName == "الظهر"),
+                        PrayerItem(t("العصر", "Asr"), format12Hour(t.asr), "🌤️", isNext = nextPrayerName == "العصر"),
+                        PrayerItem(t("المغرب", "Maghrib"), format12Hour(t.maghrib), "🌇", isNext = nextPrayerName == "المغرب"),
+                        PrayerItem(t("العشاء", "Isha"), format12Hour(t.isha), "🌙", isNext = nextPrayerName == "العشاء")
                     )
 
                     LazyColumn(
@@ -550,7 +554,7 @@ private fun PrayerCard(item: PrayerItem) {
                         color = Gold.copy(alpha = 0.3f)
                     ) {
                         Text(
-                            text = "القادمة",
+                            text = t("القادمة", "Next"),
                             color = Gold,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
@@ -576,7 +580,7 @@ private fun format12Hour(time24: String): String {
         if (parts.size < 2) return time24
         var hour = parts[0].trim().toInt()
         val minute = parts[1].trim().toInt()
-        val period = if (hour >= 12) "م" else "ص"
+        val period = if (hour >= 12) t("م", "PM") else t("ص", "AM")
         if (hour == 0) hour = 12
         else if (hour > 12) hour -= 12
         String.format(Locale.US, "%d:%02d %s", hour, minute, period)

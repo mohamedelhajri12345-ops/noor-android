@@ -1,5 +1,9 @@
 package com.elhajri.noor.prayer
 
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.toArabicDigits
+
 import android.content.Context
 import com.elhajri.noor.data.Prefs
 import kotlinx.coroutines.Dispatchers
@@ -184,7 +188,7 @@ object LocalPrayerCalculator {
             )
             val hMonth = months.getOrNull(cal.get(android.icu.util.IslamicCalendar.MONTH)) ?: ""
             val hYear = cal.get(android.icu.util.IslamicCalendar.YEAR)
-            "$hDay $hMonth $hYear هـ"
+            if (NoorLocale.isEnglish) "$hDay $hMonth $hYear AH" else "$hDay $hMonth $hYear هـ"
         } catch (_: Exception) {
             "15 ربيع الأول 1448 هـ"
         }
@@ -361,7 +365,7 @@ object PrayerRepository {
                     val year = hijriObj.optString("year", "")
                     val weekdayObj = hijriObj.optJSONObject("weekday")
                     val dayName = weekdayObj?.optString("ar", "") ?: ""
-                    hijriStr = listOf(dayName, day, monthName, year).filter { it.isNotBlank() }.joinToString(" ") + " هـ"
+                    hijriStr = listOf(dayName, day, monthName, year).filter { it.isNotBlank() }.joinToString(" ") + (if (NoorLocale.isEnglish) " AH" else " هـ")
                 }
             }
 

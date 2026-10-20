@@ -1,5 +1,8 @@
 package com.elhajri.noor.theme
 
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,8 +17,10 @@ import com.elhajri.noor.R
  */
 data class NoorThemeDef(
     val id: String,
-    val name: String,
-    val description: String,
+    val nameAr: String,
+    val nameEn: String,
+    val descAr: String,
+    val descEn: String,
     val price: Int,               // 0 = مجاني
     // الخلفية العامة (تدرّج رأسي من اللونين)
     val background: Color,
@@ -44,7 +49,10 @@ data class NoorThemeDef(
     val motifColor: Color = accent,
     val cardStyle: NoorCardStyle = NoorCardStyle(radius = cardRadius),
     val headerStyle: NoorHeaderStyle = NoorHeaderStyle()
-)
+) {
+    val name: String get() = if (NoorLocale.isEnglish) nameEn else nameAr
+    val description: String get() = if (NoorLocale.isEnglish) descEn else descAr
+}
 
 /**
  * حالة الثيم النشط — واحدة لكل التطبيق، تقرأها الشاشات تفاعلياً
@@ -70,7 +78,7 @@ object NoorThemeState {
 object NoorThemes {
 
     private fun theme(
-        id: String, name: String, description: String, price: Int = ThemeStore.THEME_PRICE,
+        id: String, nameAr: String, nameEn: String, descAr: String, descEn: String, price: Int = ThemeStore.THEME_PRICE,
         bg: Long, bgEnd: Long, surface: Long, surfaceVariant: Long,
         accent: Long, accentSoft: Long, accentDeep: Long,
         text: Long, textSec: Long,
@@ -81,7 +89,7 @@ object NoorThemes {
     ): NoorThemeDef {
         val accentCol = Color(accent)
         return NoorThemeDef(
-            id, name, description, price,
+            id, nameAr, nameEn, descAr, descEn, price,
             Color(bg), Color(bgEnd), Color(surface), Color(surfaceVariant),
             accentCol, Color(accentSoft), Color(accentDeep),
             Color(text), Color(textSec),
@@ -96,7 +104,7 @@ object NoorThemes {
 
         // ─────────── 00 — الثيم الافتراضي المجاني ───────────
         theme(
-            "noor_default", "نور الأساسي", "الهوية المعتمدة — أخضر ليلي زيتوني وذهب دافئ", price = 0,
+            "noor_default", "نور الأساسي", "NOOR Default", "الهوية المعتمدة — أخضر ليلي زيتوني وذهب دافئ", "Official Theme — Night Olive Green & Warm Gold", price = 0,
             bg = 0xFF10220F, bgEnd = 0xFF081209, surface = 0xFF13291B, surfaceVariant = 0xFF1A3323,
             accent = 0xFFE9C46A, accentSoft = 0xFFF6E2A0, accentDeep = 0xFFA57C31,
             text = 0xFFEDE9DD, textSec = 0xFFB9C4B0,
@@ -106,7 +114,7 @@ object NoorThemes {
 
         // ─────────── 01 — نور الفجر ───────────
         theme(
-            "fajr_noor", "نور الفجر", "سماء الفجر الهادئة — أزرق فجري داكن وذهب خفيف لبداية يوم جديد",
+            "fajr_noor", "نور الفجر", "Fajr Light", "سماء الفجر الهادئة — أزرق فجري داكن وذهب خفيف لبداية يوم جديد", "Serene Dawn Sky — Dark Dawn Blue & Subtle Gold",
             bg = 0xFF0C1826, bgEnd = 0xFF081220, surface = 0xFF142436, surfaceVariant = 0xFF1C3046,
             accent = 0xFFD9BC66, accentSoft = 0xFFF0DCA0, accentDeep = 0xFFB08D2F,
             text = 0xFFF6FBFF, textSec = 0xFFBFD2E4,
@@ -116,7 +124,7 @@ object NoorThemes {
 
         // ─────────── 02 — زمرد القرآن ───────────
         theme(
-            "emerald_quran", "زمرد القرآن", "كلاسيكي إسلامي فاخر — زمردي عميق وذهب على أخضر داكن",
+            "emerald_quran", "زمرد القرآن", "Qur'an Emerald", "كلاسيكي إسلامي فاخر — زمردي عميق وذهب على أخضر داكن", "Luxurious Islamic Classic — Deep Emerald & Gold",
             bg = 0xFF062A1E, bgEnd = 0xFF04211A, surface = 0xFF0B3D2E, surfaceVariant = 0xFF0E4A38,
             accent = 0xFFD4AF35, accentSoft = 0xFFF0D77A, accentDeep = 0xFF9E7C2E,
             text = 0xFFF2FAF5, textSec = 0xFFBFD6C9,
@@ -126,7 +134,7 @@ object NoorThemes {
 
         // ─────────── 03 — المسجد الذهبي ───────────
         theme(
-            "golden_mosque", "المسجد الذهبي", "فخامة ملكية — ذهب راقٍ على بني داكن وأسود ناعم",
+            "golden_mosque", "المسجد الذهبي", "Golden Mosque", "فخامة ملكية — ذهب راقٍ على بني داكن وأسود ناعم", "Royal Elegance — Fine Gold on Dark Brown",
             bg = 0xFF16100A, bgEnd = 0xFF100B07, surface = 0xFF231A10, surfaceVariant = 0xFF2C2115,
             accent = 0xFFE3B94D, accentSoft = 0xFFF6D98A, accentDeep = 0xFFA87F2B,
             text = 0xFFFBF5E9, textSec = 0xFFD6C4A5,
@@ -136,7 +144,7 @@ object NoorThemes {
 
         // ─────────── 04 — ليل مكة ───────────
         theme(
-            "makkah_night", "ليل مكة", "ليل روحاني فاخر — كحلي عميق وذهب متوهج",
+            "makkah_night", "ليل مكة", "Makkah Night", "ليل روحاني فاخر — كحلي عميق وذهب متوهج", "Spiritual Night — Deep Navy & Glowing Gold",
             bg = 0xFF070F2A, bgEnd = 0xFF050A1E, surface = 0xFF0C1734, surfaceVariant = 0xFF11204A,
             accent = 0xFFE0B94F, accentSoft = 0xFFF7DB86, accentDeep = 0xFFA5842D,
             text = 0xFFF4F6FC, textSec = 0xFFB9C2DC,
@@ -146,7 +154,7 @@ object NoorThemes {
 
         // ─────────── 05 — المدينة الهادئة ───────────
         theme(
-            "madinah_calm", "المدينة الهادئة", "دفء تراثي — أخضر زيتوني وبيج المسجد النبوي",
+            "madinah_calm", "المدينة الهادئة", "Serene Madinah", "دفء تراثي — أخضر زيتوني وبيج المسجد النبوي", "Heritage Warmth — Olive Green & Madinah Beige",
             bg = 0xFF141B10, bgEnd = 0xFF101609, surface = 0xFF1F2A17, surfaceVariant = 0xFF28341D,
             accent = 0xFFD9B25F, accentSoft = 0xFFEFD394, accentDeep = 0xFFA08140,
             text = 0xFFF7F3E8, textSec = 0xFFD0C7B0,
@@ -156,7 +164,7 @@ object NoorThemes {
 
         // ─────────── 06 — الكعبة الملكية ───────────
         theme(
-            "royal_kaaba", "الكعبة الملكية", "Premium إسلامي — أسود فاخر بكسوة ذهبية",
+            "royal_kaaba", "الكعبة الملكية", "Royal Ka'bah", "Premium إسلامي — أسود فاخر بكسوة ذهبية", "Royal Islamic — Premium Black with Golden Kiswah",
             bg = 0xFF0A0A0C, bgEnd = 0xFF070708, surface = 0xFF141416, surfaceVariant = 0xFF1B1B1E,
             accent = 0xFFDAB84C, accentSoft = 0xFFF3DE8C, accentDeep = 0xFF9C7D2F,
             text = 0xFFF5F4F2, textSec = 0xFFC2C0BB,
@@ -166,7 +174,7 @@ object NoorThemes {
 
         // ─────────── 07 — السماء الزرقاء ───────────
         theme(
-            "blue_sky", "السماء الزرقاء", "ليلي عميق — أزرق ملكي داكن صافٍ وخط واضح",
+            "blue_sky", "السماء الزرقاء", "Blue Sky", "ليلي عميق — أزرق ملكي داكن صافٍ وخط واضح", "Deep Night — Clear Royal Dark Blue",
             bg = 0xFF0A1A33, bgEnd = 0xFF071226, surface = 0xFF122540, surfaceVariant = 0xFF1B3460,
             accent = 0xFF4E8AE6, accentSoft = 0xFF87B7F2, accentDeep = 0xFF1D5FBF,
             text = 0xFFF2F8FF, textSec = 0xFFB8D0EC,
@@ -176,7 +184,7 @@ object NoorThemes {
 
         // ─────────── 08 — الهلال الفضي ───────────
         theme(
-            "silver_crescent", "الهلال الفضي", "ليلي أنيق Minimal — فضي هادئ على كحلي ليلي",
+            "silver_crescent", "الهلال الفضي", "Silver Crescent", "ليلي أنيق Minimal — فضي هادئ على كحلي ليلي", "Minimalist Night — Calm Silver on Navy",
             bg = 0xFF0B1020, bgEnd = 0xFF080C18, surface = 0xFF131A30, surfaceVariant = 0xFF18213E,
             accent = 0xFFC9D4E4, accentSoft = 0xFFE6ECF5, accentDeep = 0xFF8E9DB3,
             text = 0xFFEFF3F9, textSec = 0xFFB4BFCE,
@@ -186,7 +194,7 @@ object NoorThemes {
 
         // ─────────── 09 — الصحراء الذهبية ───────────
         theme(
-            "golden_desert", "الصحراء الذهبية", "تراث عربي — رمال ذهبية وبيج دافئ وبني عميق",
+            "golden_desert", "الصحراء الذهبية", "Golden Desert", "تراث عربي — رمال ذهبية وبيج دافئ وبني عميق", "Arabian Heritage — Golden Sands & Deep Brown",
             bg = 0xFF1E160C, bgEnd = 0xFF171009, surface = 0xFF2A2013, surfaceVariant = 0xFF33281A,
             accent = 0xFFE2BC6A, accentSoft = 0xFFF4DCA6, accentDeep = 0xFFAA8340,
             text = 0xFFFAF2E4, textSec = 0xFFD9C8AC,
@@ -196,7 +204,7 @@ object NoorThemes {
 
         // ─────────── 10 — الزيتون ───────────
         theme(
-            "olive", "الزيتون", "طبيعي مريح للعين — زيتوني داكن على كريمي هادئ",
+            "olive", "الزيتون", "Olive Branch", "طبيعي مريح للعين — زيتوني داكن على كريمي هادئ", "Eye-Comfort Natural — Dark Olive & Soft Cream",
             bg = 0xFF101508, bgEnd = 0xFF0C1006, surface = 0xFF1A2110, surfaceVariant = 0xFF222A16,
             accent = 0xFFC9B45A, accentSoft = 0xFFE5D68E, accentDeep = 0xFF93823D,
             text = 0xFFF6F3E6, textSec = 0xFFCDC8B2,
@@ -206,7 +214,7 @@ object NoorThemes {
 
         // ─────────── 11 — الفيروز الإسلامي ───────────
         theme(
-            "islamic_turquoise", "الفيروز الإسلامي", "إسلامي حديث مشرق — تركواز على فيروزي وأبيض",
+            "islamic_turquoise", "الفيروز الإسلامي", "Islamic Turquoise", "إسلامي حديث مشرق — تركواز على فيروزي وأبيض", "Bright Modern Islamic — Turquoise & Gold",
             bg = 0xFF05302E, bgEnd = 0xFF042624, surface = 0xFF094540, surfaceVariant = 0xFF0B524C,
             accent = 0xFFD9B54A, accentSoft = 0xFFF2DC8E, accentDeep = 0xFFA28430,
             text = 0xFFEFFBF9, textSec = 0xFFB5DBD6,
@@ -216,7 +224,7 @@ object NoorThemes {
 
         // ─────────── 12 — البنفسج الروحاني ───────────
         theme(
-            "spiritual_violet", "البنفسج الروحاني", "روحاني فاخر — بنفسجي عميق بذهب فاتح",
+            "spiritual_violet", "البنفسج الروحاني", "Spiritual Violet", "روحاني فاخر — بنفسجي عميق بذهب فاتح", "Spiritual Luxe — Deep Violet with Light Gold",
             bg = 0xFF170E2A, bgEnd = 0xFF110A20, surface = 0xFF221741, surfaceVariant = 0xFF2A1C4E,
             accent = 0xFFE4C565, accentSoft = 0xFFF6E4A3, accentDeep = 0xFFAB8A3C,
             text = 0xFFF6F2FB, textSec = 0xFFC9BEDF,
@@ -226,7 +234,7 @@ object NoorThemes {
 
         // ─────────── 13 — زمرد الليل ───────────
         theme(
-            "night_emerald", "زمرد الليل", "Dark Premium — زمردي داكن على أسود بذهب",
+            "night_emerald", "زمرد الليل", "Night Emerald", "Dark Premium — زمردي داكن على أسود بذهب", "Dark Premium — Deep Emerald on Black with Gold",
             bg = 0xFF041410, bgEnd = 0xFF020C09, surface = 0xFF0A211A, surfaceVariant = 0xFF0D2921,
             accent = 0xFFD6B345, accentSoft = 0xFFF1D980, accentDeep = 0xFF9F8030,
             text = 0xFFF0FAF6, textSec = 0xFFB4CFC4,
@@ -236,7 +244,7 @@ object NoorThemes {
 
         // ─────────── 14 — الفجر الوردي ───────────
         theme(
-            "pink_dawn", "الفجر الوردي", "نعومة هادئة راقية — وردي فجر مع بنفسجي فاتح وسماوي",
+            "pink_dawn", "الفجر الوردي", "Pink Dawn", "نعومة هادئة راقية — وردي فجر مع بنفسجي فاتح وسماوي", "Soft Serenity — Dawn Pink & Light Violet",
             bg = 0xFF241420, bgEnd = 0xFF1C1019, surface = 0xFF33202D, surfaceVariant = 0xFF3C2635,
             accent = 0xFFE5B896, accentSoft = 0xFFF6D9C4, accentDeep = 0xFFB07E5F,
             text = 0xFFFDF3F0, textSec = 0xFFE0C1C2,
@@ -246,7 +254,7 @@ object NoorThemes {
 
         // ─────────── 15 — البحر الإسلامي ───────────
         theme(
-            "islamic_sea", "البحر الإسلامي", "منعش وهادئ — أزرق بحري عميق بتركوازي وذهب",
+            "islamic_sea", "البحر الإسلامي", "Islamic Sea", "منعش وهادئ — أزرق بحري عميق بتركوازي وذهب", "Calm Ocean — Deep Sea Blue with Gold",
             bg = 0xFF052338, bgEnd = 0xFF041B2C, surface = 0xFF0A3350, surfaceVariant = 0xFF0C3D5E,
             accent = 0xFFDDB654, accentSoft = 0xFFF5DC92, accentDeep = 0xFFA58434,
             text = 0xFFEFF7FC, textSec = 0xFFB3CFE0,
@@ -256,7 +264,7 @@ object NoorThemes {
 
         // ─────────── 16 — المخطوطات ───────────
         theme(
-            "manuscripts", "المخطوطات", "تراث مخطوطات فخم — ورق عتيق وبني ذهبي وأخضر داكن",
+            "manuscripts", "المخطوطات", "Manuscripts", "تراث مخطوطات فخم — ورق عتيق وبني ذهبي وأخضر داكن", "Manuscript Heritage — Aged Parchment & Gold Brown",
             bg = 0xFF171009, bgEnd = 0xFF120B06, surface = 0xFF241A0E, surfaceVariant = 0xFF2C2112,
             accent = 0xFFC99B4A, accentSoft = 0xFFE4C683, accentDeep = 0xFF96702F,
             text = 0xFFFAF0DC, textSec = 0xFFD8C6A4,
@@ -266,7 +274,7 @@ object NoorThemes {
 
         // ─────────── 17 — قبة الزمرد ───────────
         theme(
-            "emerald_dome", "قبة الزمرد", "كلاسيكي فاخر — قبة زمردية بذهب وأبيض دافئ",
+            "emerald_dome", "قبة الزمرد", "Emerald Dome", "كلاسيكي فاخر — قبة زمردية بذهب وأبيض دافئ", "Classic Luxe — Emerald Dome with Gold",
             bg = 0xFF063D2C, bgEnd = 0xFF052E22, surface = 0xFF0A523C, surfaceVariant = 0xFF0C5E46,
             accent = 0xFFE3C15C, accentSoft = 0xFFF5DE9B, accentDeep = 0xFFAC8B38,
             text = 0xFFF1FBF7, textSec = 0xFFBCE0D1,
@@ -276,7 +284,7 @@ object NoorThemes {
 
         // ─────────── 18 — رمضان ───────────
         theme(
-            "ramadan", "رمضان", "روحاني احتفالي متزن — فانوس ليلي بنفسجي بأزرق وذهب",
+            "ramadan", "رمضان", "Ramadan", "روحاني احتفالي متزن — فانوس ليلي بنفسجي بأزرق وذهب", "Festive Spiritual — Night Violet, Blue & Gold",
             bg = 0xFF0B1230, bgEnd = 0xFF1A0F3D, surface = 0xFF131C49, surfaceVariant = 0xFF182355,
             accent = 0xFFE7C05C, accentSoft = 0xFFF8E29B, accentDeep = 0xFFAE8E3A,
             text = 0xFFF3F1FC, textSec = 0xFFC0BCE0,
@@ -286,7 +294,7 @@ object NoorThemes {
 
         // ─────────── 19 — الهلال الليلي ───────────
         theme(
-            "night_crescent", "الهلال الليلي", "Dark Mode فاخر — أسود كحلي بفضي وذهب بسيط",
+            "night_crescent", "الهلال الليلي", "Night Crescent", "Dark Mode فاخر — أسود كحلي بفضي وذهب بسيط", "Luxe Dark Mode — Navy Black with Silver & Gold",
             bg = 0xFF06080D, bgEnd = 0xFF04050A, surface = 0xFF0D1220, surfaceVariant = 0xFF111726,
             accent = 0xFFC9CCD6, accentSoft = 0xFFE8EAF0, accentDeep = 0xFF9AA0AE,
             text = 0xFFEFF1F6, textSec = 0xFFB2B7C4,
@@ -296,7 +304,7 @@ object NoorThemes {
 
         // ─────────── 20 — نور Premium ───────────
         theme(
-            "noor_premium", "نور Premium", "الثيم المميز — كحلي فاخر بذهب وأبيض ولمسة زمرد",
+            "noor_premium", "نور Premium", "NOOR Premium", "الثيم المميز — كحلي فاخر بذهب وأبيض ولمسة زمرد", "Signature Theme — Luxe Navy, Gold & Emerald Touch",
             bg = 0xFF0A1226, bgEnd = 0xFF070D1B, surface = 0xFF101B38, surfaceVariant = 0xFF152347,
             accent = 0xFFE5C158, accentSoft = 0xFFF8E29E, accentDeep = 0xFFAC8C3E,
             text = 0xFFFAFAF7, textSec = 0xFFC7CDE0,
