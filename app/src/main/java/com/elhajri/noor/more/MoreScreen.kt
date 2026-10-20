@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.SpatialAudio
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -82,6 +83,8 @@ private fun features() = listOf(
     MoreFeature("hajj", t("الحج والعمرة", "Hajj & Umrah"), t("دليل المصطافين", "Pilgrim guide"), Icons.Filled.Bookmark),
     MoreFeature("tracker", t("بياناتي وإحصائياتي", "My Data & Stats"), t("لوحة إحصائيات النشاط والإنجاز الشاملة", "Activity and stats dashboard"), Icons.Filled.BarChart),
     MoreFeature("themes", t("متجر الثيمات", "Theme Store"), t("ثيمات إسلامية بالنقاط", "Islamic themes with points"), Icons.Filled.Palette),
+    MoreFeature("podcasts", t("البودكاست الإسلامي", "Islamic Podcasts"), t("برامج ودروس صوتية هادئة بدون موسيقى", "Calm voice-only shows and lessons"), Icons.Filled.SpatialAudio),
+    MoreFeature("ruqyah", t("الرقية الشرعية المسموعة", "Audio Ruqyah"), t("رقية العين والسحر والشعوذة بصوت هادئ", "Eye, sorcery and sihr ruqyah audio"), Icons.Filled.MenuBook),
     MoreFeature("mychild", t("طفلي", "My Child"), t("ملف طفلك، الوضع الآمن، قصة قبل النوم، الحفظ والتحدي العائلي", "Child profile, safe mode, bedtime story, memorization & family quiz"), Icons.Filled.Face),
     MoreFeature("settings", t("الإعدادات", "Settings"), t("إعدادات التطبيق", "App settings"), Icons.Filled.Settings),
 )
