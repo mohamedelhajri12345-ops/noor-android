@@ -1,3 +1,5 @@
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 package com.elhajri.noor.games
 
 import android.content.Context
@@ -360,6 +362,8 @@ private fun TawafOrderingPlayScreen(
     var mistakesCount by remember(stage) { mutableIntStateOf(0) }
     var showWinDialog by remember(stage) { mutableStateOf(false) }
     var earnedStars by remember(stage) { mutableIntStateOf(3) }
+    val haptics = LocalHapticFeedback.current
+    var shakeTrigger by remember(stage) { mutableLongStateOf(0L) }
 
     LaunchedEffect(feedbackMessage) {
         if (feedbackMessage != null) {
@@ -375,6 +379,7 @@ private fun TawafOrderingPlayScreen(
             newList[index] = newList[index - 1]
             newList[index - 1] = tmp
             currentList = newList
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             itemStatuses = List(stage.steps.size) { null }
         }
     }
@@ -386,6 +391,7 @@ private fun TawafOrderingPlayScreen(
             newList[index] = newList[index + 1]
             newList[index + 1] = tmp
             currentList = newList
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             itemStatuses = List(stage.steps.size) { null }
         }
     }
@@ -397,6 +403,7 @@ private fun TawafOrderingPlayScreen(
 
         val allCorrect = statuses.all { it }
         if (allCorrect) {
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             val stars = when (mistakesCount) {
                 0 -> 3
                 1 -> 2
@@ -406,6 +413,8 @@ private fun TawafOrderingPlayScreen(
             onCompleteStage(stars)
             showWinDialog = true
         } else {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            shakeTrigger = System.currentTimeMillis()
             mistakesCount += 1
             feedbackMessage = "الترتيب غير صحيح، تفقد العناصر الملونة باللون الأحمر"
         }
@@ -600,6 +609,7 @@ private fun TawafOrderingPlayScreen(
 
             Button(
                 onClick = { checkOrder() },
+                modifier = Modifier.wrongAnswerShake(shakeTrigger),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),

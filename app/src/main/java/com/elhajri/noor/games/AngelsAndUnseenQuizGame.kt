@@ -1,4 +1,6 @@
 package com.elhajri.noor.games
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 
 import android.content.Context
 import androidx.compose.animation.*
@@ -285,6 +287,8 @@ private fun AngelsAndUnseenPlayScreen(
     var mistakesCount by remember(stage) { mutableIntStateOf(0) }
     var showWinDialog by remember(stage) { mutableStateOf(false) }
     var earnedStars by remember(stage) { mutableIntStateOf(3) }
+    val haptics = LocalHapticFeedback.current
+    var shakeTrigger by remember(stage) { mutableLongStateOf(0L) }
 
     fun handleOptionClick(opt: String) {
         if (isAnswered) return
@@ -293,6 +297,7 @@ private fun AngelsAndUnseenPlayScreen(
 
         val isCorrect = (opt == stage.correctAnswer)
         if (isCorrect) {
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             val stars = when (mistakesCount) {
                 0 -> 3
                 1 -> 2
@@ -302,6 +307,8 @@ private fun AngelsAndUnseenPlayScreen(
             onCompleteStage(stars)
             showWinDialog = true
         } else {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            shakeTrigger = System.currentTimeMillis()
             mistakesCount += 1
         }
     }

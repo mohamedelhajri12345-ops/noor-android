@@ -289,7 +289,8 @@ fun NoorApp() {
                     onCommunity = { navigateSafe("community") },
                     onDonate = { navigateSafe("donation") },
                     onAssistant = { navigateSafe("ai") },
-                    onSettings = { navigateSafe("settings") }
+                    onSettings = { navigateSafe("settings") },
+                    onProfile = { navigateSafe("profile") }
                 )
             },
             bottomBar = {
@@ -337,6 +338,7 @@ fun NoorApp() {
                 composable("names") { NamesOfAllahScreen() }
                 composable("quiz") { QuizScreen() }
                 composable("stories") { StoriesScreen(onOpenStory = { id -> navController.navigate("story/$id") }) }
+                composable("profile") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "profile"); com.elhajri.noor.profile.ProfileScreen(onBack = { navController.popBackStack() }, onNavigate = { navigateSafe(it) }) }
                 composable("settings") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "settings"); SettingsScreen(onOpenPrivacy = { navController.navigate("privacy") }) }
                 composable("themes") { com.elhajri.noor.theme.ThemeStoreScreen(onOpenEarnPoints = { navController.navigate("earn") }) }
                 composable("earn") { com.elhajri.noor.theme.EarnPointsScreen(onBack = { navController.popBackStack() }) }

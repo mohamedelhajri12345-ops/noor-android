@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -45,7 +46,8 @@ fun NoorTopBar(
     onCommunity: () -> Unit,
     onDonate: () -> Unit,
     onAssistant: () -> Unit,
-    onSettings: () -> Unit
+    onSettings: () -> Unit,
+    onProfile: () -> Unit = {}
 ) {
     val context = LocalContext.current
     Surface(
@@ -90,6 +92,7 @@ fun NoorTopBar(
                     }
                     TopBarAction(icon = { Icon(Icons.Filled.Favorite, contentDescription = "تبرع", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onDonate)
                     TopBarAction(icon = { Icon(Icons.Filled.AutoAwesome, contentDescription = "المساعد الذكي", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onAssistant)
+                    TopBarAction(icon = { Icon(Icons.Filled.Person, contentDescription = "ملفي الشخصي", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onProfile)
                     TopBarAction(icon = { Icon(Icons.Filled.Settings, contentDescription = "الإعدادات", tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onSettings)
                 }
             }
