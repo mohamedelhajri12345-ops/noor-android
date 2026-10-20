@@ -7,7 +7,7 @@ data class Reciter(val id: String, val name: String, val servers: List<String>, 
 data class AthkarCategory(val id: String, val name: String, val subtitle: String, val icon: String, val count: Int)
 data class Dhikr(val text: String, val count: Int, val ref: String)
 data class TasbihPreset(val text: String, val target: Int)
-data class City(val name: String, val lat: Double, val lng: Double, val country: String)
+data class City(val name: String, val lat: Double, val lng: Double, val country: String, val timezone: String = "")
 data class QuizQuestion(val q: String, val options: List<String>, val correct: Int, val ref: String)
 data class Story(val id: Int, val prophet: String, val title: String, val icon: String)
 data class NameOfAllah(val name: String, val meaning: String)
@@ -65,7 +65,13 @@ object DataLoader {
         val arr = read(context, "cities.json").getJSONArray("cities")
         return List(arr.length()) { i ->
             val o = arr.getJSONObject(i)
-            City(o.getString("name"), o.getDouble("lat"), o.getDouble("lng"), o.optString("country"))
+            City(
+                o.getString("name"),
+                o.getDouble("lat"),
+                o.getDouble("lng"),
+                o.optString("country"),
+                o.optString("timezone", "")
+            )
         }
     }
 

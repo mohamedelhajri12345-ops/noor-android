@@ -15,12 +15,13 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TextButton
-import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,7 +65,8 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
     var reciter by remember { mutableStateOf(NoorSettings.getReciter(context)) }
     var audioQuality by remember { mutableStateOf(NoorSettings.getAudioQuality(context)) }
     var fontSize by remember { mutableStateOf(NoorSettings.getFontSize(context)) }
-    var city by remember { mutableStateOf(com.elhajri.noor.data.Prefs.getCity(context) ?: com.elhajri.noor.data.City("مكة المكرمة", 21.4225, 39.8262, "السعودية")) }
+    var city by remember { mutableStateOf(com.elhajri.noor.data.Prefs.getCity(context) ?: com.elhajri.noor.data.City("مكة المكرمة", 21.4225, 39.8262, "السعودية", "Asia/Riyadh")) }
+    var isAutoLocation by remember { mutableStateOf(com.elhajri.noor.data.Prefs.isAutoLocation(context)) }
     var showCityPicker by remember { mutableStateOf(false) }
     var citySearch by remember { mutableStateOf("") }
     val allCities = remember { com.elhajri.noor.data.DataLoader.cities(context) }
@@ -124,9 +126,36 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
 
         Spacer(Modifier.height(12.dp))
 
-        // ============ الموقع — مواقيت الصلاة والقبلة ============
-        SettingsSection(icon = Icons.Filled.LocationOn, title = t("الموقع", "Location")) {
+        // ============ المدينة والموقع ============
+        SettingsSection(icon = Icons.Filled.LocationOn, title = t("المدينة والموقع", "City & Location")) {
             Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("التحديد التلقائي للموقع", color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text("انتقال تلقائي حسب الموقع الجغرافي (GPS)", color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
+                    }
+                    GoldToggle(
+                        on = isAutoLocation,
+                        onToggle = { enabled ->
+                            isAutoLocation = enabled
+                            com.elhajri.noor.data.Prefs.setAutoLocation(context, enabled)
+                            if (enabled) {
+                                com.elhajri.noor.prayer.NoorLocationManager.updateAutoLocation(context, force = true) { newCity ->
+                                    if (newCity != null) {
+                                        city = newCity
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+
+                Spacer(Modifier.height(12.dp))
+
                 Text(t("مدينة الصلاة والقبلة", "Prayer times & Qibla city"), color = TextMain.copy(alpha = 0.5f), fontSize = 12.sp)
                 Spacer(Modifier.height(8.dp))
                 Row(
@@ -136,14 +165,25 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                         .background(NavyLight.copy(alpha = 0.5f))
                         .clickable { showCityPicker = true }
                         .padding(horizontal = 14.dp, vertical = 12.dp),
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Filled.LocationOn, contentDescription = null, tint = Gold, modifier = Modifier.size(16.dp))
+                    Icon(
+                        imageVector = if (isAutoLocation) Icons.Filled.MyLocation else Icons.Filled.LocationOn,
+                        contentDescription = null,
+                        tint = Gold,
+                        modifier = Modifier.size(18.dp)
+                    )
                     Spacer(Modifier.width(8.dp))
-                    Text(city.name, color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.width(6.dp))
-                    Text(city.country, color = GoldSoft, fontSize = 11.sp)
-                    Spacer(Modifier.weight(1f))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(city.name, color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            if (isAutoLocation) {
+                                Spacer(Modifier.width(6.dp))
+                                Text("(تلقائي)", color = Gold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        Text(city.country, color = GoldSoft, fontSize = 11.sp)
+                    }
                     Text("تغيير", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
             }
@@ -286,49 +326,94 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
 
         Spacer(Modifier.height(24.dp))
     }
+
     // ═══ اختيار المدينة ═══
     if (showCityPicker) {
-        androidx.compose.material3.AlertDialog(
+        AlertDialog(
             onDismissRequest = { showCityPicker = false },
-            title = { Text("اختر مدينتك", color = Gold, fontWeight = FontWeight.Bold) },
+            title = { Text("اختر مدينتك أو التحديد التلقائي", color = Gold, fontWeight = FontWeight.Bold) },
             text = {
                 Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (isAutoLocation) Gold else NavyLight)
+                            .clickable {
+                                isAutoLocation = true
+                                com.elhajri.noor.data.Prefs.setAutoLocation(context, true)
+                                com.elhajri.noor.prayer.NoorLocationManager.updateAutoLocation(context, force = true) { newCity ->
+                                    if (newCity != null) {
+                                        city = newCity
+                                    }
+                                    showCityPicker = false
+                                }
+                            }
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Filled.MyLocation,
+                            contentDescription = null,
+                            tint = if (isAutoLocation) Navy else Gold,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "الموقع التلقائي (GPS)",
+                                color = if (isAutoLocation) Navy else Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "انتقال تلقائي للمواقيت حسب موقعك",
+                                color = if (isAutoLocation) Navy.copy(alpha = 0.7f) else GoldSoft.copy(alpha = 0.7f),
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     OutlinedTextField(
                         value = citySearch,
                         onValueChange = { citySearch = it },
-                        placeholder = { Text("ابحث عن مدينة...", fontSize = 13.sp) },
+                        placeholder = { Text("ابحث عن مدينة (300+ مدينة عالمية)...", fontSize = 12.sp) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = androidx.compose.ui.graphics.Color.White,
-                            unfocusedTextColor = androidx.compose.ui.graphics.Color.White,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
                             cursorColor = Gold,
                             focusedBorderColor = Gold,
                             unfocusedBorderColor = NavyLight
                         )
                     )
-                    Column(Modifier.verticalScroll(rememberScrollState()).height(320.dp)) {
+                    Column(Modifier.verticalScroll(rememberScrollState()).height(300.dp)) {
                         val q = citySearch.trim()
                         val filtered = if (q.isBlank()) allCities else allCities.filter { it.name.contains(q) || it.country.contains(q) }
                         filtered.forEach { c ->
-                            val selected = c.name == city.name && c.country == city.country
+                            val selected = !isAutoLocation && c.name == city.name && c.country == city.country
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(10.dp))
-                                    .background(if (selected) Gold else androidx.compose.ui.graphics.Color.Transparent)
+                                    .background(if (selected) Gold else Color.Transparent)
                                     .clickable {
+                                        isAutoLocation = false
+                                        com.elhajri.noor.data.Prefs.setAutoLocation(context, false)
                                         city = c
                                         com.elhajri.noor.data.Prefs.setCity(context, c)
                                         com.elhajri.noor.notification.AdhanScheduler.scheduleNextAdhan(context)
                                         showCityPicker = false
                                     }
                                     .padding(horizontal = 10.dp, vertical = 10.dp),
-                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(Icons.Filled.LocationOn, contentDescription = null, tint = if (selected) Navy else Gold, modifier = Modifier.size(16.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text(c.name, color = if (selected) Navy else androidx.compose.ui.graphics.Color.White, fontSize = 14.sp)
+                                Text(c.name, color = if (selected) Navy else Color.White, fontSize = 14.sp)
                                 Spacer(Modifier.width(6.dp))
                                 Text(c.country, color = if (selected) Navy.copy(alpha = 0.7f) else GoldSoft.copy(alpha = 0.6f), fontSize = 11.sp)
                             }
@@ -342,7 +427,6 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
             containerColor = NavyCard
         )
     }
-
 }
 
 /** قسم إعدادات — بطاقة بأيقونة ذهبية وعنوان، كما في الموقع */
@@ -381,36 +465,40 @@ private fun SettingsRow(label: String, desc: String, control: @Composable () -> 
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(Modifier.weight(1f)) {
-            Text(label, color = TextMain, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-            Text(desc, color = TextMain.copy(alpha = 0.45f), fontSize = 11.sp, lineHeight = 15.sp)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(label, color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            if (desc.isNotEmpty()) {
+                Text(desc, color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
+            }
         }
         Spacer(Modifier.width(12.dp))
         control()
     }
 }
 
-/** مفتاح تبديل ذهبي — كما Toggle بالموقع */
+/** زر تبديل ذهبي أنيق متناسق مع تصميم التطبيق */
 @Composable
 private fun GoldToggle(on: Boolean, onToggle: (Boolean) -> Unit) {
     Box(
         modifier = Modifier
-            .width(46.dp)
-            .height(26.dp)
-            .clip(RoundedCornerShape(13.dp))
-            .background(if (on) Gold else NavyLight.copy(alpha = 0.8f))
+            .width(44.dp)
+            .height(24.dp)
+            .clip(CircleShape)
+            .background(if (on) Gold else NavyLight)
             .clickable { onToggle(!on) }
-            .border(1.dp, if (on) Gold.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.08f), RoundedCornerShape(13.dp)),
-        contentAlignment = if (on) Alignment.CenterStart else Alignment.CenterEnd
+            .padding(3.dp),
+        contentAlignment = if (on) Alignment.CenterEnd else Alignment.CenterStart
     ) {
         Box(
             modifier = Modifier
-                .padding(horizontal = 3.dp)
-                .size(20.dp)
+                .size(18.dp)
                 .clip(CircleShape)
-                .background(if (on) Navy else Color.White.copy(alpha = 0.7f))
+                .background(if (on) Navy else TextMain.copy(alpha = 0.4f))
         )
     }
 }
+
+

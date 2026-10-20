@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.PlayArrow
@@ -51,7 +52,8 @@ data class PrayerItem(
 @Composable
 fun PrayerScreen() {
     val context = LocalContext.current
-    var city by remember { mutableStateOf(Prefs.getCity(context) ?: City("مكة المكرمة", 21.4225, 39.8262, "السعودية")) }
+    var city by remember { mutableStateOf(Prefs.getCity(context) ?: City("مكة المكرمة", 21.4225, 39.8262, "السعودية", "Asia/Riyadh")) }
+    var isAutoLocation by remember { mutableStateOf(Prefs.isAutoLocation(context)) }
     var showCityPicker by remember { mutableStateOf(false) }
     var citySearch by remember { mutableStateOf("") }
     val allCities = remember { com.elhajri.noor.data.DataLoader.cities(context) }
@@ -71,7 +73,8 @@ fun PrayerScreen() {
             context,
             lat = city.lat,
             lng = city.lng,
-            country = city.country
+            country = city.country,
+            timezone = city.timezone
         )
         isLoading = false
         // Reschedule adhan now that the cache holds THIS city's fresh times
@@ -157,8 +160,6 @@ fun PrayerScreen() {
         }
     }
 
-    // الأذان الآن عبر خدمة أمامية احترافية: ملف محلي = تشغيل فوري،
-    // إشعار أنيق بأيقونة التطبيق وزر إيقاف، ويستمر حتى لو خرج المستخدم من التطبيق
     fun toggleAdhanAudio() {
         if (isAdhanPlaying) {
             com.elhajri.noor.notification.AdhanPlaybackService.stop(context)
@@ -169,17 +170,60 @@ fun PrayerScreen() {
         }
     }
 
-    // ═══ اختيار المدينة — طبق الأصل عن القائمة السابقة ═══
+    // ═══ اختيار المدينة والتحديد التلقائي ═══
     if (showCityPicker) {
         AlertDialog(
             onDismissRequest = { showCityPicker = false },
-            title = { Text("اختر مدينتك", color = Gold, fontWeight = FontWeight.Bold) },
+            title = { Text("اختر مدينتك أو الموقع التلقائي", color = Gold, fontWeight = FontWeight.Bold) },
             text = {
                 Column {
+                    // خيار التحديد التلقائي حسب GPS
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (isAutoLocation) Gold else NavyLight)
+                            .clickable {
+                                isAutoLocation = true
+                                Prefs.setAutoLocation(context, true)
+                                NoorLocationManager.updateAutoLocation(context, force = true) { newCity ->
+                                    if (newCity != null) {
+                                        city = newCity
+                                    }
+                                    showCityPicker = false
+                                }
+                            }
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Filled.MyLocation,
+                            contentDescription = null,
+                            tint = if (isAutoLocation) Navy else Gold,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                "الموقع التلقائي (GPS)",
+                                color = if (isAutoLocation) Navy else Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "انتقال تلقائي حسب موقعك الجغرافي",
+                                color = if (isAutoLocation) Navy.copy(alpha = 0.7f) else GoldSoft.copy(alpha = 0.7f),
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     OutlinedTextField(
                         value = citySearch,
                         onValueChange = { citySearch = it },
-                        placeholder = { Text("ابحث عن مدينة...", fontSize = 13.sp) },
+                        placeholder = { Text("ابحث عن مدينة (300+ مدينة عالمية)...", fontSize = 12.sp) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -190,22 +234,24 @@ fun PrayerScreen() {
                             unfocusedBorderColor = NavyLight
                         )
                     )
-                    LazyColumn(modifier = Modifier.height(320.dp)) {
+
+                    LazyColumn(modifier = Modifier.height(300.dp)) {
                         val q = citySearch.trim()
                         val filtered = if (q.isBlank()) allCities else allCities.filter {
                             it.name.contains(q) || it.country.contains(q)
                         }
                         items(filtered) { c ->
-                            val selected = c.name == city.name && c.country == city.country
+                            val selected = !isAutoLocation && c.name == city.name && c.country == city.country
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(10.dp))
                                     .background(if (selected) Gold else Color.Transparent)
                                     .clickable {
+                                        isAutoLocation = false
+                                        Prefs.setAutoLocation(context, false)
                                         city = c
                                         Prefs.setCity(context, c)
-                                        // الجدولة تحدث بعد جلب مواقيت الموقع الجديد (LaunchedEffect أعلاه)
                                         showCityPicker = false
                                     }
                                     .padding(horizontal = 10.dp, vertical = 10.dp),
@@ -248,9 +294,12 @@ fun PrayerScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { showCityPicker = true }
+                ) {
                     Icon(
-                        imageVector = Icons.Filled.LocationOn,
+                        imageVector = if (isAutoLocation) Icons.Filled.MyLocation else Icons.Filled.LocationOn,
                         contentDescription = null,
                         tint = Gold,
                         modifier = Modifier.size(20.dp)
@@ -260,9 +309,23 @@ fun PrayerScreen() {
                         text = "${city.name}, ${city.country}",
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { showCityPicker = true }
+                        fontWeight = FontWeight.Bold
                     )
+                    if (isAutoLocation) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Gold.copy(alpha = 0.2f)
+                        ) {
+                            Text(
+                                "تلقائي",
+                                color = Gold,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -449,20 +512,25 @@ fun PrayerScreen() {
 }
 
 @Composable
-fun PrayerCard(item: PrayerItem) {
-    val bgColor = if (item.isNext) NavyLight else NavyCard
-    val borderColor = if (item.isNext) Gold else Gold.copy(alpha = 0.15f)
+private fun PrayerCard(item: PrayerItem) {
+    val backgroundColor = when {
+        item.isNext -> Gold.copy(alpha = 0.2f)
+        item.isSunrise -> NavyLight.copy(alpha = 0.3f)
+        else -> NavyLight.copy(alpha = 0.6f)
+    }
+
+    val borderColor = if (item.isNext) Gold else Color.Transparent
 
     Card(
-        modifier = Modifier.fillMaxWidth().noorGlassCard(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = androidx.compose.foundation.BorderStroke(if (item.isNext) 1.5.dp else 1.dp, borderColor)
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -472,24 +540,31 @@ fun PrayerCard(item: PrayerItem) {
                 Text(
                     text = item.name,
                     color = if (item.isNext) Gold else MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = if (item.isNext) FontWeight.Bold else FontWeight.Medium
+                    fontWeight = if (item.isNext) FontWeight.Bold else FontWeight.Medium,
+                    fontSize = 16.sp
                 )
-                if (item.isSunrise) {
+                if (item.isNext) {
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "(شروق)",
-                        color = GoldSoft.copy(alpha = 0.6f),
-                        fontSize = 11.sp
-                    )
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = Gold.copy(alpha = 0.3f)
+                    ) {
+                        Text(
+                            text = "القادمة",
+                            color = Gold,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
                 }
             }
 
             Text(
                 text = item.time,
-                color = if (item.isNext) Gold else GoldSoft,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                color = if (item.isNext) Gold else MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
             )
         }
     }
@@ -499,11 +574,12 @@ private fun format12Hour(time24: String): String {
     return try {
         val parts = time24.split(":")
         if (parts.size < 2) return time24
-        val h = parts[0].trim().toInt()
-        val m = parts[1].trim().toInt()
-        val amPm = if (h >= 12) "م" else "ص"
-        val h12 = if (h % 12 == 0) 12 else h % 12
-        String.format(Locale.US, "%02d:%02d %s", h12, m, amPm)
+        var hour = parts[0].trim().toInt()
+        val minute = parts[1].trim().toInt()
+        val period = if (hour >= 12) "م" else "ص"
+        if (hour == 0) hour = 12
+        else if (hour > 12) hour -= 12
+        String.format(Locale.US, "%d:%02d %s", hour, minute, period)
     } catch (_: Exception) {
         time24
     }

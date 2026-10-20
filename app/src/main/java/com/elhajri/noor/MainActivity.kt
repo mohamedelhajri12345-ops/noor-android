@@ -101,7 +101,7 @@ import com.elhajri.noor.privacy.PrivacyPolicyScreen
 import com.elhajri.noor.qibla.QiblaScreen
 import com.elhajri.noor.quran.QuranReaderScreen
 import com.elhajri.noor.analytics.AnalyticsDashboardScreen
-import com.elhajri.noor.quiz.QuizScreen
+import com.elhajri.noor.exams.ExamsRootScreen
 import com.elhajri.noor.settings.SettingsScreen
 import com.elhajri.noor.stories.StoriesScreen
 import com.elhajri.noor.stories.StoryDetailScreen
@@ -170,13 +170,17 @@ class MainActivity : ComponentActivity() {
         Thread {
             try {
                 // Use the user's SAVED city (not default Mecca) so the cache and adhan match the location
+                if (com.elhajri.noor.data.Prefs.isAutoLocation(this@MainActivity)) {
+                    com.elhajri.noor.prayer.NoorLocationManager.updateAutoLocation(this@MainActivity)
+                }
                 val savedCity = com.elhajri.noor.data.Prefs.getCity(this@MainActivity)
                 kotlinx.coroutines.runBlocking {
                     com.elhajri.noor.prayer.PrayerRepository.getTimings(
                         this@MainActivity,
                         lat = savedCity?.lat ?: 21.4225,
                         lng = savedCity?.lng ?: 39.8262,
-                        country = savedCity?.country ?: ""
+                        country = savedCity?.country ?: "",
+                        timezone = savedCity?.timezone ?: ""
                     )
                 }
                 com.elhajri.noor.notification.AdhanScheduler.scheduleNextAdhan(this@MainActivity)
@@ -336,7 +340,8 @@ fun NoorApp() {
                 composable("qibla") { QiblaScreen() }
                 composable("tasbih") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "tasbih"); TasbihScreen(onBack = { navController.popBackStack() }) }
                 composable("names") { NamesOfAllahScreen() }
-                composable("quiz") { QuizScreen() }
+                composable("quiz") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "exam"); ExamsRootScreen(onBack = { navController.popBackStack() }) }
+                composable("exams") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "exam"); ExamsRootScreen(onBack = { navController.popBackStack() }) }
                 composable("stories") { StoriesScreen(onOpenStory = { id -> navController.navigate("story/$id") }) }
                 composable("profile") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "profile"); com.elhajri.noor.profile.ProfileScreen(onBack = { navController.popBackStack() }, onNavigate = { navigateSafe(it) }) }
                 composable("settings") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "settings"); SettingsScreen(onOpenPrivacy = { navController.navigate("privacy") }) }

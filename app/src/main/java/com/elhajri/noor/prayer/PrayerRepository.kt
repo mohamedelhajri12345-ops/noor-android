@@ -1,6 +1,7 @@
 package com.elhajri.noor.prayer
 
 import android.content.Context
+import com.elhajri.noor.data.Prefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -114,9 +115,21 @@ object LocalPrayerCalculator {
         day: Int,
         lat: Double,
         lng: Double,
-        country: String = ""
+        country: String = "",
+        timezone: String = ""
     ): PrayerTimings {
-        val tzOffset = Calendar.getInstance().timeZone.getOffset(System.currentTimeMillis()) / 3600000.0
+        val tzOffset = if (timezone.isNotBlank()) {
+            try {
+                val tz = java.util.TimeZone.getTimeZone(timezone)
+                val cal = Calendar.getInstance().apply { set(year, month - 1, day, 12, 0) }
+                tz.getOffset(cal.timeInMillis) / 3600000.0
+            } catch (_: Exception) {
+                Calendar.getInstance().timeZone.getOffset(System.currentTimeMillis()) / 3600000.0
+            }
+        } else {
+            Calendar.getInstance().timeZone.getOffset(System.currentTimeMillis()) / 3600000.0
+        }
+
         val method = PrayerMethods.methodFor(country)
         val (fajrAngle, ishaAngle, isUmmAlQura) = when (method) {
             4, 8, 9, 10 -> Triple(18.5, 17.5, true)
@@ -160,7 +173,10 @@ object LocalPrayerCalculator {
         }
 
         val hijriStr = try {
-            val cal = android.icu.util.IslamicCalendar()
+            val icuTz = if (timezone.isNotBlank()) android.icu.util.TimeZone.getTimeZone(timezone) else android.icu.util.TimeZone.getDefault()
+            val cal = android.icu.util.IslamicCalendar(icuTz)
+            val gCal = Calendar.getInstance().apply { set(year, month - 1, day) }
+            cal.time = gCal.time
             val hDay = cal.get(android.icu.util.IslamicCalendar.DAY_OF_MONTH)
             val months = listOf(
                 "محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الآخرة",
@@ -202,7 +218,8 @@ object PrayerRepository {
         date: String = "",
         lat: Double = 21.4225,
         lng: Double = 39.8262,
-        country: String = ""
+        country: String = "",
+        timezone: String = ""
     ): PrayerTimings = withContext(Dispatchers.IO) {
         val targetDate = if (date.isBlank()) {
             SimpleDateFormat("dd-MM-yyyy", Locale.US).format(Date())
@@ -239,41 +256,17 @@ object PrayerRepository {
         val year = cal.get(Calendar.YEAR)
         val month = cal.get(Calendar.MONTH) + 1
         val day = cal.get(Calendar.DAY_OF_MONTH)
-        val computed = LocalPrayerCalculator.calculate(year, month, day, lat, lng, country)
+        val computed = LocalPrayerCalculator.calculate(year, month, day, lat, lng, country, timezone)
         val jsonStr = buildJsonFromTimings(computed)
         saveToCache(context, jsonStr, lat, lng)
         computed
     }
 
-    suspend fun getTimings(
-        date: String,
-        lat: Double,
-        lng: Double
-    ): PrayerTimings = withContext(Dispatchers.IO) {
-        val targetDate = if (date.isBlank()) {
-            SimpleDateFormat("dd-MM-yyyy", Locale.US).format(Date())
-        } else date
 
-        val url = "https://api.aladhan.com/v1/timings/$targetDate?latitude=$lat&longitude=$lng"
-        try {
-            val request = Request.Builder().url(url).build()
-            val response = client.newCall(request).execute()
-            val bodyStr = response.body?.string() ?: ""
-            val parsed = parseTimingsJson(bodyStr)
-            if (parsed != null) return@withContext parsed
-        } catch (_: Exception) { }
-
-        // Fallback to local calculation
-        val cal = Calendar.getInstance()
-        val year = cal.get(Calendar.YEAR)
-        val month = cal.get(Calendar.MONTH) + 1
-        val day = cal.get(Calendar.DAY_OF_MONTH)
-        LocalPrayerCalculator.calculate(year, month, day, lat, lng, "")
-    }
 
     /** Cached timings for the CURRENT saved city — guaranteed non-null with offline calculation fallback */
     fun getCachedTimings(context: Context): PrayerTimings {
-        val city = com.elhajri.noor.data.Prefs.getCity(context) ?: com.elhajri.noor.data.City("مكة المكرمة", 21.4225, 39.8262, "السعودية")
+        val city = Prefs.getCity(context) ?: com.elhajri.noor.data.City("مكة المكرمة", 21.4225, 39.8262, "السعودية", "Asia/Riyadh")
         val cached = getFromCache(context, city.lat, city.lng)
         if (cached != null) return cached
 
@@ -281,7 +274,7 @@ object PrayerRepository {
         val year = cal.get(Calendar.YEAR)
         val month = cal.get(Calendar.MONTH) + 1
         val day = cal.get(Calendar.DAY_OF_MONTH)
-        val computed = LocalPrayerCalculator.calculate(year, month, day, city.lat, city.lng, city.country)
+        val computed = LocalPrayerCalculator.calculate(year, month, day, city.lat, city.lng, city.country, city.timezone)
         val jsonStr = buildJsonFromTimings(computed)
         saveToCache(context, jsonStr, city.lat, city.lng)
         return computed
@@ -377,7 +370,7 @@ object PrayerRepository {
             }
 
             PrayerTimings(fajr, sunrise, dhuhr, asr, maghrib, isha, hijriStr)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

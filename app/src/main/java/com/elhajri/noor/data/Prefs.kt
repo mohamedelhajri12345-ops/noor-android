@@ -13,7 +13,8 @@ object Prefs {
         val lat = sp(context).getFloat("city_lat", 0f).toDouble()
         val lng = sp(context).getFloat("city_lng", 0f).toDouble()
         val country = sp(context).getString("city_country", "") ?: ""
-        return City(name, lat, lng, country)
+        val timezone = sp(context).getString("city_timezone", "") ?: ""
+        return City(name, lat, lng, country, timezone)
     }
 
     fun setCity(context: Context, city: City) {
@@ -22,8 +23,13 @@ object Prefs {
             .putFloat("city_lat", city.lat.toFloat())
             .putFloat("city_lng", city.lng.toFloat())
             .putString("city_country", city.country)
+            .putString("city_timezone", city.timezone)
             .apply()
     }
+
+    fun isAutoLocation(context: Context): Boolean = sp(context).getBoolean("auto_location_enabled", false)
+
+    fun setAutoLocation(context: Context, enabled: Boolean) = sp(context).edit().putBoolean("auto_location_enabled", enabled).apply()
 
     fun getReciter(context: Context): String = sp(context).getString("reciter", "") ?: ""
 
