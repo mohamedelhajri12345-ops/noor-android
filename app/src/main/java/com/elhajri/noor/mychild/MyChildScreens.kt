@@ -38,6 +38,9 @@ import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.toArabicDigits
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
 import com.elhajri.noor.ui.TextSecondaryLinen
@@ -428,21 +431,21 @@ fun ParentsDashboardContent(
                 ) {
                     MetricBox(
                         icon = Icons.Filled.Timer,
-                        label = "وقت الشاشة اليوم",
+                        label = t("وقت الشاشة اليوم", "Daily Screen Time"),
                         value = "$screenTimeMinutes دقيقة",
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(Modifier.width(8.dp))
                     MetricBox(
                         icon = Icons.Filled.Star,
-                        label = "رصيد النجوم",
+                        label = t("رصيد النجوم", "Star Balance"),
                         value = "${activeProfile.totalStarsEarned} ⭐️",
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(Modifier.width(8.dp))
                     MetricBox(
                         icon = Icons.Filled.MenuBook,
-                        label = "السور المحفوظة",
+                        label = t("السور المحفوظة", "Memorized Surahs"),
                         value = "$memorizedCount من ٣٨",
                         modifier = Modifier.weight(1f)
                     )
@@ -564,21 +567,21 @@ fun ParentsDashboardContent(
             ) {
                 QuickLauncherCard(
                     title = t("متابعة الحفظ", "Memorization Tracker"),
-                    desc = "سور الجزء ٣٠",
+                    desc = t("سور الجزء ٣٠", "Juz 30 Surahs"),
                     icon = Icons.Filled.Star,
                     onClick = { onNavigateToTab(ChildTab.MEMORIZATION) },
                     modifier = Modifier.weight(1f)
                 )
                 QuickLauncherCard(
                     title = t("قصة قبل النوم", "Bedtime Story"),
-                    desc = "قصص الأنبياء",
+                    desc = t("قصص الأنبياء", "Prophets Stories"),
                     icon = Icons.Filled.NightsStay,
                     onClick = { onNavigateToTab(ChildTab.BEDTIME_STORY) },
                     modifier = Modifier.weight(1f)
                 )
                 QuickLauncherCard(
                     title = t("تحدي عائلي", "Family Challenge"),
-                    desc = "مسابقة الوالدين",
+                    desc = t("مسابقة الوالدين", "Parent Quiz"),
                     icon = Icons.Filled.SportsEsports,
                     onClick = { onNavigateToTab(ChildTab.FAMILY_QUIZ) },
                     modifier = Modifier.weight(1f)
@@ -609,8 +612,8 @@ fun ParentsDashboardContent(
 
     if (showPinDialog) {
         PinVerificationDialog(
-            title = "تأكيد رمز الحماية الوالدية",
-            desc = "أدخل رمز PIN لتفعيل وضع الطفل الآمن (الافتراضي 1234)",
+            title = t("تأكيد رمز الحماية الوالدية", "Parental PIN Confirmation"),
+            desc = t("أدخل رمز PIN لتفعيل وضع الطفل الآمن (الافتراضي 1234)", "Enter 4-digit PIN to enable Safe Kids Mode (default 1234)"),
             onDismiss = { showPinDialog = false },
             onVerified = {
                 showPinDialog = false
@@ -793,8 +796,8 @@ fun SafeKidsHomeScreen(
 
     if (showExitPinDialog) {
         PinVerificationDialog(
-            title = "رمز خروج الوالدين",
-            desc = "أدخل رمز PIN المكون من ٤ أرقام للخروج من وضع الطفل الآمن",
+            title = t("رمز خروج الوالدين", "Parent Exit PIN"),
+            desc = t("أدخل رمز PIN المكون من ٤ أرقام للخروج من وضع الطفل الآمن", "Enter 4-digit PIN to exit Safe Kids Mode"),
             onDismiss = { showExitPinDialog = false },
             onVerified = {
                 showExitPinDialog = false
@@ -1005,7 +1008,7 @@ fun MemorizationTrackerContent(
                         Spacer(Modifier.width(10.dp))
 
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(surah.surahNameAr, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
+                            Text(if (NoorLocale.isEnglish) surah.surahNameEn else surah.surahNameAr, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
                             Text("${surah.versesCount} آيات", color = GoldSoft.copy(alpha = 0.7f), fontSize = 11.sp)
                         }
 
@@ -1268,8 +1271,8 @@ fun FamilyChallengeContent(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    MetricBox(icon = Icons.Filled.Person, label = "الوالد/الوالدة", value = "$parentScore نقطة")
-                    MetricBox(icon = Icons.Filled.Face, label = childProfile.name, value = "$childScore نقطة")
+                    MetricBox(icon = Icons.Filled.Person, label = t("الوالد/الوالدة", "Parent"), value = "${toArabicDigits(parentScore)} ${t("نقطة", "pts")}")
+                    MetricBox(icon = Icons.Filled.Face, label = childProfile.name, value = "${toArabicDigits(childScore)} ${t("نقطة", "pts")}")
                 }
 
                 Spacer(Modifier.height(20.dp))
