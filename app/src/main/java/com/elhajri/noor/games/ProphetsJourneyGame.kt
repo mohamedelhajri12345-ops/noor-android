@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -281,53 +283,39 @@ fun ProphetsJourneyGameScreen(onBack: () -> Unit) {
                 var correctCount by remember(lvl) { mutableStateOf(0) }
                 var selected by remember(lvl) { mutableStateOf<Int?>(null) }
                 var finished by remember(lvl) { mutableStateOf(false) }
+                val haptics = LocalHapticFeedback.current
 
                 if (finished) {
-                    val stars = when {
-                        correctCount >= 5 -> 3
-                        correctCount >= 4 -> 2
-                        correctCount >= 3 -> 1
-                        else -> 0
-                    }
-                    val earned = correctCount * 25 * lvl
-                    Column(
-                        Modifier.fillMaxSize().noorGlassCard(cornerRadius = 18.dp).padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Gold, modifier = Modifier.size(48.dp))
-                        Spacer(Modifier.height(10.dp))
-                        Text("اكتملت المحطة ${lvl.toArabicDigits()}", color = Gold, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                        Text(station.prophet, color = GoldSoft, fontSize = 13.sp)
-                        Text("أجبت ${correctCount.toArabicDigits()} من ٥", color = GoldSoft, fontSize = 12.sp)
-                        Row {
-                            repeat(3) { s ->
-                                Icon(
-                                    Icons.Default.Star, contentDescription = null,
-                                    tint = if (s < stars) Gold else GoldSoft.copy(alpha = 0.25f),
-                                    modifier = Modifier.size(28.dp)
-                                )
+                    val stars = when { correctCount >= 5 -> 3; correctCount >= 4 -> 2; correctCount >= 3 -> 1; else -> 0 }
+                    WinCelebrationOverlay(
+                        stageNumber = lvl,
+                        totalStages = totalLevels,
+                        stars = stars,
+                        stageTitle = station.prophet,
+                        onNextStage = {
+                            val earned = correctCount * 25 * lvl
+                            totalScore += earned
+                            if (lvl >= highestUnlocked && stars >= 2) {
+                                highestUnlocked = (lvl + 1).coerceAtMost(totalLevels)
                             }
-                        }
-                        Spacer(Modifier.height(14.dp))
-                        Button(
-                            onClick = {
-                                totalScore += earned
-                                if (lvl >= highestUnlocked && stars >= 2) {
-                                    highestUnlocked = (lvl + 1).coerceAtMost(totalLevels)
-                                }
-                                if (stars >= 1) totalStars += 1
-                                NewGameProgress.save(
-                                    context, "game_prophets_journey",
-                                    highestUnlocked, totalScore,
-                                    progressData.streak + 1, totalStars, ""
-                                )
-                                progressData = NewGameProgress.load(context, "game_prophets_journey")
-                                currentLevel = null
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Gold.copy(alpha = 0.2f))
-                        ) { Text("متابعة الرحلة", color = Gold) }
-                    }
+                            if (stars >= 1) totalStars += 1
+                            NewGameProgress.save(
+                                context, "game_prophets_journey",
+                                highestUnlocked, totalScore,
+                                progressData.streak + 1, totalStars, ""
+                            )
+                            progressData = NewGameProgress.load(context, "game_prophets_journey")
+                            currentLevel = if (lvl < totalLevels) lvl + 1 else null
+                        },
+                        onReplayStage = {
+                            qIndex = 0
+                            introShown = false
+                            correctCount = 0
+                            selected = null
+                            finished = false
+                        },
+                        onStageMap = { currentLevel = null }
+                    )
                 } else if (!introShown) {
                     // Story intro screen
                     Column(
@@ -380,8 +368,14 @@ fun ProphetsJourneyGameScreen(onBack: () -> Unit) {
                                         .noorGlassCard(cornerRadius = 14.dp)
                                         .clickable {
                                             if (selected == null) {
+                                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                                 selected = i
-                                                if (isCorrect) correctCount++
+                                                if (isCorrect) {
+                                                    correctCount++
+                                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                } else {
+                                                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                }
                                             }
                                         }
                                         .padding(14.dp)

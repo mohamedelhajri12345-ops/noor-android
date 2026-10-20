@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -208,6 +210,7 @@ private fun MirrorPlay(
     var errors by remember(surah.num) { mutableIntStateOf(0) }
     var revealed by remember(surah.num) { mutableStateOf(false) }
     var finished by remember(surah.num) { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
 
     val current = blanks.getOrNull(idx)
 
@@ -299,6 +302,26 @@ private fun MirrorPlay(
                 }
             }
         } else {
+            val stars = when {
+                errors == 0 -> 3
+                errors <= 2 -> 2
+                else -> 1
+            }
+            WinCelebrationOverlay(
+                stageNumber = levelIdx + 1,
+                totalStages = mirrorSurahs.size,
+                stars = stars,
+                stageTitle = "سورة ${surah.name}",
+                onNextStage = { onDone(errors) },
+                onReplayStage = {
+                    idx = 0
+                    errors = 0
+                    revealed = false
+                    finished = false
+                },
+                onStageMap = onExit
+            )
+
             // النتيجة بالنجوم
             Column(Modifier.fillMaxSize().padding(top = 50.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 val stars = when {

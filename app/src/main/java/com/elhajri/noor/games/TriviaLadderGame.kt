@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -194,6 +196,7 @@ private fun TriviaLadderPlayScreen(
     var pickedIdx by remember(levelIdx) { mutableStateOf<Int?>(null) }
     var helpsUsed by remember(levelIdx) { mutableStateOf(setOf<String>()) }
     var wrongFlash by remember(levelIdx) { mutableStateOf<Int?>(null) }
+    val haptics = LocalHapticFeedback.current
 
     val q = ladderQuestions.getOrNull(step)
 
@@ -213,13 +216,16 @@ private fun TriviaLadderPlayScreen(
 
     fun answer(i: Int) {
         if (state != "playing" || i in eliminated) return
+        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         pickedIdx = i
         if (i == q!!.correct) {
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             state = "answered"
             val pointsAwarded = 100 * combo
             score += pointsAwarded
             combo = if (combo < 3) combo + 1 else 3
         } else {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             wrongFlash = i
             mistakes++
             state = "fail"
@@ -228,6 +234,7 @@ private fun TriviaLadderPlayScreen(
 
     fun useHelp(h: String) {
         if (h in helpsUsed || state != "playing") return
+        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         helpsUsed = helpsUsed + h
         when (h) {
             "wisdom" -> {
@@ -258,6 +265,34 @@ private fun TriviaLadderPlayScreen(
                         .background(if (s < step) Gold else if (s == step) GoldSoft else Gold.copy(alpha = 0.15f))
                 )
             }
+        }
+
+        if (state == "done") {
+            val stars = when {
+                mistakes == 0 -> 3
+                mistakes == 1 -> 2
+                else -> 1
+            }
+            WinCelebrationOverlay(
+                stageNumber = levelIdx + 1,
+                totalStages = ladderQuestions.size,
+                stars = stars,
+                stageTitle = "ميدان المعرفة",
+                onNextStage = { onNextLevel() },
+                onReplayStage = {
+                    step = 0
+                    eliminated = emptySet()
+                    timeLeft = 15
+                    combo = 1
+                    score = 0
+                    mistakes = 0
+                    state = "playing"
+                    pickedIdx = null
+                    helpsUsed = emptySet()
+                    wrongFlash = null
+                },
+                onStageMap = onExit
+            )
         }
 
         if (q == null || state == "done") {

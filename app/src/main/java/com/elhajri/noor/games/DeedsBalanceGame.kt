@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -250,6 +252,7 @@ private fun DeedsBalancePlayScreen(
     var correctCount by remember(stageIdx) { mutableIntStateOf(0) }
     var showWinDialog by remember(stageIdx) { mutableStateOf(false) }
     var earnedStars by remember(stageIdx) { mutableIntStateOf(3) }
+    val haptics = LocalHapticFeedback.current
 
     val activeRound = stageComparisons[roundInStageIdx]
 
@@ -261,6 +264,9 @@ private fun DeedsBalancePlayScreen(
         val isCorrect = isDeedA == activeRound.isDeedAGreater
         if (isCorrect) {
             correctCount += 1
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        } else {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
 
@@ -456,7 +462,7 @@ private fun DeedsBalancePlayScreen(
         }
 
         if (showWinDialog) {
-            StageWinDialog(
+            WinCelebrationOverlay(
                 stageNumber = stageNumber,
                 totalStages = totalStages,
                 stars = earnedStars,

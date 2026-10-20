@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -149,6 +151,7 @@ fun ProphetsOrderGameScreen(onBack: () -> Unit) {
                 var selected by remember(lvl) { mutableStateOf(listOf<String>()) }
                 var wrongProphet by remember(lvl) { mutableStateOf<String?>(null) }
                 var isSuccess by remember(lvl) { mutableStateOf(false) }
+                val haptics = LocalHapticFeedback.current
 
                 LaunchedEffect(wrongProphet) {
                     if (wrongProphet != null) {
@@ -238,8 +241,10 @@ fun ProphetsOrderGameScreen(onBack: () -> Unit) {
                                         RoundedCornerShape(14.dp)
                                     )
                                     .clickable(enabled = !isSel && !isSuccess) {
+                                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                         val expectedIdx = selected.size
                                         if (prophet == targetProphets[expectedIdx]) {
+                                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                             val nextSelected = selected + prophet
                                             selected = nextSelected
                                             if (nextSelected.size == targetProphets.size) {
@@ -256,6 +261,7 @@ fun ProphetsOrderGameScreen(onBack: () -> Unit) {
                                                 )
                                             }
                                         } else {
+                                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                             wrongProphet = prophet
                                         }
                                     }
@@ -288,6 +294,22 @@ fun ProphetsOrderGameScreen(onBack: () -> Unit) {
                     }
 
                     if (isSuccess) {
+                        WinCelebrationOverlay(
+                            stageNumber = lvl,
+                            totalStages = 25,
+                            stars = 3,
+                            stageTitle = "المستوى ${lvl.toArabicDigits()}",
+                            onNextStage = {
+                                if (lvl < 25) currentLevel = lvl + 1 else currentLevel = null
+                            },
+                            onReplayStage = {
+                                selected = emptyList()
+                                shuffled = targetProphets.shuffled()
+                                isSuccess = false
+                            },
+                            onStageMap = { currentLevel = null }
+                        )
+
                         Spacer(Modifier.height(12.dp))
                         Box(
                             Modifier

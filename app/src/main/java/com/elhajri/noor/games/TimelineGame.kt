@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -160,6 +162,7 @@ fun TimelineGameScreen(onBack: () -> Unit) {
             } else {
                 TimelinePlayScreen(
                     levelIdx = currentLevelIdx,
+                    totalStages = totalLevels,
                     onLevelComplete = { heartsLeft, scoreGained ->
                         val stars = when (heartsLeft) {
                             3 -> 3
@@ -186,6 +189,7 @@ fun TimelineGameScreen(onBack: () -> Unit) {
 @Composable
 private fun TimelinePlayScreen(
     levelIdx: Int,
+    totalStages: Int,
     onLevelComplete: (heartsLeft: Int, scoreGained: Int) -> Unit,
     onNextLevel: () -> Unit,
     onExit: () -> Unit
@@ -206,12 +210,15 @@ private fun TimelinePlayScreen(
     var placed by remember(levelIdx) { mutableStateOf(listOf<SeerahEvent>()) }
     var wrong by remember(levelIdx) { mutableStateOf<Int?>(null) }
     var roundDone by remember(levelIdx) { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
 
     fun tap(event: SeerahEvent) {
         if (roundDone) return
+        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         val remaining = pool - placed.toSet()
         val oldest = remaining.minByOrNull { it.yearNum }
         if (event == oldest) {
+            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
             placed = placed + event
             score += 40
             if (remaining.size == 1) {
@@ -220,6 +227,7 @@ private fun TimelinePlayScreen(
                 onLevelComplete(hearts, score)
             }
         } else {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
             wrong = pool.indexOf(event)
             hearts -= 1
             if (hearts <= 0) {
@@ -283,34 +291,58 @@ private fun TimelinePlayScreen(
                     }
                 }
             } else {
-                item {
-                    Spacer(Modifier.height(16.dp))
-                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            if (hearts > 0) "ما شاء الله! ترتيب تاريخي دقيق 🌙" else "انتهت القلوب — حاول مجدداً",
-                            color = Gold, fontWeight = FontWeight.Bold, fontSize = 15.sp
+
+
+                if (hearts > 0) {
+                    item {
+                        // Gold win celebration overlay, consistent with the rest of the games
+                        WinCelebrationOverlay(
+                            stageNumber = levelIdx + 1,
+                            totalStages = totalStages,
+                            stars = if (hearts >= 3) 3 else if (hearts == 2) 2 else 1,
+                            stageTitle = "خط الزمن النبوي",
+                            onNextStage = onNextLevel,
+                            onReplayStage = {
+                                hearts = 3
+                                score = 0
+                                placed = emptyList()
+                                wrong = null
+                                roundDone = false
+                            },
+                            onStageMap = onExit
                         )
-                        Spacer(Modifier.height(12.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Box(
-                                Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(NavyCard)
-                                    .border(1.dp, Gold, RoundedCornerShape(12.dp))
-                                    .clickable { onExit() }
-                                    .padding(horizontal = 20.dp, vertical = 10.dp)
-                            ) {
-                                Text("القائمة", color = Gold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                            }
-                            if (hearts > 0) {
+                    }
+                } else {
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("انتهت القلوب — حاول مجدداً", color = Gold, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Spacer(Modifier.height(12.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Box(
+                                    Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(NavyCard)
+                                        .border(1.dp, Gold, RoundedCornerShape(12.dp))
+                                        .clickable { onExit() }
+                                        .padding(horizontal = 20.dp, vertical = 10.dp)
+                                ) {
+                                    Text("القائمة", color = Gold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                }
                                 Box(
                                     Modifier
                                         .clip(RoundedCornerShape(12.dp))
                                         .background(Gold)
-                                        .clickable { onNextLevel() }
+                                        .clickable {
+                                            hearts = 3
+                                            score = 0
+                                            placed = emptyList()
+                                            wrong = null
+                                            roundDone = false
+                                        }
                                         .padding(horizontal = 26.dp, vertical = 10.dp)
                                 ) {
-                                    Text("المستوى التالي", color = Navy, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                    Text("حاول مجدداً", color = Navy, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                 }
                             }
                         }

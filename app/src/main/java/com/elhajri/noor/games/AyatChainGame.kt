@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -192,6 +194,7 @@ private fun AyatChainPlay(
     var selected by remember(surah.num) { mutableStateOf<Int?>(null) }
     var solved by remember(surah.num) { mutableStateOf(false) }
     var moves by remember(surah.num) { mutableIntStateOf(0) }
+    val haptics = LocalHapticFeedback.current
 
     val isCorrect = order == ayahs.indices.toList()
 
@@ -242,6 +245,7 @@ private fun AyatChainPlay(
                         )
                         .clickable {
                             if (isCorrect) return@clickable
+                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             val s = selected
                             if (s == null) selected = i
                             else if (s == i) selected = null
@@ -251,6 +255,9 @@ private fun AyatChainPlay(
                                     val tmp = it[s]; it[s] = it[i]; it[i] = tmp
                                 }
                                 selected = null
+                                if (order == ayahs.indices.toList()) {
+                                    haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                }
                             }
                         }
                         .padding(14.dp)
@@ -271,6 +278,28 @@ private fun AyatChainPlay(
                     }
                 }
             }
+        }
+
+        if (solved) {
+            val stars = when {
+                moves <= 2 -> 3
+                moves <= 5 -> 2
+                else -> 1
+            }
+            WinCelebrationOverlay(
+                stageNumber = levelIdx + 1,
+                totalStages = chainSurahs.size,
+                stars = stars,
+                stageTitle = "سورة ${surah.name}",
+                onNextStage = { onDone(moves) },
+                onReplayStage = {
+                    order = ayahs.indices.shuffled().toMutableList()
+                    selected = null
+                    solved = false
+                    moves = 0
+                },
+                onStageMap = onExit
+            )
         }
 
         if (isCorrect) {
