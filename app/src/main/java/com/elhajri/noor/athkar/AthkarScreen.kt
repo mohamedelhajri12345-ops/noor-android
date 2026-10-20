@@ -1,6 +1,7 @@
 package com.elhajri.noor.athkar
 
-import com.elhajri.noor.ui.themeScreenBackground
+import com.elhajri.noor.settings.t
+
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,28 +11,32 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elhajri.noor.audio.player.AthkarPlayerManager
 import com.elhajri.noor.data.DataLoader
+import com.elhajri.noor.theme.noorGlassCard
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
-import com.elhajri.noor.ui.NoorGradients
-import androidx.compose.ui.graphics.Color
-import com.elhajri.noor.theme.noorGlassCard
+import com.elhajri.noor.ui.themeScreenBackground
 
 internal fun toArabicNumber(number: Any): String {
     val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
@@ -42,6 +47,7 @@ internal fun toArabicNumber(number: Any): String {
 fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
     val context = LocalContext.current
     var selectedCategory by remember { mutableStateOf<Pair<String, String>?>(null) }
+    val playerState by AthkarPlayerManager.athkarState.collectAsState()
 
     if (selectedCategory != null) {
         AthkarDetailScreen(
@@ -60,8 +66,8 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
                 .padding(16.dp)
         ) {
             com.elhajri.noor.ui.NoorSectionTitle(
-                title = "الأذكار",
-                subtitle = "حصنك من كل شر بإذن الله",
+                title = t("حصن المسلم الصوتي", "Audio Hisn al-Muslim"),
+                subtitle = t("أذكار الصباح والمساء واليوم مع القراءة المتتابعة", "Morning, Evening & Daily Adhkar with Audio Recitation"),
                 modifier = Modifier.padding(bottom = 10.dp)
             )
 
@@ -80,20 +86,23 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
                     val totalCount = dhikrs.size
                     val progress = if (totalCount > 0) completedCount.toFloat() / totalCount.toFloat() else 0f
 
+                    val isCategoryPlaying = playerState.isPlaying && playerState.categoryId == cat.id
+
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
                                 onOpenCategory(cat.id, cat.name)
                                 selectedCategory = Pair(cat.id, cat.name)
-                            }.noorGlassCard(),
+                            }
+                            .noorGlassCard(),
                         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(14.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -112,7 +121,7 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
                                     if (isCompleted) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
-                                            contentDescription = "مكتمل",
+                                            contentDescription = t("مكتمل", "Completed"),
                                             tint = Gold,
                                             modifier = Modifier.size(24.dp)
                                         )
@@ -147,7 +156,7 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
                                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                                             ) {
                                                 Text(
-                                                    text = "مكتمل",
+                                                    text = t("مكتمل", "Completed"),
                                                     color = Gold,
                                                     fontSize = 10.sp,
                                                     fontWeight = FontWeight.Medium
@@ -169,7 +178,7 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
                                     if (!isCompleted && progress > 0f) {
                                         Spacer(modifier = Modifier.height(6.dp))
                                         LinearProgressIndicator(
-                                            progress = progress,
+                                            progress = { progress },
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .height(4.dp)
@@ -181,12 +190,34 @@ fun AthkarScreen(onOpenCategory: (String, String) -> Unit = { _, _ -> }) {
                                 }
                             }
 
-                            Icon(
-                                imageVector = Icons.Filled.KeyboardArrowLeft,
-                                contentDescription = null,
-                                tint = GoldSoft,
-                                modifier = Modifier.size(20.dp)
-                            )
+                            // 1-Tap Sequential Audio Playback Button
+                            IconButton(
+                                onClick = {
+                                    AthkarPlayerManager.initPlayer(context)
+                                    if (isCategoryPlaying) {
+                                        AthkarPlayerManager.togglePlayPause(context)
+                                    } else {
+                                        AthkarPlayerManager.startCategory(
+                                            context = context,
+                                            categoryId = cat.id,
+                                            categoryTitle = cat.name,
+                                            dhikrs = dhikrs,
+                                            startIndex = 0
+                                        )
+                                    }
+                                },
+                                modifier = Modifier
+                                    .size(42.dp)
+                                    .clip(CircleShape)
+                                    .background(Gold)
+                            ) {
+                                Icon(
+                                    imageVector = if (isCategoryPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                    contentDescription = if (isCategoryPlaying) "إيقاف مؤقت" else "تشغيل الصوتي",
+                                    tint = Navy,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     }
                 }

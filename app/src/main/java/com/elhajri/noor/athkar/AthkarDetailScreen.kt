@@ -1,11 +1,11 @@
 package com.elhajri.noor.athkar
 
-import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -20,9 +20,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Headphones
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -37,18 +45,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elhajri.noor.audio.player.AthkarPlayerManager
 import com.elhajri.noor.data.DataLoader
 import com.elhajri.noor.data.Dhikr
+import com.elhajri.noor.theme.noorGlassCard
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
+import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.launch
-import com.elhajri.noor.ui.NoorGradients
 
 @Composable
 fun AthkarDetailScreen(
@@ -67,9 +78,23 @@ fun AthkarDetailScreen(
     val counts = remember { mutableStateMapOf<Int, Int>() }
     var showCelebrationDialog by remember { mutableStateOf(false) }
 
+    val playerState by AthkarPlayerManager.athkarState.collectAsState()
+
+    val isCategoryActive = playerState.categoryId == categoryId
+    val activeIndex = if (isCategoryActive) playerState.activeIndex else -1
+
     LaunchedEffect(categoryId) {
         dhikrs.indices.forEach { i ->
             counts[i] = sp.getInt("athkar_count_${categoryId}_$i", 0)
+        }
+    }
+
+    // Auto-scroll list to active playing dhikr during sequential playback
+    LaunchedEffect(activeIndex) {
+        if (activeIndex in dhikrs.indices) {
+            coroutineScope.launch {
+                listState.animateScrollToItem(activeIndex + 1)
+            }
         }
     }
 
@@ -100,6 +125,7 @@ fun AthkarDetailScreen(
             sp.edit().remove("athkar_count_${categoryId}_$i").apply()
         }
         sp.edit().remove("athkar_completed_$categoryId").apply()
+        Toast.makeText(context, "تمت إعادة ضبط الأذكار", Toast.LENGTH_SHORT).show()
     }
 
     fun incrementDhikr(index: Int) {
@@ -126,220 +152,493 @@ fun AthkarDetailScreen(
                 }
                 if (nextUndoneIndex != null) {
                     coroutineScope.launch {
-                        listState.animateScrollToItem(nextUndoneIndex)
+                        listState.animateScrollToItem(nextUndoneIndex + 1)
                     }
                 }
             }
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .themeScreenBackground()
-            .padding(16.dp)
     ) {
-        // Header
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
         ) {
-            IconButton(
-                onClick = onBack,
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Header Row
+            Row(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(NavyCard)
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "رجوع",
-                    tint = Gold
-                )
-            }
-
-            Text(
-                text = title,
-                color = Gold,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
-            )
-
-            IconButton(
-                onClick = { resetAll() },
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(NavyCard)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "إعادة",
-                    tint = GoldSoft
-                )
-            }
-        }
-
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            itemsIndexed(dhikrs) { index, item ->
-                val currentCount = counts[index] ?: 0
-                val isDone = currentCount >= item.count
-                val progress = if (item.count > 0) (currentCount.toFloat() / item.count.toFloat()).coerceIn(0f, 1f) else 1f
-
-                Card(
+                IconButton(
+                    onClick = onBack,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(enabled = !isDone) { incrementDhikr(index) },
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isDone) NavyCard.copy(alpha = 0.6f) else NavyCard
-                    ),
-                    shape = RoundedCornerShape(20.dp)
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(NavyCard)
                 ) {
-                    Column(
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "رجوع",
+                        tint = Gold
+                    )
+                }
+
+                Text(
+                    text = title,
+                    color = Gold,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f)
+                )
+
+                IconButton(
+                    onClick = { resetAll() },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(NavyCard)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "إعادة الضبط",
+                        tint = GoldSoft
+                    )
+                }
+            }
+
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = if (isCategoryActive) 130.dp else 24.dp)
+            ) {
+                // Sequential Reading Mode Hero Card ("قراءة متتابعة")
+                item {
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .noorGlassCard(),
+                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                        shape = RoundedCornerShape(18.dp)
                     ) {
-                        Text(
-                            text = item.text,
-                            color = if (isDone) TextMain.copy(alpha = 0.6f) else TextMain,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            lineHeight = 28.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
                         ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Headphones,
+                                        contentDescription = null,
+                                        tint = Gold,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Text(
+                                        text = "وضع القراءة المتتابعة",
+                                        color = Gold,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+
+                                if (isCategoryActive && playerState.isPlaying) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(Gold.copy(alpha = 0.2f))
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = "جاري التشغيل...",
+                                            color = Gold,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
                             Text(
-                                text = item.ref,
-                                color = GoldSoft.copy(alpha = 0.7f),
+                                text = "استمع وتتبع الأذكار بصوت خاشع ومؤثر مع الانتقال التلقائي بين الأذكار",
+                                color = GoldSoft.copy(alpha = 0.8f),
                                 fontSize = 12.sp,
-                                modifier = Modifier.weight(1f)
+                                lineHeight = 18.sp
                             )
 
-                            Box(
-                                modifier = Modifier
-                                    .size(52.dp)
-                                    .clickable(enabled = !isDone) { incrementDhikr(index) },
-                                contentAlignment = Alignment.Center
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
-                                Canvas(modifier = Modifier.fillMaxSize()) {
-                                    val strokeWidth = 4.dp.toPx()
-                                    val radius = (size.minDimension - strokeWidth) / 2
-                                    val topLeft = Offset((size.width - radius * 2) / 2, (size.height - radius * 2) / 2)
-                                    val arcSize = Size(radius * 2, radius * 2)
-
-                                    drawArc(
-                                        color = Gold.copy(alpha = 0.2f),
-                                        startAngle = 0f,
-                                        sweepAngle = 360f,
-                                        useCenter = false,
-                                        topLeft = topLeft,
-                                        size = arcSize,
-                                        style = Stroke(width = strokeWidth)
+                                // Previous Dhikr
+                                IconButton(
+                                    onClick = { AthkarPlayerManager.previousDhikr(context) },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                        .background(NavyCard)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.SkipNext, // RTL arrow direction
+                                        contentDescription = "الذكر السابق",
+                                        tint = Gold
                                     )
+                                }
 
-                                    if (progress > 0f) {
+                                // Play / Pause Button
+                                Button(
+                                    onClick = {
+                                        if (isCategoryActive) {
+                                            AthkarPlayerManager.togglePlayPause(context)
+                                        } else {
+                                            AthkarPlayerManager.startCategory(
+                                                context = context,
+                                                categoryId = categoryId,
+                                                categoryTitle = title,
+                                                dhikrs = dhikrs,
+                                                startIndex = 0
+                                            )
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy),
+                                    shape = RoundedCornerShape(14.dp),
+                                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 10.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = if (isCategoryActive && playerState.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                        contentDescription = if (isCategoryActive && playerState.isPlaying) "إيقاف مؤقت" else "ابدأ الاستماع",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = if (isCategoryActive && playerState.isPlaying) "إيقاف مؤقت" else "تشغيل متتابع",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp
+                                    )
+                                }
+
+                                // Next Dhikr
+                                IconButton(
+                                    onClick = { AthkarPlayerManager.nextDhikr(context) },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                        .background(NavyCard)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.SkipPrevious, // RTL arrow direction
+                                        contentDescription = "الذكر التالي",
+                                        tint = Gold
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Dhikrs List
+                itemsIndexed(dhikrs) { index, item ->
+                    val currentCount = counts[index] ?: 0
+                    val isDone = currentCount >= item.count
+                    val isCurrentPlaying = isCategoryActive && playerState.activeIndex == index && playerState.isPlaying
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                if (isCategoryActive && playerState.activeIndex == index) {
+                                    AthkarPlayerManager.togglePlayPause(context)
+                                } else {
+                                    AthkarPlayerManager.startCategory(
+                                        context = context,
+                                        categoryId = categoryId,
+                                        categoryTitle = title,
+                                        dhikrs = dhikrs,
+                                        startIndex = index
+                                    )
+                                }
+                            }
+                            .noorGlassCard(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isCurrentPlaying) Gold.copy(alpha = 0.12f) else Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(18.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Gold.copy(alpha = 0.15f))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = "ذكر ${toArabicNumber(index + 1)} من ${toArabicNumber(dhikrs.size)}",
+                                        color = Gold,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+
+                                if (isCurrentPlaying) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.VolumeUp,
+                                            contentDescription = "مستمر",
+                                            tint = Gold,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Text(
+                                            text = "جاري القراءة",
+                                            color = Gold,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Text(
+                                text = item.text,
+                                color = if (isDone) TextMain.copy(alpha = 0.6f) else TextMain,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                lineHeight = 28.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = item.ref,
+                                    color = GoldSoft.copy(alpha = 0.7f),
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.weight(1f)
+                                )
+
+                                // Circular Counter / Repeat Indicator
+                                Box(
+                                    modifier = Modifier
+                                        .size(52.dp)
+                                        .clickable(enabled = !isDone) { incrementDhikr(index) },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Canvas(modifier = Modifier.fillMaxSize()) {
+                                        val strokeWidth = 4.dp.toPx()
+                                        val radius = (size.minDimension - strokeWidth) / 2
+                                        val topLeft = Offset((size.width - radius * 2) / 2, (size.height - radius * 2) / 2)
+                                        val arcSize = Size(radius * 2, radius * 2)
+
+                                        val progress = if (item.count > 0) (currentCount.toFloat() / item.count.toFloat()).coerceIn(0f, 1f) else 1f
+
+                                        drawArc(
+                                            color = Gold.copy(alpha = 0.2f),
+                                            startAngle = 0f,
+                                            sweepAngle = 360f,
+                                            useCenter = false,
+                                            topLeft = topLeft,
+                                            size = arcSize,
+                                            style = Stroke(width = strokeWidth)
+                                        )
+
                                         drawArc(
                                             color = Gold,
                                             startAngle = -90f,
-                                            sweepAngle = progress * 360f,
+                                            sweepAngle = 360f * progress,
                                             useCenter = false,
                                             topLeft = topLeft,
                                             size = arcSize,
                                             style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                                         )
                                     }
-                                }
 
-                                if (isDone) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = "تم",
-                                        tint = Gold,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                } else {
-                                    Text(
-                                        text = "${toArabicNumber(currentCount)}/${toArabicNumber(item.count)}",
-                                        color = Gold,
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    if (isDone) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "مكتمل",
+                                            tint = Gold,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    } else {
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            Text(
+                                                text = toArabicNumber(currentCount),
+                                                color = Gold,
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            Text(
+                                                text = "/${toArabicNumber(item.count)}",
+                                                color = GoldSoft.copy(alpha = 0.7f),
+                                                fontSize = 10.sp
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
 
-                        if (item.count > 1 && !isDone) {
-                            Spacer(modifier = Modifier.height(10.dp))
-                            LinearProgressIndicator(
-                                progress = progress,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(4.dp)
-                                    .clip(CircleShape),
-                                color = Gold,
-                                trackColor = NavyLight
+        // Floating Bottom Audio Player Bar during Active Playback
+        if (isCategoryActive) {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(12.dp)
+                    .noorGlassCard(),
+                color = Color.Transparent,
+                shape = RoundedCornerShape(18.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = playerState.currentDhikrText.take(35) + if (playerState.currentDhikrText.length > 35) "..." else "",
+                            color = TextMain,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "الذكر ${toArabicNumber(playerState.activeIndex + 1)} من ${toArabicNumber(dhikrs.size)} • ${playerState.currentRef}",
+                            color = GoldSoft,
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        IconButton(
+                            onClick = { AthkarPlayerManager.togglePlayPause(context) },
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(Gold)
+                        ) {
+                            Icon(
+                                imageVector = if (playerState.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                                contentDescription = if (playerState.isPlaying) "إيقاف مؤقت" else "تشغيل",
+                                tint = Navy,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { AthkarPlayerManager.stopAudioMode(context) },
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(NavyCard)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "إنهاء",
+                                tint = GoldSoft,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }
                 }
             }
         }
-    }
 
-    if (showCelebrationDialog) {
-        AlertDialog(
-            onDismissRequest = { showCelebrationDialog = false },
-            containerColor = NavyCard,
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.AutoAwesome,
-                    contentDescription = null,
-                    tint = Gold,
-                    modifier = Modifier.size(36.dp)
-                )
-            },
-            title = {
-                Text(
-                    text = "تقبّل الله طاعتكم",
-                    color = Gold,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-            },
-            text = {
-                Text(
-                    text = "لقد أكملت جميع $title بنجاح.",
-                    color = TextMain,
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.Center
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = { showCelebrationDialog = false },
-                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("تم", fontWeight = FontWeight.Bold)
-                }
-            }
-        )
+        // Completion Celebration Dialog
+        AnimatedVisibility(
+            visible = showCelebrationDialog,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            AlertDialog(
+                onDismissRequest = { showCelebrationDialog = false },
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            tint = Gold
+                        )
+                        Text(
+                            text = "تقبل الله طاعتكم",
+                            color = Gold,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                },
+                text = {
+                    Text(
+                        text = "أحسنت! أتممت قراءة $title بنجاح. كتب الله أجركم وجعلكم من الذاكرين الله كثيراً والذاكرات.",
+                        color = TextMain,
+                        fontSize = 14.sp,
+                        lineHeight = 22.sp
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = { showCelebrationDialog = false }) {
+                        Text(text = "تم", color = Gold, fontWeight = FontWeight.Bold)
+                    }
+                },
+                containerColor = Navy,
+                shape = RoundedCornerShape(20.dp)
+            )
+        }
     }
 }
