@@ -1,0 +1,183 @@
+[
+  {
+    "id": "show_seerah_badr",
+    "title": "السيرة النبوية الشريفة",
+    "host": "الشيخ بدر المشاري",
+    "category": "seerah",
+    "category_ar": "السيرة النبوية",
+    "cover_url": "https://archive.org/services/img/Isstiwana-35",
+    "description": "سلسلة جامعة في السيرة النبوية العطرة من مولد النبي ﷺ وحتى وفاته بأسلوب مشوق ومؤثر.",
+    "episodes": [
+      {
+        "id": "ep_seerah_badr_01",
+        "title": "الحلقة 1: العهد المكي وبداية البعثة النبوية",
+        "audio_url": "https://content.rss.com/episodes/197784/892772/prophetic-seerah-badr-mishary/2023_04_03_06_18_04_6c97164d-0db0-42a8-84ce-9627ae10d881.mp3",
+        "duration": "٤٥ دقيقة",
+        "description": "مولد النبي ﷺ، نشأته الكريمة، نزول الوحي في غار حراء، وبداية الدعوة إلى الله."
+      },
+      {
+        "id": "ep_seerah_badr_02",
+        "title": "الحلقة 2: الجهر بالدعوة واضطهاد قريش",
+        "audio_url": "https://content.rss.com/episodes/197784/892778/prophetic-seerah-badr-mishary/2023_04_03_06_20_22_4de6779e-8879-4e49-8670-d225338cd3de.mp3",
+        "duration": "٤٠ دقيقة",
+        "description": "الجهر بالدعوة على الصفا، ابتلاء المستضعفين من الصحابة، والهجرة الأولى إلى الحبشة."
+      },
+      {
+        "id": "ep_seerah_badr_03",
+        "title": "الحلقة 3: عام الحزن والإسراء والمعراج",
+        "audio_url": "https://content.rss.com/episodes/197784/892782/prophetic-seerah-badr-mishary/2023_04_03_06_22_42_a5aa182e-9b87-4ffa-b240-5d8a7683d5ef.mp3",
+        "duration": "٤٨ دقيقة",
+        "description": "وفاة خديجة وأبي طالب، رحلة الطائف، ومعجزة الإسراء والمعراج وفرض الصلاة."
+      },
+      {
+        "id": "ep_seerah_badr_04",
+        "title": "الحلقة 4: الهجرة النبوية إلى المدينة المنورة",
+        "audio_url": "https://content.rss.com/episodes/197784/892790/prophetic-seerah-badr-mishary/2023_04_03_06_38_12_22b1d4f8-3eac-421a-90ce-472dc53f2289.mp3",
+        "duration": "٥٠ دقيقة",
+        "description": "بيعة العقبة، المؤامرة في دار الندوة، الهجرة العظيمة مع أبي بكر الصديق، وبناء المسجد النبوي."
+      },
+      {
+        "id": "ep_seerah_badr_05",
+        "title": "الحلقة 5: غزوة بدر الكبرى والفتح المبين",
+        "audio_url": "https://content.rss.com/episodes/197784/901488/prophetic-seerah-badr-mishary/2023_04_10_04_34_45_65548ed6-4af9-4f82-8b42-f09094c9e0eb.mp3",
+        "duration": "٤٦ دقيقة",
+        "description": "يوم الفرقان، أسباب غزوة بدر، تنزل الملائكة والنصر المؤزر للمسلمين."
+      }
+    ]
+  },
+  {
+    "id": "show_seerah_as_syaid",
+    "title": "السيرة النبوية للمصلحين",
+    "host": "الشيخ أحمد السيد",
+    "category": "seerah",
+    "category_ar": "السيرة النبوية",
+    "cover_url": "https://archive.org/services/img/kurapica_Sona",
+    "description": "دروس واستنباطات تربوية وإيمانية عميقة من معالم السيرة النبوية العطرة.",
+    "episodes": [
+      {
+        "id": "ep_seerah_sayid_01",
+        "title": "الدرس 1: معالم التربية النبوية في مكة",
+        "audio_url": "https://archive.org/download/kurapica_Sona/01.mp3",
+        "duration": "٣٥ دقيقة",
+        "description": "كيف ربّى النبي ﷺ جيل الصحابة الأول في العهد المكي."
+      },
+      {
+        "id": "ep_seerah_sayid_02",
+        "title": "الدرس 2: ثبات النبي ﷺ وأصحابه في الأزمات",
+        "audio_url": "https://archive.org/download/kurapica_Sona/02.mp3",
+        "duration": "٣٨ دقيقة",
+        "description": "معالم الثبات واليقين بالله تعالى خلال فترة الحصار والابتلاء."
+      },
+      {
+        "id": "ep_seerah_sayid_03",
+        "title": "الدرس 3: بناء الدولة والمجتمع في المدينة",
+        "audio_url": "https://archive.org/download/kurapica_Sona/03.mp3",
+        "duration": "٤٢ دقيقة",
+        "description": "المؤاخاة بين المهاجرين والأنصار ووظائف المسجد النبوي الشريف."
+      }
+    ]
+  },
+  {
+    "id": "show_tafsir_badr",
+    "title": "القواعد الحسان في تفسير القرآن",
+    "host": "الشيخ عبد الرزاق البدر",
+    "category": "tafsir",
+    "category_ar": "تفسير القرآن",
+    "cover_url": "https://archive.org/services/img/islami-417",
+    "description": "شرح قواعد وأصول تفسير كتاب الله عز وجل وتدبر آياته الكريمة.",
+    "episodes": [
+      {
+        "id": "ep_tafsir_badr_01",
+        "title": "المجلس 1: مقدمة في أصول وقواعد التفسير",
+        "audio_url": "https://archive.org/download/islami-417/%D8%A7%D9%84%D9%82%D9%88%D8%A7%D8%B9%D8%AF%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D9%86%20%D9%84%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86%20%7B%7B10%7D%7D%20%D9%81%D8%B6%D9%8A%D9%84%D8%A9%20%D8%A7%D9%84%D8%B4%D9%8A%D8%AE%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%B1%D8%B2%D8%A7%D9%82%20%D8%A8%D9%86%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D9%85%D8%AD%D8%B3%D9%86%20%D8%A7%D9%84%D8%A8%D8%AF%D8%B1.mp3",
+        "duration": "٣٢ دقيقة",
+        "description": "كيفية التعامل مع كلام الله وفهم معانيه وقواعد تفسير القرآن بالقرآن والسنة."
+      },
+      {
+        "id": "ep_tafsir_badr_02",
+        "title": "المجلس 2: تدبر آيات التوحيد والأسماء والصفات",
+        "audio_url": "https://archive.org/download/islami-417/%D8%A7%D9%84%D9%82%D9%88%D8%A7%D8%B9%D8%AF%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D9%86%20%D9%84%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86%20%7B%7B11%7D%7D%20%D9%81%D8%B6%D9%8A%D9%84%D8%A9%20%D8%A7%D9%84%D8%B4%D9%8A%D8%AE%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%B1%D8%B2%D8%A7%D9%82%20%D8%A8%D9%86%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D9%85%D8%AD%D8%B3%D9%86%20%D8%A7%D9%84%D8%A8%D8%AF%D8%B1.mp3",
+        "duration": "٣٥ دقيقة",
+        "description": "القواعد الجليلة في استنباط معاني الأسماء والصفات ودلالاتها في القرآن الكريم."
+      },
+      {
+        "id": "ep_tafsir_badr_03",
+        "title": "المجلس 3: الأمثال والقصص في التنزيل",
+        "audio_url": "https://archive.org/download/islami-417/%D8%A7%D9%84%D9%82%D9%88%D8%A7%D8%B9%D8%AF%20%D8%A7%D9%84%D8%AD%D8%B3%D8%A7%D9%86%20%D9%84%D8%AA%D9%81%D8%B3%D9%8A%D8%B1%20%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86%20%7B%7B12%7D%7D%20%D9%81%D8%B6%D9%8A%D9%84%D8%A9%20%D8%A7%D9%84%D8%B4%D9%8A%D8%AE%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D8%B1%D8%B2%D8%A7%D9%82%20%D8%A8%D9%86%20%D8%B9%D8%A8%D8%AF%20%D8%A7%D9%84%D9%85%D8%AD%D8%B3%D9%86%20%D8%A7%D9%84%D8%A8%D8%AF%D8%B1.mp3",
+        "duration": "٣٠ دقيقة",
+        "description": "حكم أسرار أمثال القرآن الكريم وما تتضمنه من العبر والدروس واليقين."
+      }
+    ]
+  },
+  {
+    "id": "show_adab_jazairi",
+    "title": "منهاج المسلم - الآداب والأخلاق",
+    "host": "الشيخ أبو بكر الجزائري",
+    "category": "adab",
+    "category_ar": "الآداب والأخلاق",
+    "cover_url": "https://archive.org/services/img/abo-sarh-21",
+    "description": "دروس جامعة في آداب المسلم في نفسه ومع ربه ومع الناس والأخلاق الفاضلة.",
+    "episodes": [
+      {
+        "id": "ep_adab_jaz_01",
+        "title": "الحلقة 1: حسن الخلق وبيانه وفضله",
+        "audio_url": "https://archive.org/download/abo-sarh-21/1.mp3",
+        "duration": "٢٨ دقيقة",
+        "description": "حقيقة حسن الخلق ومكانته في الإسلام وأثره في ثقل الميزان يوم القيامة."
+      },
+      {
+        "id": "ep_adab_jaz_02",
+        "title": "الحلقة 2: خلق الصدق وآثاره الإيمانية",
+        "audio_url": "https://archive.org/download/abo-sarh-21/10.mp3",
+        "duration": "٣١ دقيقة",
+        "description": "فضيلة الصدق في القول والعمل والنيات وأنه يهدي إلى البر والجنة."
+      },
+      {
+        "id": "ep_adab_jaz_03",
+        "title": "الحلقة 3: السخاء والكرم والجود",
+        "audio_url": "https://archive.org/download/abo-sarh-21/11.mp3",
+        "duration": "٣٠ دقيقة",
+        "description": "أهمية الإنفاق والبذل وطهارة النفس من الشح والبخل."
+      },
+      {
+        "id": "ep_adab_jaz_04",
+        "title": "الحلقة 4: خلق التواضع وذم الكبر",
+        "audio_url": "https://archive.org/download/abo-sarh-21/12.mp3",
+        "duration": "٣٣ دقيقة",
+        "description": "التواضع لله وللمؤمنين والتحذير الشديد من الكبر والخيلاء."
+      }
+    ]
+  },
+  {
+    "id": "show_family_shanqiti",
+    "title": "فقه الأسرة وبناء البيت المسلم",
+    "host": "الشيخ محمد مختار الشنقيطي",
+    "category": "family",
+    "category_ar": "الأسرة والتربية",
+    "cover_url": "https://archive.org/services/img/aa_461",
+    "description": "توجيهات فقهية وتربوية جامعة لبناء أسرة مسلمة مستقرة ومتحابة.",
+    "episodes": [
+      {
+        "id": "ep_family_shan_01",
+        "title": "الحلقة 1: حقوق الزوجة والمودة الأسرية",
+        "audio_url": "https://archive.org/download/aa_461/461.mp3",
+        "duration": "٣٥ دقيقة",
+        "description": "حقوق الزوجة في المعاشرة بالمعروف والنفقة والإكرام والاحترام."
+      },
+      {
+        "id": "ep_family_shan_02",
+        "title": "الحلقة 2: صلة الأرحام وبر الوالدين",
+        "audio_url": "https://archive.org/download/aa_461/462.mp3",
+        "duration": "٣٨ دقيقة",
+        "description": "عظمة حق الوالدين والأقارب وأثر صلة الرحم في زيادة الرزق والبركة."
+      },
+      {
+        "id": "ep_family_shan_03",
+        "title": "الحلقة 3: حقوق الأبناء والتربية الإيمانية",
+        "audio_url": "https://archive.org/download/aa_461/467.mp3",
+        "duration": "٤٠ دقيقة",
+        "description": "واجب الآباء في حسن اختيار الاسم والتربية الإيمانية والأخلاقية للأولاد."
+      }
+    ]
+  }
+]
