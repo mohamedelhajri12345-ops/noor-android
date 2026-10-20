@@ -329,13 +329,27 @@ object Base44Auth {
     }
 
     private fun parseErrorMessage(jsonStr: String?): String? {
-        if (jsonStr.isNullOrEmpty()) return null
+        if (jsonStr.isNullOrBlank()) return null
         return try {
             val obj = JSONObject(jsonStr)
-            val msg = obj.optString("message", obj.optString("error", ""))
+            val msg = when {
+                obj.has("message") && obj.getString("message").isNotBlank() -> obj.getString("message")
+                obj.has("detail") -> {
+                    val detailObj = obj.get("detail")
+                    if (detailObj is JSONObject) detailObj.optString("message", detailObj.toString())
+                    else detailObj.toString()
+                }
+                obj.has("error") -> {
+                    val errObj = obj.get("error")
+                    if (errObj is JSONObject) errObj.optString("message", errObj.toString())
+                    else errObj.toString()
+                }
+                obj.has("error_description") && obj.getString("error_description").isNotBlank() -> obj.getString("error_description")
+                else -> ""
+            }
             if (msg.isNotBlank()) msg else null
         } catch (_: Exception) {
-            null
+            if (jsonStr.length in 1..300 && !jsonStr.startsWith("<")) jsonStr.trim() else null
         }
     }
 }

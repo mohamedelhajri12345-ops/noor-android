@@ -11,6 +11,8 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.settings.t
@@ -45,6 +48,9 @@ fun RegisterScreen(
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPassword by remember { mutableStateOf("") }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -185,7 +191,7 @@ fun RegisterScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Password field with Arabic label
+                        // Password field with Arabic label & eye toggle
                         OutlinedTextField(
                             value = password,
                             onValueChange = { password = it; errorMessage = null },
@@ -193,8 +199,54 @@ fun RegisterScreen(
                             leadingIcon = {
                                 Icon(Icons.Filled.Lock, contentDescription = null, tint = Gold)
                             },
+                            trailingIcon = {
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(
+                                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                        contentDescription = if (passwordVisible) "إخفاء كلمة المرور" else "إظهار كلمة المرور",
+                                        tint = Gold
+                                    )
+                                }
+                            },
                             singleLine = true,
-                            visualTransformation = PasswordVisualTransformation(),
+                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Next
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Gold,
+                                unfocusedBorderColor = Gold.copy(alpha = 0.4f),
+                                focusedLabelColor = Gold,
+                                cursorColor = Gold,
+                                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Confirm Password field with Arabic label & eye toggle
+                        OutlinedTextField(
+                            value = confirmPassword,
+                            onValueChange = { confirmPassword = it; errorMessage = null },
+                            label = { Text("تأكيد كلمة المرور", color = GoldSoft) },
+                            leadingIcon = {
+                                Icon(Icons.Filled.Lock, contentDescription = null, tint = Gold)
+                            },
+                            trailingIcon = {
+                                IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                                    Icon(
+                                        imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                        contentDescription = if (confirmPasswordVisible) "إخفاء كلمة المرور" else "إظهار كلمة المرور",
+                                        tint = Gold
+                                    )
+                                }
+                            },
+                            singleLine = true,
+                            visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password,
                                 imeAction = ImeAction.Done
@@ -217,7 +269,7 @@ fun RegisterScreen(
                             onClick = {
                                 val cleanEmail = email.trim()
                                 val cleanName = fullName.trim()
-                                if (cleanName.isBlank() || cleanEmail.isBlank() || password.isBlank()) {
+                                if (cleanName.isBlank() || cleanEmail.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
                                     errorMessage = "يرجى ملء جميع الحقول المطلوبة"
                                     return@Button
                                 }
@@ -227,6 +279,10 @@ fun RegisterScreen(
                                 }
                                 if (password.length < 6) {
                                     errorMessage = "يجب أن تكون كلمة المرور ٦ أحرف على الأقل"
+                                    return@Button
+                                }
+                                if (password != confirmPassword) {
+                                    errorMessage = "كلمتا المرور غير متطابقتين، يرجى التأكد وإعادة المحاولة"
                                     return@Button
                                 }
 

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>رمز التحقق الخاص بنور - NOOR OTP Verification</title>
+  <style>
+    /* Reset & Email Client Normalization */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #050911; font-family: 'Tajawal', 'Amiri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-font-smoothing: antialiased; }
+    
+    /* Responsive Breakpoints */
+    @media screen and (max-width: 600px) {
+      .email-container { width: 100% !important; padding: 12px !important; }
+      .content-card { padding: 20px 16px !important; }
+      .otp-code { font-size: 32px !important; letter-spacing: 8px !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #050911; color: #E2E8F0; direction: rtl; text-align: right;">
+
+  <!-- Outer Background Table -->
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #050911; padding: 30px 0;">
+    <tr>
+      <td align="center">
+        
+        <!-- Main Email Container -->
+        <table role="presentation" class="email-container" border="0" cellpadding="0" cellspacing="0" width="560" style="max-width: 560px; width: 100%; margin: 0 auto;">
+          
+          <!-- BRAND HEADER -->
+          <tr>
+            <td align="center" style="padding-bottom: 24px;">
+              <!-- Gold Crescent & Lantern Header Graphic -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="background: linear-gradient(135deg, #1A382B 0%, #0D221A 100%); border: 1.5px solid #D4AF37; border-radius: 50%; width: 72px; height: 72px; text-align: center; vertical-align: middle; box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);">
+                    <!-- SVG Lantern Motif -->
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: auto;">
+                      <path d="M12 2C11.45 2 11 2.45 11 3V4.1C8.61 4.55 7 6.63 7 9.1V14L5 16V17H19V16L17 14V9.1C17 6.63 15.39 4.55 13 4.1V3C13 2.45 12.55 2 12 2Z" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M10 20C10 21.1 10.9 22 12 22C13.1 22 14 21.1 14 20" stroke="#D4AF37" stroke-width="1.8" stroke-linecap="round"/>
+                      <circle cx="12" cy="10" r="1.5" fill="#F3E5AB"/>
+                    </svg>
+                  </td>
+                </tr>
+              </table>
+              <h1 style="margin: 12px 0 0 0; color: #D4AF37; font-size: 26px; font-weight: 800; letter-spacing: 1px; font-family: 'Amiri', 'Tajawal', Georgia, serif;">
+                نُـــــور
+              </h1>
+              <p style="margin: 4px 0 0 0; color: #A0AEC0; font-size: 13px; font-weight: 500;">
+                تطبيقك الإسلامي الشامل
+              </p>
+            </td>
+          </tr>
+
+          <!-- CARD CONTAINER -->
+          <tr>
+            <td>
+              <table role="presentation" class="content-card" border="0" cellpadding="0" cellspacing="0" width="100%" style="background: linear-gradient(180deg, #0C1E17 0%, #081611 100%); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 24px; padding: 32px 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+                
+                <!-- Title -->
+                <tr>
+                  <td align="center" style="padding-bottom: 16px;">
+                    <h2 style="margin: 0; color: #D4AF37; font-size: 22px; font-weight: 700; font-family: 'Amiri', 'Tajawal', sans-serif;">
+                      رمز التحقق الخاص بنور
+                    </h2>
+                  </td>
+                </tr>
+
+                <!-- Greeting & Body -->
+                <tr>
+                  <td style="color: #CBD5E0; font-size: 15px; line-height: 1.8; text-align: right;">
+                    <p style="margin: 0 0 12px 0; font-weight: 700; color: #F3E5AB;">
+                      السلام عليكم ورحمة الله وبركاته،
+                    </p>
+                    <p style="margin: 0 0 20px 0;">
+                      مرحباً بك في تطبيق <strong>نُور</strong>. لإكمال إنشاء حسابك والتحقق من ملكيتك للبريد الإلكتروني، يرجى إدخال رمز التحقق أدناه في التطبيق:
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- OTP DISPLAY BOX -->
+                <tr>
+                  <td align="center" style="padding: 16px 0 24px 0;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto; background: linear-gradient(135deg, #05120D 0%, #0B221A 100%); border: 2px solid #D4AF37; border-radius: 16px; padding: 20px 36px; box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.15);">
+                      <tr>
+                        <td align="center">
+                          <span class="otp-code" style="font-size: 38px; font-weight: 800; letter-spacing: 12px; color: #F3E5AB; font-family: 'Courier New', Consolas, monospace; display: block; text-shadow: 0 2px 10px rgba(212, 175, 55, 0.4);">
+                            {{OTP_CODE}}
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- EXPIRY & SECURITY NOTICE -->
+                <tr>
+                  <td>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: rgba(212, 175, 55, 0.08); border-right: 4px solid #D4AF37; border-radius: 8px; padding: 14px 16px;">
+                      <tr>
+                        <td style="color: #D4AF37; font-size: 13px; line-height: 1.6; text-align: right;">
+                          ⏱️ <strong>ملاحظة هامة:</strong> هذا الرمز صالِح لمدة <strong>١٠ دقائق</strong> فقط. لحماية حسابك، يرجى عدم إعطاء هذا الرمز لأي شخص آخر.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- IGNORE NOTICE -->
+                <tr>
+                  <td style="padding-top: 20px; color: #718096; font-size: 13px; line-height: 1.6; text-align: right;">
+                    إذا لم تقم بطلب هذا الرمز، فيمكنك تجاهل هذه الرسالة بأمان دون اتخاذ أي إجراء.
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td align="center" style="padding-top: 28px; color: #718096; font-size: 12px; line-height: 1.8;">
+              <p style="margin: 0 0 6px 0; color: #A0AEC0; font-weight: 600;">
+                تطبيق نُور — نُورٌ لِقلبِكَ وعِبادَتِك
+              </p>
+              <p style="margin: 0;">
+                هذه رسالة تلقائية، يرجى عدم الرد عليها مباشرة.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
