@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elhajri.noor.settings.NoorLocale
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
@@ -48,7 +50,7 @@ fun TasbihStylePickerScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "أنماط المسبحة",
+                        t("أنماط المسبحة", "Tasbih Styles"),
                         color = Gold,
                         fontWeight = FontWeight.Bold,
                         fontFamily = AmiriFamily,
@@ -58,7 +60,7 @@ fun TasbihStylePickerScreen(
                 navigationIcon = {
                     if (onBack != null) {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.Default.ChevronRight, contentDescription = "رجوع", tint = Gold)
+                            Icon(Icons.Default.ChevronRight, contentDescription = t("رجوع", "Back"), tint = Gold)
                         }
                     }
                 },
@@ -75,7 +77,6 @@ fun TasbihStylePickerScreen(
         ) {
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Statistics Card Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +89,7 @@ fun TasbihStylePickerScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("تسبيحات اليوم", color = GoldSoft.copy(alpha = 0.8f), fontSize = 12.sp)
+                        Text(t("تسبيحات اليوم", "Today's Count"), color = GoldSoft.copy(alpha = 0.8f), fontSize = 12.sp)
                         Spacer(Modifier.height(2.dp))
                         Text(
                             toArabicNumber(dailyCount),
@@ -106,7 +107,7 @@ fun TasbihStylePickerScreen(
                     )
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("المجموع الكلي", color = GoldSoft.copy(alpha = 0.8f), fontSize = 12.sp)
+                        Text(t("المجموع الكلي", "All-Time Total"), color = GoldSoft.copy(alpha = 0.8f), fontSize = 12.sp)
                         Spacer(Modifier.height(2.dp))
                         Text(
                             toArabicNumber(totalAllTime),
@@ -121,7 +122,7 @@ fun TasbihStylePickerScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                "اختر نمط التسبيح المفضل لديك:",
+                t("اختر نمط التسبيح المفضل لديك:", "Choose your favorite tasbih style:"),
                 color = Color.White,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
@@ -164,7 +165,7 @@ fun TasbihStylePickerScreen(
 
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = style.titleAr,
+                                    text = if (NoorLocale.isEnglish) style.titleEn else style.titleAr,
                                     color = Gold,
                                     fontSize = 17.sp,
                                     fontWeight = FontWeight.Bold,
@@ -172,7 +173,7 @@ fun TasbihStylePickerScreen(
                                 )
                                 Spacer(modifier = Modifier.height(3.dp))
                                 Text(
-                                    text = style.descAr,
+                                    text = if (NoorLocale.isEnglish) style.descEn else style.descAr,
                                     color = Color.White.copy(alpha = 0.8f),
                                     fontSize = 12.sp,
                                     lineHeight = 16.sp

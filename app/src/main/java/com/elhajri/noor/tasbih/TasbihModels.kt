@@ -1,5 +1,7 @@
 package com.elhajri.noor.tasbih
 
+import com.elhajri.noor.settings.NoorLocale
+
 enum class TasbihStyle(
     val titleAr: String,
     val titleEn: String,
@@ -66,6 +68,5 @@ val DEFAULT_DHIKR_LIST = listOf(
 )
 
 fun toArabicNumber(number: Any): String {
-    val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
-    return number.toString().map { map[it] ?: it }.joinToString("")
+    return NoorLocale.formatDigits(number)
 }
