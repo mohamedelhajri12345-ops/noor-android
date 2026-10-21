@@ -4,7 +4,7 @@ data class Book(
     val id: String,
     val title: String,
     val author: String,
-    val category: String, // "prophets_kids", "prophets_adults", "kids_stories", "educational", "fiqh", "religious_stories", "tafsir_seerah"
+    val category: String, // "prophets_kids", "prophets_adults", "kids_stories", "educational", "fiqh", "religious_stories", "tafsir_seerah", "companions_stories"
     val lang: String,
     val pages: Int,
     val format: String, // "pdf", "epub"
@@ -46,6 +46,7 @@ object LibraryCategories {
     val EDUCATIONAL = BookCategory("educational", "تعليمية", "Educational", "🎓")
     val FIQH = BookCategory("fiqh", "فقه", "Fiqh Basics", "📖")
     val RELIGIOUS_STORIES = BookCategory("religious_stories", "قصص دينية", "Islamic Stories", "🌟")
+    val COMPANIONS_STORIES = BookCategory("companions_stories", "قصص الصحابة", "Companions Stories", "🕌")
     val TAFSIR_SEERAH = BookCategory("tafsir_seerah", "تفسير وسيرة", "Tafsir & Seerah", "✨")
 
     val LIST = listOf(
@@ -56,7 +57,8 @@ object LibraryCategories {
         EDUCATIONAL,
         FIQH,
         RELIGIOUS_STORIES,
-        TAFSIR_SEERAH
+        TAFSIR_SEERAH,
+        COMPANIONS_STORIES
     )
 
     fun getCategoryNameAr(categoryId: String): String {
