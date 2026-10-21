@@ -1,4 +1,5 @@
 package com.elhajri.noor.videos
+import com.elhajri.noor.settings.t
 
 import android.content.Context
 import org.json.JSONArray
@@ -57,7 +58,7 @@ object KidsVideoStore {
                     val id = obj.optString("id", "").trim()
                     val title = obj.optString("title", "").trim()
                     val category = obj.optString("category", "عام").trim()
-                    val channel = obj.optString("channel", "نور للأطفال").trim()
+                    val channel = obj.optString("channel", t("نور للأطفال", "NOOR Kids")).trim()
 
                     val mp4 = obj.optString("mp4", "").trim()
                     if (id.isNotEmpty() && title.isNotEmpty()) {
@@ -76,12 +77,12 @@ object KidsVideoStore {
     }
 
     /**
-     * Returns "الكل", "فيديوهات التطبيق" followed by all unique sorted category names derived from the data.
+     * Returns "الكل", t("فيديوهات التطبيق", "App Videos") followed by all unique sorted category names derived from the data.
      */
     fun getCategories(context: Context): List<String> {
         val videos = loadVideos(context)
-        val categories = videos.map { it.category }.filter { it != "فيديوهات التطبيق" }.distinct().sorted()
-        return listOf("الكل", "فيديوهات التطبيق") + categories
+        val categories = videos.map { it.category }.filter { it != t("فيديوهات التطبيق", "App Videos") }.distinct().sorted()
+        return listOf("الكل", t("فيديوهات التطبيق", "App Videos")) + categories
     }
 
     /**
@@ -91,7 +92,7 @@ object KidsVideoStore {
         var result = loadVideos(context)
 
         if (!category.isNullOrEmpty() && category != "الكل") {
-            if (category == "فيديوهات التطبيق") {
+            if (category == t("فيديوهات التطبيق", "App Videos")) {
                 result = result.filter { it.mp4Url != null || it.id.startsWith("mp4_") }
             } else {
                 result = result.filter { it.category == category }

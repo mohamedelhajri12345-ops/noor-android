@@ -1,4 +1,5 @@
 package com.elhajri.noor.ui
+import com.elhajri.noor.settings.t
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.animateFloatAsState
@@ -176,7 +177,7 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
                     // expand
                     Icon(
                         Icons.Filled.KeyboardArrowUp,
-                        contentDescription = "توسيع المشغل",
+                        contentDescription = t("توسيع المشغل", "Expand Player"),
                         tint = Gold,
                         modifier = Modifier
                             .size(26.dp)
@@ -187,7 +188,7 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
                     // إخفاء من الشاشة — يستمر التشغيل بالخلفية
                     Icon(
                         Icons.Filled.Close,
-                        contentDescription = "إخفاء المشغل (يستمر الصوت في الخلفية)",
+                        contentDescription = t("إخفاء المشغل (يستمر الصوت في الخلفية)", "Dismiss Player (Audio keeps playing in background)"),
                         tint = GoldSoft.copy(alpha = 0.7f),
                         modifier = Modifier
                             .size(22.dp)
@@ -225,8 +226,8 @@ fun NoorPlayerBar(modifier: Modifier = Modifier) {
 
 /**
  * ورقة المشغل الكامل — طبق الأصل عن الموقع: شريحة ثابتة تنزلق من الأسفل بحركة
- * واحدة منتظمة (slide-up) فوق ستار معتم، تُغلق بالنقر على الستار أو زر "إيقاف"،
- * بلا فيزياء سحب عشوائية الاستقرار (كانت سبب شعور المشغل بأنه "يتحرك عشوائياً").
+ * واحدة منتظمة (slide-up) فوق ستار معتم، تُغلق بالنقر على الستار أو زر t("إيقاف", "Off")،
+ * بلا فيزياء سحب عشوائية الاستقرار (كانت سبب شعور المشغل بأنه t("يتحرك عشوائياً", "Shuffle")).
  * تُحسب حشوة شريط تنقّل النظام أسفلها كي لا تُغطّى أزرار الهاتف صفوف التحكم السفلية.
  */
 @Composable
@@ -361,7 +362,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
             ) {
                 Icon(
                     Icons.Filled.Shuffle,
-                    contentDescription = "عشوائي",
+                    contentDescription = t("عشوائي", "Shuffle"),
                     tint = if (s.shuffle) Gold else Color(0xFF6B7594),
                     modifier = Modifier
                         .size(22.dp)
@@ -372,7 +373,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                 Spacer(Modifier.width(14.dp))
                 Icon(
                     Icons.Filled.SkipNext,
-                    contentDescription = "التالي",
+                    contentDescription = t("التالي", "Next"),
                     tint = Color.White,
                     modifier = Modifier
                         .size(52.dp)
@@ -400,7 +401,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                 Spacer(Modifier.width(18.dp))
                 Icon(
                     Icons.Filled.SkipPrevious,
-                    contentDescription = "السابق",
+                    contentDescription = t("السابق", "Previous"),
                     tint = Color.White,
                     modifier = Modifier
                         .size(52.dp)
@@ -413,7 +414,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                 Box {
                     Icon(
                         Icons.Filled.Loop,
-                        contentDescription = "تكرار",
+                        contentDescription = t("تكرار", "Repeat"),
                         tint = if (s.repeatMode != "none") Gold else Color(0xFF6B7594),
                         modifier = Modifier
                             .size(22.dp)
@@ -456,7 +457,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp)
                     ) {
-                        Icon(Icons.Filled.Speed, contentDescription = "السرعة", tint = Gold, modifier = Modifier.size(15.dp))
+                        Icon(Icons.Filled.Speed, contentDescription = t("السرعة", "Speed"), tint = Gold, modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(4.dp))
                         Text(
                             (if (s.rate % 1f == 0f) toArabicDigits(s.rate.toInt().toLong()) else "${s.rate}") + "×",
@@ -477,7 +478,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp)
                     ) {
-                        Icon(Icons.Filled.Bedtime, contentDescription = "مؤقت النوم", tint = Gold, modifier = Modifier.size(15.dp))
+                        Icon(Icons.Filled.Bedtime, contentDescription = t("مؤقت النوم", "Sleep Timer"), tint = Gold, modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(4.dp))
                         Text("مؤقت النوم", color = TextMain, fontSize = 12.sp)
                     }
@@ -500,7 +501,7 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
                     ) {
                         Icon(Icons.Filled.Close, contentDescription = null, tint = Color(0xFFE07080), modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("إيقاف", color = Color(0xFFE07080), fontSize = 12.sp)
+                        Text(t("إيقاف", "Off"), color = Color(0xFFE07080), fontSize = 12.sp)
                     }
                 }
             }
@@ -508,12 +509,12 @@ private fun FullPlayerSheet(active: ActivePlayer, onDismiss: () -> Unit) {
             if (showSleep) {
                 Spacer(Modifier.height(12.dp))
                 val options = listOf(
-                    "إيقاف" to 0,
-                    "نهاية السورة" to -1,
-                    "٥ دقائق" to 5,
-                    "١٥ دقيقة" to 15,
-                    "٣٠ دقيقة" to 30,
-                    "٦٠ دقيقة" to 60
+                    t("إيقاف", "Off") to 0,
+                    t("نهاية السورة", "End of Surah") to -1,
+                    t("٥ دقائق", "5 minutes") to 5,
+                    t("١٥ دقيقة", "15 minutes") to 15,
+                    t("٣٠ دقيقة", "30 minutes") to 30,
+                    t("٦٠ دقيقة", "60 minutes") to 60
                 )
                 Surface(
                     color = NavyCard,

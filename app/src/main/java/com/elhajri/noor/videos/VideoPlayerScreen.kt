@@ -1,4 +1,5 @@
 package com.elhajri.noor.videos
+import com.elhajri.noor.settings.t
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -142,8 +143,8 @@ fun VideoPlayerScreen(
     val currentVideo = remember(currentVideoId) {
         KidsVideoStore.getVideoById(context, currentVideoId) ?: KidsVideo(
             id = currentVideoId,
-            title = "فيديو يوتيوب",
-            category = "عام",
+            title = t("فيديو يوتيوب", "YouTube Video"),
+            category = t("عام", "General"),
             channel = "يوتيوب"
         )
     }
@@ -352,7 +353,7 @@ fun VideoPlayerScreen(
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            text = "هذا الفيديو غير متاح للتشغيل المباشر داخل التطبيق بناءً على قيود الناشر",
+                            text = t("هذا الفيديو غير متاح للتشغيل المباشر داخل التطبيق بناءً على قيود الناشر", "This video is not available for direct in-app playback due to publisher restrictions"),
                             color = Color.White,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
@@ -360,7 +361,7 @@ fun VideoPlayerScreen(
                         )
                         Spacer(Modifier.height(6.dp))
                         Text(
-                            text = "يمكنك فتح الفيديو مباشرة في تطبيق يوتيوب للاستمتاع بالمشاهدة",
+                            text = t("يمكنك فتح الفيديو مباشرة في تطبيق يوتيوب للاستمتاع بالمشاهدة", "You can open the video directly in the YouTube app"),
                             color = GoldSoft,
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center
@@ -501,7 +502,7 @@ fun VideoPlayerScreen(
                                 }) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = "رجوع",
+                                        contentDescription = t("رجوع", "Back"),
                                         tint = Gold,
                                         modifier = Modifier.size(26.dp)
                                     )
@@ -536,7 +537,7 @@ fun VideoPlayerScreen(
                                 ) {
                                     Icon(
                                         imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                        contentDescription = if (isPlaying) "إيقاف مؤقت" else "تشغيل",
+                                        contentDescription = if (isPlaying) t("إيقاف مؤقت", "Pause") else t("تشغيل", "Play"),
                                         tint = Color(0xFF0B1120),
                                         modifier = Modifier.size(32.dp)
                                     )
@@ -586,7 +587,7 @@ fun VideoPlayerScreen(
                                                     DropdownMenuItem(
                                                         text = {
                                                             Text(
-                                                                if (r == 1f) "عادي" else "×$r",
+                                                                if (r == 1f) t("عادي", "Normal") else "×$r",
                                                                 color = if (r == playbackRate) Gold else Color.White,
                                                                 fontWeight = if (r == playbackRate) FontWeight.Bold else FontWeight.Normal
                                                             )
@@ -606,7 +607,7 @@ fun VideoPlayerScreen(
                                         IconButton(onClick = { toggleFullscreen() }) {
                                             Icon(
                                                 imageVector = if (isLandscape) Icons.Default.FullscreenExit else Icons.Default.Fullscreen,
-                                                contentDescription = "ملء الشاشة",
+                                                contentDescription = t("ملء الشاشة", "Fullscreen"),
                                                 tint = Gold,
                                                 modifier = Modifier.size(24.dp)
                                             )
@@ -687,7 +688,7 @@ fun VideoPlayerScreen(
 
                     // Suggested Videos Header
                     Text(
-                        text = "فيديوهات مقترحة",
+                        text = t("فيديوهات مقترحة", "Suggested Videos"),
                         color = Gold,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,

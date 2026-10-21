@@ -1,4 +1,5 @@
 package com.elhajri.noor.videos
+import com.elhajri.noor.settings.t
 
 import android.app.Activity
 import androidx.compose.foundation.background
@@ -42,12 +43,12 @@ import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.themeScreenBackground
 
 /**
- * Kids Videos Library Screen ("مكتبة الفيديو للأطفال").
+ * Kids Videos Library Screen (t("مكتبة الفيديو للأطفال", "Kids Video Library")).
  *
  * Features:
  * - Category filter chips derived dynamically from data.
  * - Live search text field filtering by Arabic title.
- * - "متابعة المشاهدة" (Continue Watching) banner row for last watched video.
+ * - t("متابعة المشاهدة", "Continue Watching") (Continue Watching) banner row for last watched video.
  * - LazyVerticalGrid (2 columns) with glass visual style, gold thin border, and video details.
  * - Rewarded ad / points gating dialog when daily free limit (3 videos) is reached.
  * - Zero crescent moon icons anywhere.
@@ -61,7 +62,7 @@ fun VideosScreen(
     val activity = context as? Activity
 
     val categories = remember { KidsVideoStore.getCategories(context) }
-    var selectedCategory by remember { mutableStateOf("الكل") }
+    var selectedCategory by remember { mutableStateOf(t("الكل", "All")) }
     var searchQuery by remember { mutableStateOf("") }
 
     val videos = remember(selectedCategory, searchQuery) {
@@ -105,19 +106,19 @@ fun VideosScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "رجوع",
+                        contentDescription = t("رجوع", "Back"),
                         tint = Gold
                     )
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "مكتبة الفيديو للأطفال",
+                        text = t("مكتبة الفيديو للأطفال", "Kids Video Library"),
                         color = Gold,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "قصص الأنبياء والعظماء وسيرة النبي ﷺ — رسوم متحركة موثوقة",
+                        text = t("قصص الأنبياء والعظماء وسيرة النبي ﷺ — رسوم متحركة موثوقة", "Stories of Prophets, Companions & Seerah — Authentic Animation"),
                         color = GoldSoft,
                         fontSize = 11.sp
                     )
@@ -137,12 +138,12 @@ fun VideosScreen(
                         Text("ابحث عن فيديو...", color = GoldSoft.copy(alpha = 0.6f), fontSize = 13.sp)
                     },
                     leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = "بحث", tint = Gold)
+                        Icon(Icons.Default.Search, contentDescription = t("بحث", "Search"), tint = Gold)
                     },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
                             IconButton(onClick = { searchQuery = "" }) {
-                                Icon(Icons.Default.Close, contentDescription = "مسح", tint = GoldSoft)
+                                Icon(Icons.Default.Close, contentDescription = t("مسح", "Clear"), tint = GoldSoft)
                             }
                         }
                     },
@@ -160,7 +161,7 @@ fun VideosScreen(
                 )
             }
 
-            // Continue Watching Banner Row ("متابعة المشاهدة")
+            // Continue Watching Banner Row (t("متابعة المشاهدة", "Continue Watching"))
             if (lastVideo != null) {
                 Surface(
                     modifier = Modifier
@@ -212,7 +213,7 @@ fun VideosScreen(
                                         .padding(horizontal = 6.dp, vertical = 1.dp)
                                 ) {
                                     Text(
-                                        text = "متابعة المشاهدة",
+                                        text = t("متابعة المشاهدة", "Continue Watching"),
                                         color = Color(0xFF0D1330),
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold
@@ -238,7 +239,7 @@ fun VideosScreen(
 
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
-                            contentDescription = "متابعة",
+                            contentDescription = t("متابعة", "Continue"),
                             tint = Gold,
                             modifier = Modifier
                                 .size(32.dp)
@@ -296,7 +297,7 @@ fun VideosScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "لا توجد فيديوهات مطابقة للبحث",
+                        text = t("لا توجد فيديوهات مطابقة للبحث", "No videos match your search"),
                         color = GoldSoft,
                         fontSize = 14.sp
                     )
@@ -331,7 +332,7 @@ fun VideosScreen(
                 shape = RoundedCornerShape(20.dp),
                 title = {
                     Text(
-                        text = "وصلت للحد اليومي المجاني",
+                        text = t("وصلت للحد اليومي المجاني", "Daily free limit reached"),
                         color = Gold,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -345,7 +346,7 @@ fun VideosScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "لقد شاهدت ٣ فيديوهات مجانية اليوم. يمكنك فتح هذا الفيديو بمشاهدة إعلان مكافأة أو استخدام نقاطك.",
+                            text = t("لقد شاهدت ٣ فيديوهات مجانية اليوم. يمكنك فتح هذا الفيديو بمشاهدة إعلان مكافأة أو استخدام نقاطك.", "You watched 3 free videos today. Unlock this video by watching a reward ad or using points."),
                             color = Color.White,
                             fontSize = 13.sp,
                             textAlign = TextAlign.Center
@@ -388,7 +389,7 @@ fun VideosScreen(
                                             onOpenVideo(videoId)
                                         },
                                         onFailure = {
-                                            gatingErrorMessage = "تعذر تحميل الإعلان، حاول مرة أخرى"
+                                            gatingErrorMessage = t("تعذر تحميل الإعلان، حاول مرة أخرى", "Ad load failed, try again")
                                         }
                                     )
                                 } else {
@@ -412,7 +413,7 @@ fun VideosScreen(
                                     pendingGatedVideoId = null
                                     onOpenVideo(videoId)
                                 } else {
-                                    gatingErrorMessage = "رصيد النقاط غير كافٍ ($currentPoints / ٥٠)"
+                                    gatingErrorMessage = t("رصيد النقاط غير كافٍ ($currentPoints / ٥٠)", "Insufficient points balance ($currentPoints / 50)")
                                 }
                             },
                             border = androidx.compose.foundation.BorderStroke(1.dp, Gold),
