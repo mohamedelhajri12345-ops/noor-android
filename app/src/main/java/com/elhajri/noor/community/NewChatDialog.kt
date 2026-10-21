@@ -1,4 +1,5 @@
 package com.elhajri.noor.community
+import com.elhajri.noor.settings.t
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -86,16 +87,16 @@ fun NewChatDialog(
             if (searchMode == "email") {
                 val e = emailInput.trim().lowercase()
                 if (e.isBlank() || !e.contains("@")) {
-                    error = "بريد إلكتروني غير صالح"
+                    error = t("بريد إلكتروني غير صالح", "Invalid email address")
                     loading = false
                     return@launch
                 }
                 val res = CommunityApi.getProfileByEmail(e)
                 res.onSuccess { friend ->
                     if (friend == null) {
-                        error = "لا يوجد مستخدم بهذا البريد"
+                        error = t("لا يوجد مستخدم بهذا البريد", "No user found with this email")
                     } else if (friend.handle == currentUser.handle) {
-                        error = "لا يمكنك محادثة نفسك"
+                        error = t("لا يمكنك محادثة نفسك", "You cannot chat with yourself")
                     } else {
                         val createRes = CommunityApi.createConversation(
                             name = friend.displayName,
@@ -105,27 +106,27 @@ fun NewChatDialog(
                             memberAvatars = listOf(currentUser.avatar, friend.avatarUrl)
                         )
                         createRes.onSuccess { conv -> onCreated(conv) }
-                            .onFailure { error = "تعذر إنشاء المحادثة" }
+                            .onFailure { error = t("تعذر إنشاء المحادثة", "Could not create conversation") }
                     }
                 }.onFailure {
-                    error = "تعذر البحث عن المستخدم"
+                    error = t("تعذر البحث عن المستخدم", "Could not search for user")
                 }
             } else {
                 val h = handleInput.trim().lowercase().removePrefix("@")
                 if (h.length < 3) {
-                    error = "معرف غير صالح"
+                    error = t("معرف غير صالح", "Invalid ID")
                     loading = false
                     return@launch
                 }
                 if (h == currentUser.handle) {
-                    error = "لا يمكنك محادثة نفسك"
+                    error = t("لا يمكنك محادثة نفسك", "You cannot chat with yourself")
                     loading = false
                     return@launch
                 }
                 val res = CommunityApi.getProfileByHandle(h)
                 res.onSuccess { friend ->
                     if (friend == null) {
-                        error = "لا يوجد مستخدم بهذا المعرف"
+                        error = t("لا يوجد مستخدم بهذا المعرف", "No user found with this ID")
                     } else {
                         val createRes = CommunityApi.createConversation(
                             name = friend.displayName,
@@ -135,10 +136,10 @@ fun NewChatDialog(
                             memberAvatars = listOf(currentUser.avatar, friend.avatarUrl)
                         )
                         createRes.onSuccess { conv -> onCreated(conv) }
-                            .onFailure { error = "تعذر إنشاء المحادثة" }
+                            .onFailure { error = t("تعذر إنشاء المحادثة", "Could not create conversation") }
                     }
                 }.onFailure {
-                    error = "تعذر البحث عن المستخدم"
+                    error = t("تعذر البحث عن المستخدم", "Could not search for user")
                 }
             }
             loading = false
@@ -148,11 +149,11 @@ fun NewChatDialog(
     fun createGroup() {
         val name = groupName.trim()
         if (name.isEmpty()) {
-            error = "أدخل اسم المجموعة"
+            error = t("أدخل اسم المجموعة", "Enter group name")
             return
         }
         if (selectedContacts.isEmpty()) {
-            error = "اختر عضواً واحداً على الأقل"
+            error = t("اختر عضواً واحداً على الأقل", "Select at least one member")
             return
         }
         error = ""
@@ -183,7 +184,7 @@ fun NewChatDialog(
                 memberAvatars = avatarsList
             )
             createRes.onSuccess { conv -> onCreated(conv) }
-                .onFailure { error = "تعذر إنشاء المجموعة" }
+                .onFailure { error = t("تعذر إنشاء المجموعة", "Could not create group") }
 
             loading = false
         }
@@ -212,13 +213,13 @@ fun NewChatDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "محادثة جديدة",
+                        text = t("محادثة جديدة", "New Conversation"),
                         color = Gold,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold
                     )
                     IconButton(onClick = onClose, modifier = Modifier.size(28.dp)) {
-                        Icon(Icons.Default.Close, contentDescription = "إغلاق", tint = GoldSoft.copy(alpha = 0.8f))
+                        Icon(Icons.Default.Close, contentDescription = t("إغلاق", "Close"), tint = GoldSoft.copy(alpha = 0.8f))
                     }
                 }
 
@@ -435,7 +436,7 @@ fun NewChatDialog(
                                     }
                                 }
                             ) {
-                                Icon(Icons.Default.Add, contentDescription = "إضافة", tint = Gold)
+                                Icon(Icons.Default.Add, contentDescription = t("إضافة", "Add"), tint = Gold)
                             }
                         }
                     }

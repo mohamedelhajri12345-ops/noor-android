@@ -1,4 +1,5 @@
 package com.elhajri.noor.community
+import com.elhajri.noor.settings.t
 
 import android.content.Context
 import androidx.compose.foundation.BorderStroke
@@ -144,7 +145,7 @@ fun CommunityScreen(
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Text(
-                        text = "مجتمع القرآن الكريم",
+                        text = t("مجتمع القرآن الكريم", "Noble Qur'an Community"),
                         color = Gold,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -152,7 +153,7 @@ fun CommunityScreen(
                     )
 
                     Text(
-                        text = "يجب تسجيل الدخول للمشاركة وتواصل مع باقي المسلمين",
+                        text = t("يجب تسجيل الدخول للمشاركة وتواصل مع باقي المسلمين", "Sign in to participate and connect with Muslims"),
                         color = GoldSoft.copy(alpha = 0.85f),
                         fontSize = 14.sp,
                         modifier = Modifier.padding(top = 6.dp, bottom = 28.dp)
@@ -172,7 +173,7 @@ fun CommunityScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "تسجيل الدخول",
+                            text = t("تسجيل الدخول", "Sign In"),
                             color = Navy,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
@@ -258,7 +259,7 @@ fun CommunityScreen(
                                     fontSize = 16.sp
                                 )
                                 Text(
-                                    text = "اسم المعرف: @${profile.handle}",
+                                    text = t("اسم المعرف: @${profile.handle}", "Username: @${profile.handle}"),
                                     color = GoldSoft.copy(alpha = 0.85f),
                                     fontSize = 12.sp
                                 )

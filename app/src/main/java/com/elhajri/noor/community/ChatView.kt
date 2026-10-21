@@ -1,4 +1,5 @@
 package com.elhajri.noor.community
+import com.elhajri.noor.settings.t
 
 import android.Manifest
 import android.content.Context
@@ -163,7 +164,7 @@ fun ChatView(
                             id = "temp_${System.currentTimeMillis()}",
                             conversationId = conversation.id,
                             nickname = currentUser.name,
-                            text = "📷 صورة",
+                            text = t("📷 صورة", "📷 Image"),
                             avatarUrl = currentUser.avatar,
                             fileUrl = url,
                             fileType = "image",
@@ -175,14 +176,14 @@ fun ChatView(
                         val createRes = CommunityApi.createMessage(
                             conversationId = conversation.id,
                             nickname = currentUser.name,
-                            text = "📷 صورة",
+                            text = t("📷 صورة", "📷 Image"),
                             avatarUrl = currentUser.avatar,
                             fileUrl = url,
                             fileType = "image"
                         )
                         createRes.onSuccess { created ->
                             messages = messages.map { if (it.id == tempMsg.id) created else it }
-                            CommunityApi.updateConversation(conversation.id, "📷 صورة", currentUser.name, nowIso)
+                            CommunityApi.updateConversation(conversation.id, t("📷 صورة", "📷 Image"), currentUser.name, nowIso)
                         }.onFailure {
                             messages = messages.map { if (it.id == tempMsg.id) it.copy(pending = false, failed = true) else it }
                         }
@@ -217,12 +218,12 @@ fun ChatView(
                             CommunityApi.createMessage(
                                 conversationId = conversation.id,
                                 nickname = currentUser.name,
-                                text = "🎙️ رسالة صوتية",
+                                text = t("🎙️ رسالة صوتية", "🎙️ Voice Message"),
                                 avatarUrl = currentUser.avatar,
                                 fileUrl = url,
                                 fileType = "voice"
                             ).onSuccess {
-                                CommunityApi.updateConversation(conversation.id, "🎙️ رسالة صوتية", currentUser.name, nowIso)
+                                CommunityApi.updateConversation(conversation.id, t("🎙️ رسالة صوتية", "🎙️ Voice Message"), currentUser.name, nowIso)
                                 loadMessages()
                             }
                         }
@@ -278,12 +279,12 @@ fun ChatView(
                             CommunityApi.createMessage(
                                 conversationId = conversation.id,
                                 nickname = currentUser.name,
-                                text = "🎙️ رسالة صوتية",
+                                text = t("🎙️ رسالة صوتية", "🎙️ Voice Message"),
                                 avatarUrl = currentUser.avatar,
                                 fileUrl = url,
                                 fileType = "voice"
                             ).onSuccess {
-                                CommunityApi.updateConversation(conversation.id, "🎙️ رسالة صوتية", currentUser.name, nowIso)
+                                CommunityApi.updateConversation(conversation.id, t("🎙️ رسالة صوتية", "🎙️ Voice Message"), currentUser.name, nowIso)
                                 loadMessages()
                             }
                         }
@@ -352,7 +353,7 @@ fun ChatView(
         }
     }
 
-    val convName = if (conversation.type == "group") conversation.name.ifEmpty { "مجموعة" }
+    val convName = if (conversation.type == "group") conversation.name.ifEmpty { t("مجموعة", "Group") }
     else {
         val otherIdx = conversation.memberHandles.indexOfFirst { it != currentUser.handle }
         if (otherIdx >= 0) conversation.memberNames.getOrNull(otherIdx) ?: conversation.name
@@ -390,7 +391,7 @@ fun ChatView(
                                     fontFamily = AmiriFamily
                                 )
                                 Text(
-                                    text = if (conversation.type == "group") "${conversation.memberHandles.size} أعضاء" else "محادثة خاصة",
+                                    text = if (conversation.type == "group") t("${conversation.memberHandles.size} أعضاء", "${conversation.memberHandles.size} Members") else t("محادثة خاصة", "Private Chat"),
                                     color = GoldSoft.copy(alpha = 0.7f),
                                     fontSize = 10.sp
                                 )
@@ -399,7 +400,7 @@ fun ChatView(
                     },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = t("رجوع", "Back"), tint = Gold)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
@@ -493,7 +494,7 @@ fun ChatView(
                                     if (msg.fileUrl.isNotEmpty() && msg.fileType == "image") {
                                         AsyncImage(
                                             model = msg.fileUrl,
-                                            contentDescription = "صورة",
+                                            contentDescription = t("صورة", "Image"),
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .heightIn(max = 220.dp)
@@ -527,7 +528,7 @@ fun ChatView(
                                                 )
                                             }
                                             Text(
-                                                text = if (playingMsgId == msg.id) "جاري التشغيل..." else "رسالة صوتية",
+                                                text = if (playingMsgId == msg.id) t("جاري التشغيل...", "Playing...") else t("رسالة صوتية", "Voice Message"),
                                                 color = if (isMine) Navy else TextMain,
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold
@@ -535,7 +536,7 @@ fun ChatView(
                                         }
                                     }
 
-                                    if (msg.text.isNotEmpty() && msg.text != "📷 صورة" && msg.text != "🎙️ رسالة صوتية") {
+                                    if (msg.text.isNotEmpty() && msg.text != "📷 صورة" && msg.text != "🎙️ رسالة صوتية" && msg.text != "📷 Image" && msg.text != "🎙️ Voice Message") {
                                         Text(
                                             text = msg.text,
                                             color = if (isMine) Navy else TextMain,
@@ -578,7 +579,7 @@ fun ChatView(
                         onClick = { imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                         modifier = Modifier.size(38.dp)
                     ) {
-                        Icon(Icons.Default.Image, contentDescription = "إرفاق صورة", tint = Gold, modifier = Modifier.size(22.dp))
+                        Icon(Icons.Default.Image, contentDescription = t("إرفاق صورة", "Attach Image"), tint = Gold, modifier = Modifier.size(22.dp))
                     }
 
                     IconButton(
@@ -587,7 +588,7 @@ fun ChatView(
                     ) {
                         Icon(
                             imageVector = if (isRecording) Icons.Default.Stop else Icons.Default.Mic,
-                            contentDescription = "تسجيل صوتي",
+                            contentDescription = t("تسجيل صوتي", "Record Voice"),
                             tint = if (isRecording) Color.Red else Gold,
                             modifier = Modifier.size(22.dp)
                         )
@@ -595,7 +596,7 @@ fun ChatView(
 
                     if (isRecording) {
                         Text(
-                            text = "جاري التسجيل (${recDuration}s)...",
+                            text = t("جاري التسجيل (${recDuration}ث)...", "Recording (${recDuration}s)..."),
                             color = Color.Red,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
@@ -634,7 +635,7 @@ fun ChatView(
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "إرسال",
+                            contentDescription = t("إرسال", "Send"),
                             tint = if (textInput.isNotBlank() && !isRecording) Navy else Navy.copy(alpha = 0.5f),
                             modifier = Modifier.size(18.dp)
                         )

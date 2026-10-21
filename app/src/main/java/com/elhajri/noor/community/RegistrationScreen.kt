@@ -1,4 +1,5 @@
 package com.elhajri.noor.community
+import com.elhajri.noor.settings.t
 
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -99,11 +100,11 @@ fun RegistrationScreen(
         val cleanHandle = handle.replace(" ", "").lowercase().trim()
         val cleanName = name.trim()
         if (cleanHandle.length < 3) {
-            error = "المعرف يجب أن يكون ٣ أحرف على الأقل"
+            error = t("المعرف يجب أن يكون ٣ أحرف على الأقل", "Username must be at least 3 characters")
             return
         }
         if (cleanName.isEmpty()) {
-            error = "أدخل اسمك"
+            error = t("أدخل اسمك", "Enter your name")
             return
         }
         loading = true
@@ -124,7 +125,7 @@ fun RegistrationScreen(
                     .apply()
                 onRegistered(profile)
             }.onFailure { err ->
-                error = err.message ?: "تعذر إنشاء الحساب، حاول مرة أخرى"
+                error = err.message ?: t("تعذر إنشاء الحساب، حاول مرة أخرى", "Account creation failed, try again")
             }
             loading = false
         }
@@ -155,7 +156,7 @@ fun RegistrationScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "التسجيل في المجتمع",
+            text = t("التسجيل في المجتمع", "Community Registration"),
             color = Gold,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
@@ -163,7 +164,7 @@ fun RegistrationScreen(
         )
 
         Text(
-            text = "أنشئ معرفك الخاص للمشاركة في مجتمع نور",
+            text = t("أنشئ معرفك الخاص للمشاركة في مجتمع نور", "Create your profile to join the NOOR community"),
             color = GoldSoft.copy(alpha = 0.85f),
             fontSize = 13.sp,
             modifier = Modifier.padding(top = 4.dp)
@@ -201,21 +202,21 @@ fun RegistrationScreen(
                         } else if (avatar.isNotEmpty()) {
                             AsyncImage(
                                 model = avatar,
-                                contentDescription = "صورة شخصية",
+                                contentDescription = t("صورة شخصية", "Profile Picture"),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Default.CameraAlt,
-                                contentDescription = "اختر صورة",
+                                contentDescription = t("اختر صورة", "Choose Image"),
                                 tint = Gold,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
                     }
                     Text(
-                        text = "صورة شخصية (اختياري)",
+                        text = t("صورة شخصية (اختياري)", "Profile Picture (Optional)"),
                         color = GoldSoft.copy(alpha = 0.7f),
                         fontSize = 11.sp,
                         modifier = Modifier.padding(top = 6.dp)
@@ -225,7 +226,7 @@ fun RegistrationScreen(
                 // Handle Input
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "المعرف (اسم فريد لك)",
+                        text = t("المعرف (اسم فريد لك)", "Username (Unique Handle)"),
                         color = GoldSoft,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
@@ -267,15 +268,15 @@ fun RegistrationScreen(
                             if (checkingHandle) {
                                 CircularProgressIndicator(color = Gold, modifier = Modifier.size(16.dp))
                             } else if (handleAvailable == true) {
-                                Icon(Icons.Default.Check, contentDescription = "متاح", tint = Color(0xFF4CAF50), modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Check, contentDescription = t("متاح", "Available"), tint = Color(0xFF4CAF50), modifier = Modifier.size(18.dp))
                             } else if (handleAvailable == false) {
-                                Icon(Icons.Default.Close, contentDescription = "غير متاح", tint = Color.Red, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Close, contentDescription = t("غير متاح", "Unavailable"), tint = Color.Red, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
                     if (handleAvailable == false) {
                         Text(
-                            text = "هذا المعرف مستخدم بالفعل",
+                            text = t("هذا المعرف مستخدم بالفعل", "Handle already taken"),
                             color = Color.Red,
                             fontSize = 10.sp,
                             modifier = Modifier.padding(top = 2.dp, start = 4.dp)
@@ -286,7 +287,7 @@ fun RegistrationScreen(
                 // Display Name Input
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "الاسم الظاهر",
+                        text = t("الاسم الظاهر", "Display Name"),
                         color = GoldSoft,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
@@ -338,7 +339,7 @@ fun RegistrationScreen(
                         CircularProgressIndicator(color = Navy, modifier = Modifier.size(22.dp))
                     } else {
                         Text(
-                            text = "إتمام التسجيل",
+                            text = t("إتمام التسجيل", "Complete Registration"),
                             color = Navy,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold

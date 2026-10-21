@@ -1,4 +1,5 @@
 package com.elhajri.noor.community
+import com.elhajri.noor.settings.t
 
 import com.elhajri.noor.auth.Base44Auth
 import kotlinx.coroutines.Dispatchers
@@ -60,13 +61,13 @@ object CommunityApi {
 
     private fun checkResponse(code: Int, bodyStr: String?) {
         if (code == 401 || code == 403) {
-            throw Exception("تحتاج تسجيل الدخول للمشاركة")
+            throw Exception(t("تحتاج تسجيل الدخول للمشاركة", "You must be signed in to participate"))
         }
         if (code !in 200..299) {
             val msg = try {
                 if (!bodyStr.isNullOrBlank()) JSONObject(bodyStr).optString("message", null) else null
             } catch (_: Exception) { null }
-            throw Exception(msg ?: "حدث خطأ في الاتصال بالخادم ($code)")
+            throw Exception(msg ?: t("حدث خطأ في الاتصال بالخادم ($code)", "Server connection error ($code)"))
         }
     }
 
@@ -82,16 +83,16 @@ object CommunityApi {
             val bodyStr = response.body?.string()
 
             if (response.code == 401 || response.code == 403) {
-                return@withContext Result.failure(Exception("تحتاج تسجيل الدخول للمشاركة"))
+                return@withContext Result.failure(Exception(t("تحتاج تسجيل الدخول للمشاركة", "You must be signed in to participate")))
             }
             if (!response.isSuccessful || bodyStr.isNullOrBlank()) {
-                return@withContext Result.failure(Exception("غير مسجّل الدخول"))
+                return@withContext Result.failure(Exception(t("غير مسجّل الدخول", "Not Signed In")))
             }
 
             val json = JSONObject(bodyStr)
             val email = json.optString("email", "")
             if (email.isBlank()) {
-                return@withContext Result.failure(Exception("غير مسجّل الدخول"))
+                return@withContext Result.failure(Exception(t("غير مسجّل الدخول", "Not Signed In")))
             }
             val id = json.optString("id", json.optString("_id", ""))
             Result.success(User(email = email, id = id))
@@ -359,7 +360,7 @@ object CommunityApi {
             val json = JSONObject(bodyStr ?: "{}")
             val fileUrl = json.optString("file_url", "")
             if (fileUrl.isBlank()) {
-                Result.failure(Exception("فشل تحميل الملف"))
+                Result.failure(Exception(t("فشل تحميل الملف", "File upload failed")))
             } else {
                 Result.success(fileUrl)
             }

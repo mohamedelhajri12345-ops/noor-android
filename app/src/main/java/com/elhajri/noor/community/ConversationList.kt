@@ -1,4 +1,5 @@
 package com.elhajri.noor.community
+import com.elhajri.noor.settings.t
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -108,7 +109,7 @@ fun ConversationList(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "المحادثات والرسائل",
+                    text = t("المحادثات والرسائل", "Chats & Messages"),
                     color = Gold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -183,13 +184,13 @@ fun ConversationList(
                     }
                     Spacer(modifier = Modifier.height(14.dp))
                     Text(
-                        text = "لا توجد محادثات بعد",
+                        text = t("لا توجد محادثات بعد", "No conversations yet"),
                         color = TextMain.copy(alpha = 0.8f),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "اضغط على زر (+) لبدء محادثة خاصة أو مجموعة جديدة",
+                        text = t("اضغط على زر (+) لبدء محادثة خاصة أو مجموعة جديدة", "Tap (+) to start a private chat or new group"),
                         color = GoldSoft.copy(alpha = 0.7f),
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 4.dp)
@@ -261,7 +262,7 @@ fun ConversationList(
                                         if (conv.lastSender.isNotEmpty()) {
                                             append("${conv.lastSender}: ")
                                         }
-                                        append(conv.lastMessage.ifEmpty { "ابدأ المحادثة" })
+                                        append(conv.lastMessage.ifEmpty { t("ابدأ المحادثة", "Start Chat") })
                                     }
                                     Text(
                                         text = subtitle,
@@ -301,7 +302,7 @@ fun ConversationList(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "محادثة جديدة",
+                contentDescription = t("محادثة جديدة", "New Conversation"),
                 tint = Navy,
                 modifier = Modifier.size(30.dp)
             )
