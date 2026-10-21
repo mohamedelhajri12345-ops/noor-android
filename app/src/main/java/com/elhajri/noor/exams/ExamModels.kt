@@ -9,10 +9,10 @@ enum class ExamTrack(val id: String, val titleAr: String, val titleEn: String) {
 }
 
 @Keep
-enum class ExamDifficulty(val id: String, val titleAr: String, val totalLevels: Int, val certTitleKid: String, val certTitleAdult: String) {
-    EASY("easy", "سهل", 1000, "شهادة الجدارة (المستوى المبتدئ)", "شهادة التمكن (المستوى المبتدئ)"),
-    MEDIUM("medium", "متوسط", 1000, "شهادة الجدارة (المستوى المتوسط)", "شهادة التمكن (المستوى المتوسط)"),
-    HARD("hard", "صعب", 2000, "شهادة الجدارة الفائقة", "شهادة التمكن العالية")
+enum class ExamDifficulty(val id: String, val titleAr: String, val titleEn: String, val totalLevels: Int, val certTitleKid: String, val certTitleAdult: String) {
+    EASY("easy", "سهل", "Easy", 1000, "شهادة الجدارة (المستوى المبتدئ)", "شهادة التمكن (المستوى المبتدئ)"),
+    MEDIUM("medium", "متوسط", "Medium", 1000, "شهادة الجدارة (المستوى المتوسط)", "شهادة التمكن (المستوى المتوسط)"),
+    HARD("hard", "صعب", "Hard", 2000, "شهادة الجدارة الفائقة", "شهادة التمكن العالية")
 }
 
 @Keep

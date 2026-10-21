@@ -283,7 +283,7 @@ fun InAppBookReaderScreen(
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
-                                text = "صفحة ${pagerState.currentPage + 1} من $totalPages",
+                                text = t("صفحة ", "Page ") + "${pagerState.currentPage + 1}" + t(" من ", " of ") + "$totalPages",
                                 color = GoldSoft,
                                 fontSize = 11.sp
                             )
@@ -443,7 +443,7 @@ private fun PdfPageView(
         } else if (pageBitmap != null) {
             Image(
                 bitmap = pageBitmap!!.asImageBitmap(),
-                contentDescription = "صفحة ${pageIndex + 1}",
+                contentDescription = t("صفحة ", "Page ") + "${pageIndex + 1}",
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp))

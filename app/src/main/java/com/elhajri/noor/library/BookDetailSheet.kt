@@ -1,5 +1,7 @@
 package com.elhajri.noor.library
 
+import com.elhajri.noor.settings.t
+
 import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -102,14 +104,14 @@ fun BookDetailSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "تفاصيل الكتاب",
+                    text = t("تفاصيل الكتاب", "Book Details"),
                     color = Gold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = AmiriFamily
                 )
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Default.Close, contentDescription = "إغلاق", tint = GoldSoft)
+                    Icon(Icons.Default.Close, contentDescription = t("إغلاق", "Close"), tint = GoldSoft)
                 }
             }
 
@@ -179,7 +181,7 @@ fun BookDetailSheet(
                     Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
-                        text = "المؤلف: ${book.author}",
+                        text = t("المؤلف: ", "Author: ") + book.author,
                         color = GoldSoft,
                         fontSize = 13.sp,
                         maxLines = 1,
@@ -211,7 +213,7 @@ fun BookDetailSheet(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = "${book.pages} صفحة",
+                                text = "${book.pages} " + t("صفحة", "pages"),
                                 color = Color.White.copy(alpha = 0.8f),
                                 fontSize = 11.sp,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -222,7 +224,7 @@ fun BookDetailSheet(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "التنسيق: ${book.format.uppercase()} | الرخصة: ${book.license}",
+                        text = t("التنسيق: ", "Format: ") + book.format.uppercase() + t(" | الرخصة: ", " | License: ") + book.license,
                         color = GoldSoft.copy(alpha = 0.6f),
                         fontSize = 10.sp
                     )
@@ -242,7 +244,7 @@ fun BookDetailSheet(
                     Text("نبذة عن الكتاب", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "كتاب إسلامي قيم معتمد مفهرس بصيغة ${book.format.uppercase()}، يحتوي على ${book.pages} صفحة من المعارف والمضامين النافعة.",
+                        t("كتاب إسلامي قيم معتمد مفهرس بصيغة ", "A valuable indexed Islamic book in ") + book.format.uppercase() + t("، يحتوي على ", " containing ") + "${book.pages} " + t("صفحة من المعارف والمضامين النافعة.", "pages of beneficial knowledge."),
                         color = Color.White.copy(alpha = 0.85f),
                         fontSize = 12.sp,
                         lineHeight = 18.sp
@@ -289,7 +291,7 @@ fun BookDetailSheet(
                             ) {
                                 Image(
                                     bitmap = bmp.asImageBitmap(),
-                                    contentDescription = "صفحة ${idx + 1}",
+                                    contentDescription = t("صفحة ", "Page ") + "${idx + 1}",
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Fit
                                 )
@@ -392,7 +394,7 @@ fun BookDetailSheet(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = if (isDownloaded) "منزّل أوفلاين" else "تنزيل (بدون إعلانات)",
+                        text = if (isDownloaded) t("منزّل أوفلاين", "Downloaded Offline") else t("تنزيل (بدون إعلانات)", "Download (No Ads)"),
                         color = Gold,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp

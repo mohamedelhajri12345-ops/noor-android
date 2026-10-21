@@ -76,7 +76,7 @@ fun ExamCertificateScreen(
                     )
                 }
                 Text(
-                    text = if (track == ExamTrack.KID) "شهادة الجدارة" else "شهادة التمكن",
+                    text = if (track == ExamTrack.KID) t("شهادة الجدارة", "Certificate of Merit") else t("شهادة التمكن", "Certificate of Mastery"),
                     color = Gold,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
@@ -94,7 +94,7 @@ fun ExamCertificateScreen(
 
             // Subtitle
             Text(
-                text = "مبارك! لقد استحققت هذه الشهادة الرسمية لإتمام المستوى",
+                text = t("مبارك! لقد استحققت هذه الشهادة الرسمية لإتمام المستوى", "Congratulations! You earned this official certificate for completing the level"),
                 color = GoldSoft,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center

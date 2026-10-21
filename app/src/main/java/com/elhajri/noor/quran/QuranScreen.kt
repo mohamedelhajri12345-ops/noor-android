@@ -215,7 +215,7 @@ fun QuranScreen(onSurahClick: (Surah) -> Unit) {
 
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = if (NoorLocale.isEnglish) surah.englishName else "سورة ${surah.name}",
+                                    text = if (NoorLocale.isEnglish) surah.englishName else t("سورة ", "Surah ") + surah.name,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White

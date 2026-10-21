@@ -814,7 +814,7 @@ private fun AdhanCustomizationSection() {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    "$mins د",
+                                    if (NoorLocale.isEnglish) "$mins m" else "$mins د",
                                     color = if (isSelected) Navy else TextMain,
                                     fontSize = 12.sp,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
@@ -847,7 +847,7 @@ private fun AdhanCustomizationSection() {
                             Spacer(Modifier.height(6.dp))
                             Text("🕌 اقترب موعد صلاة الظهر", color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             Text(
-                                "باقي $preMinutes دقائق على أذان صلاة الظهر — استعد للصلاة والوضوء",
+                                t("باقي $preMinutes دقائق على أذان صلاة الظهر — استعد للصلاة والوضوء", "$preMinutes minutes remaining until Dhuhr Adhan — prepare for prayer and Wudu"),
                                 color = TextMain.copy(alpha = 0.8f),
                                 fontSize = 11.sp
                             )

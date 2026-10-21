@@ -395,7 +395,7 @@ fun PrayerScreen() {
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Text(
-                                text = timings?.hijriDate ?: "جاري التحميل...",
+                                text = timings?.hijriDate ?: t("جاري التحميل...", "Loading..."),
                                 color = Gold,
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold

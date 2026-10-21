@@ -1,4 +1,6 @@
 package com.elhajri.noor.exams
+
+import com.elhajri.noor.settings.NoorLocale
 import com.elhajri.noor.settings.t
 
 import androidx.compose.foundation.background
@@ -111,7 +113,7 @@ fun ExamResultScreen(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "المستوى ${result.levelNumber.toArabicDigits()} (${result.difficulty.titleAr} - ${result.track.titleAr})",
+                        text = t("المستوى ", "Level ") + (if (NoorLocale.isEnglish) "${result.levelNumber}" else result.levelNumber.toArabicDigits()) + " (" + (if (NoorLocale.isEnglish) result.difficulty.titleEn else result.difficulty.titleAr) + " - " + (if (NoorLocale.isEnglish) result.track.titleEn else result.track.titleAr) + ")",
                         color = GoldSoft,
                         fontSize = 14.sp
                     )
@@ -151,14 +153,14 @@ fun ExamResultScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 MetricCard(
-                    title = "الإجابات الصحيحة",
+                    title = t("الإجابات الصحيحة", "Correct Answers"),
                     value = "${result.correctAnswers.toArabicDigits()} / ${result.totalQuestions.toArabicDigits()}",
                     color = Color.Green,
                     modifier = Modifier.weight(1f)
                 )
                 MetricCard(
-                    title = "الوقت المستغرق",
-                    value = "${(result.timeTakenSeconds / 60).toArabicDigits()} د ${(result.timeTakenSeconds % 60).toArabicDigits()} ث",
+                    title = t("الوقت المستغرق", "Time Spent"),
+                    value = if (NoorLocale.isEnglish) "${result.timeTakenSeconds / 60}m ${result.timeTakenSeconds % 60}s" else "${(result.timeTakenSeconds / 60).toArabicDigits()} د ${(result.timeTakenSeconds % 60).toArabicDigits()} ث",
                     color = Gold,
                     modifier = Modifier.weight(1f)
                 )
@@ -168,7 +170,7 @@ fun ExamResultScreen(
 
             // Category Breakdown Section
             Text(
-                text = "الأداء حسب الفئات والمواضيع:",
+                text = t("الأداء حسب الفئات والمواضيع:", "Performance by Category:"),
                 color = Gold,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
@@ -205,7 +207,7 @@ fun ExamResultScreen(
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = "${correctInCat.toArabicDigits()} من ${totalInCat.toArabicDigits()}",
+                                    text = if (NoorLocale.isEnglish) "$correctInCat of $totalInCat" else "${correctInCat.toArabicDigits()} من ${totalInCat.toArabicDigits()}",
                                     color = GoldSoft,
                                     fontSize = 13.sp
                                 )
@@ -229,7 +231,7 @@ fun ExamResultScreen(
 
             // Question by Question Review List
             Text(
-                text = "مراجعة جميع الأسئلة والإجابات:",
+                text = t("مراجعة جميع الأسئلة والإجابات:", "Review All Questions & Answers:"),
                 color = Gold,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
@@ -261,7 +263,7 @@ fun ExamResultScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "سؤال ${(idx + 1).toArabicDigits()}",
+                                    text = t("سؤال ", "Question ") + (if (NoorLocale.isEnglish) "${idx + 1}" else (idx + 1).toArabicDigits()),
                                     color = Gold,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.sp
@@ -289,10 +291,10 @@ fun ExamResultScreen(
                             val userOptText = if (ans.selectedIndex != null && ans.selectedIndex in 0..3) {
                                 ans.question.options[ans.selectedIndex]
                             } else {
-                                "لم يتم الاختيار (انتهى الوقت)"
+                                t("لم يتم الاختيار (انتهى الوقت)", "No selection made (Time out)")
                             }
                             Text(
-                                text = "إجابتك: $userOptText",
+                                text = t("إجابتك: ", "Your answer: ") + userOptText,
                                 color = if (ans.isCorrect) Color.Green else Color.Red,
                                 fontSize = 13.sp
                             )
@@ -300,7 +302,7 @@ fun ExamResultScreen(
                             // Correct Answer if wrong
                             if (!ans.isCorrect) {
                                 Text(
-                                    text = "الإجابة الصحيحة: ${ans.question.options[ans.question.correct]}",
+                                    text = t("الإجابة الصحيحة: ", "Correct answer: ") + ans.question.options[ans.question.correct],
                                     color = GoldSoft,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Bold
@@ -311,7 +313,7 @@ fun ExamResultScreen(
 
                             // Explanation
                             Text(
-                                text = "الشرح والتعليم: ${ans.question.explanation}",
+                                text = t("الشرح والتعليم: ", "Explanation: ") + ans.question.explanation,
                                 color = TextMain.copy(alpha = 0.8f),
                                 fontSize = 12.sp,
                                 lineHeight = 18.sp
