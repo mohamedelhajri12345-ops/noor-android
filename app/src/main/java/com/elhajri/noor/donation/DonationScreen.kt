@@ -1,4 +1,5 @@
 package com.elhajri.noor.donation
+import com.elhajri.noor.settings.t
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -76,7 +77,7 @@ fun DonationScreen(onBack: () -> Unit) {
             TopAppBar(
                 title = {
                     Text(
-                        text = "دعم التطبيق",
+                        text = t("دعم التطبيق", "Support App"),
                         color = Gold,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -86,7 +87,7 @@ fun DonationScreen(onBack: () -> Unit) {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "رجوع",
+                            contentDescription = t("رجوع", "Back"),
                             tint = Gold
                         )
                     }
@@ -132,14 +133,14 @@ fun DonationScreen(onBack: () -> Unit) {
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "صدقتك الجارية",
+                        text = t("صدقتك الجارية", "Your Ongoing Charity (Sadaqah Jariyah)"),
                         color = Gold,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = "كل تبرع منك يُبقي هذا التطبيق حياً لآلاف المسلمين",
+                        text = t("كل تبرع منك يُبقي هذا التطبيق حياً لآلاف المسلمين", "Every donation keeps this app alive for thousands of Muslims"),
                         color = TextMain,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
@@ -160,7 +161,7 @@ fun DonationScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "اختر مبلغ التبرع",
+                        text = t("اختر مبلغ التبرع", "Choose donation amount"),
                         color = GoldSoft,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
@@ -242,7 +243,7 @@ fun DonationScreen(onBack: () -> Unit) {
                                 modifier = Modifier.size(18.dp)
                             )
                             Text(
-                                text = "تبرع الآن عبر الموقع",
+                                text = t("تبرع الآن عبر الموقع", "Donate now via Website"),
                                 color = Navy,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -264,7 +265,7 @@ fun DonationScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(
-                        text = "بيانات التبرع الحسابي (التحويل البنكي)",
+                        text = t("بيانات التبرع الحسابي (التحويل البنكي)", "Bank Transfer Details"),
                         color = GoldSoft,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
@@ -306,7 +307,7 @@ fun DonationScreen(onBack: () -> Unit) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.ContentCopy,
-                                        contentDescription = "نسخ",
+                                        contentDescription = t("نسخ", "Copy"),
                                         tint = Gold,
                                         modifier = Modifier.size(16.dp)
                                     )
@@ -329,16 +330,16 @@ fun DonationScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(
-                        text = "خطوات التبرع",
+                        text = t("خطوات التبرع", "Donation Steps"),
                         color = GoldSoft,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     val steps = listOf(
-                        "١" to "انسخ RIB أعلاه",
-                        "٢" to "افتح تطبيق بنكك وحوّل المبلغ الذي تريده",
-                        "٣" to "أرسل لنا إشعار التحويل عبر واتساب لنشكرك شخصياً"
+                        "١" to t("انسخ RIB أعلاه", "Copy RIB above"),
+                        "٢" to t("افتح تطبيق بنكك وحوّل المبلغ الذي تريده", "Open your bank app and transfer your desired amount"),
+                        "٣" to t("أرسل لنا إشعار التحويل عبر واتساب لنشكرك شخصياً", "Send transfer receipt via WhatsApp so we can thank you")
                     )
 
                     steps.forEach { (num, text) ->
@@ -382,7 +383,7 @@ fun DonationScreen(onBack: () -> Unit) {
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
-                    text = "💬 تأكيد التبرع عبر واتساب",
+                    text = t("💬 تأكيد التبرع عبر واتساب", "💬 Confirm Donation via WhatsApp"),
                     color = Color.White,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
@@ -390,7 +391,7 @@ fun DonationScreen(onBack: () -> Unit) {
             }
 
             Text(
-                text = "جزاك الله خيراً 🤲",
+                text = t("جزاك الله خيراً 🤲", "Jazakum Allahu Khairan 🤲"),
                 color = Gold,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,

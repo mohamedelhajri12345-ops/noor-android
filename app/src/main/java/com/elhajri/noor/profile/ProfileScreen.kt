@@ -303,7 +303,7 @@ fun ProfileScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "رجوع",
+                        contentDescription = t("رجوع", "Back"),
                         tint = Gold
                     )
                 }
@@ -608,7 +608,7 @@ fun ProfileScreen(
                             putExtra(Intent.EXTRA_TEXT, shareText)
                             type = "text/plain"
                         }
-                        context.startActivity(Intent.createChooser(sendIntent, "مشاركة الإنجاز"))
+                        context.startActivity(Intent.createChooser(sendIntent, t("مشاركة الإنجاز", "Share Achievement")))
                     }
                 }
             }
@@ -662,7 +662,7 @@ fun ProfileScreen(
             containerColor = Navy,
             title = {
                 Text(
-                    text = "تعديل البيانات الشخصية",
+                    text = t("تعديل البيانات الشخصية", "Edit Profile"),
                     color = Gold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -750,14 +750,14 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "تطبيق نور الإسلامي",
+                            text = t("تطبيق نور الإسلامي", "NOOR Islamic App"),
                             color = GoldSoft,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
 
                         Text(
-                            text = "شهادة تقدير واستحقاق",
+                            text = t("شهادة تقدير واستحقاق", "Certificate of Merit & Achievement"),
                             color = Gold,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
@@ -767,7 +767,7 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = "تُمنح هذه الشهادة المباركة لـ:",
+                            text = t("تُمنح هذه الشهادة المباركة لـ:", "This blessed certificate is awarded to:"),
                             color = TextSecondaryLinen,
                             fontSize = 12.5.sp
                         )
@@ -825,7 +825,7 @@ fun ProfileScreen(
                             putExtra(Intent.EXTRA_TEXT, shareText)
                             type = "text/plain"
                         }
-                        context.startActivity(Intent.createChooser(sendIntent, "مشاركة الشهادة"))
+                        context.startActivity(Intent.createChooser(sendIntent, t("مشاركة الشهادة", "Share Certificate")))
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy)
                 ) {
@@ -835,7 +835,7 @@ fun ProfileScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("مشاركة الشهادة", fontWeight = FontWeight.Bold)
+                    Text(t("مشاركة الشهادة", "Share Certificate"), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -964,7 +964,7 @@ private fun AchievementItemCard(
                             color = Gold.copy(alpha = 0.2f)
                         ) {
                             Text(
-                                text = "مكتسب ✓",
+                                text = t("مكتسب ✓", "Earned ✓"),
                                 color = Gold,
                                 fontSize = 10.5.sp,
                                 fontWeight = FontWeight.Bold,
@@ -999,7 +999,7 @@ private fun AchievementItemCard(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Share,
-                        contentDescription = "مشاركة",
+                        contentDescription = t("مشاركة", "Share"),
                         tint = GoldSoft,
                         modifier = Modifier.size(16.dp)
                     )
@@ -1081,7 +1081,7 @@ private fun CertificateItemCard(
                     )
                 } else {
                     Text(
-                        text = "قيد الإنجاز — أتم المقتضيات لفتح الشهادة",
+                        text = t("قيد الإنجاز — أتم المقتضيات لفتح الشهادة", "In progress — complete requirements to unlock certificate"),
                         color = TextSecondaryLinen.copy(alpha = 0.7f),
                         fontSize = 11.sp
                     )

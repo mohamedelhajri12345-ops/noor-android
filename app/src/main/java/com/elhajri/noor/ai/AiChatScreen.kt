@@ -257,7 +257,7 @@ fun AiChatScreen(onBack: () -> Unit) {
                         if (ok) { downloaded = true; downloading = false }
                         else { downloading = false } // أُلغي
                     } catch (e: Exception) {
-                        downloadError = e.message ?: "تعذّر التنزيل"
+                        downloadError = e.message ?: t("تعذّر التنزيل", "Download Failed")
                         downloading = false
                     }
                 }

@@ -1,4 +1,5 @@
 package com.elhajri.noor.exams
+import com.elhajri.noor.settings.t
 
 import android.graphics.Bitmap
 import android.widget.Toast
@@ -70,7 +71,7 @@ fun ExamCertificateScreen(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "رجوع",
+                        contentDescription = t("رجوع", "Back"),
                         tint = Gold
                     )
                 }
@@ -83,7 +84,7 @@ fun ExamCertificateScreen(
                 IconButton(onClick = { showEditDialog = true }) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "تعديل الاسم",
+                        contentDescription = t("تعديل الاسم", "Edit Name"),
                         tint = Gold
                     )
                 }
@@ -111,7 +112,7 @@ fun ExamCertificateScreen(
                 ) {
                     Image(
                         bitmap = bmp.asImageBitmap(),
-                        contentDescription = "شهادة التخرج",
+                        contentDescription = t("شهادة التخرج", "Graduation Certificate"),
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(2000f / 1414f)
@@ -194,7 +195,7 @@ fun ExamCertificateScreen(
                             )
                             if (uri != null) {
                                 Toast.makeText(context, "تم تصدير الشهادة كملف PDF!", Toast.LENGTH_LONG).show()
-                                ExamCertificateGenerator.shareUri(context, uri, "application/pdf", "عرض شهادة PDF")
+                                ExamCertificateGenerator.shareUri(context, uri, "application/pdf", t("عرض شهادة PDF", "View PDF Certificate"))
                             } else {
                                 Toast.makeText(context, "حدث خطأ أثناء التصدير", Toast.LENGTH_SHORT).show()
                             }
@@ -223,7 +224,7 @@ fun ExamCertificateScreen(
                             "NOOR_Share_Cert"
                         )
                         if (uri != null) {
-                            ExamCertificateGenerator.shareUri(context, uri, "image/png", "مشاركة شهادة نُور")
+                            ExamCertificateGenerator.shareUri(context, uri, "image/png", t("مشاركة شهادة نُور", "Share NOOR Certificate"))
                         }
                     }
                 },

@@ -1,4 +1,5 @@
 package com.elhajri.noor.journal
+import com.elhajri.noor.settings.t
 
 import com.elhajri.noor.ui.themeScreenBackground
 import android.content.Context
@@ -171,7 +172,7 @@ fun JournalScreen() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "المفكرة",
+                text = t("المفكرة", "Reflections Journal"),
                 color = Gold,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
@@ -186,14 +187,14 @@ fun JournalScreen() {
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "إضافة خاطرة",
+                    contentDescription = t("إضافة خاطرة", "Add Reflection"),
                     tint = Navy
                 )
             }
         }
 
         Text(
-            text = "مساحتك الخاصة لتدوين الخواطر والأدعية",
+            text = t("مساحتك الخاصة لتدوين الخواطر والأدعية", "Your private space for reflections and supplications"),
             color = GoldSoft.copy(alpha = 0.8f),
             fontSize = 12.sp,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -213,7 +214,7 @@ fun JournalScreen() {
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = if (editingId == null) "إضافة خاطرة جديدة" else "تعديل الخاطرة",
+                        text = if (editingId == null) t("إضافة خاطرة جديدة", "Add New Reflection") else t("تعديل الخاطرة", "Edit Reflection"),
                         color = Gold,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
@@ -254,7 +255,7 @@ fun JournalScreen() {
                     )
 
                     Text(
-                        text = "الشعور / الحالة:",
+                        text = t("الشعور / الحالة:", "Feeling / Mood:"),
                         color = GoldSoft,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(bottom = 6.dp)
@@ -325,13 +326,13 @@ fun JournalScreen() {
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "لا توجد خواطر بعد",
+                        text = t("لا توجد خواطر بعد", "No reflections yet"),
                         color = GoldSoft,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
-                        text = "ابدأ بتدوين أول خاطرة",
+                        text = t("ابدأ بتدوين أول خاطرة", "Start writing your first reflection"),
                         color = GoldSoft.copy(alpha = 0.6f),
                         fontSize = 12.sp,
                         modifier = Modifier.padding(top = 4.dp)
@@ -393,7 +394,7 @@ fun JournalScreen() {
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Edit,
-                                            contentDescription = "تعديل",
+                                            contentDescription = t("تعديل", "Edit"),
                                             tint = GoldSoft,
                                             modifier = Modifier.size(16.dp)
                                         )
@@ -405,7 +406,7 @@ fun JournalScreen() {
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Delete,
-                                            contentDescription = "حذف",
+                                            contentDescription = t("حذف", "Delete"),
                                             tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
                                             modifier = Modifier.size(16.dp)
                                         )
@@ -441,7 +442,7 @@ fun JournalScreen() {
             containerColor = NavyCard,
             title = {
                 Text(
-                    text = "حذف الخاطرة",
+                    text = t("حذف الخاطرة", "Delete Reflection"),
                     color = Gold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -449,7 +450,7 @@ fun JournalScreen() {
             },
             text = {
                 Text(
-                    text = "هل أنت تأكد من حذف هذه الخاطرة؟",
+                    text = t("هل أنت تأكد من حذف هذه الخاطرة؟", "Are you sure you want to delete this reflection?"),
                     color = TextMain,
                     fontSize = 14.sp
                 )
@@ -460,7 +461,7 @@ fun JournalScreen() {
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("حذف", color = TextMain)
+                    Text(t("حذف", "Delete"), color = TextMain)
                 }
             },
             dismissButton = {

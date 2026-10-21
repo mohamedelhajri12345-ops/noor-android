@@ -1,4 +1,5 @@
 package com.elhajri.noor.athkar
+import com.elhajri.noor.settings.t
 
 import android.content.Context
 import android.os.Build
@@ -188,7 +189,7 @@ fun AthkarDetailScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "رجوع",
+                        contentDescription = t("رجوع", "Back"),
                         tint = Gold
                     )
                 }
@@ -211,7 +212,7 @@ fun AthkarDetailScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "إعادة الضبط",
+                        contentDescription = t("إعادة الضبط", "Reset"),
                         tint = GoldSoft
                     )
                 }
@@ -225,7 +226,7 @@ fun AthkarDetailScreen(
                     .fillMaxWidth(),
                 contentPadding = PaddingValues(bottom = if (isCategoryActive) 130.dp else 24.dp)
             ) {
-                // Sequential Reading Mode Hero Card ("قراءة متتابعة")
+                // Sequential Reading Mode Hero Card (t("قراءة متتابعة", "Sequential Audio"))
                 item {
                     Card(
                         modifier = Modifier
@@ -255,7 +256,7 @@ fun AthkarDetailScreen(
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Text(
-                                        text = "وضع القراءة المتتابعة",
+                                        text = t("وضع القراءة المتتابعة", "Sequential Audio Mode"),
                                         color = Gold,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold
@@ -270,7 +271,7 @@ fun AthkarDetailScreen(
                                             .padding(horizontal = 8.dp, vertical = 4.dp)
                                     ) {
                                         Text(
-                                            text = "جاري التشغيل...",
+                                            text = t("جاري التشغيل...", "Playing..."),
                                             color = Gold,
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Medium
@@ -282,7 +283,7 @@ fun AthkarDetailScreen(
                             Spacer(modifier = Modifier.height(6.dp))
 
                             Text(
-                                text = "استمع وتتبع الأذكار بصوت خاشع ومؤثر مع الانتقال التلقائي بين الأذكار",
+                                text = t("استمع وتتبع الأذكار بصوت خاشع ومؤثر مع الانتقال التلقائي بين الأذكار", "Listen and follow adhkar with auto-advance"),
                                 color = GoldSoft.copy(alpha = 0.8f),
                                 fontSize = 12.sp,
                                 lineHeight = 18.sp
@@ -305,7 +306,7 @@ fun AthkarDetailScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.SkipNext, // RTL arrow direction
-                                        contentDescription = "الذكر السابق",
+                                        contentDescription = t("الذكر السابق", "Previous Dhikr"),
                                         tint = Gold
                                     )
                                 }
@@ -331,12 +332,12 @@ fun AthkarDetailScreen(
                                 ) {
                                     Icon(
                                         imageVector = if (isCategoryActive && playerState.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                        contentDescription = if (isCategoryActive && playerState.isPlaying) "إيقاف مؤقت" else "ابدأ الاستماع",
+                                        contentDescription = if (isCategoryActive && playerState.isPlaying) t("إيقاف مؤقت", "Pause") else t("ابدأ الاستماع", "Start Listening"),
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = if (isCategoryActive && playerState.isPlaying) "إيقاف مؤقت" else "تشغيل متتابع",
+                                        text = if (isCategoryActive && playerState.isPlaying) t("إيقاف مؤقت", "Pause") else t("تشغيل متتابع", "Sequential Play"),
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 14.sp
                                     )
@@ -352,7 +353,7 @@ fun AthkarDetailScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.SkipPrevious, // RTL arrow direction
-                                        contentDescription = "الذكر التالي",
+                                        contentDescription = t("الذكر التالي", "Next Dhikr"),
                                         tint = Gold
                                     )
                                 }
@@ -420,12 +421,12 @@ fun AthkarDetailScreen(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.VolumeUp,
-                                            contentDescription = "مستمر",
+                                            contentDescription = t("مستمر", "Continuous"),
                                             tint = Gold,
                                             modifier = Modifier.size(16.dp)
                                         )
                                         Text(
-                                            text = "جاري القراءة",
+                                            text = t("جاري القراءة", "Reading"),
                                             color = Gold,
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold
@@ -497,7 +498,7 @@ fun AthkarDetailScreen(
                                     if (isDone) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
-                                            contentDescription = "مكتمل",
+                                            contentDescription = t("مكتمل", "Completed"),
                                             tint = Gold,
                                             modifier = Modifier.size(24.dp)
                                         )
@@ -573,7 +574,7 @@ fun AthkarDetailScreen(
                         ) {
                             Icon(
                                 imageVector = if (playerState.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                contentDescription = if (playerState.isPlaying) "إيقاف مؤقت" else "تشغيل",
+                                contentDescription = if (playerState.isPlaying) t("إيقاف مؤقت", "Pause") else "تشغيل",
                                 tint = Navy,
                                 modifier = Modifier.size(22.dp)
                             )
@@ -588,7 +589,7 @@ fun AthkarDetailScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "إنهاء",
+                                contentDescription = t("إنهاء", "Finish"),
                                 tint = GoldSoft,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -617,7 +618,7 @@ fun AthkarDetailScreen(
                             tint = Gold
                         )
                         Text(
-                            text = "تقبل الله طاعتكم",
+                            text = t("تقبل الله طاعتكم", "May Allah accept your worship"),
                             color = Gold,
                             fontWeight = FontWeight.Bold
                         )

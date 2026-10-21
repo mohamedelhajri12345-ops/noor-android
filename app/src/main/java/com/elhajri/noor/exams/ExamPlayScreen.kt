@@ -390,7 +390,7 @@ fun ExamPlayScreen(
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Text(
-                        text = if (currentQuestionIdx < questions.size - 1) "السؤال التالي" else "عرض النتيجة والتحليل",
+                        text = if (currentQuestionIdx < questions.size - 1) t("السؤال التالي", "Next Question") else t("عرض النتيجة والتحليل", "View Results & Analysis"),
                         color = Color.Black,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
@@ -413,14 +413,14 @@ fun getOptionSymbolAr(idx: Int): String {
 
 fun getCategoryLabelAr(cat: String): String {
     return when (cat.lowercase()) {
-        "quran" -> "القرآن الكريم"
-        "seerah" -> "السيرة النبوية"
-        "prophets" -> "قصص الأنبياء"
-        "fiqh" -> "الفقه الإسلامي"
-        "aqeedah" -> "العقيدة الإسلامية"
-        "adab" -> "الآداب والأخلاق"
-        "history" -> "التاريخ الإسلامي"
-        "adhkar" -> "الأذكار والأدعية"
-        else -> "علوم إسلامية"
+        "quran" -> t("القرآن الكريم", "Noble Qur'an")
+        "seerah" -> t("السيرة النبوية", "Prophet's Seerah")
+        "prophets" -> t("قصص الأنبياء", "Stories of Prophets")
+        "fiqh" -> t("الفقه الإسلامي", "Islamic Fiqh")
+        "aqeedah" -> t("العقيدة الإسلامية", "Islamic Aqeedah")
+        "adab" -> t("الآداب والأخلاق", "Manners & Morals")
+        "history" -> t("التاريخ الإسلامي", "Islamic History")
+        "adhkar" -> t("الأذكار والأدعية", "Adhkar & Duas")
+        else -> t("علوم إسلامية", "Islamic Sciences")
     }
 }

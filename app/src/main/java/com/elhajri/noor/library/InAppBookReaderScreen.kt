@@ -1,4 +1,5 @@
 package com.elhajri.noor.library
+import com.elhajri.noor.settings.t
 
 import android.content.Context
 import android.content.Intent
@@ -106,7 +107,7 @@ fun InAppBookReaderScreen(
                 if (success) {
                     localFile = LibraryStore.getLocalFile(context, book)
                 } else {
-                    downloadError = msg ?: "فشل تحميل الكتاب"
+                    downloadError = msg ?: t("فشل تحميل الكتاب", "Failed to load book")
                 }
             }
         }
@@ -136,7 +137,7 @@ fun InAppBookReaderScreen(
                 )
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = "تنسيق EPUB يتطلب قارئ مستندات خارجي. يمكنك تنزيل الكتاب وفتحه عبر القارئ المفضل لديك.",
+                    text = t("تنسيق EPUB يتطلب قارئ مستندات خارجي. يمكنك تنزيل الكتاب وفتحه عبر القارئ المفضل لديك.", "EPUB format requires an external reader app. Download and open in your preferred app."),
                     color = GoldSoft,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
@@ -265,7 +266,7 @@ fun InAppBookReaderScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.Default.ChevronRight, contentDescription = "رجوع", tint = Gold, modifier = Modifier.size(28.dp))
+                            Icon(Icons.Default.ChevronRight, contentDescription = t("رجوع", "Back"), tint = Gold, modifier = Modifier.size(28.dp))
                         }
 
                         Column(
@@ -290,17 +291,17 @@ fun InAppBookReaderScreen(
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             IconButton(onClick = { showBookmarksSheet = true }) {
-                                Icon(Icons.Default.FormatListNumbered, contentDescription = "الفواصل", tint = Gold)
+                                Icon(Icons.Default.FormatListNumbered, contentDescription = t("الفواصل", "Bookmarks"), tint = Gold)
                             }
                             IconButton(onClick = {
                                 val added = LibraryStore.toggleBookmark(context, bookId, pagerState.currentPage)
                                 bookmarks = LibraryStore.getBookmarks(context, bookId)
-                                val msg = if (added) "تم حفظ العلامة المرجعية" else "تم إزالة العلامة المرجعية"
+                                val msg = if (added) t("تم حفظ العلامة المرجعية", "Bookmark saved") else t("تم إزالة العلامة المرجعية", "Bookmark removed")
                                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                             }) {
                                 Icon(
                                     imageVector = if (isCurrentPageBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                                    contentDescription = "علامة مرجعية",
+                                    contentDescription = t("علامة مرجعية", "Bookmark"),
                                     tint = Gold
                                 )
                             }
