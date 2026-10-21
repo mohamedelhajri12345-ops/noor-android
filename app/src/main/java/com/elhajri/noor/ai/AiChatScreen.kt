@@ -170,14 +170,11 @@ fun AiChatScreen(onBack: () -> Unit) {
                         Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Gold, modifier = Modifier.size(34.dp))
                     }
                     Spacer(Modifier.height(20.dp))
-                    Text("ذكاء اصطناعي على هاتفك", color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily, textAlign = TextAlign.Center)
+                    Text(t("ذكاء اصطناعي على هاتفك", "On-Device AI"), color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(10.dp))
                     Text(
-                        "مساعد إسلامي ذكي يعمل محلياً بالكامل بنموذج مجاني مفتوح من Google LiteRT.\n" +
-                            "اسأل ما تشاء عن دينك بلا حدود:\n" +
-                            "• بدون إنترنت بعد التحميل\n" +
-                            "• بدون حسابات ولا مفاتيح API\n" +
-                            "• أسئلتك لا تُغادر هاتفك أبداً",
+                        t("مساعد إسلامي ذكي يعمل محلياً بالكامل بنموذج مجاني مفتوح من Google LiteRT.\nاسأل ما تشاء عن دينك بلا حدود:\n• بدون إنترنت بعد التحميل\n• بدون حسابات ولا مفاتيح API\n• أسئلتك لا تُغادر هاتفك أبداً",
+                          "Smart Islamic AI assistant running 100% locally with Google LiteRT.\nAsk anything about Islam freely:\n• Offline after download\n• No accounts or API keys needed\n• Your questions never leave your device"),
                         color = TextMain.copy(alpha = 0.75f), fontSize = 13.sp, lineHeight = 20.sp, textAlign = TextAlign.Center
                     )
                     Spacer(Modifier.height(16.dp))
@@ -226,7 +223,8 @@ fun AiChatScreen(onBack: () -> Unit) {
                         Icon(Icons.Filled.ErrorOutline, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(32.dp))
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "المساحة المتاحة على جهازك لا تكفي للنموذج (${selectedModel.sizeLabel()}).\nحرّر بعض المساحة ثم عُد.",
+                            t("المساحة المتاحة على جهازك لا تكفي للنموذج (${selectedModel.sizeLabel()}).\nحرّر بعض المساحة ثم عُد.",
+                              "Not enough storage space on your device for this model (${selectedModel.sizeLabel()}).\nFree up space and try again."),
                             color = TextMain.copy(alpha = 0.6f), fontSize = 12.sp, textAlign = TextAlign.Center
                         )
                     } else {
