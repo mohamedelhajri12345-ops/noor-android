@@ -118,7 +118,7 @@ fun MyChildRootScreen(
                 MyChildStore.setKidsSafeModeActive(context, false)
                 isSafeMode = false
                 SfxManager.playSuccess(context)
-                Toast.makeText(context, "تم الخروج من وضع الطفل الآمن", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, t("تم الخروج من وضع الطفل الآمن", "Exited Safe Kids Mode"), Toast.LENGTH_SHORT).show()
             },
             onNavigate = onNavigate
         )
@@ -476,7 +476,7 @@ fun ParentsDashboardContent(
                         MyChildStore.addStarsToChild(context, activeProfile.id, 5)
                         onProfileUpdated()
                         SfxManager.playSuccess(context)
-                        Toast.makeText(context, "تم إهداء ٥ نجوم تشجيعية لطفلك! 🌟", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, t("تم إهداء ٥ نجوم تشجيعية لطفلك! 🌟", "Gifted 5 encouragement stars to your child! 🌟"), Toast.LENGTH_SHORT).show()
                     }) {
                         Text("إهداء ٥ نجوم ⭐️", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
@@ -526,9 +526,9 @@ fun ParentsDashboardContent(
                                             rewardsList = MyChildStore.getParentRewards(context, activeProfile.id)
                                             onProfileUpdated()
                                             SfxManager.playSuccess(context)
-                                            Toast.makeText(context, "مبروك! تم استبدال المكافأة 🎉", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, t("مبروك! تم استبدال المكافأة 🎉", "Congratulations! Reward redeemed 🎉"), Toast.LENGTH_SHORT).show()
                                         } else {
-                                            Toast.makeText(context, "رصيد النجوم غير كافٍ بعد", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, t("رصيد النجوم غير كافٍ بعد", "Insufficient star balance"), Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     enabled = activeProfile.totalStarsEarned >= reward.starCost,
@@ -1118,7 +1118,7 @@ fun BedtimeStoryContent(
                 onClick = {
                     BedtimeStoryManager.scheduleBedtimeNotification(context, childProfile)
                     SfxManager.playSuccess(context)
-                    Toast.makeText(context, "تم ضبط تنبيه قصة قبل النوم الساعة 8:00 مساءً 🌙", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, t("تم ضبط تنبيه قصة قبل النوم الساعة 8:00 مساءً 🌙", "Bedtime story reminder set for 8:00 PM 🌙"), Toast.LENGTH_SHORT).show()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = NavyCard),
                 shape = RoundedCornerShape(12.dp),
@@ -1137,7 +1137,7 @@ fun BedtimeStoryContent(
                 MyChildStore.addStarsToChild(context, childProfile.id, 3)
                 onProfileUpdated()
                 SfxManager.playSuccess(context)
-                Toast.makeText(context, "قرأتم القصة معاً! تم منح طفلك +٣ نجوم 🌟", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, t("قرأتم القصة معاً! تم منح طفلك +٣ نجوم 🌟", "Read story together! Awarded +3 stars 🌟"), Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -1351,10 +1351,10 @@ fun FamilyChallengeContent(
                         if (isCorrect) {
                             if (isChildTurn) childScore += 10 else parentScore += 10
                             SfxManager.playSuccess(context)
-                            Toast.makeText(context, "إجابة صحيحة! 👏", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, t("إجابة صحيحة! 👏", "Correct answer! 👏"), Toast.LENGTH_SHORT).show()
                         } else {
                             SfxManager.playWrong(context)
-                            Toast.makeText(context, "إجابة خاطئة", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, t("إجابة خاطئة", "Incorrect answer"), Toast.LENGTH_SHORT).show()
                         }
 
                         if (currentRoundIdx + 1 < questions.size) {
@@ -1460,7 +1460,7 @@ private fun PinVerificationDialog(
                     if (MyChildStore.verifyParentPin(context, pin)) {
                         onVerified()
                     } else {
-                        Toast.makeText(context, "رمز PIN غير صحيح", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, t("رمز PIN غير صحيح", "Incorrect PIN"), Toast.LENGTH_SHORT).show()
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Gold)
