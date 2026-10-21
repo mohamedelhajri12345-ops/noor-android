@@ -94,7 +94,7 @@ private val JUZ_30_SURAHS = listOf(
 
 enum class ChildTab(val titleAr: String, val icon: ImageVector) {
     PARENTS(t("لوحة الوالدين", "Parents Dashboard"), Icons.Filled.FamilyRestroom),
-    SAFE_MODE("وضع الطفل الآمن", Icons.Filled.Shield),
+    SAFE_MODE(t("وضع الطفل الآمن", "Safe Kids Mode"), Icons.Filled.Shield),
     MEMORIZATION(t("متابعة الحفظ", "Memorization Tracker"), Icons.Filled.Star),
     BEDTIME_STORY(t("قصة قبل النوم", "Bedtime Story"), Icons.Filled.NightsStay),
     FAMILY_QUIZ(t("تحدي عائلي", "Family Challenge"), Icons.Filled.SportsEsports)
@@ -145,19 +145,19 @@ fun MyChildRootScreen(
                     onBack()
                 }
             ) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
+                Icon(Icons.Filled.ArrowBack, contentDescription = t("رجوع", "Back"), tint = Gold)
             }
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "طفلي 👶",
+                    text = t("طفلي 👶", "My Child 👶"),
                     color = Gold,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = AmiriFamily
                 )
                 Text(
-                    text = "ملف الطفل، وضع آمن، متابعة الحفظ، وتحدي عائلي",
+                    text = t("ملف الطفل، وضع آمن، متابعة الحفظ، وتحدي عائلي", "Child profile, safe mode, memorization tracker & family quiz"),
                     color = GoldSoft.copy(alpha = 0.7f),
                     fontSize = 11.sp
                 )
@@ -324,14 +324,14 @@ fun ParentsDashboardContent(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "ملف أطفالي 👶",
+                        text = t("ملف أطفالي 👶", "My Children Profiles 👶"),
                         color = Gold,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     TextButton(onClick = { showAddDialog = true }) {
-                        Icon(Icons.Filled.Add, contentDescription = "إضافة", tint = Gold, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Filled.Add, contentDescription = t("إضافة", "Add"), tint = Gold, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(4.dp))
                         Text("إضافة طفل", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
@@ -371,7 +371,7 @@ fun ParentsDashboardContent(
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(
-                                        "${profile.age} سنوات | ⭐️ ${profile.totalStarsEarned}",
+                                        t("${profile.age} سنوات | ⭐️ ${profile.totalStarsEarned}", "${profile.age} yrs | ⭐️ ${profile.totalStarsEarned}"),
                                         color = GoldSoft,
                                         fontSize = 11.sp
                                     )
@@ -396,14 +396,14 @@ fun ParentsDashboardContent(
                     Spacer(Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "لوحة الوالدين لـ ${activeProfile.name}",
+                            text = t("لوحة الوالدين لـ ${activeProfile.name}", "Parent Dashboard for ${activeProfile.name}"),
                             color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = AmiriFamily
                         )
                         Text(
-                            text = "ملخص إنجاز ونشاط اليوم",
+                            text = t("ملخص إنجاز ونشاط اليوم", "Today summary of achievements and activity"),
                             color = GoldSoft.copy(alpha = 0.7f),
                             fontSize = 12.sp
                         )
@@ -417,7 +417,7 @@ fun ParentsDashboardContent(
                         colors = ButtonDefaults.buttonColors(containerColor = Gold),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Icon(Icons.Filled.Shield, contentDescription = "وضع آمن", tint = Navy, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Filled.Shield, contentDescription = t("وضع آمن", "Safe Mode"), tint = Navy, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))
                         Text("وضع الطفل الآمن", color = Navy, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
@@ -432,7 +432,7 @@ fun ParentsDashboardContent(
                     MetricBox(
                         icon = Icons.Filled.Timer,
                         label = t("وقت الشاشة اليوم", "Daily Screen Time"),
-                        value = "$screenTimeMinutes دقيقة",
+                        value = t("$screenTimeMinutes دقيقة", "$screenTimeMinutes min"),
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(Modifier.width(8.dp))
@@ -446,7 +446,7 @@ fun ParentsDashboardContent(
                     MetricBox(
                         icon = Icons.Filled.MenuBook,
                         label = t("السور المحفوظة", "Memorized Surahs"),
-                        value = "$memorizedCount من ٣٨",
+                        value = t("$memorizedCount من ٣٨", "$memorizedCount of 38"),
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -467,7 +467,7 @@ fun ParentsDashboardContent(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.CardGiftcard, contentDescription = "مكافآت", tint = Gold, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Filled.CardGiftcard, contentDescription = t("مكافآت", "Rewards"), tint = Gold, modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
                         Text("بطاقات التحفيز ومكافآت الوالدين 🎁", color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
@@ -506,7 +506,7 @@ fun ParentsDashboardContent(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    "التكلفة: ${reward.starCost} نجمة",
+                                    t("التكلفة: ${reward.starCost} نجمة", "Cost: ${reward.starCost} stars"),
                                     color = GoldSoft,
                                     fontSize = 11.sp
                                 )
@@ -550,7 +550,7 @@ fun ParentsDashboardContent(
                     shape = RoundedCornerShape(12.dp),
                     border = androidx.compose.foundation.BorderStroke(1.dp, Gold.copy(alpha = 0.5f))
                 ) {
-                    Icon(Icons.Filled.Add, contentDescription = "إضافة مكافأة", tint = Gold)
+                    Icon(Icons.Filled.Add, contentDescription = t("إضافة مكافأة", "Add Reward"), tint = Gold)
                     Spacer(Modifier.width(6.dp))
                     Text("إضافة هدية أو مكافأة خاصة", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
@@ -729,7 +729,7 @@ fun SafeKidsHomeScreen(
                 Spacer(Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "مرحباً يا ${childProfile.name}! 🌟",
+                        t("مرحباً يا ${childProfile.name}! 🌟", "Welcome ${childProfile.name}! 🌟"),
                         color = Gold,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -744,7 +744,7 @@ fun SafeKidsHomeScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Gold),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Filled.Lock, contentDescription = "خروج الوالدين", tint = Navy, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Filled.Lock, contentDescription = t("خروج الوالدين", "Parent Exit"), tint = Navy, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(4.dp))
                     Text("خروج 🔒", color = Navy, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
@@ -758,7 +758,7 @@ fun SafeKidsHomeScreen(
                 .padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val tabs = listOf("🎮 الألعاب", "📚 القصص", "🎵 الأناشيد")
+            val tabs = listOf(t("🎮 الألعاب", "🎮 Games"), t("📚 القصص", "📚 Stories"), t("🎵 الأناشيد", "🎵 Nasheeds"))
             tabs.forEachIndexed { idx, label ->
                 val isSelected = activeSubTab == idx
                 Surface(
@@ -811,12 +811,12 @@ fun SafeKidsHomeScreen(
 @Composable
 private fun KidsGamesGrid(onNavigate: (String) -> Unit) {
     val kidsGames = listOf(
-        Pair("فوانيس الذاكرة 🏮", "game_lantern_memory"),
-        Pair("كلمة من الذكر 🔤", "game_kalimat"),
-        Pair("البحث عن الكلمات 🔍", "game_word_search"),
-        Pair("خطوات الوضوء 🧼", "game_wudu"),
-        Pair("ترتيب الصلاة 🕌", "game_prayer_order"),
-        Pair("ترتيب الأنبياء 📜", "game_prophets_order")
+        Pair(t("فوانيس الذاكرة 🏮", "Lantern Memory 🏮"), "game_lantern_memory"),
+        Pair(t("كلمة من الذكر 🔤", "Words of Dhikr 🔤"), "game_kalimat"),
+        Pair(t("البحث عن الكلمات 🔍", "Word Search 🔍"), "game_word_search"),
+        Pair(t("خطوات الوضوء 🧼", "Wudu Steps 🧼"), "game_wudu"),
+        Pair(t("ترتيب الصلاة 🕌", "Prayer Order 🕌"), "game_prayer_order"),
+        Pair(t("ترتيب الأنبياء 📜", "Prophets Order 📜"), "game_prophets_order")
     )
 
     LazyVerticalGrid(
@@ -884,7 +884,7 @@ private fun KidsStoriesGrid() {
                         Text(story.title, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         Text(story.summary, color = GoldSoft.copy(alpha = 0.7f), fontSize = 11.sp, maxLines = 2)
                     }
-                    Icon(Icons.Filled.ChevronLeft, contentDescription = "قراءة", tint = Gold)
+                    Icon(Icons.Filled.ChevronLeft, contentDescription = t("قراءة", "Read"), tint = Gold)
                 }
             }
         }
@@ -895,11 +895,11 @@ private fun KidsStoriesGrid() {
 @Composable
 private fun KidsNasheedsGrid() {
     val kidsNasheeds = listOf(
-        "يا نبي سلام عليك 🌸",
-        "المصطفى ﷺ 🌟",
-        "سبحان الله وبحمده 🍃",
-        "اشكر الله على النعم 🤲",
-        "إن شاء الله 🎈"
+        t("يا نبي سلام عليك 🌸", "Ya Nabi Salam Alaika 🌸"),
+        t("المصطفى ﷺ 🌟", "Al-Mustafa ﷺ 🌟"),
+        t("سبحان الله وبحمده 🍃", "Subhan Allah wa Bihamdihi 🍃"),
+        t("اشكر الله على النعم 🤲", "Thank Allah for Blessings 🤲"),
+        t("إن شاء الله 🎈", "In Sha Allah 🎈")
     )
 
     LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -917,7 +917,7 @@ private fun KidsNasheedsGrid() {
                     Icon(Icons.Filled.MusicNote, contentDescription = title, tint = Gold, modifier = Modifier.size(28.dp))
                     Spacer(Modifier.width(12.dp))
                     Text(title, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                    Icon(Icons.Filled.PlayArrow, contentDescription = "تشغيل", tint = Gold)
+                    Icon(Icons.Filled.PlayArrow, contentDescription = t("تشغيل", "Play"), tint = Gold)
                 }
             }
         }
@@ -954,7 +954,7 @@ fun MemorizationTrackerContent(
                 .padding(16.dp)
         ) {
             Text(
-                "متابعة حفظ القرآن الكريم لـ ${childProfile.name} 📖",
+                t("متابعة حفظ القرآن الكريم لـ ${childProfile.name} 📖", "Quran Memorization Tracker for ${childProfile.name} 📖"),
                 color = Gold,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
@@ -962,7 +962,7 @@ fun MemorizationTrackerContent(
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                "سور الجزء ٣ون و الفاتحة | حَفِظَ $memorizedCount من $totalSurahs سورة",
+                t("سور الجزء ٣٠ و الفاتحة | حَفِظَ $memorizedCount من $totalSurahs سورة", "Juz 30 & Al-Fatiha | Memorized $memorizedCount of $totalSurahs surahs"),
                 color = Color.White,
                 fontSize = 13.sp
             )
@@ -1028,7 +1028,7 @@ fun MemorizationTrackerContent(
                                 ) {
                                     Icon(
                                         if (isFilled) Icons.Filled.Star else Icons.Filled.StarBorder,
-                                        contentDescription = "نجمة $s",
+                                        contentDescription = t("نجمة $s", "Star $s"),
                                         tint = if (isFilled) Gold else Gold.copy(alpha = 0.3f),
                                         modifier = Modifier.size(20.dp)
                                     )
@@ -1090,7 +1090,7 @@ fun BedtimeStoryContent(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Icon(Icons.Filled.MenuBook, contentDescription = "قراءة القصة", tint = Navy)
+                Icon(Icons.Filled.MenuBook, contentDescription = t("قراءة القصة", "Read Story"), tint = Navy)
                 Spacer(Modifier.width(6.dp))
                 Text("اقرأ قصة الليلة الآن 📖", color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
@@ -1104,7 +1104,7 @@ fun BedtimeStoryContent(
                 .padding(16.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.NotificationsActive, contentDescription = "التنبيهات", tint = Gold, modifier = Modifier.size(20.dp))
+                Icon(Icons.Filled.NotificationsActive, contentDescription = t("التنبيهات", "Notifications"), tint = Gold, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("تنبيه قصة قبل النوم اليومي ⏰", color = Gold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
             }
@@ -1246,7 +1246,7 @@ fun FamilyChallengeContent(
     }
 
     if (isGameOver) {
-        val winnerName = if (childScore > parentScore) childProfile.name else if (parentScore > childScore) "الوالد/الوالدة 👑" else "تعادل رائع 🤝"
+        val winnerName = if (childScore > parentScore) childProfile.name else if (parentScore > childScore) t("الوالد/الوالدة 👑", "Parent 👑") else t("تعادل رائع 🤝", "Great Draw 🤝")
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -1283,15 +1283,15 @@ fun FamilyChallengeContent(
                         onProfileUpdated()
                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, "فزنا في التحدي العائلي بتطبيق نور! 🏆 النتيجة: الوالد $parentScore - ${childProfile.name} $childScore")
+                            putExtra(Intent.EXTRA_TEXT, t("فزنا في التحدي العائلي بتطبيق نور! 🏆 النتيجة: الوالد $parentScore - ${childProfile.name} $childScore", "We won the Family Challenge in NOOR! 🏆 Result: Parent $parentScore - ${childProfile.name} $childScore"))
                         }
-                        context.startActivity(Intent.createChooser(shareIntent, "مشاركة نتيجة التحدي"))
+                        context.startActivity(Intent.createChooser(shareIntent, t("مشاركة نتيجة التحدي", "Share Challenge Result")))
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Gold),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(Icons.Filled.Share, contentDescription = "مشاركة", tint = Navy)
+                    Icon(Icons.Filled.Share, contentDescription = t("مشاركة", "Share"), tint = Navy)
                     Spacer(Modifier.width(6.dp))
                     Text("مشاركة بطاقة الفوز وإهداء +٥ نجوم 🌟", color = Navy, fontWeight = FontWeight.Bold)
                 }
@@ -1309,7 +1309,7 @@ fun FamilyChallengeContent(
     // Play Battle Round
     val currentQuestion = questions.getOrNull(currentRoundIdx) ?: return
     val isChildTurn = currentRoundIdx % 2 == 1
-    val turnLabel = if (isChildTurn) "دور ${childProfile.name} 🧒" else "دور الوالد/الوالدة 👑"
+    val turnLabel = if (isChildTurn) t("دور ${childProfile.name} 🧒", "${childProfile.name}'s turn 🧒") else t("دور الوالد/الوالدة 👑", "Parent's turn 👑")
 
     Column(
         modifier = Modifier
