@@ -182,15 +182,13 @@ object LocalPrayerCalculator {
             val gCal = Calendar.getInstance().apply { set(year, month - 1, day) }
             cal.time = gCal.time
             val hDay = cal.get(android.icu.util.IslamicCalendar.DAY_OF_MONTH)
-            val months = listOf(
-                "محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الآخرة",
-                "رجب", "شعبان", "رمضان", "شوّال", "ذو القعدة", "ذو الحجة"
-            )
-            val hMonth = months.getOrNull(cal.get(android.icu.util.IslamicCalendar.MONTH)) ?: ""
+            val monthsAr = listOf("محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان", "رمضان", "شوّال", "ذو القعدة", "ذو الحجة")
+            val monthsEn = listOf("Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani", "Jumada al-Awwal", "Jumada al-Thani", "Rajab", "Sha'ban", "Ramadan", "Shawwal", "Dhu al-Qi'dah", "Dhu al-Hijjah")
+            val hMonth = (if (NoorLocale.isEnglish) monthsEn else monthsAr).getOrNull(cal.get(android.icu.util.IslamicCalendar.MONTH)) ?: ""
             val hYear = cal.get(android.icu.util.IslamicCalendar.YEAR)
             if (NoorLocale.isEnglish) "$hDay $hMonth $hYear AH" else "$hDay $hMonth $hYear هـ"
         } catch (_: Exception) {
-            "15 ربيع الأول 1448 هـ"
+            if (NoorLocale.isEnglish) "15 Rabi' al-Awwal 1448 AH" else "15 ربيع الأول 1448 هـ"
         }
 
         return PrayerTimings(
@@ -361,16 +359,16 @@ object PrayerRepository {
                     val hijriObj = dateObj.getJSONObject("hijri")
                     val day = hijriObj.optString("day", "")
                     val monthObj = hijriObj.optJSONObject("month")
-                    val monthName = monthObj?.optString("ar", monthObj.optString("en", "")) ?: ""
+                    val monthName = if (NoorLocale.isEnglish) monthObj?.optString("en", monthObj.optString("ar", "")) ?: "" else monthObj?.optString("ar", monthObj.optString("en", "")) ?: ""
                     val year = hijriObj.optString("year", "")
                     val weekdayObj = hijriObj.optJSONObject("weekday")
-                    val dayName = weekdayObj?.optString("ar", "") ?: ""
+                    val dayName = if (NoorLocale.isEnglish) weekdayObj?.optString("en", "") ?: "" else weekdayObj?.optString("ar", "") ?: ""
                     hijriStr = listOf(dayName, day, monthName, year).filter { it.isNotBlank() }.joinToString(" ") + (if (NoorLocale.isEnglish) " AH" else " هـ")
                 }
             }
 
             if (hijriStr.isBlank()) {
-                hijriStr = "15 ربيع الأول 1448 هـ"
+                hijriStr = if (NoorLocale.isEnglish) "15 Rabi' al-Awwal 1448 AH" else "15 ربيع الأول 1448 هـ"
             }
 
             PrayerTimings(fajr, sunrise, dhuhr, asr, maghrib, isha, hijriStr)

@@ -1,5 +1,7 @@
 package com.elhajri.noor.theme
 
+import com.elhajri.noor.settings.t
+
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -71,7 +73,7 @@ fun ThemeStoreScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "متجر الثيمات",
+                t("متجر الثيمات", "Theme Store"),
                 color = Gold,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -92,7 +94,7 @@ fun ThemeStoreScreen(
                 Spacer(Modifier.width(5.dp))
                 Text("$animatedPoints", color = GoldSoft, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.width(3.dp))
-                Text("نقطة", color = TextMain.copy(alpha = 0.6f), fontSize = 11.sp)
+                Text(t("نقطة", "pts"), color = TextMain.copy(alpha = 0.6f), fontSize = 11.sp)
             }
         }
 
@@ -115,7 +117,7 @@ fun ThemeStoreScreen(
         ) {
             Icon(Icons.Filled.DarkMode, contentDescription = null, tint = Navy, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(7.dp))
-            Text("اربح النقاط", color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(t("اربح النقاط", "Earn Points"), color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(Modifier.height(12.dp))
@@ -153,10 +155,10 @@ fun ThemeStoreScreen(
     if (purchaseTarget != null) {
         val def = purchaseTarget!!
         NoorDialog(
-            title = "فتح هذا الثيم؟",
-            body = "${def.name}\n\nالسعر: ${def.price} 🌙",
-            confirmText = "فتح الثيم",
-            cancelText = "إلغاء",
+            title = t("فتح هذا الثيم؟", "Unlock this theme?"),
+            body = "${def.name}\n\n" + t("السعر: ", "Price: ") + "${def.price} 🌙",
+            confirmText = t("فتح الثيم", "Unlock Theme"),
+            cancelText = t("إلغاء", "Cancel"),
             onConfirm = {
                 when (ThemeStore.purchase(context, def)) {
                     ThemeStore.PurchaseResult.OK -> {
@@ -181,10 +183,10 @@ fun ThemeStoreScreen(
     if (insufficientTarget != null) {
         val def = insufficientTarget!!
         NoorDialog(
-            title = "نقاطك غير كافية",
-            body = "تحتاج إلى ${def.price} 🌙 لفتح ثيم «${def.name}».\nرصيدك الحالي: ${ThemeStore.getPoints(context)} 🌙",
-            confirmText = "اربح النقاط",
-            cancelText = "إلغاء",
+            title = t("نقاطك غير كافية", "Insufficient Points"),
+            body = t("تحتاج إلى ", "You need ") + "${def.price} 🌙 " + t("لفتح ثيم «", "to unlock theme \"") + "${def.name}».\n" + t("رصيدك الحالي: ", "Your current balance: ") + "${ThemeStore.getPoints(context)} 🌙",
+            confirmText = t("اربح النقاط", "Earn Points"),
+            cancelText = t("إلغاء", "Cancel"),
             onConfirm = {
                 insufficientTarget = null
                 onOpenEarnPoints()
@@ -197,10 +199,10 @@ fun ThemeStoreScreen(
     if (successTarget != null) {
         val def = successTarget!!
         NoorDialog(
-            title = "تم فتح الثيم بنجاح ✓",
-            body = "يمكنك تفعيل «${def.name}» الآن.",
-            confirmText = "تفعيل الآن",
-            cancelText = "لاحقاً",
+            title = t("تم فتح الثيم بنجاح ✓", "Theme Unlocked Successfully ✓"),
+            body = t("يمكنك تفعيل «", "You can activate \"") + "${def.name}» " + t("الآن.", "now."),
+            confirmText = t("تفعيل الآن", "Activate Now"),
+            cancelText = t("لاحقاً", "Later"),
             onConfirm = {
                 ThemeStore.setCurrentTheme(context, def.id)
                 successTarget = null
@@ -266,9 +268,9 @@ private fun ThemeCard(
         ) {
             Text(
                 when {
-                    active -> "مفعّل ✓"
-                    unlocked -> "تفعيل"
-                    else -> "فتح الثيم — ${def.price} 🌙"
+                    active -> t("مفعّل ✓", "Active ✓")
+                    unlocked -> t("تفعيل", "Activate")
+                    else -> t("فتح الثيم — ", "Unlock Theme — ") + "${def.price} 🌙"
                 },
                 color = if (active) def.accent else if (unlocked) def.accent else TextMain.copy(alpha = 0.7f),
                 fontSize = 11.sp,

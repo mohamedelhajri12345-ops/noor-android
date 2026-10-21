@@ -1,5 +1,7 @@
 package com.elhajri.noor.theme
 
+import com.elhajri.noor.settings.t
+
 import android.app.Activity
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
@@ -125,7 +127,7 @@ fun EarnPointsScreen(onBack: () -> Unit) {
                 modifier = Modifier.size(48.dp)
             )
             Spacer(Modifier.height(8.dp))
-            Text("اربح النقاط", color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
+            Text(t("اربح النقاط", "Earn Points"), color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily)
             Spacer(Modifier.height(6.dp))
 
             // شارة الرصيد — تتحدث فور الحصول على نقاط
@@ -141,7 +143,7 @@ fun EarnPointsScreen(onBack: () -> Unit) {
                 Spacer(Modifier.width(6.dp))
                 Text("$animatedPoints", color = GoldSoft, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.width(4.dp))
-                Text("نقطة", color = TextMain.copy(alpha = 0.6f), fontSize = 12.sp)
+                Text(t("نقطة", "pts"), color = TextMain.copy(alpha = 0.6f), fontSize = 12.sp)
             }
 
             Spacer(Modifier.height(8.dp))
@@ -149,7 +151,7 @@ fun EarnPointsScreen(onBack: () -> Unit) {
                 Text("+${ThemeStore.POINTS_PER_AD} 🌙", color = GoldSoft, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(6.dp))
             }
-            Text("شاهد إعلانًا واحصل على 100 نقطة", color = TextMain.copy(alpha = 0.6f), fontSize = 13.sp)
+            Text(t("شاهد إعلانًا واحصل على 100 نقطة", "Watch an ad and earn 100 points"), color = TextMain.copy(alpha = 0.6f), fontSize = 13.sp)
         }
 
         Spacer(Modifier.height(20.dp))
@@ -163,7 +165,7 @@ fun EarnPointsScreen(onBack: () -> Unit) {
                 .border(1.dp, Gold.copy(alpha = 0.12f), RoundedCornerShape(16.dp))
                 .padding(14.dp)
         ) {
-            Text("إعلانات الجلسة", color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            Text(t("إعلانات الجلسة", "Session Ads"), color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(10.dp))
 
             for (i in 1..ThemeStore.ADS_PER_SESSION) {
@@ -196,11 +198,11 @@ fun EarnPointsScreen(onBack: () -> Unit) {
                     }
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        "الإعلان ${
+                        t("الإعلان", "Ad") + " ${
                             when (i) {
-                                1 -> "الأول"
-                                2 -> "الثاني"
-                                else -> "الثالث"
+                                1 -> t("الأول", "First")
+                                2 -> t("الثاني", "Second")
+                                else -> t("الثالث", "Third")
                             }
                         }",
                         color = if (done) TextMain else TextMain.copy(alpha = 0.6f),
@@ -228,7 +230,7 @@ fun EarnPointsScreen(onBack: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "أحسنت! حصلت على ${ThemeStore.ADS_PER_SESSION * ThemeStore.POINTS_PER_AD} نقطة 🌙",
+                        t("أحسنت! حصلت على ", "Well done! You earned ") + "${ThemeStore.ADS_PER_SESSION * ThemeStore.POINTS_PER_AD} " + t("نقطة 🌙", "points 🌙"),
                         color = GoldSoft,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -278,9 +280,9 @@ fun EarnPointsScreen(onBack: () -> Unit) {
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("جارٍ عرض الإعلان...", color = TextMain.copy(alpha = 0.8f), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(t("جارٍ عرض الإعلان...", "Showing ad..."), color = TextMain.copy(alpha = 0.8f), fontSize = 13.sp, fontWeight = FontWeight.Bold)
             } else if (sessionComplete) {
-                Text("اكتملت جلسة المكافآت ✓", color = TextMain.copy(alpha = 0.6f), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(t("اكتملت جلسة المكافآت ✓", "Rewards Session Completed ✓"), color = TextMain.copy(alpha = 0.6f), fontSize = 13.sp, fontWeight = FontWeight.Bold)
             } else if (!adReady) {
                 CircularProgressIndicator(
                     color = Gold,
@@ -288,18 +290,18 @@ fun EarnPointsScreen(onBack: () -> Unit) {
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("جارٍ تحميل الإعلان...", color = TextMain.copy(alpha = 0.8f), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(t("جارٍ تحميل الإعلان...", "Loading ad..."), color = TextMain.copy(alpha = 0.8f), fontSize = 13.sp, fontWeight = FontWeight.Bold)
             } else {
                 Icon(Icons.Filled.PlayCircle, contentDescription = null, tint = Navy, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("شاهد الإعلان +${ThemeStore.POINTS_PER_AD} 🌙", color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(t("شاهد الإعلان ", "Watch Ad ") + "+${ThemeStore.POINTS_PER_AD} 🌙", color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         }
 
         if (adError) {
             Spacer(Modifier.height(8.dp))
             Text(
-                "تعذّر تحميل الإعلان حالياً — تحقق من الاتصال وحاول مجدداً",
+                t("تعذّر تحميل الإعلان حالياً — تحقق من الاتصال وحاول مجدداً", "Unable to load ad — check connection and try again"),
                 color = TextMain.copy(alpha = 0.5f),
                 fontSize = 11.sp,
                 textAlign = TextAlign.Center,
@@ -309,7 +311,7 @@ fun EarnPointsScreen(onBack: () -> Unit) {
 
         Spacer(Modifier.height(6.dp))
         Text(
-            "لا تُمنح النقاط إلا بعد إكمال الإعلان كاملاً — الإغلاق المبكر لا يمنح شيئاً",
+            t("لا تُمنح النقاط إلا بعد إكمال الإعلان كاملاً — الإغلاق المبكر لا يمنح شيئاً", "Points are granted only after watching the full ad — early exit grants nothing"),
             color = TextMain.copy(alpha = 0.35f),
             fontSize = 10.sp,
             textAlign = TextAlign.Center,
