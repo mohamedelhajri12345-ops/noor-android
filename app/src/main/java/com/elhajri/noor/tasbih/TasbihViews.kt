@@ -1,4 +1,5 @@
 package com.elhajri.noor.tasbih
+import com.elhajri.noor.settings.t
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -185,7 +186,7 @@ fun ElectronicTasbihView(
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Text(
-                        text = "اضغط للسبحة",
+                        text = t("اضغط للسبحة", "Tap for Tasbih"),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -471,7 +472,7 @@ fun RotatingBeadsTasbihView(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "أدر الحلقة",
+                            text = t("أدر الحلقة", "Rotate Ring"),
                             color = GoldSoft.copy(alpha = 0.7f),
                             fontSize = 11.sp
                         )
@@ -527,7 +528,7 @@ fun NightGardenTasbihView(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "بستان الذكر",
+                    text = t("بستان الذكر", "Dhikr Garden"),
                     color = Gold,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
@@ -701,7 +702,7 @@ fun LightOrbTasbihView(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "مسبحة النور",
+                    text = t("مسبحة النور", "Light Tasbih"),
                     color = Gold,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,

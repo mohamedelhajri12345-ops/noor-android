@@ -367,7 +367,7 @@ fun DownloadsScreen(
                 Text(
                     t(
                         "هل أنت متأكد من حذف \"${item.title}\" من جهازك؟ ستتمكن من تنزيله لاحقاً عند الاتصال بالإنترنت.",
-                        "Are you sure you want to delete \"${item.title}\"? You can download it again later when connected."
+                        "Are you sure you want to delete \"${item.title}\" from your device? You can download it again later when connected."
                     ),
                     color = GoldSoft
                 )
@@ -408,7 +408,7 @@ fun DownloadsScreen(
                 ) {
                     Text(videoItem.title, color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                     IconButton(onClick = { activePlayingVideoItem = null }) {
-                        Icon(Icons.Default.Close, contentDescription = "إغلاق", tint = Gold)
+                        Icon(Icons.Default.Close, contentDescription = t("إغلاق", "Close"), tint = Gold)
                     }
                 }
             },
@@ -471,7 +471,7 @@ private fun DownloadMoreCatalogSection(
     }
 
     val appVideos = remember {
-        KidsVideoStore.filterVideos(context, "فيديوهات التطبيق")
+        KidsVideoStore.filterVideos(context, t("فيديوهات التطبيق", "App Videos"))
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -603,7 +603,7 @@ private fun DownloadMoreCatalogSection(
                                         }
                                     }
                                 ) {
-                                    Icon(Icons.Default.Download, contentDescription = "تنزيل فيديو", tint = Gold)
+                                    Icon(Icons.Default.Download, contentDescription = t("تنزيل فيديو", "Download Video"), tint = Gold)
                                 }
                             }
                         }

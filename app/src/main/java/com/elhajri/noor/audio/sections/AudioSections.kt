@@ -1,4 +1,5 @@
 package com.elhajri.noor.audio.sections
+import com.elhajri.noor.settings.t
 
 import android.content.Context
 import androidx.compose.foundation.background
@@ -138,7 +139,7 @@ object AudioSectionsData {
                 title = o.optString("title", ""),
                 reciter = o.optString("reciter", ""),
                 category = o.optString("category", "ruqyah_general"),
-                categoryAr = o.optString("category_ar", "رقية عامة"),
+                categoryAr = o.optString("category_ar", t("رقية عامة", "General Ruqyah")),
                 audioUrl = o.optString("audio_url", ""),
                 duration = o.optString("duration", ""),
                 description = o.optString("description", "")
@@ -212,12 +213,12 @@ fun PodcastsScreen(onBack: () -> Unit) {
                 .padding(horizontal = 12.dp, vertical = 10.dp)
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
+                Icon(Icons.Filled.ArrowBack, contentDescription = t("رجوع", "Back"), tint = Gold)
             }
             Icon(Icons.Filled.SpatialAudio, contentDescription = null, tint = Gold)
             Spacer(Modifier.width(8.dp))
             Text(
-                "البودكاست الإسلامي",
+                t("البودكاست الإسلامي", "Islamic Podcasts"),
                 color = Gold,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
@@ -225,7 +226,7 @@ fun PodcastsScreen(onBack: () -> Unit) {
         }
 
         Text(
-            "برامج ودروس صوتية مختارة بأسلوب هادئ — صوت فقط بدون موسيقى",
+            t("برامج ودروس صوتية مختارة بأسلوب هادئ — صوت فقط بدون موسيقى", "Selected audio programs and lessons — Voice only, no music"),
             color = TextSecondaryLinen,
             fontSize = 13.sp,
             modifier = Modifier.padding(horizontal = 20.dp)
@@ -394,10 +395,10 @@ private fun PodcastShowCard(
 // ---------------------------------------------------------------------------
 
 private val ruqyahCategories = listOf(
-    "ruqyah_eye" to "رقية العين والحسد",
-    "ruqyah_sihr" to "رقية السحر",
-    "ruqyah_mas" to "رقية الشعوذة والمس",
-    "ruqyah_general" to "رقية عامة"
+    "ruqyah_eye" to t("رقية العين والحسد", "Ruqyah for Evil Eye & Envy"),
+    "ruqyah_sihr" to t("رقية السحر", "Ruqyah for Witchcraft"),
+    "ruqyah_mas" to t("رقية الشعوذة والمس", "Ruqyah for Possession & Affliction"),
+    "ruqyah_general" to t("رقية عامة", "General Ruqyah")
 )
 
 @Composable
@@ -421,12 +422,12 @@ fun RuqyahScreen(onBack: () -> Unit) {
                 .padding(horizontal = 12.dp, vertical = 10.dp)
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "رجوع", tint = Gold)
+                Icon(Icons.Filled.ArrowBack, contentDescription = t("رجوع", "Back"), tint = Gold)
             }
             Icon(Icons.Filled.MenuBook, contentDescription = null, tint = Gold)
             Spacer(Modifier.width(8.dp))
             Text(
-                "الرقية الشرعية المسموعة",
+                t("الرقية الشرعية المسموعة", "Audio Ruqyah Shariah"),
                 color = Gold,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
@@ -490,14 +491,14 @@ fun RuqyahScreen(onBack: () -> Unit) {
             // Ayat text section (works fully offline)
             item {
                 Text(
-                    "آيات وفوائد الرقية الشرعية",
+                    t("آيات وفوائد الرقية الشرعية", "Verses & Benefits of Ruqyah"),
                     color = Gold,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp)
                 )
                 Text(
-                    "تعمل بدون إنترنت — اقرأها بيقين وتدبر",
+                    t("تعمل بدون إنترنت — اقرأها بيقين وتدبر", "Works offline — read with faith and contemplation"),
                     color = TextSecondaryLinen,
                     fontSize = 12.sp
                 )
@@ -587,7 +588,7 @@ private fun RuqyahNowPlayingCard(state: com.elhajri.noor.audio.player.PlayerStat
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    "اسمع بيقين وحضور قلب — صوت هادئ",
+                    t("اسمع بيقين وحضور قلب — صوت هادئ", "Listen with faith and focus — calm recitation"),
                     color = TextSecondaryLinen,
                     fontSize = 11.sp
                 )

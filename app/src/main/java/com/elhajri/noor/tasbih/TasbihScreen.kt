@@ -152,7 +152,7 @@ fun TasbihScreen(onBack: (() -> Unit)? = null) {
                 navigationIcon = {
                     if (onBack != null) {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.Default.ChevronRight, contentDescription = "رجوع", tint = Gold)
+                            Icon(Icons.Default.ChevronRight, contentDescription = t("رجوع", "Back"), tint = Gold)
                         }
                     }
                 },
@@ -160,15 +160,15 @@ fun TasbihScreen(onBack: (() -> Unit)? = null) {
                     IconButton(onClick = { isMuted = !isMuted }) {
                         Icon(
                             imageVector = if (isMuted) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
-                            contentDescription = "الصوت",
+                            contentDescription = t("الصوت", "Sound"),
                             tint = Gold
                         )
                     }
                     IconButton(onClick = { showStylePicker = true }) {
-                        Icon(Icons.Default.Palette, contentDescription = "تغيير النمط", tint = Gold)
+                        Icon(Icons.Default.Palette, contentDescription = t("تغيير النمط", "Change Style"), tint = Gold)
                     }
                     IconButton(onClick = { resetCount() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "إعادة ضبط", tint = GoldSoft)
+                        Icon(Icons.Default.Refresh, contentDescription = t("إعادة ضبط", "Reset"), tint = GoldSoft)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NavyCard)

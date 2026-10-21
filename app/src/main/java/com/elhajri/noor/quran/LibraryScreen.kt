@@ -1,4 +1,5 @@
 package com.elhajri.noor.quran
+import com.elhajri.noor.settings.t
 
 import android.content.Context
 import androidx.compose.animation.core.RepeatMode
@@ -179,7 +180,7 @@ fun LibraryScreen(onBack: () -> Unit) {
                 title = { Text("مكتبة الأناشيد", color = Gold, fontWeight = FontWeight.Bold, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ChevronRight, contentDescription = "رجوع", tint = Gold)
+                        Icon(Icons.Default.ChevronRight, contentDescription = t("رجوع", "Back"), tint = Gold)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = NavyCard)
@@ -197,7 +198,7 @@ fun LibraryScreen(onBack: () -> Unit) {
 
             // البانر العلوي
             com.elhajri.noor.ui.NoorSectionTitle(
-                title = "الأناشيد",
+                title = t("الأناشيد", "Nasheeds"),
                 subtitle = "أناشيد إسلامية بدون موسيقى — ${toArabicNumber(nasheeds.size)} نشيد",
                 modifier = Modifier.padding(bottom = 6.dp)
             )
@@ -207,7 +208,7 @@ fun LibraryScreen(onBack: () -> Unit) {
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 placeholder = { Text("ابحث عن نشيد أو منشد...", color = GoldSoft.copy(alpha = 0.5f), fontSize = 14.sp) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "بحث", tint = GoldSoft) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = t("بحث", "Search"), tint = GoldSoft) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = NavyCard,
@@ -344,7 +345,7 @@ fun LibraryScreen(onBack: () -> Unit) {
                                 ) {
                                     Icon(
                                         imageVector = if (isFav) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                        contentDescription = "مفضلة",
+                                        contentDescription = t("مفضلة", "Favorite"),
                                         tint = if (isFav) Gold else GoldSoft.copy(alpha = 0.4f)
                                     )
                                 }
@@ -377,7 +378,7 @@ fun LibraryScreen(onBack: () -> Unit) {
                                         }
                                         else -> Icon(
                                             imageVector = Icons.Default.PlayArrow,
-                                            contentDescription = "تشغيل",
+                                            contentDescription = t("تشغيل", "Play"),
                                             tint = Navy,
                                             modifier = Modifier.size(24.dp)
                                         )

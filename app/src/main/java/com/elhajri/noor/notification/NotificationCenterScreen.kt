@@ -1,4 +1,5 @@
 package com.elhajri.noor.notification
+import com.elhajri.noor.settings.t
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -47,7 +48,7 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
             TopAppBar(
                 title = {
                     Text(
-                        text = "مركز التنبيهات الإشعارات",
+                        text = t("مركز التنبيهات الإشعارات", "Notifications Center"),
                         color = Gold,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -57,7 +58,7 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "رجوع",
+                            contentDescription = t("رجوع", "Back"),
                             tint = Gold
                         )
                     }
@@ -109,14 +110,14 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
                         }
                         Column {
                             Text(
-                                text = "تفعيل إشعارات الأذان",
+                                text = t("تفعيل إشعارات الأذان", "Enable Adhan Notifications"),
                                 color = TextMain,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = if (adhanEnabled) "الإشعارات مفعلة لكل أوقات الصلاة" else "الإشعارات معطلة حالياً",
+                                text = if (adhanEnabled) t("الإشعارات مفعلة لكل أوقات الصلاة", "Notifications enabled for all prayer times") else t("الإشعارات معطلة حالياً", "Notifications currently disabled"),
                                 color = GoldSoft.copy(alpha = 0.8f),
                                 fontSize = 12.sp
                             )
@@ -161,7 +162,7 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
                             modifier = Modifier.size(20.dp)
                         )
                         Text(
-                            text = "مواقيت الصلاة اليوم",
+                            text = t("مواقيت الصلاة اليوم", "Today's Prayer Times"),
                             color = Gold,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
@@ -246,7 +247,7 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
                                     )
                                 }
                                 Text(
-                                    text = "اختر مدينتك في صفحة الصلاة",
+                                    text = t("اختر مدينتك في صفحة الصلاة", "Choose your city on Prayer page"),
                                     color = Gold,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
@@ -293,7 +294,7 @@ fun NotificationCenterScreen(onBack: () -> Unit) {
                     }
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "إشعارات الأذكار والتنبيهات",
+                            text = t("إشعارات الأذكار والتنبيهات", "Adhkar & Reminder Notifications"),
                             color = Gold,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold

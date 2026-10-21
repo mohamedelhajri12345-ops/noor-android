@@ -1,4 +1,5 @@
 package com.elhajri.noor.settings
+import com.elhajri.noor.settings.t
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
@@ -410,13 +411,13 @@ fun SettingsScreen(onOpenPrivacy: () -> Unit = {}) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                "الموقع التلقائي (GPS)",
+                                t("الموقع التلقائي (GPS)", "Auto Location (GPS)"),
                                 color = if (isAutoLocation) Navy else Color.White,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                "انتقال تلقائي للمواقيت حسب موقعك",
+                                t("انتقال تلقائي للمواقيت حسب موقعك", "Auto-switch prayer times based on your location"),
                                 color = if (isAutoLocation) Navy.copy(alpha = 0.7f) else GoldSoft.copy(alpha = 0.7f),
                                 fontSize = 11.sp
                             )
