@@ -39,54 +39,54 @@ data class PrivacySection(val num: String, val title: String, val body: String)
 fun PrivacyPolicyScreen(onBack: () -> Unit = {}) {
     val sections = listOf(
         PrivacySection(
-            num = "١",
-            title = "مقدمة",
-            body = "تطبيق \"القرآن الكريم\" هو تطبيق إسلامي مجاني يهدف إلى تقديم محتوى ديني موثوق. نلتزم بحماية خصوصيتك."
+            num = t("١", "1"),
+            title = t("مقدمة", "Introduction"),
+            body = t("تطبيق \"القرآن الكريم\" هو تطبيق إسلامي مجاني يهدف إلى تقديم محتوى ديني موثوق. نلتزم بحماية خصوصيتك.", "NOOR is a free Islamic app providing authentic religious content. We are committed to protecting your privacy.")
         ),
         PrivacySection(
-            num = "٢",
-            title = "المعلومات التي نجمعها",
-            body = "ميزات التطبيق كلها تعمل بدون حساب إطلاقاً. الحساب اختياري ولأعضاء المجتمع الحاليين فقط: بريدك الإلكتروني عند تسجيل الدخول، الاسم المستعار والصورة الشخصية (اختياري)، ونصوص الرسائل والملفات المرسلة في محادثات المجتمع. (لا يوجد تسجيل دخول بحساب Google، ولا إنشاء حسابات جديدة داخل التطبيق.) معلومات الاستخدام: عدد مرات فتح التطبيق والصفحات المزارة (للتحسين فقط). موقعك الجغرافي: فقط عند طلبك حساب مواقيت الصلاة واتجاه القبلة (اختياري). بيانات الإشعارات: لتفعيل تذكيرات الصلاة والأذكار (اختياري)."
+            num = t("٢", "2"),
+            title = t("المعلومات التي نجمعها", "Information We Collect"),
+            body = t("ميزات التطبيق كلها تعمل بدون حساب إطلاقاً. الحساب اختياري ولأعضاء المجتمع الحاليين فقط: بريدك الإلكتروني عند تسجيل الدخول، الاسم المستعار والصورة الشخصية (اختياري)، ونصوص الرسائل والملفات المرسلة في محادثات المجتمع. (لا يوجد تسجيل دخول بحساب Google، ولا إنشاء حسابات جديدة داخل التطبيق.) معلومات الاستخدام: عدد مرات فتح التطبيق والصفحات المزارة (للتحسين فقط). موقعك الجغرافي: فقط عند طلبك حساب مواقيت الصلاة واتجاه القبلة (اختياري). بيانات الإشعارات: لتفعيل تذكيرات الصلاة والأذكار (اختياري).", "All app features work without an account. Account creation is optional: email address, optional avatar/username, and community chat messages. Usage info is collected anonymously for app improvement. Location data is used optionally for prayer times and Qibla. Notifications data is used for prayer/dhikr alerts.")
         ),
         PrivacySection(
-            num = "٣",
-            title = "المعلومات التي لا نجمعها",
-            body = "لا نطلب رقم هاتفك أو عنوانك البريدي. لا نبيع بياناتك لأي طرف ثالث. لا نتتبع نشاطك خارج التطبيق. رسائلك في المجتمع مرئية فقط لأعضاء المحادثة، ولا يمكن لأي شخص خارجها الاطلاع عليها."
+            num = t("٣", "3"),
+            title = t("المعلومات التي لا نجمعها", "Information We Do Not Collect"),
+            body = t("لا نطلب رقم هاتفك أو عنوانك البريدي. لا نبيع بياناتك لأي طرف ثالث. لا نتتبع نشاطك خارج التطبيق. رسائلك في المجتمع مرئية فقط لأعضاء المحادثة، ولا يمكن لأي شخص خارجها الاطلاع عليها.", "We do not ask for your phone number or physical address. We do not sell your data to third parties or track your activity outside the app. Community messages are visible only to conversation participants.")
         ),
         PrivacySection(
-            num = "٤",
-            title = "الإعلانات",
-            body = "نستخدم إعلانات Google AdMob لتمويل التطبيق وصيانته (بانر، بيني بين الأقسام بشكل نادر، وإعلانات بمكافأة اختيارية). تستخدم Google معرّف الإعلانات على جهازك (Advertising ID) لعرض إعلانات ملائمة. يمكنك إيقاف تخصيص الإعلانات من: الإعدادات > Google > الإعلانات، أو إعادة تعيين معرّف الإعلانات في أي وقت. سياسة خصوصية Google متاحة على: policies.google.com/privacy"
+            num = t("٤", "4"),
+            title = t("الإعلانات", "Advertising"),
+            body = t("نستخدم إعلانات Google AdMob لتمويل التطبيق وصيانته (بانر، بيني بين الأقسام بشكل نادر، وإعلانات بمكافأة اختيارية). تستخدم Google معرّف الإعلانات على جهازك (Advertising ID) لعرض إعلانات ملائمة. يمكنك إيقاف تخصيص الإعلانات من: الإعدادات > Google > الإعلانات، أو إعادة تعيين معرّف الإعلانات في أي وقت. سياسة خصوصية Google متاحة على: policies.google.com/privacy", "We use Google AdMob ads to support app maintenance (banners, occasional interstitials, optional rewarded ads). Google uses your Advertising ID to serve relevant ads. You can disable personalized ads in device settings. Google Privacy Policy is available at policies.google.com/privacy.")
         ),
         PrivacySection(
-            num = "٥",
-            title = "الربط بيوتيوب وفتح المحتوى الخارجي",
-            body = "بعض الفيديوهات قد تتطلب تسجيل دخول يوتيوب. عند الضغط على زر \"افتح في تطبيق يوتيوب\"، نطلب منك إذناً واضحاً داخل نُور قبل أول استخدام، ثم نفتح الفيديو في تطبيق يوتيوب المثبت على جهازك ليعمل بحسابك المسجّل فيه مباشرة. نُور لا يصل إلى حسابك على يوتيوب، ولا يجمع أو يشارك بياناتك معه — استخدام حسابك يبقى بينك وبين تطبيق يوتيوب وفق سياسة خصوصية يوتيوب. يمكنك دائماً اختيار المتصفح أو الفيديوهات المباشرة داخل التطبيق بدلاً من ذلك."
+            num = t("٥", "5"),
+            title = t("الربط بيوتيوب وفتح المحتوى الخارجي", "YouTube Integration & External Content"),
+            body = t("بعض الفيديوهات قد تتطلب تسجيل دخول يوتيوب. عند الضغط على زر \"افتح في تطبيق يوتيوب\"، نطلب منك إذناً واضحاً داخل نُور قبل أول استخدام، ثم نفتح الفيديو في تطبيق يوتيوب المثبت على جهازك ليعمل بحسابك المسجّل فيه مباشرة. نُور لا يصل إلى حسابك على يوتيوب، ولا يجمع أو يشارك بياناتك معه — استخدام حسابك يبقى بينك وبين تطبيق يوتيوب وفق سياسة خصوصية يوتيوب. يمكنك دائماً اختيار المتصفح أو الفيديوهات المباشرة داخل التطبيق بدلاً من ذلك.", "Some videos open in the official YouTube app. NOOR asks for clear consent before launching external links. NOOR does not access, collect, or share your YouTube account data.")
         ),
         PrivacySection(
-            num = "٦",
-            title = "الإشعارات",
-            body = "إشعارات الصلاة والأذكار تعمل عبر OneSignal. لا نشارك بياناتك مع أطراف ثالثة."
+            num = t("٦", "6"),
+            title = t("الإشعارات", "Notifications"),
+            body = t("إشعارات الصلاة والأذكار تعمل عبر OneSignal. لا نشارك بياناتك مع أطراف ثالثة.", "Prayer and Athkar notifications operate via OneSignal. We do not share your data with third parties.")
         ),
         PrivacySection(
-            num = "٧",
-            title = "المحتوى",
-            body = "القرآن الكريم من مصادر موثوقة (mp3quran.net). الأذكار والأحاديث من مصادر صحيحة. الأناشيد من مصادر مجانية (archive.org)."
+            num = t("٧", "7"),
+            title = t("المحتوى", "Content"),
+            body = t("القرآن الكريم من مصادر موثوقة (mp3quran.net). الأذكار والأحاديث من مصادر صحيحة. الأناشيد من مصادر مجانية (archive.org).", "The Holy Qur'an is sourced from mp3quran.net. Athkar and Hadiths are from verified authentic sources. Nasheeds are from free open repositories (archive.org).")
         ),
         PrivacySection(
-            num = "٨",
-            title = "التبرعات",
-            body = "التبرعات طوعية وتذهب لصيانة التطبيق. بياناتك البنكية لا تمر عبر التطبيق."
+            num = t("٨", "8"),
+            title = t("التبرعات", "Donations"),
+            body = t("التبرعات طوعية وتذهب لصيانة التطبيق. بياناتك البنكية لا تمر عبر التطبيق.", "Donations are voluntary to support app development and maintenance. Financial data is never processed or stored by NOOR.")
         ),
         PrivacySection(
-            num = "٩",
-            title = "حقوقك",
-            body = "يمكنك حذف التطبيق في أي وقت. يمكنك تعطيل الإشعارات من الإعدادات. يمكنك استخدام التطبيق بدون إنترنت (معظم الميزات)."
+            num = t("٩", "9"),
+            title = t("حقوقك", "Your Rights"),
+            body = t("يمكنك حذف التطبيق في أي وقت. يمكنك تعطيل الإشعارات من الإعدادات. يمكنك استخدام التطبيق بدون إنترنت (معظم الميزات).", "You can uninstall the app or disable notifications at any time. You can use most features fully offline.")
         ),
         PrivacySection(
-            num = "١٠",
-            title = "التواصل والتعديلات",
-            body = "قد نحدث هذه السياسة من وقت لآخر. آخر تحديث: 2026."
+            num = t("١٠", "10"),
+            title = t("التواصل والتعديلات", "Contact & Updates"),
+            body = t("قد نحدث هذه السياسة من وقت لآخر. آخر تحديث: 2026.", "We may update this policy periodically. Last updated: 2026.")
         )
     )
 

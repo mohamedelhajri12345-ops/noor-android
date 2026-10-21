@@ -331,7 +331,7 @@ private fun StepCard(index: Int, step: Step, isUnderstood: Boolean, onUnderstand
                             Icon(Icons.Default.Check, contentDescription = null, tint = Navy, modifier = Modifier.size(20.dp))
                         } else {
                             Text(
-                                text = toArabicDigits(index + 1),
+                                text = if (NoorLocale.isEnglish) "${index + 1}" else toArabicDigits(index + 1),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = Gold,
                                 fontWeight = FontWeight.Bold

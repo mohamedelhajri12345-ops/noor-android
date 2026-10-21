@@ -124,7 +124,7 @@ fun AiChatScreen(onBack: () -> Unit) {
                 val answer = LocalAiEngine.ask(context, q)
                 messages.add(ChatMsg(false, answer))
             } catch (e: Exception) {
-                messages.add(ChatMsg(false, "حدث خطأ أثناء التوليد: ${e.message ?: "غير معروف"}"))
+                messages.add(ChatMsg(false, t("حدث خطأ أثناء التوليد: ", "Generation error: ") + (e.message ?: t("غير معروف", "unknown"))))
             }
             thinking = false
         }
@@ -218,7 +218,7 @@ fun AiChatScreen(onBack: () -> Unit) {
 
                     Spacer(Modifier.height(20.dp))
                     Text(
-                        "حجم النموذج المختار: ${selectedModel.sizeLabel()} — يُنزَّل مرة واحدة فقط",
+                        t("حجم النموذج المختار: ", "Selected model size: ") + "${selectedModel.sizeLabel()} — " + t("يُنزَّل مرة واحدة فقط", "downloaded once only"),
                         color = GoldSoft, fontSize = 12.sp
                     )
                     Spacer(Modifier.height(24.dp))
@@ -279,7 +279,7 @@ fun AiChatScreen(onBack: () -> Unit) {
                     )
                     Spacer(Modifier.height(10.dp))
                     Text(
-                        "${toArabicDigits(progressCurrent / 1048576)} / ${toArabicDigits(progressTotal / 1048576)} ميجابايت",
+                        if (NoorLocale.isEnglish) "${progressCurrent / 1048576} / ${progressTotal / 1048576} MB" else "${toArabicDigits(progressCurrent / 1048576)} / ${toArabicDigits(progressTotal / 1048576)} ميجابايت",
                         color = TextMain.copy(alpha = 0.6f), fontSize = 12.sp
                     )
                     Spacer(Modifier.height(24.dp))

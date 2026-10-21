@@ -1,5 +1,7 @@
 package com.elhajri.noor.auth
 
+import com.elhajri.noor.settings.t
+
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -134,15 +136,15 @@ object Base44Auth {
                 val parsed = parseErrorMessage(errBody)
                 val message = when {
                     parsed != null -> parsed
-                    response.code == 401 -> "البريد الإلكتروني أو كلمة المرور غير صحيحة"
-                    else -> "فشل تسجيل الدخول (${response.code})"
+                response.code == 401 -> t("البريد الإلكتروني أو كلمة المرور غير صحيحة", "Incorrect email or password")
+                else -> t("فشل تسجيل الدخول ", "Login failed (") + "(${response.code})" + t("", ")")
                 }
                 Result.failure(Exception(message))
             }
         } catch (e: IOException) {
-            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التحقق من الاتصال بالإنترنت"))
+            Result.failure(Exception(t("تعذر الاتصال بالشبكة، يرجى التحقق من الاتصال بالإنترنت", "Network error, please check your internet connection")))
         } catch (e: Exception) {
-            Result.failure(Exception(e.message ?: "حدث خطأ غير متوقع"))
+            Result.failure(Exception(e.message ?: t("حدث خطأ غير متوقع", "An unexpected error occurred")))
         }
     }
 
@@ -172,16 +174,15 @@ object Base44Auth {
                 val parsed = parseErrorMessage(errBody)
                 val message = when {
                     parsed != null -> parsed
-                    response.code == 409 || (errBody?.contains("already", ignoreCase = true) == true) ->
-                        "البريد الإلكتروني مسجل بالفعل، يرجى تسجيل الدخول"
-                    else -> "فشل إنشاء الحساب (${response.code})"
+                    response.code == 409 || (errBody?.contains("already", ignoreCase = true) == true) -> t("البريد الإلكتروني مسجل بالفعل، يرجى تسجيل الدخول", "Email already registered, please log in")
+                    else -> t("فشل إنشاء الحساب ", "Account creation failed (") + "(${response.code})" + t("", ")")
                 }
                 Result.failure(Exception(message))
             }
         } catch (e: IOException) {
-            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التحقق من الاتصال بالإنترنت"))
+            Result.failure(Exception(t("تعذر الاتصال بالشبكة، يرجى التحقق من الاتصال بالإنترنت", "Network error, please check your internet connection")))
         } catch (e: Exception) {
-            Result.failure(Exception(e.message ?: "حدث خطأ أثناء إنشاء الحساب"))
+            Result.failure(Exception(e.message ?: t("حدث خطأ أثناء إنشاء الحساب", "Error during account creation")))
         }
     }
 
@@ -227,18 +228,18 @@ object Base44Auth {
                 val rawLower = rawMsg?.lowercase() ?: ""
                 val message = when {
                     rawLower.contains("expire") || rawLower.contains("منتهي") || response.code == 410 ->
-                        "رمز التحقق منتهي الصلاحية، يرجى إطلب رمز جديد"
+                t("رمز التحقق منتهي الصلاحية، يرجى طلب رمز جديد", "Verification code expired, please request a new code")
                     rawLower.contains("invalid") || rawLower.contains("wrong") || rawLower.contains("incorrect") || rawLower.contains("غير صحيح") || response.code == 400 || response.code == 401 || response.code == 422 ->
-                        "رمز التحقق غير صحيح، يرجى التأكد من الرمز المدخل"
+                t("رمز التحقق غير صحيح، يرجى التأكد من الرمز المدخل", "Incorrect verification code, please check and try again")
                     rawMsg != null -> rawMsg
-                    else -> "رمز التحقق غير صحيح أو منتهي الصلاحية (${response.code})"
+                else -> t("رمز التحقق غير صحيح أو منتهي الصلاحية ", "Verification code invalid or expired (") + "(${response.code})" + t("", ")")
                 }
                 Result.failure(Exception(message))
             }
         } catch (e: IOException) {
-            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التأكد من اتصال الإنترنت والمحاولة مرة أخرى"))
+            Result.failure(Exception(t("تعذر الاتصال بالشبكة، يرجى التأكد من اتصال الإنترنت والمحاولة مرة أخرى", "Network error, please check your internet connection and try again")))
         } catch (e: Exception) {
-            Result.failure(Exception(e.message ?: "حدث خطأ أثناء التحقق من الرمز"))
+            Result.failure(Exception(e.message ?: t("حدث خطأ أثناء التحقق من الرمز", "Error during code verification")))
         }
     }
 
@@ -262,13 +263,13 @@ object Base44Auth {
             } else {
                 val errBody = response.body?.string()
                 val parsed = parseErrorMessage(errBody)
-                val message = parsed ?: "فشل إعادة إرسال الرمز (${response.code})"
+            val message = parsed ?: (t("فشل إعادة إرسال الرمز ", "Failed to resend code (") + "(${response.code})" + t("", ")"))
                 Result.failure(Exception(message))
             }
         } catch (e: IOException) {
-            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التأكد من اتصال الإنترنت"))
+            Result.failure(Exception(t("تعذر الاتصال بالشبكة، يرجى التأكد من اتصال الإنترنت", "Network error, please check your internet connection")))
         } catch (e: Exception) {
-            Result.failure(Exception(e.message ?: "فشل إعادة إرسال الرمز"))
+            Result.failure(Exception(e.message ?: t("فشل إعادة إرسال الرمز", "Failed to resend code")))
         }
     }
 
@@ -289,11 +290,11 @@ object Base44Auth {
                 Result.success(Unit)
             } else {
                 val errBody = response.body?.string()
-                val message = parseErrorMessage(errBody) ?: "فشل إرسال رابط إعادة التعيين"
+            val message = parseErrorMessage(errBody) ?: t("فشل إرسال رابط إعادة التعيين", "Failed to send reset link")
                 Result.failure(Exception(message))
             }
         } catch (e: IOException) {
-            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التحقق من اتصالك بالإنترنت"))
+            Result.failure(Exception(t("تعذر الاتصال بالشبكة، يرجى التحقق من اتصالك بالإنترنت", "Network error, please check your internet connection")))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -318,11 +319,11 @@ object Base44Auth {
                 Result.success(Unit)
             } else {
                 val errBody = response.body?.string()
-                val message = parseErrorMessage(errBody) ?: "فشل إعادة تعيين كلمة المرور"
+            val message = parseErrorMessage(errBody) ?: t("فشل إعادة تعيين كلمة المرور", "Failed to reset password")
                 Result.failure(Exception(message))
             }
         } catch (e: IOException) {
-            Result.failure(Exception("تعذر الاتصال بالشبكة، يرجى التحقق من اتصالك بالإنترنت"))
+            Result.failure(Exception(t("تعذر الاتصال بالشبكة، يرجى التحقق من اتصالك بالإنترنت", "Network error, please check your internet connection")))
         } catch (e: Exception) {
             Result.failure(e)
         }

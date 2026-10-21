@@ -1,5 +1,9 @@
 package com.elhajri.noor.ai
 
+import com.elhajri.noor.settings.t
+import com.elhajri.noor.settings.NoorLocale
+import java.util.Locale
+
 import android.app.DownloadManager
 import android.content.Context
 import android.net.Uri
@@ -23,8 +27,8 @@ data class AiModelDef(
     val promptTemplate: String // GEMMA / QWEN
 ) {
     fun sizeLabel(): String =
-        if (sizeBytes >= 1_000_000_000) String.format("%.1f جيجابايت", sizeBytes / 1_000_000_000.0)
-        else "${sizeBytes / 1_048_576} ميجابايت"
+        if (sizeBytes >= 1_000_000_000) (if (NoorLocale.isEnglish) String.format(Locale.US, "%.1f GB", sizeBytes / 1_000_000_000.0) else String.format("%.1f جيجابايت", sizeBytes / 1_000_000_000.0))
+        else (if (NoorLocale.isEnglish) "${sizeBytes / 1_048_576} MB" else "${sizeBytes / 1_048_576} ميجابايت")
 }
 
 /**
@@ -34,8 +38,8 @@ data class AiModelDef(
 object AiModels {
     val FULL = AiModelDef(
         id = "full",
-        name = "النموذج الكامل",
-        description = "Gemma 4 E2B — الأقوى والأشمل للأجوبة المعمّقة",
+        name = t("النموذج الكامل", "Full Model"),
+        description = t("Gemma 4 E2B — الأقوى والأشمل للأجوبة المعمّقة", "Gemma 4 E2B — Most powerful for deep answers"),
         url = "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-web.task",
         file = "gemma-4-e2b-it.task",
         sizeBytes = 2003697664L,
@@ -44,8 +48,8 @@ object AiModels {
 
     val LIGHT = AiModelDef(
         id = "light",
-        name = "النموذج الخفيف",
-        description = "Bonsai 1.7B — أخف وأسرع للأسئلة اليومية (~750 ميجابايت)",
+        name = t("النموذج الخفيف", "Light Model"),
+        description = t("Bonsai 1.7B — أخف وأسرع للأسئلة اليومية (~750 ميجابايت)", "Bonsai 1.7B — Lighter and faster (~750 MB)"),
         url = "https://huggingface.co/litert-community/Ternary-Bonsai-1.7B/resolve/main/bonsai-1.7b-int2pc-32k-mp-crashfix.litertlm",
         file = "bonsai-1.7b.litertlm",
         sizeBytes = 786313170L,
