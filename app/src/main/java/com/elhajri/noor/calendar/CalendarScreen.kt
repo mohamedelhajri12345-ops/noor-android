@@ -47,6 +47,14 @@ private fun toArabicNumber(number: Any): String {
     return number.toString().map { map[it] ?: it }.joinToString("")
 }
 
+private val HIJRI_MONTHS_EN = listOf(
+    "Muharram", "Safar", "Rabi' al-Awwal", "Rabi' al-Thani", "Jumada al-Ula", "Jumada al-Akhirah",
+    "Rajab", "Sha'ban", "Ramadan", "Shawwal", "Dhu'l-Qi'dah", "Dhu'l-Hijjah"
+)
+
+private fun hijriMonthDisplay(arMonths: List<String>, idx: Int): String =
+    if (com.elhajri.noor.settings.NoorLocale.lang == "en") HIJRI_MONTHS_EN.getOrElse(idx) { "" } else arMonths.getOrElse(idx) { "" }
+
 data class HijriDateData(
     val day: Int,
     val monthIndex: Int,
@@ -107,8 +115,8 @@ private fun computeFallbackHijri(cal: Calendar, months: List<String>, monthDays:
     val weekdays = listOf(t("الأحد", "Sun"), t("الإثنين", "Mon"), t("الثلاثاء", "Tue"), t("الأربعاء", "Wed"), t("الخميس", "Thu"), t("الجمعة", "Fri"), t("السبت", "Sat"))
     val dayOfWeekIdx = (cal.get(Calendar.DAY_OF_WEEK) - 1 + 7) % 7
     val weekdayName = weekdays.getOrElse(dayOfWeekIdx) { "" }
-    val mName = months.getOrElse(currentMonthIdx) { "" }
-    val full = "${toArabicNumber(currentDay)} $mName ${toArabicNumber(currentYear)} هـ"
+    val mName = hijriMonthDisplay(months, currentMonthIdx)
+    val full = if (com.elhajri.noor.settings.NoorLocale.lang == "en") "$currentDay $mName ${currentYear}AH" else "${toArabicNumber(currentDay)} $mName ${toArabicNumber(currentYear)} هـ"
 
     return HijriDateData(
         day = currentDay,
@@ -151,7 +159,7 @@ private suspend fun fetchHijriDate(months: List<String>, monthDays: List<Int>): 
                         val weekdayAr = gregorian?.optJSONObject("weekday")?.optString("ar", "") ?: ""
 
                         val mIdx = months.indexOfFirst { monthAr.contains(it) }.let { if (it == -1) 0 else it }
-                        val full = "${toArabicNumber(day)} $monthAr ${toArabicNumber(year)} هـ"
+                        val full = if (com.elhajri.noor.settings.NoorLocale.lang == "en") "$day ${hijriMonthDisplay(months, mIdx)} ${year}AH" else "${toArabicNumber(day)} $monthAr ${toArabicNumber(year)} هـ"
 
                         return@withContext HijriDateData(
                             day = day,
@@ -313,7 +321,7 @@ fun CalendarScreen() {
                     }
 
                     Text(
-                        text = "${hijriMonths.getOrElse(displayMonthIndex) { "" }} ${toArabicNumber(currentYear)} هـ",
+                        text = if (com.elhajri.noor.settings.NoorLocale.lang == "en") "${hijriMonthDisplay(hijriMonths, displayMonthIndex)} $currentYear AH" else "${hijriMonthDisplay(hijriMonths, displayMonthIndex)} ${toArabicNumber(currentYear)} هـ",
                         color = TextMain,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold

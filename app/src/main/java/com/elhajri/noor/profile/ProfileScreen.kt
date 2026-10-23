@@ -591,7 +591,7 @@ fun ProfileScreen(
                     fontFamily = AmiriFamily
                 )
                 Text(
-                    text = "${toArDigits(achievements.count { it.isUnlocked })} / ${toArDigits(achievements.size)} مكتمل",
+                    text = "${toArDigits(achievements.count { it.isUnlocked })} / ${toArDigits(achievements.size)} ${t("مكتمل", "completed")}",
                     color = GoldSoft,
                     fontSize = 12.5.sp,
                     fontWeight = FontWeight.SemiBold
@@ -602,7 +602,7 @@ fun ProfileScreen(
                 achievements.forEach { achievement ->
                     AchievementItemCard(achievement = achievement) {
                         // Share achievement item on click
-                        val shareText = "حزت على وسام «${achievement.title}» في تطبيق نور الإيماني! 🌙✨\n${achievement.description}"
+                        val shareText = t("حزت على وسام «${achievement.title}» في تطبيق نور الإيماني! 🌙✨\n${achievement.description}", "I earned the «${achievement.title}» badge in the NOOR app! 🌙✨\n${achievement.description}")
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, shareText)
@@ -631,7 +631,7 @@ fun ProfileScreen(
                     fontFamily = AmiriFamily
                 )
                 Text(
-                    text = "${toArDigits(certificates.count { it.isUnlocked })} مكتسبة",
+                    text = "${toArDigits(certificates.count { it.isUnlocked })} ${t("مكتسبة", "earned")}",
                     color = GoldSoft,
                     fontSize = 12.5.sp,
                     fontWeight = FontWeight.SemiBold
@@ -802,12 +802,12 @@ fun ProfileScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "التاريخ: ${cert.issueDate}",
+                                text = t("التاريخ: ${cert.issueDate}", "Date: ${cert.issueDate}"),
                                 color = GoldSoft,
                                 fontSize = 11.sp
                             )
                             Text(
-                                text = "الرمز: ${cert.verificationCode}",
+                                text = t("الرمز: ${cert.verificationCode}", "Code: ${cert.verificationCode}"),
                                 color = GoldSoft,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold
@@ -819,7 +819,7 @@ fun ProfileScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        val shareText = "حصلت بفضل الله على «${cert.title}» من تطبيق نور الإسلامي! 🌙✨\nرقم الاعتماد: ${cert.verificationCode}"
+                        val shareText = t("حصلت بفضل الله على «${cert.title}» من تطبيق نور الإسلامي! 🌙✨\nرقم الاعتماد: ${cert.verificationCode}", "By the grace of Allah I earned «${cert.title}» from the NOOR app! 🌙✨\nCredential No.: ${cert.verificationCode}")
                         val sendIntent = Intent().apply {
                             action = Intent.ACTION_SEND
                             putExtra(Intent.EXTRA_TEXT, shareText)

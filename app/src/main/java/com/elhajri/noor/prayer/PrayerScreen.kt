@@ -102,11 +102,11 @@ fun PrayerScreen() {
                 val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
 
                 val prayerTimes = listOf(
-                    "الفجر" to t.fajr,
-                    "الظهر" to t.dhuhr,
-                    "العصر" to t.asr,
-                    "المغرب" to t.maghrib,
-                    "العشاء" to t.isha
+                    NoorLocale.t("الفجر", "Fajr") to t.fajr,
+                    NoorLocale.t("الظهر", "Dhuhr") to t.dhuhr,
+                    NoorLocale.t("العصر", "Asr") to t.asr,
+                    NoorLocale.t("المغرب", "Maghrib") to t.maghrib,
+                    NoorLocale.t("العشاء", "Isha") to t.isha
                 )
 
                 var foundNext = false
@@ -135,7 +135,7 @@ fun PrayerScreen() {
                 }
 
                 if (!foundNext) {
-                    nextPrayerName = "الفجر"
+                    nextPrayerName = NoorLocale.t("الفجر", "Fajr")
                     val parts = t.fajr.split(":")
                     val h = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: 5
                     val m = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: 0

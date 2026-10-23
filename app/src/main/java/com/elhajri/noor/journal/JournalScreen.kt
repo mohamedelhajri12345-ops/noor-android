@@ -60,7 +60,7 @@ private fun loadEntries(context: Context): List<JournalEntry> {
             list.add(
                 JournalEntry(
                     id = o.optLong("id", System.currentTimeMillis()),
-                    title = o.optString("title", "خاطرة"),
+                    title = o.optString("title").ifBlank { t("خاطرة", "Reflection") },
                     content = o.optString("content", ""),
                     mood = o.optString("mood", ""),
                     date = o.optString("date", "")
@@ -100,7 +100,7 @@ fun JournalScreen() {
 
     var deletingEntry by remember { mutableStateOf<JournalEntry?>(null) }
 
-    val moodOptions = listOf("🤲 شكر", "🌸 تفاؤل", "💡 تفكّر", "❤️ سكينة", "😊 فرح")
+    val moodOptions = listOf(t("🤲 شكر", "🤲 Gratitude"), t("🌸 تفاؤل", "🌸 Hope"), t("💡 تفكّر", "💡 Reflection"), t("❤️ سكينة", "❤️ Serenity"), t("😊 فرح", "😊 Joy"))
 
     fun openAdd() {
         editingId = null
@@ -126,7 +126,7 @@ fun JournalScreen() {
         if (editingId == null) {
             val newEntry = JournalEntry(
                 id = System.currentTimeMillis(),
-                title = inputTitle.ifBlank { "خاطرة" },
+                title = inputTitle.ifBlank { t("خاطرة", "Reflection") },
                 content = inputContent.trim(),
                 mood = inputMood,
                 date = todayStr
@@ -137,7 +137,7 @@ fun JournalScreen() {
             if (idx != -1) {
                 newEntries[idx] = JournalEntry(
                     id = editingId!!,
-                    title = inputTitle.ifBlank { "خاطرة" },
+                    title = inputTitle.ifBlank { t("خاطرة", "Reflection") },
                     content = inputContent.trim(),
                     mood = inputMood,
                     date = newEntries[idx].date.ifBlank { todayStr }

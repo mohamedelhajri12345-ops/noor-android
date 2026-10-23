@@ -357,7 +357,7 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
             isBuffering = false
             releaseWakeLock()
             abandonSystemAudioFocus()
-            publish(error = "تعذّر تشغيل النشيد حالياً — يرجى التحقق من الاتصال بالإنترنت وإعادة المحاولة")
+            publish(error = com.elhajri.noor.settings.NoorLocale.t("تعذّر تشغيل النشيد حالياً — يرجى التحقق من الاتصال بالإنترنت وإعادة المحاولة", "Could not play this nasheed right now — please check your internet connection and try again"))
         }
     }
 
@@ -631,13 +631,13 @@ abstract class BasePlayerEngine(private val defaultTitle: String) : PlayerFacade
 }
 
 /** مشغّل الأناشيد — محرك مستقل */
-object PlayerCore : BasePlayerEngine("الأناشيد") {
+object PlayerCore : BasePlayerEngine(com.elhajri.noor.settings.NoorLocale.t("الأناشيد", "Nasheeds")) {
     override fun startForegroundService(context: Context) = NasheedPlaybackService.start(context)
     override fun stopForegroundService(context: Context) = NasheedPlaybackService.stop(context)
 }
 
 /** مشغّل القرآن الكريم — محرك مستقل */
-object QuranPlayerManager : BasePlayerEngine("القرآن الكريم") {
+object QuranPlayerManager : BasePlayerEngine(com.elhajri.noor.settings.NoorLocale.t("القرآن الكريم", "Holy Qur'an")) {
     override fun startForegroundService(context: Context) = QuranPlaybackService.start(context)
     override fun stopForegroundService(context: Context) = QuranPlaybackService.stop(context)
 }
@@ -694,7 +694,7 @@ private fun buildPlaybackNotification(
         "%d:%02d".format(m, r)
     }
     val timeText = if (dur > 0) "${fmt(pos)} / ${fmt(dur)}" else fmt(pos)
-    val artistLine = s.artist.ifBlank { "تطبيق نور - الأناشيد الإسلامية" }
+    val artistLine = s.artist.ifBlank { com.elhajri.noor.settings.NoorLocale.t("تطبيق نور - الأناشيد الإسلامية", "NOOR App - Islamic Nasheeds") }
 
     return NotificationCompat.Builder(context, channelId)
         .setContentTitle(s.title.ifBlank { fallbackTitle })
@@ -744,7 +744,7 @@ class QuranPlaybackService : Service() {
                 return START_NOT_STICKY
             }
         }
-        startForeground(notifId, buildPlaybackNotification(this, channelId, notifId, QuranPlayerManager, "quran", QuranPlaybackService::class.java, "القرآن الكريم"))
+        startForeground(notifId, buildPlaybackNotification(this, channelId, notifId, QuranPlayerManager, "quran", QuranPlaybackService::class.java, com.elhajri.noor.settings.NoorLocale.t("القرآن الكريم", "Holy Qur'an")))
         if (observeScope == null) {
             observeScope = CoroutineScope(Dispatchers.Main + Job()).also { sc ->
                 sc.launch {
@@ -753,7 +753,7 @@ class QuranPlaybackService : Service() {
                         if (key != lastStateKey) {
                             lastStateKey = key
                             val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                            nm.notify(notifId, buildPlaybackNotification(this@QuranPlaybackService, channelId, notifId, QuranPlayerManager, "quran", QuranPlaybackService::class.java, "القرآن الكريم"))
+                            nm.notify(notifId, buildPlaybackNotification(this@QuranPlaybackService, channelId, notifId, QuranPlayerManager, "quran", QuranPlaybackService::class.java, com.elhajri.noor.settings.NoorLocale.t("القرآن الكريم", "Holy Qur'an")))
                         }
                     }
                 }

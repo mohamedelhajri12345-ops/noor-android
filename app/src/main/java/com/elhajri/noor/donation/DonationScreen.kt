@@ -60,13 +60,13 @@ fun DonationScreen(onBack: () -> Unit) {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             context.startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(context, "تعذر فتح الرابط", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, t("تعذر فتح الرابط", "Could not open the link"), Toast.LENGTH_SHORT).show()
         }
     }
 
     val bankFields = listOf(
-        Triple("اسم المستفيد", "LAAROUSSI NAJIA", "اسم المستفيد"),
-        Triple("اسم البنك", "Attijariwafa Bank", "اسم البنك"),
+        Triple(t("اسم المستفيد", "Beneficiary Name"), "LAAROUSSI NAJIA", t("اسم المستفيد", "Beneficiary Name")),
+        Triple(t("اسم البنك", "Bank Name"), "Attijariwafa Bank", t("اسم البنك", "Bank Name")),
         Triple("RIB", "007341001431470030006084", "RIB"),
         Triple("SWIFT", "BCMAMAMC", "SWIFT"),
         Triple("IBAN", "MA64 0073 4100 1431 4700 3000 6084", "IBAN")
@@ -194,7 +194,7 @@ fun DonationScreen(onBack: () -> Unit) {
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = "$amt د.م.",
+                                        text = "$amt ${t("د.م.", "MAD")}",
                                         color = if (isSelected) Navy else TextMain,
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold

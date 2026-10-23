@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONObject
+import com.elhajri.noor.settings.NoorLocale
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -255,11 +256,11 @@ object AnalyticsTracker {
 
         // Calculate past 7 days daily minutes
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        val dayNameSdf = SimpleDateFormat("EEE", Locale("ar"))
+        val dayNameSdf = SimpleDateFormat("EEE", if (NoorLocale.lang == "en") Locale.US else Locale("ar"))
         val cal = Calendar.getInstance()
 
         val weeklyDailyList = mutableListOf<Pair<String, Int>>()
-        var peakDay = "اليوم"
+        var peakDay = NoorLocale.t("اليوم", "Today")
         var peakMinutes = 0
 
         for (i in 6 downTo 0) {
@@ -290,7 +291,7 @@ object AnalyticsTracker {
                 val mins = dayObj?.optInt("minutes", 0) ?: (15 + (3 - w) * 10)
                 weekSum += mins
             }
-            val weekLabel = "أسبوع ${4 - w}"
+            val weekLabel = NoorLocale.t("أسبوع ${4 - w}", "Week ${4 - w}")
             weeklyProgress.add(weekLabel to weekSum)
             if (w == 0) thisWeekMins = weekSum
             if (w == 1) lastWeekMins = weekSum
@@ -300,13 +301,13 @@ object AnalyticsTracker {
         val fOpensObj = json.optJSONObject("feature_opens") ?: JSONObject()
         val featureOpensMap = mutableMapOf<String, Int>()
         val defaultFeatures = listOf(
-            "quran" to "القرآن",
-            "games" to "الألعاب",
-            "tasbih" to "السبحة",
-            "nasheeds" to "الأناشيد",
-            "prayer" to "الصلاة",
-            "athkar" to "الأذكار",
-            "settings" to "الإعدادات"
+            "quran" to NoorLocale.t("القرآن", "Qur'an"),
+            "games" to NoorLocale.t("الألعاب", "Games"),
+            "tasbih" to NoorLocale.t("السبحة", "Tasbih"),
+            "nasheeds" to NoorLocale.t("الأناشيد", "Nasheeds"),
+            "prayer" to NoorLocale.t("الصلاة", "Prayer"),
+            "athkar" to NoorLocale.t("الأذكار", "Adhkar"),
+            "settings" to NoorLocale.t("الإعدادات", "Settings")
         )
         for ((key, arName) in defaultFeatures) {
             val valCount = fOpensObj.optInt(key, 0)

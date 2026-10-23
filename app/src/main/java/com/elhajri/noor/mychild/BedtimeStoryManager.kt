@@ -57,8 +57,8 @@ object BedtimeStoryManager {
                     BedtimeStoryItem(
                         id = book.id,
                         title = book.title,
-                        summary = "من كتب قصص الأطفال والمكتبة الإسلامية: " + book.author,
-                        content = "قصة ملهمة من كتاب " + book.title + ".\n\nتفضل بقراءتها مع طفلك وتأمل دروسها وأخلاقها الكريمة.",
+                        summary = com.elhajri.noor.settings.NoorLocale.t("من كتب قصص الأطفال والمكتبة الإسلامية: ", "From the kids stories & Islamic library books: ") + book.author,
+                        content = com.elhajri.noor.settings.NoorLocale.t("قصة ملهمة من كتاب ", "An inspiring story from the book ") + book.title + com.elhajri.noor.settings.NoorLocale.t(".\n\nتفضل بقراءتها مع طفلك وتأمل دروسها وأخلاقها الكريمة.", ".\n\nEnjoy reading it with your child and reflecting on its lessons and noble morals."),
                         category = book.category,
                         coverUrl = book.coverUrl,
                         isBundled = false
@@ -77,9 +77,9 @@ object BedtimeStoryManager {
         if (stories.isEmpty()) {
             return BedtimeStoryItem(
                 id = "default",
-                title = "قصة اليوم قبل النوم",
-                summary = "قصة جميلة ومفيدة",
-                content = "كان نبي الله حليماً ورحيماً، علمنا مكارم الأخلاق والصدق والأمانة."
+                title = com.elhajri.noor.settings.NoorLocale.t("قصة اليوم قبل النوم", "Today's Bedtime Story"),
+                summary = com.elhajri.noor.settings.NoorLocale.t("قصة جميلة ومفيدة", "A beautiful, beneficial story"),
+                content = com.elhajri.noor.settings.NoorLocale.t("كان نبي الله حليماً ورحيماً، علمنا مكارم الأخلاق والصدق والأمانة.", "A prophet of Allah was gentle and merciful; he taught us noble character, truthfulness and trustworthiness.")
             )
         }
         val dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
