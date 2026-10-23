@@ -400,10 +400,10 @@ private fun AchievementsSection(summary: AnalyticsTracker.AnalyticsSummary) {
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        LegendRow(color = Gold, label = t("سور القرآن المكتملة", "Completed Qur'an Surahs"), value = "${toArabicDigits(summary.quranCompletedSurahsCount)} / ١١٤ سورة")
-                        LegendRow(color = EmeraldSuccess, label = t("مراحل الألعاب المنجزة", "Completed Game Levels"), value = "${toArabicDigits(summary.totalCompletedLevels)} مرحلة")
-                        LegendRow(color = Color(0xFF4FC3F7), label = t("التسبيحات المكتملة", "Completed Tasbihs"), value = "${toArabicDigits(summary.tasbihTotalCount)} تسبيحة")
-                        LegendRow(color = Color(0xFFBA68C8), label = t("الأناشيد المستمع لها", "Nasheeds Listened"), value = "${toArabicDigits(summary.nasheedTotalPlays)} نشيد")
+                        LegendRow(color = Gold, label = t("سور القرآن المكتملة", "Completed Qur'an Surahs"), value = if (com.elhajri.noor.settings.NoorLocale.isEnglish) "${summary.quranCompletedSurahsCount} / 114 surahs" else "${toArabicDigits(summary.quranCompletedSurahsCount)} / ١١٤ سورة")
+                        LegendRow(color = EmeraldSuccess, label = t("مراحل الألعاب المنجزة", "Completed Game Levels"), value = if (com.elhajri.noor.settings.NoorLocale.isEnglish) "${summary.totalCompletedLevels} levels" else "${toArabicDigits(summary.totalCompletedLevels)} مرحلة")
+                        LegendRow(color = Color(0xFF4FC3F7), label = t("التسبيحات المكتملة", "Completed Tasbihs"), value = if (com.elhajri.noor.settings.NoorLocale.isEnglish) "${summary.tasbihTotalCount} tasbihs" else "${toArabicDigits(summary.tasbihTotalCount)} تسبيحة")
+                        LegendRow(color = Color(0xFFBA68C8), label = t("الأناشيد المستمع لها", "Nasheeds Listened"), value = if (com.elhajri.noor.settings.NoorLocale.isEnglish) "${summary.nasheedTotalPlays} tracks" else "${toArabicDigits(summary.nasheedTotalPlays)} نشيد")
                     }
                 }
             }
