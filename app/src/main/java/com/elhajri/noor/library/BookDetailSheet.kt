@@ -141,7 +141,7 @@ fun BookDetailSheet(
                             model = book.coverUrl,
                             contentDescription = book.title,
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Fit
                         )
                     } else {
                         Column(
@@ -233,174 +233,47 @@ fun BookDetailSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Short Description
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .noorGlassCard(cornerRadius = 12.dp),
-                color = NavyCard
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text("نبذة عن الكتاب", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        t("كتاب إسلامي قيم معتمد مفهرس بصيغة ", "A valuable indexed Islamic book in ") + book.format.uppercase() + t("، يحتوي على ", " containing ") + "${book.pages} " + t("صفحة من المعارف والمضامين النافعة.", "pages of beneficial knowledge."),
-                        color = Color.White.copy(alpha = 0.85f),
-                        fontSize = 12.sp,
-                        lineHeight = 18.sp
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // First Pages Preview Strip
-            if (isDownloaded || book.bundledAsset != null) {
-                Text(
-                    "معاينة الصفحات الأولى",
-                    color = Gold,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = AmiriFamily
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-
-                if (isLoadingPreviews) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(140.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Gold, modifier = Modifier.size(28.dp))
-                    }
-                } else if (previewBitmaps.isNotEmpty()) {
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        items(previewBitmaps.size) { idx ->
-                            val bmp = previewBitmaps[idx]
-                            Box(
-                                modifier = Modifier
-                                    .width(100.dp)
-                                    .height(140.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .border(1.dp, Gold.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
-                                    .background(Color.White)
-                            ) {
-                                Image(
-                                    bitmap = bmp.asImageBitmap(),
-                                    contentDescription = t("صفحة ", "Page ") + "${idx + 1}",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Fit
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .background(Navy.copy(alpha = 0.75f))
-                                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                                ) {
-                                    Text("${idx + 1}", color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Download Progress Bar
-            if (downloadState is DownloadState.Downloading) {
-                val state = downloadState as DownloadState.Downloading
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("جاري تنزيل الكتاب...", color = Gold, fontSize = 12.sp)
-                        Text("${(state.progress * 100).toInt()}%", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    LinearProgressIndicator(
-                        progress = state.progress,
-                        color = Gold,
-                        trackColor = NavyLight,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(6.dp)
-                            .clip(RoundedCornerShape(3.dp))
-                    )
-                    Spacer(Modifier.height(12.dp))
-                }
-            }
-
-            // Action Buttons: Read & Download
+            // Action Buttons
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                // Read Button
                 Button(
-                    onClick = {
-                        onDismiss()
-                        onReadClick(book)
-                    },
+                    onClick = { onReadClick(book) },
                     colors = ButtonDefaults.buttonColors(containerColor = Gold),
                     shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(50.dp)
+                    modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.MenuBook, contentDescription = null, tint = Navy)
-                    Spacer(Modifier.width(8.dp))
-                    Text("اقرأ الآن", color = Navy, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Spacer(Modifier.width(6.dp))
+                    Text(t("قراءة الآن", "Read Now"), color = Navy, fontWeight = FontWeight.Bold)
                 }
 
-                // Download Button
-                Button(
-                    onClick = {
-                        if (isDownloaded) {
-                            Toast.makeText(context, "الكتاب متوفر أوفلاين بالفعل", Toast.LENGTH_SHORT).show()
-                        } else {
+                if (!isDownloaded) {
+                    Button(
+                        onClick = {
                             scope.launch {
                                 BookDownloader.downloadBook(context, book) { success, msg ->
                                     if (success) {
                                         isDownloaded = true
-                                        Toast.makeText(context, "تم تنزيل الكتاب بنجاح!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, t("تم تنزيل الكتاب بنجاح", "Book downloaded successfully"), Toast.LENGTH_SHORT).show()
                                     } else {
-                                        Toast.makeText(context, msg ?: "فشل التنزيل", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, msg ?: t("فشل تنزيل الكتاب", "Failed to download book"), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isDownloaded) NavyLight else NavyCard
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Gold),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(50.dp),
-                    enabled = downloadState !is DownloadState.Downloading
-                ) {
-                    Icon(
-                        imageVector = if (isDownloaded) Icons.Default.Visibility else Icons.Default.Download,
-                        contentDescription = null,
-                        tint = Gold
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = if (isDownloaded) t("منزّل أوفلاين", "Downloaded Offline") else t("تنزيل (بدون إعلانات)", "Download (No Ads)"),
-                        color = Gold,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp
-                    )
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = NavyCard),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Download, contentDescription = null, tint = Gold)
+                        Spacer(Modifier.width(4.dp))
+                        Text(t("تنزيل", "Download"), color = Gold)
+                    }
                 }
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
