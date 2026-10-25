@@ -49,6 +49,16 @@ object GameFavoritesStore {
 object InteractiveGameRegistry {
     val games: List<InteractiveGame> = listOf(
         InteractiveGame(
+            id = "game_04_kaaba_unblock",
+            titleAr = "مسار القافلة",
+            titleEn = "Caravan Path Unblock",
+            category = InteractiveGameCategories.INTELLIGENCE,
+            route = "game_04_kaaba_unblock",
+            icon = Icons.Default.DirectionsCar,
+            accentColor = Color(0xFFFFD700),
+            descriptionAr = "تحريك الخشبيات لفتح المسار أمام قافلة الجمال"
+        ),
+        InteractiveGame(
             id = "game_01_dome_merge",
             titleAr = "دمج المآذن",
             titleEn = "Dome Merge 2048",
