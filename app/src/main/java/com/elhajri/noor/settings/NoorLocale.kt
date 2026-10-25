@@ -41,3 +41,7 @@ fun t(ar: String, en: String): String = NoorLocale.t(ar, en)
 /** Global helper for digit formatting sensitive to language setting. */
 fun toArabicDigits(v: Any): String = NoorLocale.formatDigits(v)
 fun toArabicNumber(v: Any): String = NoorLocale.formatDigits(v)
+
+fun Int.toArabicDigits(): String = NoorLocale.formatDigits(this)
+fun Long.toArabicDigits(): String = NoorLocale.formatDigits(this)
+fun String.toArabicDigits(): String = NoorLocale.formatDigits(this)

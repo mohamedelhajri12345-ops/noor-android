@@ -2,27 +2,35 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>noor-player</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>NOOR YouTube & MP4 Player</title>
 <style>
-  html, body { margin: 0; padding: 0; background: #000; width: 100%; height: 100%; overflow: hidden; }
-  #player-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
-  #player { width: 100%; height: 100%; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; background: #000; width: 100%; height: 100%;
+    overflow: hidden; user-select: none; -webkit-user-select: none;
+  }
+  #player-container {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; display: flex; align-items: center; justify-content: center;
+  }
+  #player { width: 100%; height: 100%; border: none; }
   iframe { width: 100%; height: 100%; border: none; pointer-events: none; }
-  #native-video { width: 100%; height: 100%; background: #000; }
+  #native-video { width: 100%; height: 100%; background: #000; object-fit: contain; }
 </style>
 </head>
 <body>
 <div id="player-container"><div id="player"></div></div>
 <script>
-  // NOOR embedded player. Two modes:
-  //  ?v=VIDEOID          -> YouTube IFrame API (real https origin, no related videos)
-  //  ?mode=mp4&src=URL   -> Native HTML5 <video> (direct file, zero login, zero tracking)
-  var first = true;
-  var currentId = null;
+  // NOOR Embedded Privacy Player (youtube-nocookie.com & HTML5 native MP4)
   var player = null;
   var nativeVideo = null;
-  var mode = qs('mode') || 'yt';
+  var mode = 'yt';
+  var currentId = null;
+  var pendingId = null;
+  var apiReady = false;
+  var progressTimer = null;
+  var currentRate = 1;
 
   function qs(name) {
     var m = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
@@ -32,19 +40,45 @@
   function report(title) { document.title = title; }
 
   function bridge(fn) {
-    try { if (window.AndroidBridge && window.AndroidBridge[fn]) window.AndroidBridge[fn](); } catch (e) {}
+    try {
+      if (window.AndroidBridge && window.AndroidBridge[fn]) {
+        window.AndroidBridge[fn]();
+      }
+    } catch (e) {}
   }
+
   function bridgeState(state) {
-    try { if (window.AndroidBridge && window.AndroidBridge.sendState) window.AndroidBridge.sendState(state); } catch (e) {}
+    try {
+      if (window.AndroidBridge) {
+        if (window.AndroidBridge.sendState) window.AndroidBridge.sendState(state);
+        if (window.AndroidBridge.sendStateChange) window.AndroidBridge.sendStateChange(state);
+      }
+    } catch (e) {}
   }
-  function bridgeProgress(t, d) {
-    try { if (window.AndroidBridge && window.AndroidBridge.sendProgress) window.AndroidBridge.sendProgress(t, d, !!(nativeVideo && nativeVideo.paused)); } catch (e) {}
+
+  function bridgeProgress(t, d, playing) {
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.sendProgress) {
+        window.AndroidBridge.sendProgress(t, d, !!playing);
+      }
+    } catch (e) {}
+  }
+
+  function bridgeError(code) {
+    report('ERROR' + code);
+    try {
+      if (window.AndroidBridge && window.AndroidBridge.sendVideoError) {
+        window.AndroidBridge.sendVideoError(code);
+      }
+    } catch (e) {}
   }
 
   // ---------------- MP4 (native) mode ----------------
   function setupNative(src) {
+    mode = 'mp4';
     report('LOADING');
     var container = document.getElementById('player');
+    container.innerHTML = '';
     nativeVideo = document.createElement('video');
     nativeVideo.id = 'native-video';
     nativeVideo.src = src;
@@ -52,130 +86,178 @@
     nativeVideo.setAttribute('playsinline', '');
     nativeVideo.setAttribute('webkit-playsinline', '');
     nativeVideo.preload = 'auto';
-    nativeVideo.onready = function () { report('READY'); bridge('sendPlayerReady'); };
+
+    nativeVideo.onloadedmetadata = function () { report('READY'); bridge('sendPlayerReady'); };
     nativeVideo.oncanplay = function () { report('READY'); bridge('sendPlayerReady'); };
     nativeVideo.onplay = function () { report('PLAYING'); bridgeState(1); };
     nativeVideo.onpause = function () { report('PAUSED'); bridgeState(2); };
-    nativeVideo.onended = function () { bridge('sendVideoEnded'); };
-    nativeVideo.onerror = function () { report('ERROR101'); try { if (window.AndroidBridge) window.AndroidBridge.sendVideoError(101); } catch (e) {} };
+    nativeVideo.onended = function () { bridgeState(0); bridge('sendVideoEnded'); };
+    nativeVideo.onerror = function () { bridgeError(101); };
+
     container.appendChild(nativeVideo);
-    var t = setInterval(function () {
+
+    if (progressTimer) clearInterval(progressTimer);
+    progressTimer = setInterval(function () {
       if (!nativeVideo || nativeVideo.readyState < 1) return;
-      bridgeProgress(nativeVideo.currentTime || 0, nativeVideo.duration || 0);
+      bridgeProgress(nativeVideo.currentTime || 0, nativeVideo.duration || 0, !nativeVideo.paused);
     }, 500);
-    nativeVideo.play().catch(function () { /* autoplay block: user taps play */ });
+
+    nativeVideo.play().catch(function () { /* autoplay policy */ });
   }
 
-  // ---------------- YouTube mode ----------------
-  function onReady() {
-    report('READY');
-    if (window.AndroidBridge && window.AndroidBridge.sendPlayerReady) {
-      window.AndroidBridge.sendPlayerReady();
-    }
-    try {
-      player.setPlaybackRate(window.__rate || 1);
-      player.playVideo();
-    } catch (e) {}
-    startProgressTimer();
-  }
-
-  function onStateChange(e) {
-    // 1 PLAYING, 2 PAUSED, 0 ENDED, 3 BUFFERING
-    if (e.data === 1) report('PLAYING');
-    if (window.AndroidBridge && window.AndroidBridge.sendState) window.AndroidBridge.sendState(e.data);
-    if (e.data === 0) {
-      if (window.AndroidBridge && window.AndroidBridge.sendVideoEnded) window.AndroidBridge.sendVideoEnded();
-    }
-  }
-
-  function onError(e) {
-    report('ERROR' + e.data);
-    if (window.AndroidBridge && window.AndroidBridge.sendVideoError) window.AndroidBridge.sendVideoError(e.data);
-  }
-
-  function startProgressTimer() {
-    if (window.__timer) clearInterval(window.__timer);
-    window.__timer = setInterval(function () {
-      if (!player || !player.getCurrentTime) return;
-      try {
-        var t = player.getCurrentTime() || 0;
-        var d = player.getDuration() || 0;
-        if (window.AndroidBridge && window.AndroidBridge.sendProgress) {
-          window.AndroidBridge.sendProgress(t, d, false);
-        }
-      } catch (err) {}
-    }, 500);
-  }
-
-  window.onYouTubeIframeAPIReady = function () {
-    if (mode === 'mp4') return; // native mode doesn't need the YT API
-    currentId = qs('v');
+  // ---------------- YouTube Mode (youtube-nocookie.com) ----------------
+  function createYouTubePlayer(vId) {
+    mode = 'yt';
+    currentId = vId;
     report('LOADING');
+
+    if (player && typeof player.destroy === 'function') {
+      try { player.destroy(); } catch (e) {}
+    }
+
     player = new YT.Player('player', {
-      videoId: currentId,
-      host: 'https://www.youtube.com',
+      videoId: vId,
+      host: 'https://www.youtube-nocookie.com',
       playerVars: {
         autoplay: 1,
-        controls: 0,
-        rel: 0,
+        controls: 0,        // NO YouTube controls — use NOOR gold controls
+        rel: 0,             // ZERO suggested videos from external channels
         modestbranding: 1,
         playsinline: 1,
         fs: 0,
         iv_load_policy: 3,
         disablekb: 1,
         cc_load_policy: 0,
-        origin: window.location.origin,
+        origin: 'https://www.youtube-nocookie.com',
         enablejsapi: 1
       },
       events: {
-        onReady: onReady,
-        onStateChange: onStateChange,
-        onError: onError
+        onReady: onYTReady,
+        onStateChange: onYTStateChange,
+        onError: onYTError
       }
     });
+  }
+
+  function onYTReady(e) {
+    apiReady = true;
+    report('READY');
+    bridge('sendPlayerReady');
+    try {
+      if (currentRate) player.setPlaybackRate(currentRate);
+      player.playVideo();
+    } catch (err) {}
+    startProgressTimer();
+  }
+
+  function onYTStateChange(e) {
+    // 1 PLAYING, 2 PAUSED, 0 ENDED, 3 BUFFERING
+    if (e.data === 1) report('PLAYING');
+    else if (e.data === 2) report('PAUSED');
+    bridgeState(e.data);
+    if (e.data === 0) {
+      bridge('sendVideoEnded');
+    }
+  }
+
+  function onYTError(e) {
+    bridgeError(e.data || 101);
+  }
+
+  function startProgressTimer() {
+    if (progressTimer) clearInterval(progressTimer);
+    progressTimer = setInterval(function () {
+      if (mode !== 'yt' || !player || !player.getCurrentTime) return;
+      try {
+        var t = player.getCurrentTime() || 0;
+        var d = player.getDuration() || 0;
+        bridgeProgress(t, d, true);
+      } catch (err) {}
+    }, 500);
+  }
+
+  window.onYouTubeIframeAPIReady = function () {
+    apiReady = true;
+    var targetId = pendingId || currentId || qs('v') || 'aLF_-NCXao0';
+    if (mode === 'yt') {
+      createYouTubePlayer(targetId);
+    }
   };
 
-  // Functions called from the Android side via evaluateJavascript
+  // ---------------- Android JS Interface Controls ----------------
   function playVideo() {
-    if (mode === 'mp4') { if (nativeVideo) nativeVideo.play().catch(function(){}); report('PLAYING'); return; }
-    if (player && player.playVideo) { player.playVideo(); report('PLAYING'); }
+    if (mode === 'mp4') {
+      if (nativeVideo) nativeVideo.play().catch(function(){});
+      report('PLAYING');
+      return;
+    }
+    if (player && player.playVideo) {
+      player.playVideo();
+      report('PLAYING');
+    }
   }
+
   function pauseVideo() {
-    if (mode === 'mp4') { if (nativeVideo) nativeVideo.pause(); report('PAUSED'); return; }
-    if (player && player.pauseVideo) { player.pauseVideo(); report('PAUSED'); }
+    if (mode === 'mp4') {
+      if (nativeVideo) nativeVideo.pause();
+      report('PAUSED');
+      return;
+    }
+    if (player && player.pauseVideo) {
+      player.pauseVideo();
+      report('PAUSED');
+    }
   }
+
   function seekTo(t) {
-    if (mode === 'mp4') { if (nativeVideo) nativeVideo.currentTime = t; return; }
-    if (player && player.seekTo) player.seekTo(t, true);
+    if (mode === 'mp4') {
+      if (nativeVideo) nativeVideo.currentTime = t;
+      return;
+    }
+    if (player && player.seekTo) {
+      player.seekTo(t, true);
+    }
   }
+
   function setRate(r) {
-    window.__rate = r;
-    if (mode === 'mp4') { if (nativeVideo) nativeVideo.playbackRate = r; return; }
-    if (player && player.setPlaybackRate) player.setPlaybackRate(r);
+    currentRate = r;
+    if (mode === 'mp4') {
+      if (nativeVideo) nativeVideo.playbackRate = r;
+      return;
+    }
+    if (player && player.setPlaybackRate) {
+      player.setPlaybackRate(r);
+    }
   }
+
   function loadNewVideo(id, src) {
-    // YouTube -> id; native mp4 -> src
     if (src) {
-      mode = 'mp4';
-      if (nativeVideo) { nativeVideo.pause(); nativeVideo.src = src; nativeVideo.load(); nativeVideo.play().catch(function(){}); }
-      else setupNative(src);
-      report('LOADING');
+      setupNative(src);
       return;
     }
     mode = 'yt';
-    currentId = id;
-    if (player && player.loadVideoById) {
+    if (apiReady && player && player.loadVideoById) {
+      currentId = id;
       player.loadVideoById(id);
-      try { player.setPlaybackRate(window.__rate || 1); } catch (e) {}
+      try { if (currentRate) player.setPlaybackRate(currentRate); } catch (e) {}
       report('LOADING');
+    } else {
+      pendingId = id;
+      createYouTubePlayer(id);
     }
   }
 
-  if (mode === 'mp4') {
-    setupNative(qs('src'));
+  // ---------------- Initialization ----------------
+  var initialSrc = qs('src');
+  var initialMode = qs('mode');
+  var initialV = qs('v');
+
+  if (initialMode === 'mp4' || initialSrc) {
+    setupNative(initialSrc);
   } else {
+    currentId = initialV || 'aLF_-NCXao0';
     var tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
+    tag.src = 'https://www.youtube-nocookie.com/iframe_api';
     document.head.appendChild(tag);
   }
 </script>

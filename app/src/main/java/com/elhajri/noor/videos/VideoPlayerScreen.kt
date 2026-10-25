@@ -325,7 +325,7 @@ fun VideoPlayerScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) outerColumn@ {
 
             // ==================== PLAYER VIEW AREA ====================
             Box(
@@ -465,11 +465,11 @@ fun VideoPlayerScreen(
                     )
 
                     // Embedded Gold Control Bar Overlay on video player
-                    androidx.compose.animation.AnimatedVisibility(
+                    this@outerColumn.AnimatedVisibility(
                         visible = areControlsVisible || !isPlaying || isEndedOverlayVisible,
+                        modifier = Modifier.fillMaxSize(),
                         enter = fadeIn(),
-                        exit = fadeOut(),
-                        modifier = Modifier.fillMaxSize()
+                        exit = fadeOut()
                     ) {
                         Box(
                             modifier = Modifier
