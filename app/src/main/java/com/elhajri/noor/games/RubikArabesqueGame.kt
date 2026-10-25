@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.audio.SfxManager
@@ -136,16 +137,18 @@ fun RubikArabesqueGame(
                 BoxWithConstraints(
                     modifier = Modifier.aspectRatio(1f).padding(12.dp)
                 ) {
+                    val density = LocalDensity.current
                     val canvasSize = minOf(maxWidth, maxHeight)
+                    val canvasSizePx = with(density) { canvasSize.toPx() }
 
                     Canvas(
                         modifier = Modifier
                             .fillMaxSize()
                             .gameGestureDetector(
-                                onTap = { pos -> handleTileTap(pos, canvasSize.toPx()) }
+                                onTap = { pos -> handleTileTap(pos, canvasSizePx) }
                             )
                     ) {
-                        val sidePx = canvasSize.toPx()
+                        val sidePx = canvasSizePx
                         val cellPx = sidePx / gridSide
 
                         tiles.forEach { tile ->

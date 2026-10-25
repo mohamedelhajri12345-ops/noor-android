@@ -13,9 +13,9 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.audio.SfxManager
@@ -29,12 +29,12 @@ import com.elhajri.noor.ui.noorGlassCard
  * Category: ألعاب ذكاء
  * Mechanic: Rotate pipe tiles 90 degrees to irrigate date palms from the water spring.
  */
-private enum class PipeType { STRAIGHT, CORNER }
+private enum class IrrigationPipeType { STRAIGHT, CORNER }
 
 private data class IrrigationPipe(
     val row: Int,
     val col: Int,
-    val type: PipeType,
+    val type: IrrigationPipeType,
     var rotation: Float, // 0, 90, 180, 270
     var isConnected: Boolean = false
 )
@@ -59,7 +59,7 @@ fun PipeIrrigationGame(
         // 4x4 Grid setup
         for (r in 0 until gridSide) {
             for (c in 0 until gridSide) {
-                val pType = if ((r + c) % 2 == 0) PipeType.CORNER else PipeType.STRAIGHT
+                val pType = if ((r + c) % 2 == 0) IrrigationPipeType.CORNER else IrrigationPipeType.STRAIGHT
                 val initRot = ((r + c + 1) * 90f) % 360f
                 pipes.add(IrrigationPipe(row = r, col = c, type = pType, rotation = initRot))
             }
@@ -154,16 +154,18 @@ fun PipeIrrigationGame(
                 BoxWithConstraints(
                     modifier = Modifier.aspectRatio(1f).padding(12.dp)
                 ) {
+                    val density = LocalDensity.current
                     val canvasSize = minOf(maxWidth, maxHeight)
+                    val canvasSizePx = with(density) { canvasSize.toPx() }
 
                     Canvas(
                         modifier = Modifier
                             .fillMaxSize()
                             .gameGestureDetector(
-                                onTap = { pos -> handlePipeTap(pos, canvasSize.toPx()) }
+                                onTap = { pos -> handlePipeTap(pos, canvasSizePx) }
                             )
                     ) {
-                        val sidePx = canvasSize.toPx()
+                        val sidePx = canvasSizePx
                         val cellPx = sidePx / gridSide
 
                         pipes.forEach { pipe ->
@@ -180,7 +182,7 @@ fun PipeIrrigationGame(
 
                             rotate(degrees = pipe.rotation, pivot = center) {
                                 val pipeColor = if (pipe.isConnected) Color(0xFF00E676) else theme.accent
-                                if (pipe.type == PipeType.STRAIGHT) {
+                                if (pipe.type == IrrigationPipeType.STRAIGHT) {
                                     drawLine(
                                         color = pipeColor,
                                         start = Offset(center.x, top + 8f),
