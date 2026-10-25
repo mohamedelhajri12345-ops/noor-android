@@ -1,10 +1,8 @@
 package com.elhajri.noor.library
-import com.elhajri.noor.settings.t
 
-import android.content.Context
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -18,23 +16,15 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.OpenInNew
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,7 +34,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,6 +41,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
@@ -83,10 +73,10 @@ fun InAppBookReaderScreen(
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("لم يتم العثور على الكتاب", color = Gold, fontSize = 16.sp)
+                Text(t("لم يتم العثور على الكتاب", "Book not found"), color = Gold, fontSize = 16.sp)
                 Spacer(Modifier.height(12.dp))
                 Button(onClick = onBack, colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
-                    Text("رجوع", color = Navy)
+                    Text(t("رجوع", "Back"), color = Navy)
                 }
             }
         }
@@ -95,13 +85,13 @@ fun InAppBookReaderScreen(
 
     var localFile by remember { mutableStateOf<File?>(LibraryStore.getLocalFile(context, book)) }
     var isDownloading by remember { mutableStateOf(false) }
-    var downloadProgress by remember { mutableFloatStateOf(0f) }
     var downloadError by remember { mutableStateOf<String?>(null) }
 
-    // If file is not local, auto-download or copy asset
+    // Auto-download if missing locally
     LaunchedEffect(bookId) {
-        if (localFile == null) {
+        if (localFile == null || !localFile!!.exists() || localFile!!.length() == 0L) {
             isDownloading = true
+            downloadError = null
             BookDownloader.downloadBook(context, book) { success, msg ->
                 isDownloading = false
                 if (success) {
@@ -133,11 +123,12 @@ fun InAppBookReaderScreen(
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontFamily = AmiriFamily
                 )
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = t("تنسيق EPUB يتطلب قارئ مستندات خارجي. يمكنك تنزيل الكتاب وفتحه عبر القارئ المفضل لديك.", "EPUB format requires an external reader app. Download and open in your preferred app."),
+                    text = t("تنسيق EPUB يتطلب قارئ مستندات خارجي. يمكنك فتح الملف عبر القارئ المفضل لديك.", "EPUB format requires an external reader app. Open in your preferred app."),
                     color = GoldSoft,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
@@ -146,7 +137,7 @@ fun InAppBookReaderScreen(
                 Button(
                     onClick = {
                         val file = LibraryStore.getLocalFile(context, book)
-                        if (file != null) {
+                        if (file != null && file.exists()) {
                             try {
                                 val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
                                 val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -154,8 +145,10 @@ fun InAppBookReaderScreen(
                                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 }
                                 context.startActivity(intent)
-                            } catch (_: Exception) {
-                                Toast.makeText(context, "لم يتم العثور على تطبيق لفتح ملفات EPUB", Toast.LENGTH_SHORT).show()
+                            } catch (e: ActivityNotFoundException) {
+                                Toast.makeText(context, t("لم يتم العثور على تطبيق لفتح ملفات EPUB", "No app found to open EPUB files"), Toast.LENGTH_LONG).show()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, t("تعذّر فتح القارئ الخارجي", "Could not launch external reader"), Toast.LENGTH_SHORT).show()
                             }
                         } else {
                             scope.launch {
@@ -167,33 +160,49 @@ fun InAppBookReaderScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Gold)
                 ) {
-                    Text(if (localFile != null) "فتح في قارئ خارجي" else "تنزيل الكتاب", color = Navy, fontWeight = FontWeight.Bold)
+                    Text(if (localFile != null) t("فتح في قارئ خارجي", "Open External Reader") else t("تنزيل الكتاب", "Download Book"), color = Navy, fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.height(12.dp))
                 OutlinedButton(onClick = onBack) {
-                    Text("رجوع", color = Gold)
+                    Text(t("رجوع", "Back"), color = Gold)
                 }
             }
         }
         return
     }
 
-    if (localFile == null || isDownloading) {
+    if (localFile == null || isDownloading || !localFile!!.exists()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFF070B14)),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
                 CircularProgressIndicator(color = Gold)
                 Spacer(Modifier.height(16.dp))
-                Text("جاري تحضير كتاب: ${book.title}...", color = Gold, fontSize = 14.sp)
+                Text(t("جاري تحضير كتاب: ${book.title}...", "Preparing: ${book.title}..."), color = Gold, fontSize = 14.sp, textAlign = TextAlign.Center)
                 if (downloadError != null) {
                     Spacer(Modifier.height(12.dp))
-                    Text(downloadError!!, color = Color.Red, fontSize = 12.sp)
-                    Spacer(Modifier.height(12.dp))
-                    Button(onClick = onBack) { Text("رجوع", color = Color.White) }
+                    Text(downloadError!!, color = Color(0xFFFF6B6B), fontSize = 13.sp, textAlign = TextAlign.Center)
+                    Spacer(Modifier.height(16.dp))
+                    Button(onClick = {
+                        isDownloading = true
+                        downloadError = null
+                        scope.launch {
+                            BookDownloader.downloadBook(context, book) { success, msg ->
+                                isDownloading = false
+                                if (success) localFile = LibraryStore.getLocalFile(context, book)
+                                else downloadError = msg ?: t("فشل التحميل", "Download failed")
+                            }
+                        }
+                    }, colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
+                        Text(t("إعادة المحاولة", "Retry"), color = Navy)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(onClick = onBack) {
+                        Text(t("رجوع", "Back"), color = Gold)
+                    }
                 }
             }
         }
@@ -204,9 +213,12 @@ fun InAppBookReaderScreen(
     val totalPages = remember(pdfFile) { PdfRendererHelper.getPageCount(pdfFile).coerceAtLeast(1) }
 
     val savedProgress = remember(bookId) { LibraryStore.getProgress(context, bookId) }
-    val initialPage = savedProgress?.lastPage?.coerceIn(0, totalPages - 1) ?: 0
+    val initialPage = savedProgress?.lastPage?.coerceIn(0, (totalPages - 1).coerceAtLeast(0)) ?: 0
 
-    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = { totalPages })
+    val pagerState = rememberPagerState(
+        initialPage = initialPage,
+        pageCount = { totalPages.coerceAtLeast(1) }
+    )
 
     var showControls by remember { mutableStateOf(true) }
     var bookmarks by remember { mutableStateOf(LibraryStore.getBookmarks(context, bookId)) }
@@ -215,7 +227,7 @@ fun InAppBookReaderScreen(
     val isCurrentPageBookmarked = bookmarks.contains(pagerState.currentPage)
 
     // Auto-save reading progress
-    LaunchedEffect(pagerState.currentPage) {
+    LaunchedEffect(pagerState.currentPage, totalPages) {
         LibraryStore.saveProgress(context, bookId, pagerState.currentPage, totalPages)
     }
 
@@ -327,37 +339,38 @@ fun InAppBookReaderScreen(
                         )
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
-                    // Page Progress Slider
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("١", color = GoldSoft, fontSize = 12.sp)
-                        Slider(
-                            value = (pagerState.currentPage + 1).toFloat(),
-                            onValueChange = { newVal ->
-                                scope.launch {
-                                    pagerState.scrollToPage(newVal.toInt() - 1)
-                                }
-                            },
-                            valueRange = 1f..totalPages.toFloat(),
-                            steps = (totalPages - 2).coerceAtLeast(0),
-                            colors = SliderDefaults.colors(
-                                thumbColor = Gold,
-                                activeTrackColor = Gold,
-                                inactiveTrackColor = NavyLight
-                            ),
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 8.dp)
-                        )
-                        Text("$totalPages", color = GoldSoft, fontSize = 12.sp)
+                    if (totalPages > 1) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("١", color = GoldSoft, fontSize = 12.sp)
+                            Slider(
+                                value = (pagerState.currentPage + 1).toFloat().coerceIn(1f, totalPages.toFloat()),
+                                onValueChange = { newVal ->
+                                    scope.launch {
+                                        val page = (newVal.toInt() - 1).coerceIn(0, totalPages - 1)
+                                        pagerState.scrollToPage(page)
+                                    }
+                                },
+                                valueRange = 1f..totalPages.toFloat(),
+                                steps = (totalPages - 2).coerceAtLeast(0),
+                                colors = SliderDefaults.colors(
+                                    thumbColor = Gold,
+                                    activeTrackColor = Gold,
+                                    inactiveTrackColor = NavyLight
+                                ),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(horizontal = 8.dp)
+                            )
+                            Text("$totalPages", color = GoldSoft, fontSize = 12.sp)
+                        }
                     }
 
                     // Progress Percentage Bar
-                    val pct = (((pagerState.currentPage + 1) * 100) / totalPages)
                     LinearProgressIndicator(
-                        progress = (pagerState.currentPage + 1).toFloat() / totalPages.toFloat(),
+                        progress = { ((pagerState.currentPage + 1).toFloat() / totalPages.toFloat()).coerceIn(0f, 1f) },
                         color = Gold,
                         trackColor = NavyLight,
                         modifier = Modifier
@@ -376,11 +389,11 @@ fun InAppBookReaderScreen(
             onDismissRequest = { showBookmarksSheet = false },
             containerColor = Color(0xFF0D1420),
             title = {
-                Text("العلامات المرجعية المحفوظة", color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(t("العلامات المرجعية المحفوظة", "Saved Bookmarks"), color = Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             },
             text = {
                 if (bookmarks.isEmpty()) {
-                    Text("لم تقم بإضافة أي علامات مرجعية لهذا الكتاب بعد.", color = GoldSoft, fontSize = 13.sp)
+                    Text(t("لم تقم بإضافة أي علامات مرجعية لهذا الكتاب بعد.", "No bookmarks saved for this book yet."), color = GoldSoft, fontSize = 13.sp)
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         bookmarks.forEach { page ->
@@ -391,13 +404,17 @@ fun InAppBookReaderScreen(
                                     .background(NavyCard)
                                     .clickable {
                                         showBookmarksSheet = false
-                                        scope.launch { pagerState.scrollToPage(page) }
+                                        scope.launch {
+                                            if (page in 0 until totalPages) {
+                                                pagerState.scrollToPage(page)
+                                            }
+                                        }
                                     }
                                     .padding(12.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("صفحة ${page + 1}", color = Color.White, fontSize = 14.sp)
+                                Text(t("صفحة ${page + 1}", "Page ${page + 1}"), color = Color.White, fontSize = 14.sp)
                                 Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Gold)
                             }
                         }
@@ -406,7 +423,7 @@ fun InAppBookReaderScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showBookmarksSheet = false }) {
-                    Text("إغلاق", color = Gold)
+                    Text(t("إغلاق", "Close"), color = Gold)
                 }
             }
         )
@@ -447,11 +464,14 @@ private fun PdfPageView(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp))
-                    .border(1.dp, Gold.copy(alpha = 0.25f), RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Fit
+                    .border(1.dp, Gold.copy(alpha = 0.25f), RoundedCornerShape(8.dp))
             )
         } else {
-            Text("تعذر عرض هذه الصفحة", color = Color.Red, fontSize = 13.sp)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(Icons.Default.MenuBook, contentDescription = null, tint = GoldSoft, modifier = Modifier.size(48.dp))
+                Spacer(Modifier.height(8.dp))
+                Text(t("تعذّر عرض هذه الصفحة", "Could not render page"), color = GoldSoft, fontSize = 13.sp)
+            }
         }
     }
 }
