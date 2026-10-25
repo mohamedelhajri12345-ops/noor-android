@@ -49,6 +49,16 @@ object GameFavoritesStore {
 object InteractiveGameRegistry {
     val games: List<InteractiveGame> = listOf(
         InteractiveGame(
+            id = "game_06_rubik_arabesque",
+            titleAr = "مكعب المقرنصات",
+            titleEn = "Muqarnas Sliding Grid",
+            category = InteractiveGameCategories.INTELLIGENCE,
+            route = "game_06_rubik_arabesque",
+            icon = Icons.Default.Grid4x4,
+            accentColor = Color(0xFF80D8FF),
+            descriptionAr = "تحريك الصفوف والأعمدة لترتيب نقش المقرنصات"
+        ),
+        InteractiveGame(
             id = "game_05_tangram_star",
             titleAr = "تنجرام النجمة الإسلامية",
             titleEn = "Islamic Star Tangram",
