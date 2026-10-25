@@ -427,6 +427,7 @@ fun NoorApp() {
                 composable("game_10_aqueduct_pipes") { AqueductPipesGame(onBack = { navController.popBackStack() }) }
                 composable("game_11_minaret_stacker") { MinaretStackerGame(onBack = { navController.popBackStack() }) }
                 composable("game_12_crescent_cannon") { CrescentCannonGame(onBack = { navController.popBackStack() }) }
+                composable("game_22_calligraphy_trace") { CalligraphyTraceGame(onBack = { navController.popBackStack() }) }
                 composable("game_30_lantern_pop") { LanternPopGame(onBack = { navController.popBackStack() }) }
                 composable("game_39_memory_cards") { MemoryCardsGame(onBack = { navController.popBackStack() }) }
                 composable("videos") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "videos"); com.elhajri.noor.videos.VideosScreen(onBack = { navController.popBackStack() }, onOpenVideo = { videoId -> navController.navigate("videoPlayer/$videoId") }) }

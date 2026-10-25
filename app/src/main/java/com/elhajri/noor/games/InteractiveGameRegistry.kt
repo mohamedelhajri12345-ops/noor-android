@@ -109,6 +109,16 @@ object InteractiveGameRegistry {
             descriptionAr = "تعديل زوايا الإطلاق والتنشين نحو النجوم والهلال"
         ),
         InteractiveGame(
+            id = "game_22_calligraphy_trace",
+            titleAr = "خطاط النور",
+            titleEn = "Calligraphy Trace",
+            category = InteractiveGameCategories.WORDS,
+            route = "game_22_calligraphy_trace",
+            icon = Icons.Default.Edit,
+            accentColor = Color(0xFFFFD700),
+            descriptionAr = "تخطيط وتتبع الخط العربي ورسم الحروف الإسلامية"
+        ),
+        InteractiveGame(
             id = "game_30_lantern_pop",
             titleAr = "فوانيس رمضان",
             titleEn = "Lantern Pop",
