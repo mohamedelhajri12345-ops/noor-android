@@ -423,6 +423,8 @@ fun NoorApp() {
                 composable("games") { NoorGameHubScreen(onBack = { navController.popBackStack() }, onNavigate = { navController.navigate(it) }) }
                 composable("game_01_dome_merge") { DomeMergeGame(onBack = { navController.popBackStack() }) }
                 composable("game_02_zellige_match3") { ZelligeMatch3Game(onBack = { navController.popBackStack() }) }
+                composable("game_09_mosque_jigsaw") { MosqueJigsawGame(onBack = { navController.popBackStack() }) }
+                composable("game_10_aqueduct_pipes") { AqueductPipesGame(onBack = { navController.popBackStack() }) }
                 composable("game_11_minaret_stacker") { MinaretStackerGame(onBack = { navController.popBackStack() }) }
                 composable("game_12_crescent_cannon") { CrescentCannonGame(onBack = { navController.popBackStack() }) }
                 composable("game_30_lantern_pop") { LanternPopGame(onBack = { navController.popBackStack() }) }
