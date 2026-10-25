@@ -425,6 +425,7 @@ fun NoorApp() {
                 composable("game_02_zellige_match3") { ZelligeMatch3Game(onBack = { navController.popBackStack() }) }
                 composable("game_03_mosque_jigsaw") { MosqueJigsawGame(onBack = { navController.popBackStack() }) }
                 composable("game_04_kaaba_unblock") { CaravanUnblockGame(onBack = { navController.popBackStack() }) }
+                composable("game_05_tangram_star") { TangramStarGame(onBack = { navController.popBackStack() }) }
                 composable("game_09_mosque_jigsaw") { MosqueJigsawGame(onBack = { navController.popBackStack() }) }
                 composable("game_10_aqueduct_pipes") { AqueductPipesGame(onBack = { navController.popBackStack() }) }
                 composable("game_11_minaret_stacker") { MinaretStackerGame(onBack = { navController.popBackStack() }) }

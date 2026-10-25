@@ -49,6 +49,16 @@ object GameFavoritesStore {
 object InteractiveGameRegistry {
     val games: List<InteractiveGame> = listOf(
         InteractiveGame(
+            id = "game_05_tangram_star",
+            titleAr = "تنجرام النجمة الإسلامية",
+            titleEn = "Islamic Star Tangram",
+            category = InteractiveGameCategories.INTELLIGENCE,
+            route = "game_05_tangram_star",
+            icon = Icons.Default.Star,
+            accentColor = Color(0xFF00E676),
+            descriptionAr = "تركيب الأشكال الهندسية داخل النجمة الإسلامية"
+        ),
+        InteractiveGame(
             id = "game_04_kaaba_unblock",
             titleAr = "مسار القافلة",
             titleEn = "Caravan Path Unblock",
