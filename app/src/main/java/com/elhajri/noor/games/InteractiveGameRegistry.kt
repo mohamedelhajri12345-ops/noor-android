@@ -238,5 +238,16 @@ object InteractiveGameRegistry {
             accentColor = Color(0xFF76FF03),
             descriptionAr = "جمع ثمار الخير وتنمية شجرة الصدقات والحسنات"
         )
+,
+        InteractiveGame(
+            id = "game_13_slingshot_dates",
+            titleAr = "مقلاع التمر",
+            titleEn = "Date Slingshot",
+            category = InteractiveGameCategories.SKILL,
+            route = "game_13_slingshot_dates",
+            icon = Icons.Default.SportsBasketball,
+            accentColor = Color(0xFFFFD700),
+            descriptionAr = "إطلاق التمر بالمقلاع لإصابة السلال والأهداف"
+        )
     )
 }
