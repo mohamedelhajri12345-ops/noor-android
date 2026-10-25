@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
@@ -40,13 +39,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * The NOOR top bar, faithful to the original web app header:
- * crescent logo + app title on one side, gold action buttons on the other.
+ * The NOOR top bar:
+ * Crescent logo + app title on one side, gold action buttons on the other.
+ * Donation (التبرع) entry removed per owner requirement.
  */
 @Composable
 fun NoorTopBar(
     onCommunity: () -> Unit,
-    onDonate: () -> Unit,
+    onDonate: () -> Unit = {}, // Retained with empty default for backward compatibility
     onAssistant: () -> Unit,
     onSettings: () -> Unit,
     onProfile: () -> Unit = {}
@@ -67,7 +67,6 @@ fun NoorTopBar(
             ) {
                 // Logo: crescent moon + title
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // أيقونة التطبيق الرسمية الحالية — بنفس هوية المشغّل
                     androidx.compose.foundation.Image(
                         painter = androidx.compose.ui.res.painterResource(com.elhajri.noor.R.mipmap.ic_launcher),
                         contentDescription = t("أيقونة التطبيق", "App Icon"),
@@ -86,19 +85,18 @@ fun NoorTopBar(
                     )
                 }
 
-                // Action buttons
+                // Action buttons — Donation removed
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TopBarAction(icon = { Icon(Icons.Filled.Groups, contentDescription = t("المجتمع", "Community"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onCommunity)
                     TopBarAction(icon = { Icon(Icons.AutoMirrored.Filled.Send, contentDescription = t("واتساب", "WhatsApp"), tint = Gold, modifier = Modifier.size(18.dp)) }) {
                         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/212726626546")))
                     }
-                    TopBarAction(icon = { Icon(Icons.Filled.Favorite, contentDescription = t("تبرع", "Donate"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onDonate)
                     TopBarAction(icon = { Icon(Icons.Filled.AutoAwesome, contentDescription = t("المساعد الذكي", "Smart Assistant"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onAssistant)
                     TopBarAction(icon = { Icon(Icons.Filled.Person, contentDescription = t("ملفي الشخصي", "My Profile"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onProfile)
                     TopBarAction(icon = { Icon(Icons.Filled.Settings, contentDescription = t("الإعدادات", "Settings"), tint = Gold, modifier = Modifier.size(18.dp)) }, onClick = onSettings)
                 }
             }
-            // hairline gold separator, like the web header bottom border
+            // hairline gold separator
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()

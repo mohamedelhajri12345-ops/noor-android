@@ -1,343 +1,329 @@
 package com.elhajri.noor.theme
 
-import com.elhajri.noor.settings.NoorLocale
-import com.elhajri.noor.settings.t
-
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.elhajri.noor.R
 
 /**
- * تعريف الثيم — بنية بيانات واضحة تجعل إضافة ثيم جديد مسألة سطر واحد
- * داخل قائمة NoorThemes.all دون أي تعديل على بقية النظام.
- */
-data class NoorThemeDef(
-    val id: String,
-    val nameAr: String,
-    val nameEn: String,
-    val descAr: String,
-    val descEn: String,
-    val price: Int,               // 0 = مجاني
-    // الخلفية العامة (تدرّج رأسي من اللونين)
-    val background: Color,
-    val backgroundEnd: Color,
-    // البطاقات والأسطح
-    val surface: Color,
-    val surfaceVariant: Color,
-    // اللون الرئيسي (الذهب في الثيم الافتراضي)
-    val accent: Color,
-    val accentSoft: Color,
-    val accentDeep: Color,
-    // النصوص
-    val textPrimary: Color,
-    val textSecondary: Color,
-    // ألوان الحالات
-    val success: Color = Color(0xFF10B981),
-    val error: Color = Color(0xFFEF4444),
-    // خلفية مرسومة بالكود فقط (تدرّجات وإضاءة) — لا صور ويب نهائياً
-    val backgroundRes: Int = 0,
-    // الأنماط البصرية
-    val cardRadius: Dp = 16.dp,
-    val buttonRadius: Dp = 14.dp,
-    val buttonGradient: List<Color> = listOf(accentSoft, accent, accentDeep),
-    // الهوية البصرية للبصمة المخصصة (Motif Identity Fields)
-    val motifType: ThemeMotifType = ThemeMotifType.NOOR_FLAGSHIP,
-    val motifColor: Color = accent,
-    val cardStyle: NoorCardStyle = NoorCardStyle(radius = cardRadius),
-    val headerStyle: NoorHeaderStyle = NoorHeaderStyle()
-) {
-    val name: String get() = if (NoorLocale.isEnglish) nameEn else nameAr
-    val description: String get() = if (NoorLocale.isEnglish) descEn else descAr
-}
-
-/**
- * حالة الثيم النشط — واحدة لكل التطبيق، تقرأها الشاشات تفاعلياً
- * (أي تغيير هنا ينعكس فوراً على كل الواجهات دون إعادة إنشاء النشاط).
- */
-object NoorThemeState {
-    var active by mutableStateOf(NoorThemes.all.first())
-        private set
-
-    fun apply(def: NoorThemeDef) {
-        active = def
-    }
-
-    fun applyById(id: String) {
-        NoorThemes.byId(id)?.let { active = it }
-    }
-}
-
-/**
- * كتالوج الثيمات — 21 ثيمة إسلامية (نور الأساسي مجاني + 20 ثيمة مدفوعة بالنقاط).
- * كل ثيمة تمتلك بصمتها البصرية الفريدة (Visual Signature Motif) ومعلمات أسلوبها الخاص.
+ * كتالوج الثيمات الـ20 المستقبليّة (2026/2027 Futuristic Islamic Theme Store).
+ * جميع الثيمات الـ20 مصممة بهوية إسلامية مستقبلية مع ألوان غنية وبصمات رسم كود.
  */
 object NoorThemes {
 
     private fun theme(
-        id: String, nameAr: String, nameEn: String, descAr: String, descEn: String, price: Int = ThemeStore.THEME_PRICE,
+        id: String,
+        nameAr: String, nameEn: String,
+        descAr: String, descEn: String,
+        price: Int = ThemeStore.THEME_PRICE,
         bg: Long, bgEnd: Long, surface: Long, surfaceVariant: Long,
         accent: Long, accentSoft: Long, accentDeep: Long,
         text: Long, textSec: Long,
-        motifType: ThemeMotifType = ThemeMotifType.NOOR_FLAGSHIP,
-        motifColor: Color? = null,
-        cardStyle: NoorCardStyle? = null,
-        headerStyle: NoorHeaderStyle = NoorHeaderStyle()
+        motifType: ThemeMotifType
     ): NoorThemeDef {
         val accentCol = Color(accent)
         return NoorThemeDef(
-            id, nameAr, nameEn, descAr, descEn, price,
-            Color(bg), Color(bgEnd), Color(surface), Color(surfaceVariant),
-            accentCol, Color(accentSoft), Color(accentDeep),
-            Color(text), Color(textSec),
+            id = id,
+            nameAr = nameAr,
+            nameEn = nameEn,
+            descAr = descAr,
+            descEn = descEn,
+            price = price,
+            background = Color(bg),
+            backgroundEnd = Color(bgEnd),
+            surface = Color(surface),
+            surfaceVariant = Color(surfaceVariant),
+            accent = accentCol,
+            accentSoft = Color(accentSoft),
+            accentDeep = Color(accentDeep),
+            textPrimary = Color(text),
+            textSecondary = Color(textSec),
             motifType = motifType,
-            motifColor = motifColor ?: accentCol,
-            cardStyle = cardStyle ?: NoorCardStyle(glowColor = accentCol),
-            headerStyle = headerStyle
+            motifColor = accentCol,
+            cardStyle = NoorCardStyle(radius = 18.dp, glowColor = accentCol)
         )
     }
 
-    private val base = listOf(
+    val all: List<NoorThemeDef> = listOf(
 
-        // ─────────── 00 — الثيم الافتراضي المجاني ───────────
+        // 00 — نور السيبراني 2027 (الثيم الافتراضي الرئيسي المجاني)
         theme(
-            "noor_default", "نور الأساسي", "NOOR Default", "الهوية المعتمدة — أخضر ليلي زيتوني وذهب دافئ", "Official Theme — Night Olive Green & Warm Gold", price = 0,
-            bg = 0xFF10220F, bgEnd = 0xFF081209, surface = 0xFF13291B, surfaceVariant = 0xFF1A3323,
-            accent = 0xFFE9C46A, accentSoft = 0xFFF6E2A0, accentDeep = 0xFFA57C31,
-            text = 0xFFEDE9DD, textSec = 0xFFB9C4B0,
-            motifType = ThemeMotifType.NOOR_FLAGSHIP,
-            cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.dp, borderAlpha = 0.25f, glowColor = Color(0xFFE9C46A))
+            id = "noor_cyber_2027",
+            nameAr = "نور السيبراني 2027",
+            nameEn = "Cyber Noor 2027",
+            descAr = "الهوية المستقبلية المعتمدة — أوبسيديان أخضر ليلي مع ذهب كوانتمي ناصع",
+            descEn = "Flagship 2027 Vision — Night Obsidian Green & Quantum Cyber Gold",
+            price = 0,
+            bg = 0xFF0A1810, bgEnd = 0xFF040C07,
+            surface = 0xFF122E1A, surfaceVariant = 0xFF193D23,
+            accent = 0xFFFFD700, accentSoft = 0xFFFFE875, accentDeep = 0xFFC29B00,
+            text = 0xFFF7FBF6, textSec = 0xFFBCE3B5,
+            motifType = ThemeMotifType.CYBER_NOOR_CORE
         ),
 
-        // ─────────── 01 — نور الفجر ───────────
+        // 01 — الزمرد الكوانتي
         theme(
-            "fajr_noor", "نور الفجر", "Fajr Light", "سماء الفجر الهادئة — أزرق فجري داكن وذهب خفيف لبداية يوم جديد", "Serene Dawn Sky — Dark Dawn Blue & Subtle Gold",
-            bg = 0xFF0C1826, bgEnd = 0xFF081220, surface = 0xFF142436, surfaceVariant = 0xFF1C3046,
-            accent = 0xFFD9BC66, accentSoft = 0xFFF0DCA0, accentDeep = 0xFFB08D2F,
-            text = 0xFFF6FBFF, textSec = 0xFFBFD2E4,
-            motifType = ThemeMotifType.FAJR_DAWN,
-            cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.dp, borderAlpha = 0.18f, glowColor = Color(0xFFD9BC66))
+            id = "quantum_emerald",
+            nameAr = "الزمرد الكوانتي",
+            nameEn = "Quantum Emerald",
+            descAr = "شبكة زمردية ليزرية مع إشراق مآذن نيونية",
+            descEn = "Quantum Laser Emerald Grid with Neon Minaret Radiance",
+            bg = 0xFF041F18, bgEnd = 0xFF02120F,
+            surface = 0xFF0A3326, surfaceVariant = 0xFF0F4538,
+            accent = 0xFF00E676, accentSoft = 0xFF66FFA6, accentDeep = 0xFF00A352,
+            text = 0xFFF0FDF8, textSec = 0xFFA7F3D0,
+            motifType = ThemeMotifType.QUANTUM_EMERALD_GRID
         ),
 
-        // ─────────── 02 — زمرد القرآن ───────────
+        // 02 — الكعبة الأوبسيدية 2027
         theme(
-            "emerald_quran", "زمرد القرآن", "Qur'an Emerald", "كلاسيكي إسلامي فاخر — زمردي عميق وذهب على أخضر داكن", "Luxurious Islamic Classic — Deep Emerald & Gold",
-            bg = 0xFF062A1E, bgEnd = 0xFF04211A, surface = 0xFF0B3D2E, surfaceVariant = 0xFF0E4A38,
-            accent = 0xFFD4AF35, accentSoft = 0xFFF0D77A, accentDeep = 0xFF9E7C2E,
-            text = 0xFFF2FAF5, textSec = 0xFFBFD6C9,
-            motifType = ThemeMotifType.EMERALD_DOME,
-            cardStyle = NoorCardStyle(radius = 18.dp, borderWidth = 1.2.dp, borderAlpha = 0.30f, glowColor = Color(0xFFD4AF35), isFramed = true)
+            id = "obsidian_kaaba",
+            nameAr = "الكعبة الأوبسيدية 2027",
+            nameEn = "Obsidian Kaaba 2027",
+            descAr = "أسود أوبسيدي فاخر بحزام كسوة ذهبي ليزري ناصع",
+            descEn = "Deep Obsidian Black with Laser Golden Kiswah Belt",
+            bg = 0xFF0A0B10, bgEnd = 0xFF030406,
+            surface = 0xFF181A24, surfaceVariant = 0xFF222533,
+            accent = 0xFFF5C542, accentSoft = 0xFFFFE082, accentDeep = 0xFFC49514,
+            text = 0xFFFAFAFD, textSec = 0xFFC9CBDC,
+            motifType = ThemeMotifType.OBSIDIAN_KAABA_NEON
         ),
 
-        // ─────────── 03 — المسجد الذهبي ───────────
+        // 03 — الكوفي النيون
         theme(
-            "golden_mosque", "المسجد الذهبي", "Golden Mosque", "فخامة ملكية — ذهب راقٍ على بني داكن وأسود ناعم", "Royal Elegance — Fine Gold on Dark Brown",
-            bg = 0xFF16100A, bgEnd = 0xFF100B07, surface = 0xFF231A10, surfaceVariant = 0xFF2C2115,
-            accent = 0xFFE3B94D, accentSoft = 0xFFF6D98A, accentDeep = 0xFFA87F2B,
-            text = 0xFFFBF5E9, textSec = 0xFFD6C4A5,
-            motifType = ThemeMotifType.GOLDEN_MOSQUE,
-            cardStyle = NoorCardStyle(radius = 14.dp, borderWidth = 1.5.dp, borderAlpha = 0.35f, glowColor = Color(0xFFE3B94D), isFramed = true)
+            id = "neon_kufic_gold",
+            nameAr = "الكوفي النيون",
+            nameEn = "Neon Kufic Gold",
+            descAr = "خط كوفي هندسي متوهج بذهب دافئ على خلفية داكنة",
+            descEn = "Geometric Kufic Geometry glowing in Warm Gold",
+            bg = 0xFF17120B, bgEnd = 0xFF0D0905,
+            surface = 0xFF281E13, surfaceVariant = 0xFF36281B,
+            accent = 0xFFFFB300, accentSoft = 0xFFFFD54F, accentDeep = 0xFFC78100,
+            text = 0xFFFFFDF5, textSec = 0xFFE6CFAD,
+            motifType = ThemeMotifType.NEON_KUFIC_GOLD
         ),
 
-        // ─────────── 04 — ليل مكة ───────────
+        // 04 — البنفسج الفلكي
         theme(
-            "makkah_night", "ليل مكة", "Makkah Night", "ليل روحاني فاخر — كحلي عميق وذهب متوهج", "Spiritual Night — Deep Navy & Glowing Gold",
-            bg = 0xFF070F2A, bgEnd = 0xFF050A1E, surface = 0xFF0C1734, surfaceVariant = 0xFF11204A,
-            accent = 0xFFE0B94F, accentSoft = 0xFFF7DB86, accentDeep = 0xFFA5842D,
-            text = 0xFFF4F6FC, textSec = 0xFFB9C2DC,
-            motifType = ThemeMotifType.MAKKAH_NIGHT,
-            cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.dp, borderAlpha = 0.25f, glowColor = Color(0xFFE0B94F))
+            id = "celestial_madinah",
+            nameAr = "البنفسج الفلكي",
+            nameEn = "Celestial Madinah Violet",
+            descAr = "سماء بنفسجية فلكية مع هالة الروضة الشريفة",
+            descEn = "Deep Celestial Violet with Rawdah Glowing Aura",
+            bg = 0xFF130A24, bgEnd = 0xFF0A0414,
+            surface = 0xFF22143A, surfaceVariant = 0xFF2F1D52,
+            accent = 0xFFB388FF, accentSoft = 0xFFD1C4E9, accentDeep = 0xFF7C4DFF,
+            text = 0xFFFBF8FF, textSec = 0xFFD1C2F0,
+            motifType = ThemeMotifType.CELESTIAL_MADINAH_VIOLET
         ),
 
-        // ─────────── 05 — المدينة الهادئة ───────────
+        // 05 — الذهب الفتوري الوردي
         theme(
-            "madinah_calm", "المدينة الهادئة", "Serene Madinah", "دفء تراثي — أخضر زيتوني وبيج المسجد النبوي", "Heritage Warmth — Olive Green & Madinah Beige",
-            bg = 0xFF141B10, bgEnd = 0xFF101609, surface = 0xFF1F2A17, surfaceVariant = 0xFF28341D,
-            accent = 0xFFD9B25F, accentSoft = 0xFFEFD394, accentDeep = 0xFFA08140,
-            text = 0xFFF7F3E8, textSec = 0xFFD0C7B0,
-            motifType = ThemeMotifType.MADINAH_CALM,
-            cardStyle = NoorCardStyle(radius = 20.dp, borderWidth = 1.dp, borderAlpha = 0.20f, glowColor = Color(0xFFD9B25F))
+            id = "diwani_cyber_rose",
+            nameAr = "الذهب الفتوري الوردي",
+            nameEn = "Diwani Cyber Rose",
+            descAr = "انسيابية خط ديواني نيون بحواف ذهب وردي ملكي",
+            descEn = "Fluid Diwani Neon Calligraphy in Royal Rose Gold",
+            bg = 0xFF1C0D18, bgEnd = 0xFF0F050D,
+            surface = 0xFF2D1627, surfaceVariant = 0xFF3D1F35,
+            accent = 0xFFFF80AB, accentSoft = 0xFFFF4081, accentDeep = 0xFFC51162,
+            text = 0xFFFFF5F9, textSec = 0xFFF8BBD0,
+            motifType = ThemeMotifType.DIWANI_CYBER_ROSE
         ),
 
-        // ─────────── 06 — الكعبة الملكية ───────────
+        // 06 — الزليج الهولوغرامي
         theme(
-            "royal_kaaba", "الكعبة الملكية", "Royal Ka'bah", "Premium إسلامي — أسود فاخر بكسوة ذهبية", "Royal Islamic — Premium Black with Golden Kiswah",
-            bg = 0xFF0A0A0C, bgEnd = 0xFF070708, surface = 0xFF141416, surfaceVariant = 0xFF1B1B1E,
-            accent = 0xFFDAB84C, accentSoft = 0xFFF3DE8C, accentDeep = 0xFF9C7D2F,
-            text = 0xFFF5F4F2, textSec = 0xFFC2C0BB,
-            motifType = ThemeMotifType.ROYAL_KAABA,
-            cardStyle = NoorCardStyle(radius = 12.dp, borderWidth = 2.dp, borderAlpha = 0.40f, glowColor = Color(0xFFDAB84C), isFramed = true)
+            id = "holographic_zellige",
+            nameAr = "الزليج الهولوغرامي",
+            nameEn = "Holographic Zellige",
+            descAr = "زخارف أندلسية ثمانية بطيف ضوئي متوهج",
+            descEn = "Spectral 8-Pointed Andalusian Holographic Tessellation",
+            bg = 0xFF0D1B2A, bgEnd = 0xFF060D14,
+            surface = 0xFF1B2A4A, surfaceVariant = 0xFF243861,
+            accent = 0xFF80D8FF, accentSoft = 0xFFB388FF, accentDeep = 0xFF0091EA,
+            text = 0xFFF4FAFF, textSec = 0xFFB3E5FC,
+            motifType = ThemeMotifType.HOLOGRAPHIC_ZELLIGE
         ),
 
-        // ─────────── 07 — السماء الزرقاء ───────────
+        // 07 — البلور الأندلسي
         theme(
-            "blue_sky", "السماء الزرقاء", "Blue Sky", "ليلي عميق — أزرق ملكي داكن صافٍ وخط واضح", "Deep Night — Clear Royal Dark Blue",
-            bg = 0xFF0A1A33, bgEnd = 0xFF071226, surface = 0xFF122540, surfaceVariant = 0xFF1B3460,
-            accent = 0xFF4E8AE6, accentSoft = 0xFF87B7F2, accentDeep = 0xFF1D5FBF,
-            text = 0xFFF2F8FF, textSec = 0xFFB8D0EC,
-            motifType = ThemeMotifType.BLUE_SKY,
-            cardStyle = NoorCardStyle(radius = 18.dp, borderWidth = 1.dp, borderAlpha = 0.30f, glowColor = Color(0xFF4E8AE6))
+            id = "andalusian_crystal",
+            nameAr = "البلور الأندلسي",
+            nameEn = "Andalusian Crystal Glass",
+            descAr = "زجاج الكريستال الأندلسي مع انكسارات الضوء الفاخرة",
+            descEn = "Frosted Andalusian Crystal Glass with Prism Radiance",
+            bg = 0xFF091E22, bgEnd = 0xFF030D10,
+            surface = 0xFF123136, surfaceVariant = 0xFF18424A,
+            accent = 0xFF64FFDA, accentSoft = 0xFFA7FFEB, accentDeep = 0xFF00BFA5,
+            text = 0xFFF2FCFB, textSec = 0xFFB2DFDB,
+            motifType = ThemeMotifType.ANDALUSIAN_CRYSTAL_GLASS
         ),
 
-        // ─────────── 08 — الهلال الفضي ───────────
+        // 08 — فجر السولار
         theme(
-            "silver_crescent", "الهلال الفضي", "Silver Crescent", "ليلي أنيق Minimal — فضي هادئ على كحلي ليلي", "Minimalist Night — Calm Silver on Navy",
-            bg = 0xFF0B1020, bgEnd = 0xFF080C18, surface = 0xFF131A30, surfaceVariant = 0xFF18213E,
-            accent = 0xFFC9D4E4, accentSoft = 0xFFE6ECF5, accentDeep = 0xFF8E9DB3,
-            text = 0xFFEFF3F9, textSec = 0xFFB4BFCE,
-            motifType = ThemeMotifType.SILVER_CRESCENT,
-            cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.dp, borderAlpha = 0.22f, glowColor = Color(0xFFC9D4E4))
+            id = "solar_fajr",
+            nameAr = "فجر السولار",
+            nameEn = "Solar Fajr Glowing",
+            descAr = "أشعة فجر شمسية بلازمية ببصمة ضوئية متصاعدة",
+            descEn = "Solar Plasma Dawn Beams with Radiating Aura",
+            bg = 0xFF241006, bgEnd = 0xFF120702,
+            surface = 0xFF3B1B0B, surfaceVariant = 0xFF4F240F,
+            accent = 0xFFFF6D00, accentSoft = 0xFFFFAB40, accentDeep = 0xFFDD2C00,
+            text = 0xFFFFF8F5, textSec = 0xFFFFCCBC,
+            motifType = ThemeMotifType.SOLAR_FAJR_GLOWING
         ),
 
-        // ─────────── 09 — الصحراء الذهبية ───────────
+        // 09 — الهلال السحيق
         theme(
-            "golden_desert", "الصحراء الذهبية", "Golden Desert", "تراث عربي — رمال ذهبية وبيج دافئ وبني عميق", "Arabian Heritage — Golden Sands & Deep Brown",
-            bg = 0xFF1E160C, bgEnd = 0xFF171009, surface = 0xFF2A2013, surfaceVariant = 0xFF33281A,
-            accent = 0xFFE2BC6A, accentSoft = 0xFFF4DCA6, accentDeep = 0xFFAA8340,
-            text = 0xFFFAF2E4, textSec = 0xFFD9C8AC,
-            motifType = ThemeMotifType.GOLDEN_DESERT,
-            cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.dp, borderAlpha = 0.25f, glowColor = Color(0xFFE2BC6A))
+            id = "deep_space_crescent",
+            nameAr = "الهلال السحيق",
+            nameEn = "Deep Space Crescent",
+            descAr = "سوداوية مجرة سحيقة يتوسطها هلال فلكي متوهج",
+            descEn = "Deep Cosmic Void centered by Glowing Cosmic Crescent",
+            bg = 0xFF070B19, bgEnd = 0xFF02040B,
+            surface = 0xFF111730, surfaceVariant = 0xFF192042,
+            accent = 0xFF82B1FF, accentSoft = 0xFFB9D5FF, accentDeep = 0xFF2979FF,
+            text = 0xFFF5F8FF, textSec = 0xFFC6DAFE,
+            motifType = ThemeMotifType.DEEP_SPACE_CRESCENT
         ),
 
-        // ─────────── 10 — الزيتون ───────────
+        // 10 — الزفير السماوي
         theme(
-            "olive", "الزيتون", "Olive Branch", "طبيعي مريح للعين — زيتوني داكن على كريمي هادئ", "Eye-Comfort Natural — Dark Olive & Soft Cream",
-            bg = 0xFF101508, bgEnd = 0xFF0C1006, surface = 0xFF1A2110, surfaceVariant = 0xFF222A16,
-            accent = 0xFFC9B45A, accentSoft = 0xFFE5D68E, accentDeep = 0xFF93823D,
-            text = 0xFFF6F3E6, textSec = 0xFFCDC8B2,
-            motifType = ThemeMotifType.OLIVE_GARDEN,
-            cardStyle = NoorCardStyle(radius = 18.dp, borderWidth = 1.dp, borderAlpha = 0.20f, glowColor = Color(0xFFC9B45A))
+            id = "celestial_sapphire",
+            nameAr = "الزفير السماوي",
+            nameEn = "Celestial Sapphire",
+            descAr = "كحلي زفيري ملكي بأشكال بلورية ثمانية متوهجة",
+            descEn = "Royal Sapphire Cobalt with Octagonal Crystal Mesh",
+            bg = 0xFF0A1428, bgEnd = 0xFF030814,
+            surface = 0xFF12223F, surfaceVariant = 0xFF1A2F54,
+            accent = 0xFF448AFF, accentSoft = 0xFF82B1FF, accentDeep = 0xFF2962FF,
+            text = 0xFFF5F8FF, textSec = 0xFFBBDEFB,
+            motifType = ThemeMotifType.CELESTIAL_SAPPHIRE
         ),
 
-        // ─────────── 11 — الفيروز الإسلامي ───────────
+        // 11 — الروبي الحمراء
         theme(
-            "islamic_turquoise", "الفيروز الإسلامي", "Islamic Turquoise", "إسلامي حديث مشرق — تركواز على فيروزي وأبيض", "Bright Modern Islamic — Turquoise & Gold",
-            bg = 0xFF05302E, bgEnd = 0xFF042624, surface = 0xFF094540, surfaceVariant = 0xFF0B524C,
-            accent = 0xFFD9B54A, accentSoft = 0xFFF2DC8E, accentDeep = 0xFFA28430,
-            text = 0xFFEFFBF9, textSec = 0xFFB5DBD6,
-            motifType = ThemeMotifType.TURQUOISE_ARCH,
-            cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.2.dp, borderAlpha = 0.30f, glowColor = Color(0xFFD9B54A), isFramed = true)
+            id = "alhambra_ruby",
+            nameAr = "الروبي الحمراء",
+            nameEn = "Alhambra Ruby Pulse",
+            descAr = "عنابي مخملي أندلسي بنبضات ذهبية راقية",
+            descEn = "Velvet Andalusian Crimson Ruby with Golden Pulses",
+            bg = 0xFF21060E, bgEnd = 0xFF120207,
+            surface = 0xFF360C19, surfaceVariant = 0xFF4A1224,
+            accent = 0xFFFF5252, accentSoft = 0xFFFF8A80, accentDeep = 0xFFD50000,
+            text = 0xFFFFF5F5, textSec = 0xFFFFCDD2,
+            motifType = ThemeMotifType.ALHAMBRA_RUBY_PULSE
         ),
 
-        // ─────────── 12 — البنفسج الروحاني ───────────
+        // 12 — الشفق المئذني
         theme(
-            "spiritual_violet", "البنفسج الروحاني", "Spiritual Violet", "روحاني فاخر — بنفسجي عميق بذهب فاتح", "Spiritual Luxe — Deep Violet with Light Gold",
-            bg = 0xFF170E2A, bgEnd = 0xFF110A20, surface = 0xFF221741, surfaceVariant = 0xFF2A1C4E,
-            accent = 0xFFE4C565, accentSoft = 0xFFF6E4A3, accentDeep = 0xFFAB8A3C,
-            text = 0xFFF6F2FB, textSec = 0xFFC9BEDF,
-            motifType = ThemeMotifType.SPIRITUAL_VIOLET,
-            cardStyle = NoorCardStyle(radius = 20.dp, borderWidth = 1.dp, borderAlpha = 0.28f, glowColor = Color(0xFFE4C565))
+            id = "aurora_minaret",
+            nameAr = "الشفق المئذني",
+            nameEn = "Aurora Minaret",
+            descAr = "ستارة شفق قطبي أخضر وأزرق خلف ظلال المآذن",
+            descEn = "Ethereal Aurora Borealis Waves behind Minaret Silhouettes",
+            bg = 0xFF051D1A, bgEnd = 0xFF010E0C,
+            surface = 0xFF0D302B, surfaceVariant = 0xFF13423B,
+            accent = 0xFF1DE9B6, accentSoft = 0xFFA7FFEB, accentDeep = 0xFF00BFA5,
+            text = 0xFFF0FDFB, textSec = 0xFFB2DFDB,
+            motifType = ThemeMotifType.AURORA_MINARET
         ),
 
-        // ─────────── 13 — زمرد الليل ───────────
+        // 13 — أفق الصحراء الذهبي
         theme(
-            "night_emerald", "زمرد الليل", "Night Emerald", "Dark Premium — زمردي داكن على أسود بذهب", "Dark Premium — Deep Emerald on Black with Gold",
-            bg = 0xFF041410, bgEnd = 0xFF020C09, surface = 0xFF0A211A, surfaceVariant = 0xFF0D2921,
-            accent = 0xFFD6B345, accentSoft = 0xFFF1D980, accentDeep = 0xFF9F8030,
-            text = 0xFFF0FAF6, textSec = 0xFFB4CFC4,
-            motifType = ThemeMotifType.NIGHT_EMERALD,
-            cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.dp, borderAlpha = 0.25f, glowColor = Color(0xFFD6B345))
+            id = "amber_desert",
+            nameAr = "أفق الصحراء الذهبي",
+            nameEn = "Amber Desert Horizon",
+            descAr = "كثبان عنبرية سيبرانية بأفق دافئ ناصع الإضاءة",
+            descEn = "Cyber Amber Dunes with Warm Glowing Horizon Line",
+            bg = 0xFF1E1408, bgEnd = 0xFF100B03,
+            surface = 0xFF302110, surfaceVariant = 0xFF402D18,
+            accent = 0xFFFFAB00, accentSoft = 0xFFFFD740, accentDeep = 0xFFFF6D00,
+            text = 0xFFFFFDF5, textSec = 0xFFFFECB3,
+            motifType = ThemeMotifType.AMBER_DESERT_HORIZON
         ),
 
-        // ─────────── 14 — الفجر الوردي ───────────
+        // 14 — المصحف النجمي
         theme(
-            "pink_dawn", "الفجر الوردي", "Pink Dawn", "نعومة هادئة راقية — وردي فجر مع بنفسجي فاتح وسماوي", "Soft Serenity — Dawn Pink & Light Violet",
-            bg = 0xFF241420, bgEnd = 0xFF1C1019, surface = 0xFF33202D, surfaceVariant = 0xFF3C2635,
-            accent = 0xFFE5B896, accentSoft = 0xFFF6D9C4, accentDeep = 0xFFB07E5F,
-            text = 0xFFFDF3F0, textSec = 0xFFE0C1C2,
-            motifType = ThemeMotifType.PINK_DAWN,
-            cardStyle = NoorCardStyle(radius = 20.dp, borderWidth = 1.dp, borderAlpha = 0.18f, glowColor = Color(0xFFE5B896))
+            id = "starlight_mushaf",
+            nameAr = "المصحف النجمي",
+            nameEn = "Starlight Mushaf",
+            descAr = "نور مصحف كحلي يتلألأ بجزيئات نجمية دقيقة",
+            descEn = "Midnight Navy Mushaf shimmering with Starlight Particles",
+            bg = 0xFF081220, bgEnd = 0xFF030912,
+            surface = 0xFF122036, surfaceVariant = 0xFF1A2C4A,
+            accent = 0xFFE0E0E0, accentSoft = 0xFFFFFFFF, accentDeep = 0xFF9E9E9E,
+            text = 0xFFFFFFFF, textSec = 0xFFCFD8DC,
+            motifType = ThemeMotifType.STARLIGHT_MUSHAF
         ),
 
-        // ─────────── 15 — البحر الإسلامي ───────────
+        // 15 — الزيتون التيتانيوم
         theme(
-            "islamic_sea", "البحر الإسلامي", "Islamic Sea", "منعش وهادئ — أزرق بحري عميق بتركوازي وذهب", "Calm Ocean — Deep Sea Blue with Gold",
-            bg = 0xFF052338, bgEnd = 0xFF041B2C, surface = 0xFF0A3350, surfaceVariant = 0xFF0C3D5E,
-            accent = 0xFFDDB654, accentSoft = 0xFFF5DC92, accentDeep = 0xFFA58434,
-            text = 0xFFEFF7FC, textSec = 0xFFB3CFE0,
-            motifType = ThemeMotifType.ISLAMIC_SEA,
-            cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.dp, borderAlpha = 0.22f, glowColor = Color(0xFFDDB654))
+            id = "titanium_olive",
+            nameAr = "الزيتون التيتانيوم",
+            nameEn = "Titanium Olive",
+            descAr = "معدن التيتانيوم الداكن مع خطوط نور زيتونية متوهجة",
+            descEn = "Dark Metallic Titanium with Glowing Olive Energy Lines",
+            bg = 0xFF111812, bgEnd = 0xFF080C08,
+            surface = 0xFF1D261E, surfaceVariant = 0xFF263328,
+            accent = 0xFF76FF03, accentSoft = 0xFFB2FF59, accentDeep = 0xFF64DD17,
+            text = 0xFFF7FCF5, textSec = 0xFFDCEDC8,
+            motifType = ThemeMotifType.TITANIUM_OLIVE
         ),
 
-        // ─────────── 16 — المخطوطات ───────────
+        // 16 — الفانوس الهولوغرامي
         theme(
-            "manuscripts", "المخطوطات", "Manuscripts", "تراث مخطوطات فخم — ورق عتيق وبني ذهبي وأخضر داكن", "Manuscript Heritage — Aged Parchment & Gold Brown",
-            bg = 0xFF171009, bgEnd = 0xFF120B06, surface = 0xFF241A0E, surfaceVariant = 0xFF2C2112,
-            accent = 0xFFC99B4A, accentSoft = 0xFFE4C683, accentDeep = 0xFF96702F,
-            text = 0xFFFAF0DC, textSec = 0xFFD8C6A4,
-            motifType = ThemeMotifType.MANUSCRIPTS,
-            cardStyle = NoorCardStyle(radius = 14.dp, borderWidth = 1.5.dp, borderAlpha = 0.35f, glowColor = Color(0xFFC99B4A), isFramed = true)
+            id = "holographic_lantern",
+            nameAr = "الفانوس الهولوغرامي",
+            nameEn = "Holographic Lantern",
+            descAr = "فانوس رمضاني ثلاثي الأبعاد بهالة بلازما حية",
+            descEn = "3D Wireframe Ramadan Lantern with Radiant Plasma Core",
+            bg = 0xFF1C1305, bgEnd = 0xFF0F0A02,
+            surface = 0xFF2D200B, surfaceVariant = 0xFF3D2E12,
+            accent = 0xFFFFC400, accentSoft = 0xFFFFE57F, accentDeep = 0xFFFFAB00,
+            text = 0xFFFFFDF5, textSec = 0xFFFFECB3,
+            motifType = ThemeMotifType.HOLOGRAPHIC_LANTERN
         ),
 
-        // ─────────── 17 — قبة الزمرد ───────────
+        // 17 — السمت الفيروزي
         theme(
-            "emerald_dome", "قبة الزمرد", "Emerald Dome", "كلاسيكي فاخر — قبة زمردية بذهب وأبيض دافئ", "Classic Luxe — Emerald Dome with Gold",
-            bg = 0xFF063D2C, bgEnd = 0xFF052E22, surface = 0xFF0A523C, surfaceVariant = 0xFF0C5E46,
-            accent = 0xFFE3C15C, accentSoft = 0xFFF5DE9B, accentDeep = 0xFFAC8B38,
-            text = 0xFFF1FBF7, textSec = 0xFFBCE0D1,
-            motifType = ThemeMotifType.EMERALD_GEM,
-            cardStyle = NoorCardStyle(radius = 18.dp, borderWidth = 1.2.dp, borderAlpha = 0.30f, glowColor = Color(0xFFE3C15C), isFramed = true)
+            id = "zenith_turquoise",
+            nameAr = "السمت الفيروزي",
+            nameEn = "Zenith Turquoise",
+            descAr = "فيروزي إسلامي ناصع بأقواس أندلسية مستقبلية",
+            descEn = "Vibrant Islamic Turquoise with Futuristic Andalusian Arches",
+            bg = 0xFF041C24, bgEnd = 0xFF010E12,
+            surface = 0xFF0A2E3B, surfaceVariant = 0xFF0F3E50,
+            accent = 0xFF18FFFF, accentSoft = 0xFF84FFFF, accentDeep = 0xFF00E5FF,
+            text = 0xFFF0FFFF, textSec = 0xFFB2EBF2,
+            motifType = ThemeMotifType.ZENITH_TURQUOISE
         ),
 
-        // ─────────── 18 — رمضان ───────────
+        // 18 — الانديجو اللانهائي
         theme(
-            "ramadan", "رمضان", "Ramadan", "روحاني احتفالي متزن — فانوس ليلي بنفسجي بأزرق وذهب", "Festive Spiritual — Night Violet, Blue & Gold",
-            bg = 0xFF0B1230, bgEnd = 0xFF1A0F3D, surface = 0xFF131C49, surfaceVariant = 0xFF182355,
-            accent = 0xFFE7C05C, accentSoft = 0xFFF8E29B, accentDeep = 0xFFAE8E3A,
-            text = 0xFFF3F1FC, textSec = 0xFFC0BCE0,
-            motifType = ThemeMotifType.RAMADAN_LANTERN,
-            cardStyle = NoorCardStyle(radius = 18.dp, borderWidth = 1.5.dp, borderAlpha = 0.35f, glowColor = Color(0xFFE7C05C), isFramed = true)
+            id = "infinite_indigo_tasbih",
+            nameAr = "الانديجو اللانهائي",
+            nameEn = "Infinite Indigo Tasbih",
+            descAr = "حبات تسبيح نيونية متداخلة في أعمق درجات الانديجو",
+            descEn = "Overlapping Neon Tasbih Bead Rings in Deepest Indigo",
+            bg = 0xFF0B0E28, bgEnd = 0xFF040614,
+            surface = 0xFF161A40, surfaceVariant = 0xFF1E2457,
+            accent = 0xFF536DFE, accentSoft = 0xFF8C9EFF, accentDeep = 0xFF3D5AFE,
+            text = 0xFFF5F6FF, textSec = 0xFFC5CAE9,
+            motifType = ThemeMotifType.INFINITE_INDIGO_TASBIH
         ),
 
-        // ─────────── 19 — الهلال الليلي ───────────
+        // 19 — القبلة الكمومية
         theme(
-            "night_crescent", "الهلال الليلي", "Night Crescent", "Dark Mode فاخر — أسود كحلي بفضي وذهب بسيط", "Luxe Dark Mode — Navy Black with Silver & Gold",
-            bg = 0xFF06080D, bgEnd = 0xFF04050A, surface = 0xFF0D1220, surfaceVariant = 0xFF111726,
-            accent = 0xFFC9CCD6, accentSoft = 0xFFE8EAF0, accentDeep = 0xFF9AA0AE,
-            text = 0xFFEFF1F6, textSec = 0xFFB2B7C4,
-            motifType = ThemeMotifType.NIGHT_CRESCENT,
-            cardStyle = NoorCardStyle(radius = 16.dp, borderWidth = 1.dp, borderAlpha = 0.20f, glowColor = Color(0xFFC9CCD6))
-        ),
-
-        // ─────────── 20 — نور Premium ───────────
-        theme(
-            "noor_premium", "نور Premium", "NOOR Premium", "الثيم المميز — كحلي فاخر بذهب وأبيض ولمسة زمرد", "Signature Theme — Luxe Navy, Gold & Emerald Touch",
-            bg = 0xFF0A1226, bgEnd = 0xFF070D1B, surface = 0xFF101B38, surfaceVariant = 0xFF152347,
-            accent = 0xFFE5C158, accentSoft = 0xFFF8E29E, accentDeep = 0xFFAC8C3E,
-            text = 0xFFFAFAF7, textSec = 0xFFC7CDE0,
-            motifType = ThemeMotifType.NOOR_PREMIUM,
-            cardStyle = NoorCardStyle(radius = 20.dp, borderWidth = 2.dp, borderAlpha = 0.40f, glowColor = Color(0xFFE5C158), isFramed = true)
+            id = "quantum_qibla_emerald",
+            nameAr = "القبلة الكمومية",
+            nameEn = "Quantum Qibla Emerald",
+            descAr = "بوصلة قبلة اتجاهية ليزرية بنبض كوانتمي زمردي",
+            descEn = "Directional Laser Qibla Compass with Quantum Emerald Pulses",
+            bg = 0xFF021B14, bgEnd = 0xFF010D0A,
+            surface = 0xFF072E22, surfaceVariant = 0xFF0B3E30,
+            accent = 0xFF00BFA5, accentSoft = 0xFF64FFDA, accentDeep = 0xFF00897B,
+            text = 0xFFF0FDF9, textSec = 0xFFA7F3D0,
+            motifType = ThemeMotifType.QUANTUM_QIBLA_EMERALD
         )
-    )
-
-    val all: List<NoorThemeDef> = base
-
-    /** أيقونة تعريفية لكل ثيم — شخصية بصرية خاصة لكل ثيمة في المتجر */
-    val icons = mapOf(
-        "noor_default" to "✨",
-        "fajr_noor" to "🌅",
-        "emerald_quran" to "📗",
-        "golden_mosque" to "🕌",
-        "makkah_night" to "🕋",
-        "madinah_calm" to "🌙",
-        "royal_kaaba" to "🕋",
-        "blue_sky" to "☁️",
-        "silver_crescent" to "🌙",
-        "golden_desert" to "🏜️",
-        "olive" to "🫒",
-        "islamic_turquoise" to "🔷",
-        "spiritual_violet" to "💜",
-        "night_emerald" to "🌿",
-        "pink_dawn" to "🌸",
-        "islamic_sea" to "🌊",
-        "manuscripts" to "📜",
-        "emerald_dome" to "🏛️",
-        "ramadan" to "🏮",
-        "night_crescent" to "🌛",
-        "noor_premium" to "👑"
     )
 
     fun byId(id: String): NoorThemeDef? = all.find { it.id == id }

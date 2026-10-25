@@ -5,52 +5,50 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * أنواع البصمات البصرية للثيمات (Theme Visual Signatures)
- * كل ثيمة لها بصمة رسم كود فريدة مرسومة بالـ Canvas دون أي صور خارجية.
+ * أنواع البصمات البصرية المستقبلية للثيمات الـ20 (Futuristic Islamic Visual Signatures 2026/2027)
+ * رسم كود كلي بالـ Canvas تفاعلي وعالي السرعة (60/120 FPS).
  */
 enum class ThemeMotifType {
-    NOOR_FLAGSHIP,      // 00 — نور الأساسي: هالة زيتونية ذهبية مع هلال دقيق وشعاع ضوء
-    FAJR_DAWN,          // 01 — نور الفجر: أشعة فجر سماوية متصاعدة وأفق دافئ
-    EMERALD_DOME,       // 02 — زمرد القرآن: قبة مسجد زمردية أنيقة مع توهج ناعم
-    GOLDEN_MOSQUE,      // 03 — المسجد الذهبي: ظلال مآذن وقبة ذهبية فاخرة
-    MAKKAH_NIGHT,       // 04 — ليل مكة: أفق الكعبة المشرفة تحت سماء كحلية بنجوم متلألئة
-    MADINAH_CALM,       // 05 — المدينة الهادئة: منحنى القبة الخضراء مع هالة هادئة
-    ROYAL_KAABA,        // 06 — الكعبة الملكية: مجسم الكعبة الملكي بحزام كسوة ذهبي متوهج
-    BLUE_SKY,           // 07 — السماء الزرقاء: غيوم انسيابية وأشعة ناصعة
-    SILVER_CRESCENT,    // 08 — الهلال الفضي: هلال فضي ناعم مع نجوم دقيقة
-    GOLDEN_DESERT,      // 09 — الصحراء الذهبية: كثبان رملية انسيابية وأفق دافئ
-    OLIVE_GARDEN,       // 10 — الزيتون: أغصان وأوراق زيتون انسيابية
-    TURQUOISE_ARCH,     // 11 — الفيروز الإسلامي: أقواس أندلسية فيروذية متوهجة
-    SPIRITUAL_VIOLET,   // 12 — البنفسج الروحاني: سماء بنفسجية مع إشعاع نجمي ثماني
-    NIGHT_EMERALD,      // 13 — زمرد الليل: عناقيد نجوم على سماء زمردية ليليّة
-    PINK_DAWN,          // 14 — الفجر الوردي: تموجات ضوئية وردية لأفق الفجر
-    ISLAMIC_SEA,        // 15 — البحر الإسلامي: أمواج بحرية انسيابية بتألق ذهبي
-    MANUSCRIPTS,        // 16 — المخطوطات: زخارف زوايا المخطوطات الأندلسية العتيقة
-    EMERALD_GEM,        // 17 — قبة الزمرد: انعكاسات بلورية زمردية فاخرة
-    RAMADAN_LANTERN,    // 18 — رمضان: فانوس رمضان متوهج بشعاع ضوء وهلال ذهبي
-    NIGHT_CRESCENT,     // 19 — الهلال الليلي: هلال بارز متوهج في سماء ليليّة حلكة
-    NOOR_PREMIUM        // 20 — نور Premium: أشعة ملكية متداخلة وهالة تاجية ذهبية
+    CYBER_NOOR_CORE,          // 00 — نور السيبراني 2027: هالة ليزرية ذهبية كوانتمية وشعاع شعاعي
+    QUANTUM_EMERALD_GRID,     // 01 — الزمرد الكوانتي: شبكة هندسية زمردية مع قبة ضوئية متوهجة
+    OBSIDIAN_KAABA_NEON,      // 02 — الكعبة الأوبسيدية 2027: مجسم كعبة أوبسيدي بحزام نيون ذهبي
+    NEON_KUFIC_GOLD,          // 03 — الكوفي النيون: شبكة خط كوفي ثمانية متوهجة بذهب دافئ
+    CELESTIAL_MADINAH_VIOLET, // 04 — البنفسج الفلكي: منحنى قبة المدينة ببنفسج فلكي وهالة شفقية
+    DIWANI_CYBER_ROSE,        // 05 — الذهب الفتوري الوردي: منحنيات ديوانية سيبرانية بذهب وردي
+    HOLOGRAPHIC_ZELLIGE,      // 06 — الزليج الهولوغرامي: نجمة ثمانية متداخلة بألوان هولوغرافية
+    ANDALUSIAN_CRYSTAL_GLASS, // 07 — البلور الأندلسي: قوس أندلسي زجاجي كريستالي مع انكسارات ضوء
+    SOLAR_FAJR_GLOWING,       // 08 — فجر السولار: هالة بلازما شمسية فجرية بأشعة طاقة متصاعدة
+    DEEP_SPACE_CRESCENT,      // 09 — الهلال السحيق: هلال فلكي متوهج في مجرة كحلية سحيقة
+    CELESTIAL_SAPPHIRE,       // 10 — الزفير السماوي: شبكة كريستالية بكحلي زفييري متوهج
+    ALHAMBRA_RUBY_PULSE,      // 11 — الروبي الحمراء: مخمل أندلسي روبي بنبضات هندسية ذهبية
+    AURORA_MINARET,           // 12 — الشفق المئذني: ستارة شفق قطبي خلف مآذن مستقبليّة
+    AMBER_DESERT_HORIZON,     // 13 — أفق الصحراء الذهبي: أمواج رملية سيبرانية بأفق عنبري متوهج
+    STARLIGHT_MUSHAF,         // 14 — المصحف النجمي: هندسة مصحف مفتوح مع جزيئات نور متلألئة
+    TITANIUM_OLIVE,           // 15 — الزيتون التيتانيوم: زيتون تيتانيومي داكن بخطوط نور زمردية
+    HOLOGRAPHIC_LANTERN,      // 16 — الفانوس الهولوغرامي: فانوس ثلاثي الأبعاد بلوري بقلب بلازما
+    ZENITH_TURQUOISE,         // 17 — السمت الفيروزي: قوس حدوة حصان فيروزي بشبكة طاقة
+    INFINITE_INDIGO_TASBIH,   // 18 — الانديجو اللانهائي: حلقات حبات تسبيح نيونية متداخلة
+    QUANTUM_QIBLA_EMERALD     // 19 — القبلة الكمومية: بوصلة قبلة متجهة كوانتمية بحلقات نبض
 }
 
 /**
- * معلمات معاملة البطاقات للثيمة (Card Styles).
- * تمكّن العائلات المختلفة من إظهار شخصيات بصرية متفاوتة (انحناء الزوايا، قوة الحدود، التوهج).
+ * معلمات تخصيص البطاقات للثيمات الـ20 المستقبليّة.
  */
 data class NoorCardStyle(
-    val radius: Dp = 16.dp,
+    val radius: Dp = 18.dp,
     val borderWidth: Dp = 1.dp,
     val borderColor: Color = Color.Unspecified,
-    val borderAlpha: Float = 0.2f,
-    val elevation: Dp = 2.dp,
+    val borderAlpha: Float = 0.30f,
+    val elevation: Dp = 4.dp,
     val glowColor: Color? = null,
-    val isFramed: Boolean = false
+    val isFramed: Boolean = true
 )
 
 /**
- * معلمات تخصيص الهيدر وشريط العنوان (Header Styles).
+ * معلمات أسلوب الهيدر والرأس.
  */
 data class NoorHeaderStyle(
     val showAccentRay: Boolean = true,
-    val glowIntensity: Float = 0.3f,
-    val badgeStyle: String = "CLASSIC"
+    val glowIntensity: Float = 0.4f,
+    val badgeStyle: String = "FUTURISTIC_2027"
 )

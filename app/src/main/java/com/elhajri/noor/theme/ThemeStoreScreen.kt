@@ -5,7 +5,6 @@ import com.elhajri.noor.settings.t
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,8 +14,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,20 +26,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.ui.AmiriFamily
-import com.elhajri.noor.ui.Navy
-import com.elhajri.noor.ui.NavyCard
-import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.Gold
 import com.elhajri.noor.ui.GoldSoft
+import com.elhajri.noor.ui.Navy
+import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.TextMain
+import com.elhajri.noor.ui.themeScreenBackground
 
 /**
- * متجر الثيمات — نظام ثيمات إسلامي متكامل:
- * نقاط، إعلانات مكافأة، معاينة حقيقية، شراء وتفعيل.
+ * متجر الثيمات الـ20 المستقبليّة (2026/2027 Futuristic Theme Store).
  */
 @Composable
 fun ThemeStoreScreen(
@@ -55,14 +54,13 @@ fun ThemeStoreScreen(
 
     var purchaseTarget by remember { mutableStateOf<NoorThemeDef?>(null) }
     var insufficientTarget by remember { mutableStateOf<NoorThemeDef?>(null) }
-    var successTarget by remember { mutableStateOf<NoorThemeDef?>(null) }
 
     fun refresh() { points = ThemeStore.getPoints(context) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Navy)
+            .themeScreenBackground()
             .padding(horizontal = 14.dp)
     ) {
         Spacer(Modifier.height(10.dp))
@@ -73,7 +71,7 @@ fun ThemeStoreScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                t("متجر الثيمات", "Theme Store"),
+                t("متجر الثيمات المستقبليّ", "Futuristic Theme Store"),
                 color = Gold,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -81,7 +79,6 @@ fun ThemeStoreScreen(
             )
             Spacer(Modifier.weight(1f))
 
-            // شارة النقاط — عداد متحرك يتحدث فور حصول أو شراء
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(14.dp))
@@ -115,342 +112,201 @@ fun ThemeStoreScreen(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Filled.DarkMode, contentDescription = null, tint = Navy, modifier = Modifier.size(16.dp))
+            Icon(Icons.Filled.Palette, contentDescription = null, tint = Navy, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(7.dp))
-            Text(t("اربح النقاط", "Earn Points"), color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(t("اربح النقاط وافتح الثيمات", "Earn Points & Unlock Themes"), color = Navy, fontSize = 14.sp, fontWeight = FontWeight.Bold)
         }
 
         Spacer(Modifier.height(12.dp))
 
-        // ───────── شبكة الثيمات ─────────
+        // ───────── شبكة الثيمات الـ20 الموحدة ─────────
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(bottom = 20.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(NoorThemes.all) { def ->
+            items(NoorThemes.all, key = { it.id }) { def ->
                 val unlocked = remember(points) { ThemeStore.isUnlocked(context, def) }
                 val active = NoorThemeState.active.id == def.id
-                ThemeCard(
-                    def = def,
-                    unlocked = unlocked,
-                    active = active,
-                    onClick = {
-                        if (active) return@ThemeCard
-                        if (unlocked) {
-                            ThemeStore.setCurrentTheme(context, def.id)
-                        } else if (ThemeStore.getPoints(context) >= def.price) {
-                            purchaseTarget = def
-                        } else {
-                            insufficientTarget = def
+
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .noorGlassCard(cornerRadius = 18.dp)
+                        .clickable {
+                            if (unlocked) {
+                                ThemeStore.setCurrentTheme(context, def.id)
+                            } else {
+                                if (points >= def.price) {
+                                    purchaseTarget = def
+                                } else {
+                                    insufficientTarget = def
+                                }
+                            }
+                        },
+                    color = Color.Transparent
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        ThemeMotif(def = def, modifier = Modifier.fillMaxSize())
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clip(CircleShape)
+                                        .background(def.accent)
+                                        .border(1.dp, Color.White, CircleShape)
+                                )
+
+                                if (active) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(Gold)
+                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(t("نشط", "Active"), color = Navy, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                } else if (!unlocked) {
+                                    Icon(Icons.Filled.Lock, contentDescription = null, tint = GoldSoft, modifier = Modifier.size(16.dp))
+                                }
+                            }
+
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = def.name,
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Spacer(Modifier.height(2.dp))
+                                Text(
+                                    text = def.description,
+                                    color = GoldSoft.copy(alpha = 0.75f),
+                                    fontSize = 11.sp,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Spacer(Modifier.height(6.dp))
+
+                                if (unlocked) {
+                                    Button(
+                                        onClick = { ThemeStore.setCurrentTheme(context, def.id) },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = if (active) Gold else Gold.copy(alpha = 0.2f),
+                                            contentColor = if (active) Navy else Gold
+                                        ),
+                                        modifier = Modifier.fillMaxWidth().height(32.dp),
+                                        contentPadding = PaddingValues(0.dp)
+                                    ) {
+                                        Text(
+                                            if (active) t("مميّز ونشط", "Active") else t("تطبيق الثيم", "Apply Theme"),
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                } else {
+                                    Button(
+                                        onClick = {
+                                            if (points >= def.price) purchaseTarget = def else insufficientTarget = def
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy),
+                                        modifier = Modifier.fillMaxWidth().height(32.dp),
+                                        contentPadding = PaddingValues(0.dp)
+                                    ) {
+                                        Text(
+                                            t("فتح بـ ${def.price} نقطة", "Unlock ${def.price} pts"),
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
-                )
-            }
-        }
-    }
-
-    // ═════════ حوار تأكيد الشراء ═════════
-    if (purchaseTarget != null) {
-        val def = purchaseTarget!!
-        NoorDialog(
-            title = t("فتح هذا الثيم؟", "Unlock this theme?"),
-            body = "${def.name}\n\n" + t("السعر: ", "Price: ") + "${def.price} 🌙",
-            confirmText = t("فتح الثيم", "Unlock Theme"),
-            cancelText = t("إلغاء", "Cancel"),
-            onConfirm = {
-                when (ThemeStore.purchase(context, def)) {
-                    ThemeStore.PurchaseResult.OK -> {
-                        purchaseTarget = null
-                        successTarget = def
-                    }
-                    ThemeStore.PurchaseResult.INSUFFICIENT_POINTS -> {
-                        purchaseTarget = null
-                        insufficientTarget = def
-                    }
-                    ThemeStore.PurchaseResult.ALREADY_UNLOCKED -> {
-                        purchaseTarget = null
-                    }
                 }
-                refresh()
-            },
-            onDismiss = { purchaseTarget = null }
-        )
-    }
-
-    // ═════════ حوار نقاط غير كافية ═════════
-    if (insufficientTarget != null) {
-        val def = insufficientTarget!!
-        NoorDialog(
-            title = t("نقاطك غير كافية", "Insufficient Points"),
-            body = t("تحتاج إلى ", "You need ") + "${def.price} 🌙 " + t("لفتح ثيم «", "to unlock theme \"") + "${def.name}».\n" + t("رصيدك الحالي: ", "Your current balance: ") + "${ThemeStore.getPoints(context)} 🌙",
-            confirmText = t("اربح النقاط", "Earn Points"),
-            cancelText = t("إلغاء", "Cancel"),
-            onConfirm = {
-                insufficientTarget = null
-                onOpenEarnPoints()
-            },
-            onDismiss = { insufficientTarget = null }
-        )
-    }
-
-    // ═════════ حوار نجاح الشراء ═════════
-    if (successTarget != null) {
-        val def = successTarget!!
-        NoorDialog(
-            title = t("تم فتح الثيم بنجاح ✓", "Theme Unlocked Successfully ✓"),
-            body = t("يمكنك تفعيل «", "You can activate \"") + "${def.name}» " + t("الآن.", "now."),
-            confirmText = t("تفعيل الآن", "Activate Now"),
-            cancelText = t("لاحقاً", "Later"),
-            onConfirm = {
-                ThemeStore.setCurrentTheme(context, def.id)
-                successTarget = null
-            },
-            onDismiss = { successTarget = null }
-        )
-    }
-}
-
-/**
- * بطاقة ثيم — معاينة حقيقية مصغرة + اسم + وصف + السعر/الحالة.
- */
-@Composable
-private fun ThemeCard(
-    def: NoorThemeDef,
-    unlocked: Boolean,
-    active: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(def.cardRadius + 2.dp))
-            .background(NavyCard)
-            .border(
-                1.dp,
-                if (active) def.accent else Gold.copy(alpha = 0.10f),
-                RoundedCornerShape(def.cardRadius + 2.dp)
-            )
-            .clickable { onClick() }
-            .padding(10.dp)
-    ) {
-        // معاينة مصغرة حقيقية: شريط علوي، بطاقة، زر، شريط تنقل
-        ThemePreview(def)
-
-        Spacer(Modifier.height(8.dp))
-
-        Text((com.elhajri.noor.theme.NoorThemes.icons[def.id] ?: "✨") + " " + def.name, color = TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-        Text(
-            def.description,
-            color = TextMain.copy(alpha = 0.5f),
-            fontSize = 10.sp,
-            lineHeight = 14.sp,
-            maxLines = 2
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        // السعر أو الحالة
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(
-                    when {
-                        active -> def.accent.copy(alpha = 0.12f)
-                        unlocked -> def.accent.copy(alpha = 0.12f)
-                        else -> NavyLight.copy(alpha = 0.6f)
-                    }
-                )
-                .padding(vertical = 7.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                when {
-                    active -> t("مفعّل ✓", "Active ✓")
-                    unlocked -> t("تفعيل", "Activate")
-                    else -> t("فتح الثيم — ", "Unlock Theme — ") + "${def.price} 🌙"
-                },
-                color = if (active) def.accent else if (unlocked) def.accent else TextMain.copy(alpha = 0.7f),
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-        }
-
-        if (def.price == 0 && !active) {
-            Spacer(Modifier.height(4.dp))
-            Text("مجاني", color = EmeraldSuccessSoft, fontSize = 10.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth())
-        }
-    }
-}
-
-private val EmeraldSuccessSoft = Color(0xFF34D399)
-
-/**
- * معاينة مصغرة للتطبيق بلون الثيم — ليست مجرد مربع لون:
- * شريط علوي + بطاقة + زر + نصوص + شريط تنقل سفلي بأيقونات.
- */
-@Composable
-fun ThemePreview(def: NoorThemeDef) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(128.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, def.accent.copy(alpha = 0.18f), RoundedCornerShape(12.dp))
-    ) {
-        Column(
-            modifier = Modifier
-                .matchParentSize()
-                .background(
-                    Brush.verticalGradient(listOf(def.background, def.backgroundEnd))
-                )
-                .drawBehind { drawThemeMotif(def) }
-                .padding(6.dp)
-        ) {
-        // الشريط العلوي
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(6.dp))
-                .background(def.surface)
-                .padding(horizontal = 6.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                Modifier.size(8.dp).clip(CircleShape).background(def.accent)
-            )
-            Spacer(Modifier.width(4.dp))
-            Box(
-                Modifier.width(26.dp).height(3.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(def.textSecondary.copy(alpha = 0.5f))
-            )
-            Spacer(Modifier.weight(1f))
-            repeat(3) {
-                Spacer(Modifier.width(3.dp))
-                Box(Modifier.size(3.dp).clip(CircleShape).background(def.accent.copy(alpha = 0.5f)))
             }
         }
-
-        Spacer(Modifier.height(5.dp))
-
-        // البطاقة
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .clip(RoundedCornerShape(7.dp))
-                .background(def.surfaceVariant)
-                .border(1.dp, def.accent.copy(alpha = 0.15f), RoundedCornerShape(7.dp))
-                .padding(5.dp)
-        ) {
-            Text("﴾ بسم الله ﴿", color = def.accent, fontSize = 9.sp, fontFamily = AmiriFamily)
-            Spacer(Modifier.height(2.dp))
-            Box(
-                Modifier.width(48.dp).height(2.dp)
-                    .background(def.textSecondary.copy(alpha = 0.35f))
-            )
-            Spacer(Modifier.height(3.dp))
-            // زر الثيم
-            Box(
-                modifier = Modifier
-                    .width(52.dp).height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Brush.horizontalGradient(def.buttonGradient)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("قراءة", color = def.background, fontSize = 6.sp, fontWeight = FontWeight.Bold)
-            }
-        }
-
-        Spacer(Modifier.height(5.dp))
-
-        // شريط التنقل السفلي
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(6.dp))
-                .background(def.surface)
-                .padding(vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            repeat(4) { i ->
-                Box(
-                    Modifier.size(7.dp).clip(CircleShape)
-                        .background(if (i == 0) def.accent else def.textSecondary.copy(alpha = 0.4f))
-                )
-            }
-        }
-        }
     }
-}
 
-/**
- * حوار موحّد بتصميم التطبيق — RTL.
- */
-@Composable
-fun NoorDialog(
-    title: String,
-    body: String,
-    confirmText: String,
-    cancelText: String,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
-        Column(
-            modifier = Modifier
-                .clip(RoundedCornerShape(18.dp))
-                .background(NavyCard)
-                .border(1.dp, Gold.copy(alpha = 0.25f), RoundedCornerShape(18.dp))
-                .padding(18.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                Icons.Filled.DarkMode,
-                contentDescription = null,
-                tint = Gold,
-                modifier = Modifier.size(28.dp)
-            )
-            Spacer(Modifier.height(10.dp))
-            Text(title, color = TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center)
-            Spacer(Modifier.height(6.dp))
-            Text(body, color = TextMain.copy(alpha = 0.65f), fontSize = 12.sp,
-                lineHeight = 18.sp, textAlign = TextAlign.Center)
-            Spacer(Modifier.height(14.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                // زر الإلغاء على يمين الحوار (RTL: أول عنصر = اليمين)
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(NavyLight.copy(alpha = 0.7f))
-                        .clickable { onDismiss() }
-                        .padding(vertical = 9.dp),
-                    contentAlignment = Alignment.Center
+    // Purchase Dialog
+    purchaseTarget?.let { def ->
+        AlertDialog(
+            onDismissRequest = { purchaseTarget = null },
+            title = { Text(t("فتح الثيم", "Unlock Theme"), color = Gold, fontWeight = FontWeight.Bold) },
+            text = {
+                Text(
+                    t("هل ترغب في فتح ثيم \"${def.name}\" مقابل ${def.price} نقطة؟", "Do you want to unlock \"${def.name}\" for ${def.price} points?"),
+                    color = TextMain
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val res = ThemeStore.purchase(context, def)
+                        if (res == ThemeStore.PurchaseResult.OK) {
+                            ThemeStore.setCurrentTheme(context, def.id)
+                            refresh()
+                        }
+                        purchaseTarget = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy)
                 ) {
-                    Text(cancelText, color = TextMain.copy(alpha = 0.7f), fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
+                    Text(t("شراء وتفعيل", "Unlock & Apply"), fontWeight = FontWeight.Bold)
                 }
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Brush.horizontalGradient(listOf(GoldSoft, Gold)))
-                        .clickable { onConfirm() }
-                        .padding(vertical = 9.dp),
-                    contentAlignment = Alignment.Center
+            },
+            dismissButton = {
+                TextButton(onClick = { purchaseTarget = null }) {
+                    Text(t("إلغاء", "Cancel"), color = GoldSoft)
+                }
+            },
+            containerColor = NavyCard
+        )
+    }
+
+    // Insufficient Points Dialog
+    insufficientTarget?.let { def ->
+        AlertDialog(
+            onDismissRequest = { insufficientTarget = null },
+            title = { Text(t("نقاط غير كافية", "Insufficient Points"), color = Gold, fontWeight = FontWeight.Bold) },
+            text = {
+                Text(
+                    t("تحتاج إلى ${def.price} نقطة لفتح \"${def.name}\". رصيدك الحالي $points نقطة.", "You need ${def.price} points to unlock \"${def.name}\". Your balance is $points pts."),
+                    color = TextMain
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        insufficientTarget = null
+                        onOpenEarnPoints()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Navy)
                 ) {
-                    Text(confirmText, color = Navy, fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    Text(t("اربح النقاط الآن", "Earn Points Now"), fontWeight = FontWeight.Bold)
                 }
-            }
-        }
+            },
+            dismissButton = {
+                TextButton(onClick = { insufficientTarget = null }) {
+                    Text(t("إإغلاق", "Close"), color = GoldSoft)
+                }
+            },
+            containerColor = NavyCard
+        )
     }
 }
