@@ -38,6 +38,8 @@ object FavoritesStore {
         return _favorites.value.contains(surahNumber)
     }
 
+    fun toggle(context: Context, surahNumber: Int) = toggleFavorite(context, surahNumber)
+
     fun toggleFavorite(context: Context, surahNumber: Int) {
         init(context)
         val current = _favorites.value.toMutableList()

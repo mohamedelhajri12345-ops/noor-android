@@ -1,8 +1,12 @@
 package com.elhajri.noor.theme
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.elhajri.noor.settings.NoorLocale
 
 /**
  * أنواع البصمات البصرية المستقبلية للثيمات الـ20 (Futuristic Islamic Visual Signatures 2026/2027)
@@ -52,3 +56,53 @@ data class NoorHeaderStyle(
     val glowIntensity: Float = 0.4f,
     val badgeStyle: String = "FUTURISTIC_2027"
 )
+
+/**
+ * تعريف الثيم الموحد للثيمات الـ20 المستقبليّة (Futuristic Theme Definition).
+ */
+data class NoorThemeDef(
+    val id: String,
+    val nameAr: String,
+    val nameEn: String,
+    val descAr: String,
+    val descEn: String,
+    val price: Int = 0,
+    val background: Color,
+    val backgroundEnd: Color,
+    val surface: Color,
+    val surfaceVariant: Color,
+    val accent: Color,
+    val accentSoft: Color,
+    val accentDeep: Color,
+    val textPrimary: Color,
+    val textSecondary: Color,
+    val success: Color = Color(0xFF10B981),
+    val error: Color = Color(0xFFEF4444),
+    val backgroundRes: Int = 0,
+    val cardRadius: Dp = 18.dp,
+    val buttonRadius: Dp = 14.dp,
+    val buttonGradient: List<Color> = listOf(accentSoft, accent, accentDeep),
+    val motifType: ThemeMotifType = ThemeMotifType.CYBER_NOOR_CORE,
+    val motifColor: Color = accent,
+    val cardStyle: NoorCardStyle = NoorCardStyle(radius = cardRadius),
+    val headerStyle: NoorHeaderStyle = NoorHeaderStyle()
+) {
+    val name: String get() = if (NoorLocale.isEnglish) nameEn else nameAr
+    val description: String get() = if (NoorLocale.isEnglish) descEn else descAr
+}
+
+/**
+ * حالة الثيم التفاعلية النشطة في التطبيق.
+ */
+object NoorThemeState {
+    var active by mutableStateOf(NoorThemes.all.first())
+        private set
+
+    fun apply(def: NoorThemeDef) {
+        active = def
+    }
+
+    fun applyById(id: String) {
+        NoorThemes.byId(id)?.let { active = it }
+    }
+}
