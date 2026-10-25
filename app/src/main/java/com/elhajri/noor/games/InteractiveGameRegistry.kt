@@ -169,6 +169,16 @@ object InteractiveGameRegistry {
             descriptionAr = "التسبيح والذكر لجمع الحسنات وغرس الأشجار في الجنة"
         ),
         InteractiveGame(
+            id = "game_52_caravan_snake",
+            titleAr = "قافلة الخير",
+            titleEn = "Caravan Snake",
+            category = InteractiveGameCategories.EDUCATIONAL,
+            route = "game_52_caravan_snake",
+            icon = Icons.Default.DirectionsRun,
+            accentColor = Color(0xFFFFAB00),
+            descriptionAr = "توجيه القافلة بلمسات السحب وتفادي العوائق"
+        ),
+        InteractiveGame(
             id = "game_kindness_tap",
             titleAr = "شجرة الحسنات",
             titleEn = "Kindness Tap",
