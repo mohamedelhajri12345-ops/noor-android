@@ -159,6 +159,16 @@ object InteractiveGameRegistry {
             descriptionAr = "قلب ومطابقة بطاقات الرسوم الإسلامية اللطيفة"
         ),
         InteractiveGame(
+            id = "game_48_tasbeeh_clicker",
+            titleAr = "حديقة التسبيح",
+            titleEn = "Tasbeeh Garden Clicker",
+            category = InteractiveGameCategories.EDUCATIONAL,
+            route = "game_48_tasbeeh_clicker",
+            icon = Icons.Default.FilterVintage,
+            accentColor = Color(0xFF64FFDA),
+            descriptionAr = "التسبيح والذكر لجمع الحسنات وغرس الأشجار في الجنة"
+        ),
+        InteractiveGame(
             id = "game_kindness_tap",
             titleAr = "شجرة الحسنات",
             titleEn = "Kindness Tap",

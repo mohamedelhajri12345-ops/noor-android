@@ -465,6 +465,7 @@ fun NoorApp() {
                 composable("game_angels_unseen") { AngelsAndUnseenQuizGame(onBack = { navController.popBackStack() }) }
                 composable("game_fasting_rules") { FastingRulesGame(onBack = { navController.popBackStack() }) }
                 composable("game_kindness_tap") { KindnessTapGame(onBack = { navController.popBackStack() }) }
+                composable("game_48_tasbeeh_clicker") { TasbeehClickerGame(onBack = { navController.popBackStack() }) }
                 // ===== Batch 3: engine-based games =====
                 composable("game_quiz_doctrine") { DoctrineQuizGameScreen(onBack = { navController.popBackStack() }) }
                 composable("game_quiz_fiqh") { FiqhQuizGameScreen(onBack = { navController.popBackStack() }) }
