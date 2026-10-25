@@ -18,6 +18,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.elhajri.noor.audio.SfxManager
@@ -57,6 +61,7 @@ fun MemoryCardsGame(
 
     val cards = remember { mutableStateListOf<MemoryCardItem>() }
     var flippedIndices by remember { mutableStateOf<List<Int>>(emptyList()) }
+    var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var isBusy by remember { mutableStateOf(false) }
     val particles = remember { ParticleSystem() }
 
@@ -172,10 +177,12 @@ fun MemoryCardsGame(
                 Canvas(
                     modifier = Modifier
                         .fillMaxSize()
+                        .onSizeChanged { canvasSize = it }
                         .gameGestureDetector(
                             onTap = { offset ->
-                                val cellW = size.width / cols.toFloat()
-                                val cellH = size.height / rows.toFloat()
+                                if (canvasSize == IntSize.Zero) return@gameGestureDetector
+                                val cellW = canvasSize.width / cols.toFloat()
+                                val cellH = canvasSize.height / rows.toFloat()
                                 val c = (offset.x / cellW).toInt().coerceIn(0, cols - 1)
                                 val r = (offset.y / cellH).toInt().coerceIn(0, rows - 1)
                                 val idx = r * cols + c
