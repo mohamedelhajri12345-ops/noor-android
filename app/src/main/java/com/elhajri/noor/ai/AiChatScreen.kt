@@ -1,15 +1,6 @@
 package com.elhajri.noor.ai
 
-import com.elhajri.noor.settings.NoorLocale
-import com.elhajri.noor.settings.t
-import com.elhajri.noor.settings.toArabicDigits
-
-
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,453 +8,560 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.elhajri.noor.settings.t
 import com.elhajri.noor.ui.AmiriFamily
 import com.elhajri.noor.ui.Gold
-import com.elhajri.noor.ui.GoldSoft
-import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.Navy
+import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
 import com.elhajri.noor.ui.TextMain
 import kotlinx.coroutines.launch
 
-private data class ChatMsg(val fromUser: Boolean, val text: String)
+private data class ChatMsg(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val fromUser: Boolean,
+    val text: String
+)
 
-/** فقاعات المحادثة — على هاتف المستخدم، بلا خوادم إطلاقاً */
+/**
+ * شاشة المساعد الذكي "نور" — متصلة بـ Free LLM API.
+ */
 @Composable
 fun AiChatScreen(onBack: () -> Unit) {
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var selectedModelId by remember { mutableStateOf(LocalAiEngine.getSelectedModel(context).id) }
-    val selectedModel = com.elhajri.noor.ai.AiModels.byId(selectedModelId)
-    var downloaded by remember { mutableStateOf(LocalAiEngine.isReady(context)) }
-    var downloading by remember { mutableStateOf(false) }
-    var progressCurrent by remember { mutableStateOf(0L) }
-    var progressTotal by remember { mutableStateOf(1L) }
-    var downloadError by remember { mutableStateOf<String?>(null) }
-    var initializing by remember { mutableStateOf(false) }
-    var initError by remember { mutableStateOf<String?>(null) }
-    var thinking by remember { mutableStateOf(false) }
     var input by remember { mutableStateOf("") }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    var thinking by remember { mutableStateOf(false) }
+    var showClearDialog by remember { mutableStateOf(false) }
     val messages = remember { mutableStateListOf<ChatMsg>() }
 
-    fun toArabicDigits(v: Any): String {
-        val map = mapOf('0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤', '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩')
-        return v.toString().map { map[it] ?: it }.joinToString("")
-    }
+    val listState = rememberLazyListState()
 
-    // عند تبديل النموذج المختار: أعد فحص جهوزيته
-    LaunchedEffect(selectedModelId) {
-        LocalAiEngine.setSelectedModel(context, selectedModelId)
-        // إن اكتمل تنزيلٌ كان جارياً في الخلفية (والتطبيق مغلق) أنجز نقله الآن
-        LocalAiEngine.finalizePendingDownload(context)
-        downloaded = LocalAiEngine.isReady(context)
-    }
-
-    // تهيئة النموذج عند أول فتح بعد التنزيل
-    LaunchedEffect(downloaded) {
-        if (downloaded && !initializing && initError == null) {
-            initializing = true
-            try {
-                LocalAiEngine.ensureInitialized(context)
-            } catch (e: Exception) {
-                initError = e.message ?: t("تعذّر تشغيل النموذج على هذا الجهاز", "Unable to run AI model on this device")
-            }
-            initializing = false
+    // التمرير التلقائي لأسفل القائمة عند وصول رسالة جديدة أو أثناء التفكير
+    LaunchedEffect(messages.size, thinking) {
+        val totalCount = messages.size + (if (thinking) 1 else 0)
+        if (totalCount > 0) {
+            listState.animateScrollToItem(totalCount - 1)
         }
     }
 
-    val listState = rememberLazyListState()
-    LaunchedEffect(messages.size, thinking) {
-        if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
-    }
-
-    fun send() {
-        val q = input.trim()
+    fun sendQuestion(queryText: String) {
+        val q = queryText.trim()
         if (q.isEmpty() || thinking) return
         input = ""
-        messages.add(ChatMsg(true, q))
+        messages.add(ChatMsg(fromUser = true, text = q))
         thinking = true
-        initError = null
+
         scope.launch {
             try {
-                LocalAiEngine.ensureInitialized(context)
-                val answer = LocalAiEngine.ask(context, q)
-                messages.add(ChatMsg(false, answer))
+                val answer = FreeLlmApiEngine.ask(q)
+                messages.add(ChatMsg(fromUser = false, text = answer))
             } catch (e: Exception) {
-                messages.add(ChatMsg(false, t("حدث خطأ أثناء التوليد: ", "Generation error: ") + (e.message ?: t("غير معروف", "unknown"))))
+                messages.add(
+                    ChatMsg(
+                        fromUser = false,
+                        text = FreeLlmApiEngine.FALLBACK_ERROR_MESSAGE
+                    )
+                )
+            } finally {
+                thinking = false
             }
-            thinking = false
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(Navy).statusBarsPadding()) {
-        // ============ الشريط العلوي ============
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Navy)
+            .statusBarsPadding()
+    ) {
+        // ============ الشريط العلوي (Top Bar) ============
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Text("رجوع", color = Gold, fontSize = 13.sp)
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = t("رجوع", "Back"),
+                    tint = Gold
+                )
             }
+
             Row(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Gold, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("المساعد الذكي", color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                Icon(
+                    Icons.Filled.AutoAwesome,
+                    contentDescription = null,
+                    tint = Gold,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    t("المساعد الذكي", "Smart Assistant"),
+                    color = Gold,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = AmiriFamily
+                )
             }
-            if (downloaded) {
-                IconButton(onClick = { showDeleteDialog = true }) {
-                    Icon(Icons.Filled.Delete, contentDescription = t("حذف النموذج", "Delete Model"), tint = TextMain.copy(alpha = 0.6f), modifier = Modifier.size(18.dp))
+
+            if (messages.isNotEmpty()) {
+                IconButton(onClick = { showClearDialog = true }) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = t("مسح المحادثة", "Clear Chat"),
+                        tint = TextMain.copy(alpha = 0.6f),
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
-            } else { Spacer(Modifier.width(48.dp)) }
+            } else {
+                Spacer(Modifier.width(48.dp))
+            }
         }
 
-        when {
-            // ============ لم يُنزَّل النموذج: بطاقة تعريف + زر التنزيل ============
-            !downloaded && !downloading -> {
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+        // ============ جسم الشاشة: إما حالة فارغة أو قائمة المحادثة ============
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            if (messages.isEmpty() && !thinking) {
+                // الشاشة الابتدائية عند عدم وجود محادثات
+                EmptyAssistantView(onSelectSuggestion = { question ->
+                    sendQuestion(question)
+                })
+            } else {
+                // قائمة الرسائل
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Box(
-                        modifier = Modifier.size(72.dp).clip(RoundedCornerShape(24.dp)).background(Gold.copy(alpha = 0.10f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Gold, modifier = Modifier.size(34.dp))
+                    items(messages, key = { it.id }) { msg ->
+                        ChatBubbleItem(msg = msg)
                     }
-                    Spacer(Modifier.height(20.dp))
-                    Text(t("ذكاء اصطناعي على هاتفك", "On-Device AI"), color = Gold, fontSize = 22.sp, fontWeight = FontWeight.Bold, fontFamily = AmiriFamily, textAlign = TextAlign.Center)
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        t("مساعد إسلامي ذكي يعمل محلياً بالكامل بنموذج مجاني مفتوح من Google LiteRT.\nاسأل ما تشاء عن دينك بلا حدود:\n• بدون إنترنت بعد التحميل\n• بدون حسابات ولا مفاتيح API\n• أسئلتك لا تُغادر هاتفك أبداً",
-                          "Smart Islamic AI assistant running 100% locally with Google LiteRT.\nAsk anything about Islam freely:\n• Offline after download\n• No accounts or API keys needed\n• Your questions never leave your device"),
-                        color = TextMain.copy(alpha = 0.75f), fontSize = 13.sp, lineHeight = 20.sp, textAlign = TextAlign.Center
-                    )
-                    Spacer(Modifier.height(16.dp))
-                    Spacer(Modifier.height(16.dp))
 
-                    // ============ اختيار النموذج: كامل أو خفيف ============
-                    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        com.elhajri.noor.ai.AiModels.all.forEach { m ->
-                            val isSelected = m.id == selectedModelId
-                            val isDownloadedModel = LocalAiEngine.isReady(context, m)
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(if (isSelected) Gold.copy(alpha = 0.12f) else NavyCard)
-                                    .border(
-                                        1.dp,
-                                        if (isSelected) Gold else Gold.copy(alpha = 0.12f),
-                                        RoundedCornerShape(14.dp)
-                                    )
-                                    .clickable(enabled = !downloading) { selectedModelId = m.id }
-                                    .padding(horizontal = 12.dp, vertical = 10.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(m.name, color = if (isSelected) Gold else TextMain, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                                    Spacer(Modifier.height(2.dp))
-                                    Text(m.description, color = TextMain.copy(alpha = 0.55f), fontSize = 10.sp)
-                                }
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    m.sizeLabel() + if (isDownloadedModel) " ✓" else "",
-                                    color = GoldSoft, fontSize = 10.sp, fontWeight = FontWeight.SemiBold
-                                )
-                            }
+                    if (thinking) {
+                        item(key = "typing_indicator") {
+                            TypingIndicatorItem()
                         }
                     }
+                }
+            }
+        }
 
-                    Spacer(Modifier.height(20.dp))
-                    Text(
-                        t("حجم النموذج المختار: ", "Selected model size: ") + "${selectedModel.sizeLabel()} — " + t("يُنزَّل مرة واحدة فقط", "downloaded once only"),
-                        color = GoldSoft, fontSize = 12.sp
-                    )
-                    Spacer(Modifier.height(24.dp))
-                    if (LocalAiEngine.freeBytes(context) < selectedModel.sizeBytes + 200_000_000L) {
-                        Icon(Icons.Filled.ErrorOutline, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(32.dp))
-                        Spacer(Modifier.height(8.dp))
+        // ============ حقل الإدخال وزر الإرسال السفلي ============
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(NavyCard)
+                .border(1.dp, Gold.copy(alpha = 0.3f), RoundedCornerShape(24.dp))
+                .padding(horizontal = 14.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BasicTextField(
+                value = input,
+                onValueChange = { input = it },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp),
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    color = TextMain,
+                    fontSize = 14.sp
+                ),
+                maxLines = 4,
+                decorationBox = { innerTextField ->
+                    if (input.isEmpty()) {
                         Text(
-                            t("المساحة المتاحة على جهازك لا تكفي للنموذج (${selectedModel.sizeLabel()}).\nحرّر بعض المساحة ثم عُد.",
-                              "Not enough storage space on your device for this model (${selectedModel.sizeLabel()}).\nFree up space and try again."),
-                            color = TextMain.copy(alpha = 0.6f), fontSize = 12.sp, textAlign = TextAlign.Center
+                            t("اكتب سؤالك هنا…", "Type your question here…"),
+                            color = TextMain.copy(alpha = 0.35f),
+                            fontSize = 14.sp
                         )
-                    } else {
-                        val btnInteraction = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(Gold)
-                                .clickable { downloading = true; downloadError = null }
-                                .padding(horizontal = 28.dp, vertical = 13.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Filled.Download, contentDescription = null, tint = Navy, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text("تنزيل النموذج", color = Navy, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                        }
                     }
+                    innerTextField()
                 }
-            }
+            )
 
-            // ============ جارٍ التنزيل: تقدم مباشر + إلغاء ============
-            downloading -> {
-                LaunchedEffect(Unit) {
-                    try {
-                        val ok = LocalAiEngine.download(context, selectedModel) { c, t ->
-                            progressCurrent = c; progressTotal = t
-                        }
-                        if (ok) { downloaded = true; downloading = false }
-                        else { downloading = false } // أُلغي
-                    } catch (e: Exception) {
-                        downloadError = e.message ?: t("تعذّر التنزيل", "Download Failed")
-                        downloading = false
-                    }
-                }
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = Gold, modifier = Modifier.size(40.dp))
-                    Spacer(Modifier.height(16.dp))
-                    val pct = if (progressTotal > 0) (progressCurrent * 100 / progressTotal).toInt() else 0
-                    Text("${toArabicDigits(pct)}٪", color = Gold, fontSize = 34.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.height(8.dp))
-                    LinearProgressIndicator(
-                        progress = { if (progressTotal > 0) progressCurrent.toFloat() / progressTotal else 0f },
-                        modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)),
-                        color = Gold,
-                        trackColor = NavyLight
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        if (NoorLocale.isEnglish) "${progressCurrent / 1048576} / ${progressTotal / 1048576} MB" else "${toArabicDigits(progressCurrent / 1048576)} / ${toArabicDigits(progressTotal / 1048576)} ميجابايت",
-                        color = TextMain.copy(alpha = 0.6f), fontSize = 12.sp
-                    )
-                    Spacer(Modifier.height(24.dp))
-                    Text("أرسل التطبيق للخلفية بأمان — التنزيل مستمر", color = GoldSoft, fontSize = 11.sp)
-                    Spacer(Modifier.height(16.dp))
-                    TextButton(onClick = { LocalAiEngine.cancelDownload(context, selectedModel) }) {
-                        Text("إلغاء", color = Color(0xFFEF4444), fontSize = 13.sp)
-                    }
-                }
-            }
+            Spacer(Modifier.width(8.dp))
 
-            // ============ جاهز: واجهة المحادثة ============
-            else -> {
-                if (messages.isEmpty()) {
-                    Column(
-                        modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        if (initializing) {
-                            Text("جارٍ تشغيل النموذج على جهازك…", color = GoldSoft, fontSize = 14.sp)
-                            Spacer(Modifier.height(14.dp))
-                            LinearProgressIndicator(color = Gold, trackColor = NavyLight, modifier = Modifier.width(140.dp))
-                            Spacer(Modifier.height(20.dp))
-                            Text("أول تشغيل قد يستغرق ثوانٍ", color = TextMain.copy(alpha = 0.5f), fontSize = 11.sp)
-                        } else if (initError != null) {
-                            Icon(Icons.Filled.ErrorOutline, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(30.dp))
-                            Spacer(Modifier.height(10.dp))
-                            Text(initError ?: "", color = TextMain.copy(alpha = 0.7f), fontSize = 13.sp, textAlign = TextAlign.Center)
-                        } else {
-                            val suggestions = listOf(
-                                t("ما فضل الصدقة؟", "What is the virtue of charity?"),
-                                t("اكتب لي دعاء لتفريج الهم", "Write me a dua for relief"),
-                                t("ما آداب زيارة المريض؟", "Etiquette of visiting the sick"),
-                                t("لخص لي قصة يوسف عليه السلام", "Summarize Prophet Yusuf's story")
-                            )
-                            Text("اسأل مساعدك عن دينك", color = Gold, fontSize = 16.sp, fontFamily = AmiriFamily)
-                            Spacer(Modifier.height(14.dp))
-                            suggestions.forEach { sug ->
-                                Text(
-                                    sug,
-                                    color = TextMain.copy(alpha = 0.8f), fontSize = 13.sp,
-                                    modifier = Modifier
-                                        .padding(vertical = 5.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .border(1.dp, Gold.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-                                        .clickable { input = sug }
-                                        .padding(horizontal = 16.dp, vertical = 9.dp)
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                        contentPadding = PaddingValues(vertical = 10.dp)
-                    ) {
-                        items(messages) { msg ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = if (msg.fromUser) Arrangement.Start else Arrangement.End
-                            ) {
-                                Text(
-                                    msg.text,
-                                    color = if (msg.fromUser) Navy else TextMain,
-                                    fontSize = 14.sp,
-                                    lineHeight = 21.sp,
-                                    modifier = Modifier
-                                        .widthIn(max = 300.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(if (msg.fromUser) Gold else NavyLight.copy(alpha = 0.55f))
-                                        .padding(horizontal = 14.dp, vertical = 10.dp)
-                                )
-                            }
-                        }
-                        if (thinking) {
-                            item {
-                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                                    val transition = rememberInfiniteTransition(label = "typing")
-                                    val alpha by transition.animateFloat(
-                                        initialValue = 0.25f, targetValue = 1f,
-                                        animationSpec = infiniteRepeatable(tween(700), RepeatMode.Reverse),
-                                        label = "typingAlpha"
-                                    )
-                                    Text(
-                                        t("المساعد يفكّر…", "Assistant is thinking..."),
-                                        color = GoldSoft.copy(alpha = alpha),
-                                        fontSize = 12.sp,
-                                        modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(NavyLight.copy(alpha = 0.4f)).padding(10.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // ============ حقل الإدخال ============
-                if (!initializing) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 10.dp)
-                            .navigationBarsPadding(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(22.dp))
-                                .background(NavyLight.copy(alpha = 0.6f))
-                                .border(1.dp, Gold.copy(alpha = 0.2f), RoundedCornerShape(22.dp))
-                                .padding(horizontal = 14.dp, vertical = 10.dp)
-                        ) {
-                            if (input.isEmpty()) {
-                                Text("اكتب سؤالك هنا…", color = TextMain.copy(alpha = 0.35f), fontSize = 13.sp)
-                            }
-                            BasicTextField(
-                                value = input,
-                                onValueChange = { input = it },
-                                textStyle = androidx.compose.ui.text.TextStyle(color = TextMain, fontSize = 14.sp),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        IconButton(
-                            onClick = { send() },
-                            enabled = input.isNotBlank() && !thinking
-                        ) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.Send,
-                                contentDescription = t("إرسال", "Send"),
-                                tint = if (input.isNotBlank() && !thinking) Gold else Gold.copy(alpha = 0.3f),
-                                modifier = Modifier.size(22.dp)
-                            )
-                        }
-                    }
-                }
+            val canSend = input.trim().isNotEmpty() && !thinking
+            IconButton(
+                onClick = { sendQuestion(input) },
+                enabled = canSend,
+                modifier = Modifier
+                    .size(38.dp)
+                    .clip(CircleShape)
+                    .background(if (canSend) Gold else NavyLight)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    contentDescription = t("إرسال", "Send"),
+                    tint = if (canSend) Navy else TextMain.copy(alpha = 0.3f),
+                    modifier = Modifier.size(18.dp)
+                )
             }
         }
+    }
 
-        // رسالة خطأ التنزيل — أعلى الشاشة عند العودة من التنزيل الفاشل
-        if (downloadError != null && !downloading) {
-            Box(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
-                Row(
+    // ============ حوار تأكيد مسح المحادثة ============
+    if (showClearDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearDialog = false },
+            containerColor = NavyCard,
+            title = {
+                Text(
+                    t("مسح المحادثة", "Clear Chat"),
+                    color = Gold,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+            },
+            text = {
+                Text(
+                    t("هل تريد مسح جميع الرسائل في المحادثة الحالية؟", "Do you want to clear all messages in current chat?"),
+                    color = TextMain,
+                    fontSize = 13.sp
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        messages.clear()
+                        FreeLlmApiEngine.clearHistory()
+                        showClearDialog = false
+                    }
+                ) {
+                    Text(t("مسح", "Clear"), color = Gold, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearDialog = false }) {
+                    Text(t("إلغاء", "Cancel"), color = TextMain.copy(alpha = 0.7f))
+                }
+            }
+        )
+    }
+}
+
+/**
+ * الشاشة الابتدائية عند بداية المحادثة.
+ */
+@Composable
+private fun EmptyAssistantView(onSelectSuggestion: (String) -> Unit) {
+    val suggestions = listOf(
+        t("ما هي أفضل الأذكار بعد صلاة الفجر؟", "What are the best adhkar after Fajr prayer?"),
+        t("كيف أحافظ على الخشوع في الصلاة؟", "How can I maintain focus in prayer?"),
+        t("أخبرني عن فضل قيام الليل والأدعية المستجابة", "Tell me about the virtue of Night Prayer"),
+        t("ما هي أركان الإسلام الخمسة وشروطها؟", "What are the 5 pillars of Islam?")
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(68.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(Gold.copy(alpha = 0.12f))
+                .border(1.dp, Gold.copy(alpha = 0.4f), RoundedCornerShape(20.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Filled.AutoAwesome,
+                contentDescription = null,
+                tint = Gold,
+                modifier = Modifier.size(32.dp)
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            t("مساعد نور الذكي", "NOOR AI Assistant"),
+            color = Gold,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = AmiriFamily,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            t(
+                "اسأل ما تشاء عن القرآن الكريم، الأذكار، الأحكام الشرعية والأخلاق الإسلامية. يجيبك بأسلوب راقٍ ومستند للقرآن والسنة.",
+                "Ask anything about the Quran, Adhkar, Islamic rulings, and ethics. Get answers powered by Free LLM API."
+            ),
+            color = TextMain.copy(alpha = 0.75f),
+            fontSize = 13.sp,
+            lineHeight = 20.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        Text(
+            t("أسئلة مقترحة للبدء:", "Suggested questions:"),
+            color = Gold.copy(alpha = 0.8f),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            suggestions.forEach { suggestion ->
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFEF4444).copy(alpha = 0.12f))
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .background(NavyCard)
+                        .border(1.dp, Gold.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+                        .clickable { onSelectSuggestion(suggestion) }
+                        .padding(horizontal = 14.dp, vertical = 10.dp)
                 ) {
-                    Icon(Icons.Filled.ErrorOutline, contentDescription = null, tint = Color(0xFFEF4444), modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(downloadError ?: "", color = TextMain, fontSize = 12.sp, modifier = Modifier.weight(1f))
                     Text(
-                        t("إعادة المحاولة", "Retry"),
-                        color = Gold, fontSize = 12.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { downloadError = null; downloading = true }
+                        text = suggestion,
+                        color = TextMain,
+                        fontSize = 12.5.sp,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
         }
     }
+}
 
-    // ============ حوار تأكيد حذف النموذج ============
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            containerColor = NavyLight,
-            titleContentColor = Gold,
-            title = { Text("حذف النموذج؟", fontFamily = AmiriFamily) },
-            text = { Text("سيُحذف النموذج من هاتفك ويمكنك تنزيله مجدداً في أي وقت. المحادثة الحالية ستنتهي.", color = TextMain, fontSize = 13.sp) },
-            confirmButton = {
-                TextButton(onClick = {
-                    LocalAiEngine.deleteModel(context)
-                    downloaded = false
-                    messages.clear()
-                    LocalAiEngine.clearConversation()
-                    showDeleteDialog = false
-                }) { Text("حذف", color = Color(0xFFEF4444), fontWeight = FontWeight.Bold) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text("إلغاء", color = Gold) }
+/**
+ * فقاعة الرسالة (إما للمستخدم أو للمساعد).
+ */
+@Composable
+private fun ChatBubbleItem(msg: ChatMsg) {
+    val isUser = msg.fromUser
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
+    ) {
+        if (!isUser) {
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(Gold.copy(alpha = 0.15f))
+                    .border(1.dp, Gold.copy(alpha = 0.4f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Filled.AutoAwesome,
+                    contentDescription = null,
+                    tint = Gold,
+                    modifier = Modifier.size(14.dp)
+                )
             }
-        )
+            Spacer(Modifier.width(8.dp))
+        }
+
+        Box(
+            modifier = Modifier
+                .widthIn(max = 290.dp)
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomStart = if (isUser) 16.dp else 4.dp,
+                        bottomEnd = if (isUser) 4.dp else 16.dp
+                    )
+                )
+                .background(if (isUser) Gold.copy(alpha = 0.15f) else NavyCard)
+                .border(
+                    width = 1.dp,
+                    color = if (isUser) Gold.copy(alpha = 0.4f) else Gold.copy(alpha = 0.15f),
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomStart = if (isUser) 16.dp else 4.dp,
+                        bottomEnd = if (isUser) 4.dp else 16.dp
+                    )
+                )
+                .padding(horizontal = 14.dp, vertical = 10.dp)
+        ) {
+            Column {
+                if (!isUser) {
+                    Text(
+                        t("نور", "NOOR"),
+                        color = Gold,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(3.dp))
+                }
+                Text(
+                    text = msg.text,
+                    color = TextMain,
+                    fontSize = 13.5.sp,
+                    lineHeight = 21.sp
+                )
+            }
+        }
+    }
+}
+
+/**
+ * مؤشر الكتابة التفاعلي (Typing Indicator) الذي يظهر أثناء انتظار رد الذكاء الاصطناعي.
+ */
+@Composable
+private fun TypingIndicatorItem() {
+    val infiniteTransition = rememberInfiniteTransition(label = "typing_dots")
+
+    val dot1Alpha by infiniteTransition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "dot1"
+    )
+
+    val dot2Alpha by infiniteTransition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 500, delayMillis = 160, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "dot2"
+    )
+
+    val dot3Alpha by infiniteTransition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 500, delayMillis = 320, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "dot3"
+    )
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(Gold.copy(alpha = 0.15f))
+                .border(1.dp, Gold.copy(alpha = 0.4f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Filled.AutoAwesome,
+                contentDescription = null,
+                tint = Gold,
+                modifier = Modifier.size(14.dp)
+            )
+        }
+
+        Spacer(Modifier.width(8.dp))
+
+        Box(
+            modifier = Modifier
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomStart = 4.dp,
+                        bottomEnd = 16.dp
+                    )
+                )
+                .background(NavyCard)
+                .border(1.dp, Gold.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
+                .padding(horizontal = 14.dp, vertical = 10.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    t("نور يفكر الآن", "NOOR is thinking"),
+                    color = Gold.copy(alpha = 0.9f),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .alpha(dot1Alpha)
+                            .clip(CircleShape)
+                            .background(Gold)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .alpha(dot2Alpha)
+                            .clip(CircleShape)
+                            .background(Gold)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .alpha(dot3Alpha)
+                            .clip(CircleShape)
+                            .background(Gold)
+                    )
+                }
+            }
+        }
     }
 }

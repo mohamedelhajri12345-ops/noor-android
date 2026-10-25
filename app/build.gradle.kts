@@ -19,8 +19,10 @@ android {
             useSupportLibrary = true
         }
 
+        buildConfigField("String", "FREE_LLM_API_BASE_URL", "\"https://text.pollinations.ai/v1/chat/completions\"")
+        buildConfigField("String", "FREE_LLM_API_KEY", "\"freellmapi-your-unified-key\"")
+        buildConfigField("String", "FREE_LLM_API_MODEL", "\"openai-fast\"")
     }
-
 
     signingConfigs {
         create("noor") {
@@ -108,8 +110,6 @@ dependencies {
     implementation("androidx.media:media:1.7.0")
     implementation("androidx.media3:media3-exoplayer:1.2.1")
     implementation("androidx.media3:media3-ui:1.2.1")
-    // الذكاء الاصطناعي المحلي: نموذج Gemma يعمل على هاتف المستخدم (MediaPipe GenAI)
-    implementation("com.google.mediapipe:tasks-genai:0.10.35")
     // إعلانات AdMob الرسمية — تُستعمل معرّفات الاختبار حتى يزوّد المالك معرّفاته الحقيقية
     implementation("com.google.android.gms:play-services-ads:23.6.0")
 
