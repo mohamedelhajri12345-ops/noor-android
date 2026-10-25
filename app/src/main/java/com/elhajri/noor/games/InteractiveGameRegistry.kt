@@ -129,6 +129,16 @@ object InteractiveGameRegistry {
             descriptionAr = "فرقعة الفوانيس المضيئة الصاعدة بلمسات سريعة"
         ),
         InteractiveGame(
+            id = "game_31_oasis_merger",
+            titleAr = "واحة السلام",
+            titleEn = "Oasis Merge Board",
+            category = InteractiveGameCategories.FUN,
+            route = "game_31_oasis_merger",
+            icon = Icons.Default.Spa,
+            accentColor = Color(0xFF00E676),
+            descriptionAr = "دمج العناصر وتطوير النخيل والعيون في الواحة"
+        ),
+        InteractiveGame(
             id = "game_lantern_memory",
             titleAr = "ذاكرة الفوانيس",
             titleEn = "Lantern Memory",
