@@ -37,6 +37,7 @@ import com.elhajri.noor.calendar.CalendarScreen
 import com.elhajri.noor.community.CommunityScreen
 import com.elhajri.noor.donation.DonationScreen
 import com.elhajri.noor.favorites.FavoritesScreen
+import com.elhajri.noor.games.*
 import com.elhajri.noor.games.NoorGameHubScreen
 import com.elhajri.noor.games.WordSearchGame
 import com.elhajri.noor.games.TawafOrderGame
@@ -420,6 +421,12 @@ fun NoorApp() {
                 composable("ruqyah") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "ruqyah"); com.elhajri.noor.audio.sections.RuqyahScreen(onBack = { navController.popBackStack() }) }
                 composable("analytics") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "analytics"); AnalyticsDashboardScreen(onBack = { navController.popBackStack() }) }
                 composable("games") { NoorGameHubScreen(onBack = { navController.popBackStack() }, onNavigate = { navController.navigate(it) }) }
+                composable("game_01_dome_merge") { DomeMergeGame(onBack = { navController.popBackStack() }) }
+                composable("game_02_zellige_match3") { ZelligeMatch3Game(onBack = { navController.popBackStack() }) }
+                composable("game_11_minaret_stacker") { MinaretStackerGame(onBack = { navController.popBackStack() }) }
+                composable("game_12_crescent_cannon") { CrescentCannonGame(onBack = { navController.popBackStack() }) }
+                composable("game_30_lantern_pop") { LanternPopGame(onBack = { navController.popBackStack() }) }
+                composable("game_39_memory_cards") { MemoryCardsGame(onBack = { navController.popBackStack() }) }
                 composable("videos") { com.elhajri.noor.analytics.AnalyticsTracker.trackFeatureOpen(appCtx, "videos"); com.elhajri.noor.videos.VideosScreen(onBack = { navController.popBackStack() }, onOpenVideo = { videoId -> navController.navigate("videoPlayer/$videoId") }) }
                 composable("videoPlayer/{videoId}") { entry ->
                     val videoId = entry.arguments?.getString("videoId") ?: ""
