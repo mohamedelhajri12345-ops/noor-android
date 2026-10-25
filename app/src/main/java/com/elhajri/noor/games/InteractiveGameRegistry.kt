@@ -49,6 +49,16 @@ object GameFavoritesStore {
 object InteractiveGameRegistry {
     val games: List<InteractiveGame> = listOf(
         InteractiveGame(
+            id = "game_07_pipe_irrigation",
+            titleAr = "قنوات السقيا",
+            titleEn = "Oasis Aqueduct Pipes",
+            category = InteractiveGameCategories.INTELLIGENCE,
+            route = "game_07_pipe_irrigation",
+            icon = Icons.Default.Build,
+            accentColor = Color(0xFF64FFDA),
+            descriptionAr = "تدوير القنوات لتوصيل المياه وسقيا النخيل"
+        ),
+        InteractiveGame(
             id = "game_06_rubik_arabesque",
             titleAr = "مكعب المقرنصات",
             titleEn = "Muqarnas Sliding Grid",
