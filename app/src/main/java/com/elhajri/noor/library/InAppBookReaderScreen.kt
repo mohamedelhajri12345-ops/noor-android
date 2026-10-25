@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +49,7 @@ import com.elhajri.noor.ui.GoldSoft
 import com.elhajri.noor.ui.Navy
 import com.elhajri.noor.ui.NavyCard
 import com.elhajri.noor.ui.NavyLight
+import com.elhajri.noor.ui.themeScreenBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,32 +65,46 @@ fun InAppBookReaderScreen(
     val scope = rememberCoroutineScope()
 
     val books = remember { LibraryCatalogLoader.loadCatalog(context) }
-    val book = remember(bookId) { books.find { it.id == bookId } }
+    val book = remember(bookId, books) { books.find { it.id == bookId } }
 
-    if (book == null) {
+    if (bookId.isBlank() || book == null) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF070B14)),
+                .themeScreenBackground(),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(t("لم يتم العثور على الكتاب", "Book not found"), color = Gold, fontSize = 16.sp)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(24.dp)
+            ) {
+                Icon(Icons.Default.MenuBook, contentDescription = null, tint = GoldSoft, modifier = Modifier.size(50.dp))
                 Spacer(Modifier.height(12.dp))
-                Button(onClick = onBack, colors = ButtonDefaults.buttonColors(containerColor = Gold)) {
-                    Text(t("رجوع", "Back"), color = Navy)
+                Text(
+                    text = t("لم يتم العثور على الكتاب المطلوب", "Book not found"),
+                    color = Gold,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = onBack,
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold)
+                ) {
+                    Text(t("رجوع للمكتبة", "Back to Library"), color = Navy, fontWeight = FontWeight.Bold)
                 }
             }
         }
         return
     }
 
-    var localFile by remember { mutableStateOf<File?>(LibraryStore.getLocalFile(context, book)) }
+    var localFile by remember(book.id) { mutableStateOf<File?>(LibraryStore.getLocalFile(context, book)) }
     var isDownloading by remember { mutableStateOf(false) }
     var downloadError by remember { mutableStateOf<String?>(null) }
 
     // Auto-download if missing locally
-    LaunchedEffect(bookId) {
+    LaunchedEffect(book.id) {
         if (localFile == null || !localFile!!.exists() || localFile!!.length() == 0L) {
             isDownloading = true
             downloadError = null
@@ -108,7 +124,7 @@ fun InAppBookReaderScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF070B14))
+                .themeScreenBackground()
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -171,11 +187,11 @@ fun InAppBookReaderScreen(
         return
     }
 
-    if (localFile == null || isDownloading || !localFile!!.exists()) {
+    if (localFile == null || isDownloading || !localFile!!.exists() || localFile!!.length() == 0L) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF070B14)),
+                .themeScreenBackground(),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
@@ -210,10 +226,19 @@ fun InAppBookReaderScreen(
     }
 
     val pdfFile = localFile!!
-    val totalPages = remember(pdfFile) { PdfRendererHelper.getPageCount(pdfFile).coerceAtLeast(1) }
+    val totalPages = remember(pdfFile) {
+        try {
+            PdfRendererHelper.getPageCount(pdfFile).coerceAtLeast(1)
+        } catch (_: Exception) {
+            1
+        }
+    }
 
-    val savedProgress = remember(bookId) { LibraryStore.getProgress(context, bookId) }
-    val initialPage = savedProgress?.lastPage?.coerceIn(0, (totalPages - 1).coerceAtLeast(0)) ?: 0
+    val savedProgress = remember(book.id) { LibraryStore.getProgress(context, book.id) }
+    val initialPage = remember(savedProgress, totalPages) {
+        val safeTotal = totalPages.coerceAtLeast(1)
+        (savedProgress?.lastPage ?: 0).coerceIn(0, safeTotal - 1)
+    }
 
     val pagerState = rememberPagerState(
         initialPage = initialPage,
@@ -221,14 +246,18 @@ fun InAppBookReaderScreen(
     )
 
     var showControls by remember { mutableStateOf(true) }
-    var bookmarks by remember { mutableStateOf(LibraryStore.getBookmarks(context, bookId)) }
+    var bookmarks by remember { mutableStateOf(LibraryStore.getBookmarks(context, book.id)) }
     var showBookmarksSheet by remember { mutableStateOf(false) }
 
     val isCurrentPageBookmarked = bookmarks.contains(pagerState.currentPage)
 
     // Auto-save reading progress
     LaunchedEffect(pagerState.currentPage, totalPages) {
-        LibraryStore.saveProgress(context, bookId, pagerState.currentPage, totalPages)
+        try {
+            LibraryStore.saveProgress(context, book.id, pagerState.currentPage, totalPages)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     Scaffold(
@@ -306,8 +335,8 @@ fun InAppBookReaderScreen(
                                 Icon(Icons.Default.FormatListNumbered, contentDescription = t("الفواصل", "Bookmarks"), tint = Gold)
                             }
                             IconButton(onClick = {
-                                val added = LibraryStore.toggleBookmark(context, bookId, pagerState.currentPage)
-                                bookmarks = LibraryStore.getBookmarks(context, bookId)
+                                val added = LibraryStore.toggleBookmark(context, book.id, pagerState.currentPage)
+                                bookmarks = LibraryStore.getBookmarks(context, book.id)
                                 val msg = if (added) t("تم حفظ العلامة المرجعية", "Bookmark saved") else t("تم إزالة العلامة المرجعية", "Bookmark removed")
                                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                             }) {
@@ -370,7 +399,9 @@ fun InAppBookReaderScreen(
 
                     // Progress Percentage Bar
                     LinearProgressIndicator(
-                        progress = { ((pagerState.currentPage + 1).toFloat() / totalPages.toFloat()).coerceIn(0f, 1f) },
+                        progress = {
+                            if (totalPages > 0) ((pagerState.currentPage + 1).toFloat() / totalPages.toFloat()).coerceIn(0f, 1f) else 0f
+                        },
                         color = Gold,
                         trackColor = NavyLight,
                         modifier = Modifier
@@ -441,7 +472,11 @@ private fun PdfPageView(
     LaunchedEffect(pdfFile, pageIndex) {
         isLoading = true
         withContext(Dispatchers.IO) {
-            val bmp = PdfRendererHelper.renderPageBitmap(pdfFile, pageIndex, targetWidth = 1080, targetHeight = 1520)
+            val bmp = try {
+                PdfRendererHelper.renderPageBitmap(pdfFile, pageIndex, targetWidth = 1080, targetHeight = 1520)
+            } catch (e: Exception) {
+                null
+            }
             withContext(Dispatchers.Main) {
                 pageBitmap = bmp
                 isLoading = false
@@ -450,9 +485,7 @@ private fun PdfPageView(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 40.dp, horizontal = 4.dp),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         if (isLoading) {
@@ -460,18 +493,16 @@ private fun PdfPageView(
         } else if (pageBitmap != null) {
             Image(
                 bitmap = pageBitmap!!.asImageBitmap(),
-                contentDescription = t("صفحة ", "Page ") + "${pageIndex + 1}",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(8.dp))
-                    .border(1.dp, Gold.copy(alpha = 0.25f), RoundedCornerShape(8.dp))
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
             )
         } else {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.MenuBook, contentDescription = null, tint = GoldSoft, modifier = Modifier.size(48.dp))
-                Spacer(Modifier.height(8.dp))
-                Text(t("تعذّر عرض هذه الصفحة", "Could not render page"), color = GoldSoft, fontSize = 13.sp)
-            }
+            Text(
+                text = t("تعذّر عرض هذه الصفحة", "Could not render page"),
+                color = GoldSoft,
+                fontSize = 13.sp
+            )
         }
     }
 }

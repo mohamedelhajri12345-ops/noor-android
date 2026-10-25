@@ -1,6 +1,9 @@
 package com.elhajri.noor.library
 
 import android.content.Context
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.security.MessageDigest
 
@@ -63,6 +66,20 @@ object LibraryCatalogLoader {
             cachedBooks = list
             return list
         }
+    }
+
+    suspend fun loadCatalogAsync(context: Context, timeoutMs: Long = 5000L): List<Book> {
+        cachedBooks?.let { return it }
+        return withContext(Dispatchers.IO) {
+            val result = withTimeoutOrNull(timeoutMs) {
+                loadCatalog(context)
+            }
+            result ?: cachedBooks ?: emptyList()
+        }
+    }
+
+    fun clearCache() {
+        cachedBooks = null
     }
 
     private fun generateBookId(url: String, title: String, index: Int): String {
