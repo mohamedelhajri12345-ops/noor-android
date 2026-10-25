@@ -49,6 +49,16 @@ object GameFavoritesStore {
 object InteractiveGameRegistry {
     val games: List<InteractiveGame> = listOf(
         InteractiveGame(
+            id = "game_08_tetris_geometry",
+            titleAr = "بناء الأسوار",
+            titleEn = "Wall Brick Tetris",
+            category = InteractiveGameCategories.INTELLIGENCE,
+            route = "game_08_tetris_geometry",
+            icon = Icons.Default.ViewCompact,
+            accentColor = Color(0xFFFFAB00),
+            descriptionAr = "رصف الأحجار المنحوتة لإكمال أسوار المدينة"
+        ),
+        InteractiveGame(
             id = "game_07_pipe_irrigation",
             titleAr = "قنوات السقيا",
             titleEn = "Oasis Aqueduct Pipes",
