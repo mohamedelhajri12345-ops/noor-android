@@ -1,5 +1,10 @@
 package com.elhajri.noor.library
 
+enum class LibrarySection(val id: String, val titleAr: String, val titleEn: String, val subtitleAr: String, val subtitleEn: String, val iconEmoji: String) {
+    KIDS("kids", "مكتبة الصغار", "Kids Library", "قصص هادفة، تعليم، وأخلاق للنشء الصاعد", "Educational & moral stories for kids", "👶"),
+    ADULTS("adults", "مكتبة الكبار", "Adults Library", "فقه، عقيدة، تفسير، سيرة، ومصنفات إسلامية جامعة", "Fiqh, Aqeedah, Tafsir & detailed Islamic works", "📜")
+}
+
 data class Book(
     val id: String,
     val title: String,
@@ -14,13 +19,21 @@ data class Book(
     val isKids: Boolean,
     val hasImages: Boolean,
     val bundledAsset: String? = null
-)
+) {
+    val section: LibrarySection
+        get() = if (isKids || category in listOf("prophets_kids", "kids_stories", "educational")) {
+            LibrarySection.KIDS
+        } else {
+            LibrarySection.ADULTS
+        }
+}
 
 data class BookCategory(
     val id: String,
     val nameAr: String,
     val nameEn: String,
-    val iconEmoji: String
+    val iconEmoji: String,
+    val section: LibrarySection? = null // null means applicable to both
 )
 
 data class ReadingProgress(
@@ -40,28 +53,41 @@ data class Bookmark(
 
 object LibraryCategories {
     val ALL = BookCategory("all", "الكل", "All", "📚")
-    val PROPHETS_KIDS = BookCategory("prophets_kids", "قصص أنبياء صغار", "Prophets for Kids", "👶")
-    val PROPHETS_ADULTS = BookCategory("prophets_adults", "قصص أنبياء كبار", "Prophets Stories", "📜")
-    val KIDS_STORIES = BookCategory("kids_stories", "قصص أطفال", "Kids Stories", "🎨")
-    val EDUCATIONAL = BookCategory("educational", "تعليمية", "Educational", "🎓")
-    val FIQH = BookCategory("fiqh", "فقه", "Fiqh Basics", "📖")
-    val RELIGIOUS_STORIES = BookCategory("religious_stories", "قصص دينية", "Islamic Stories", "🌟")
-    val COMPANIONS_STORIES = BookCategory("companions_stories", "قصص الصحابة", "Companions Stories", "🕌")
-    val TAFSIR_SEERAH = BookCategory("tafsir_seerah", "تفسير وسيرة", "Tafsir & Seerah", "✨")
+    
+    // Kids Categories
+    val PROPHETS_KIDS = BookCategory("prophets_kids", "أنبياء الصغار", "Prophets for Kids", "👶", LibrarySection.KIDS)
+    val KIDS_STORIES = BookCategory("kids_stories", "قصص أطفال", "Kids Stories", "🎨", LibrarySection.KIDS)
+    val EDUCATIONAL = BookCategory("educational", "كتب تعليمية", "Educational", "🎓", LibrarySection.KIDS)
+    
+    // Adults Categories
+    val FIQH = BookCategory("fiqh", "الفقه والأحكام", "Fiqh & Laws", "📖", LibrarySection.ADULTS)
+    val TAFSIR_SEERAH = BookCategory("tafsir_seerah", "التفسير والسيرة", "Tafsir & Seerah", "✨", LibrarySection.ADULTS)
+    val PROPHETS_ADULTS = BookCategory("prophets_adults", "قصص الأنبياء", "Prophets Stories", "📜", LibrarySection.ADULTS)
+    val COMPANIONS_STORIES = BookCategory("companions_stories", "سير الصحابة", "Companions", "🕌", LibrarySection.ADULTS)
+    val RELIGIOUS_STORIES = BookCategory("religious_stories", "مؤلفات إسلامية", "Islamic Works", "🌟", LibrarySection.ADULTS)
 
     val LIST = listOf(
         ALL,
         PROPHETS_KIDS,
-        PROPHETS_ADULTS,
         KIDS_STORIES,
         EDUCATIONAL,
         FIQH,
-        RELIGIOUS_STORIES,
         TAFSIR_SEERAH,
-        COMPANIONS_STORIES
+        PROPHETS_ADULTS,
+        COMPANIONS_STORIES,
+        RELIGIOUS_STORIES
     )
+
+    fun getCategoriesForSection(section: LibrarySection?): List<BookCategory> {
+        if (section == null) return LIST
+        return listOf(ALL) + LIST.filter { it.id != "all" && (it.section == section || it.section == null) }
+    }
 
     fun getCategoryNameAr(categoryId: String): String {
         return LIST.find { it.id == categoryId }?.nameAr ?: categoryId
+    }
+
+    fun getCategoryNameEn(categoryId: String): String {
+        return LIST.find { it.id == categoryId }?.nameEn ?: categoryId
     }
 }
