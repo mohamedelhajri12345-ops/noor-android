@@ -9,7 +9,8 @@ import java.io.File
 
 object PdfRendererHelper {
 
-    fun getPageCount(file: File): Int {
+    fun getPageCount(file: File?): Int {
+        if (file == null || !file.exists() || file.length() == 0L) return 0
         var pfd: ParcelFileDescriptor? = null
         var renderer: PdfRenderer? = null
         return try {
@@ -26,11 +27,12 @@ object PdfRendererHelper {
     }
 
     fun renderPageBitmap(
-        file: File,
+        file: File?,
         pageIndex: Int,
         targetWidth: Int = 1080,
         targetHeight: Int = 1520
     ): Bitmap? {
+        if (file == null || !file.exists() || file.length() == 0L) return null
         var pfd: ParcelFileDescriptor? = null
         var renderer: PdfRenderer? = null
         var page: PdfRenderer.Page? = null
@@ -41,15 +43,15 @@ object PdfRendererHelper {
 
             page = renderer.openPage(pageIndex)
 
-            val width = if (targetWidth > 0) targetWidth else page.width * 2
-            val height = if (targetHeight > 0) targetHeight else page.height * 2
+            val width = if (targetWidth > 0) targetWidth else (page.width * 2).coerceAtLeast(100)
+            val height = if (targetHeight > 0) targetHeight else (page.height * 2).coerceAtLeast(100)
 
             val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             bitmap.eraseColor(Color.WHITE)
 
             page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
             bitmap
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             e.printStackTrace()
             null
         } finally {
@@ -65,6 +67,8 @@ object PdfRendererHelper {
         maxPages: Int = 3
     ): List<Bitmap> {
         val file = LibraryStore.getLocalFile(context, book) ?: return emptyList()
+        if (!file.exists() || file.length() == 0L) return emptyList()
+
         val bitmaps = mutableListOf<Bitmap>()
         var pfd: ParcelFileDescriptor? = null
         var renderer: PdfRenderer? = null
@@ -78,19 +82,19 @@ object PdfRendererHelper {
                 var page: PdfRenderer.Page? = null
                 try {
                     page = renderer.openPage(i)
-                    val w = (page.width * 1.5f).toInt().coerceAtLeast(400)
-                    val h = (page.height * 1.5f).toInt().coerceAtLeast(560)
+                    val w = (page.width * 1.2f).toInt().coerceIn(300, 1080)
+                    val h = (page.height * 1.2f).toInt().coerceIn(400, 1520)
                     val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
                     bitmap.eraseColor(Color.WHITE)
                     page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                     bitmaps.add(bitmap)
-                } catch (e: Exception) {
+                } catch (e: Throwable) {
                     e.printStackTrace()
                 } finally {
                     try { page?.close() } catch (_: Exception) {}
                 }
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             e.printStackTrace()
         } finally {
             try { renderer?.close() } catch (_: Exception) {}

@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -367,14 +368,33 @@ fun VideoPlayerScreen(
                             textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(16.dp))
-                        Button(
-                            onClick = { launchYouTubeAppFallback() },
-                            colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color(0xFF0D1322)),
-                            shape = RoundedCornerShape(12.dp)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text("فتح في تطبيق يوتيوب", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            Button(
+                                onClick = {
+                                    isErrorState = false
+                                    isPlayerReady = false
+                                    webViewInstance?.reload()
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color(0xFF0D1322)),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(t("إعادة المحاولة", "Retry"), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            }
+                            OutlinedButton(
+                                onClick = { launchYouTubeAppFallback() },
+                                border = androidx.compose.foundation.BorderStroke(1.dp, Gold),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Gold),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(t("فتح في يوتيوب", "Open in YouTube"), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            }
                         }
                     }
                 } else {
@@ -434,9 +454,9 @@ fun VideoPlayerScreen(
 
                                 val vObj = KidsVideoStore.getVideoById(context, currentVideoId)
                                 val baseUrl = if (vObj?.mp4Url != null) {
-                                    "https://www.youtube.com/player.html?mode=mp4&src=" + java.net.URLEncoder.encode(vObj.mp4Url, "UTF-8")
+                                    "https://www.youtube-nocookie.com/player.html?mode=mp4&src=" + java.net.URLEncoder.encode(vObj.mp4Url, "UTF-8")
                                 } else {
-                                    "https://www.youtube.com/player.html?v=$currentVideoId"
+                                    "https://www.youtube-nocookie.com/player.html?v=$currentVideoId"
                                 }
                                 loadDataWithBaseURL(baseUrl, playerHtml, "text/html", "UTF-8", null)
                                 webViewInstance = this
