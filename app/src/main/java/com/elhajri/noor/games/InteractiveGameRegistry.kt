@@ -249,5 +249,412 @@ object InteractiveGameRegistry {
             accentColor = Color(0xFFFFD700),
             descriptionAr = "إطلاق التمر بالمقلاع لإصابة السلال والأهداف"
         )
+        ,
+        InteractiveGame(
+            id = "game_20_archery_range",
+            titleAr = "رماية السهام",
+            titleEn = "Desert Archery Range",
+            category = InteractiveGameCategories.SKILL,
+            route = "game_20_archery_range",
+            icon = Icons.Default.SportsEsports,
+            accentColor = Color(0xFFFFD700),
+            descriptionAr = "Archery precision target shooting. Pull back bowstring, move aim sight over target rings, "
+        )
+        ,
+        InteractiveGame(
+            id = "game_32_bubble_crescent",
+            titleAr = "فقاعات النور",
+            titleEn = "Crescent Bubble Popper",
+            category = InteractiveGameCategories.FUN,
+            route = "game_32_bubble_crescent",
+            icon = Icons.Default.Extension,
+            accentColor = Color(0xFF00E676),
+            descriptionAr = "Bubble shooter arcade. Aim a bottom crescent cannon at a hanging cluster of colored geomet"
+        )
+        ,
+        InteractiveGame(
+            id = "game_29_calligraphy_puzzle",
+            titleAr = "ترتيب المخطوطات",
+            titleEn = "Calligraphy Unscramble",
+            category = InteractiveGameCategories.WORDS,
+            route = "game_29_calligraphy_puzzle",
+            icon = Icons.Default.AutoAwesome,
+            accentColor = Color(0xFF80D8FF),
+            descriptionAr = "Horizontal strip unscramble. Drag and swap horizontal sliced image strips of a classical A"
+        )
+        ,
+        InteractiveGame(
+            id = "game_55_camel_balance_tilt",
+            titleAr = "توازن القافلة",
+            titleEn = "Camel Jug Balance",
+            category = InteractiveGameCategories.EDUCATIONAL,
+            route = "game_55_camel_balance_tilt",
+            icon = Icons.Default.Star,
+            accentColor = Color(0xFF64FFDA),
+            descriptionAr = "Balance slider / tilt equilibrium simulator. Drag a balance bar or tilt device to keep a t"
+        )
+        ,
+        InteractiveGame(
+            id = "game_49_charity_sorting",
+            titleAr = "صندوق الصدقات",
+            titleEn = "Charity Basket Sort",
+            category = InteractiveGameCategories.EDUCATIONAL,
+            route = "game_49_charity_sorting",
+            icon = Icons.Default.EmojiEvents,
+            accentColor = Color(0xFFB388FF),
+            descriptionAr = "Falling item sorting. Items (bread, winter coat, books, toys) fall from top; tap left/righ"
+        )
+        ,
+        InteractiveGame(
+            id = "game_54_chime_ear_train",
+            titleAr = "أنغام المنار",
+            titleEn = "Minaret Melodic Chimes",
+            category = InteractiveGameCategories.EDUCATIONAL,
+            route = "game_54_chime_ear_train",
+            icon = Icons.Default.Casino,
+            accentColor = Color(0xFFFFAB00),
+            descriptionAr = "Audio pitch match & chime sequence. Listen to 3 played pentatonic chime notes from minaret"
+        )
+        ,
+        InteractiveGame(
+            id = "game_46_connect_constellation",
+            titleAr = "نجوم السماء",
+            titleEn = "Constellation Connect",
+            category = InteractiveGameCategories.KIDS,
+            route = "game_46_connect_constellation",
+            icon = Icons.Default.Games,
+            accentColor = Color(0xFFFF5252),
+            descriptionAr = "Connect-the-dots star tracer. Drag finger from star 1 to star 2, 3... in numbered order to"
+        )
+        ,
+        InteractiveGame(
+            id = "game_17_crescent_pinning",
+            titleAr = "دائرة الهلال",
+            titleEn = "Crescent Pin Spinner",
+            category = InteractiveGameCategories.SKILL,
+            route = "game_17_crescent_pinning",
+            icon = Icons.Default.Spa,
+            accentColor = Color(0xFF1DE9B6),
+            descriptionAr = "Rotating wheel pin insertion (aa style). Tap the screen to shoot numbered pins into a cent"
+        )
+        ,
+        InteractiveGame(
+            id = "game_26_crossword_blocks",
+            titleAr = "شبكة الكلمات",
+            titleEn = "Mini Arabic Crossword",
+            category = InteractiveGameCategories.WORDS,
+            route = "game_26_crossword_blocks",
+            icon = Icons.Default.SportsBasketball,
+            accentColor = Color(0xFF82B1FF),
+            descriptionAr = "Block fitting crossword grid. Drag multi-letter horizontal or vertical word blocks onto a "
+        )
+        ,
+        InteractiveGame(
+            id = "game_36_cut_rope_lantern",
+            titleAr = "مصباح الأمل",
+            titleEn = "Pendant Rope Cut",
+            category = InteractiveGameCategories.FUN,
+            route = "game_36_cut_rope_lantern",
+            icon = Icons.Default.Rocket,
+            accentColor = Color(0xFF76FF03),
+            descriptionAr = "Physics rope cutting puzzle (Cut the Rope style). Swipe finger across ropes supporting a s"
+        )
+        ,
+        InteractiveGame(
+            id = "game_19_date_slicer",
+            titleAr = "حصاد الثمار",
+            titleEn = "Fruit Harvest Slicer",
+            category = InteractiveGameCategories.SKILL,
+            route = "game_19_date_slicer",
+            icon = Icons.Default.Bolt,
+            accentColor = Color(0xFF18FFFF),
+            descriptionAr = "Swipe slicing game (Fruit Ninja style). Swipe finger across flying dates, olives, and pome"
+        )
+        ,
+        InteractiveGame(
+            id = "game_15_dome_breaker",
+            titleAr = "كاسر الأشكال",
+            titleEn = "Dome Brick Breaker",
+            category = InteractiveGameCategories.SKILL,
+            route = "game_15_dome_breaker",
+            icon = Icons.Default.ColorLens,
+            accentColor = Color(0xFF536DFE),
+            descriptionAr = "Breakout arcade game. Drag a bottom paddle left/right to bounce a crescent orb and destroy"
+        )
+        ,
+        InteractiveGame(
+            id = "game_45_duff_rhythm",
+            titleAr = "إيقاع الدف",
+            titleEn = "Duff Drum Beat",
+            category = InteractiveGameCategories.KIDS,
+            route = "game_45_duff_rhythm",
+            icon = Icons.Default.MusicNote,
+            accentColor = Color(0xFF00BFA5),
+            descriptionAr = "Single-touch frame drum rhythm pulse. Tap the central Duff drum visualizer exactly when ex"
+        )
+        ,
+        InteractiveGame(
+            id = "game_18_flying_dove",
+            titleAr = "حمامة السلام",
+            titleEn = "Peace Dove Flight",
+            category = InteractiveGameCategories.SKILL,
+            route = "game_18_flying_dove",
+            icon = Icons.Default.Gesture,
+            accentColor = Color(0xFFFF80AB),
+            descriptionAr = "Flappy altitude control game. Tap the screen to give a peace dove an upward flap impulse a"
+        )
+        ,
+        InteractiveGame(
+            id = "game_50_good_deeds_tree",
+            titleAr = "شجرة الحسنات",
+            titleEn = "Virtue Tree Leaf Catcher",
+            category = InteractiveGameCategories.EDUCATIONAL,
+            route = "game_50_good_deeds_tree",
+            icon = Icons.Default.Lightbulb,
+            accentColor = Color(0xFFE0E0E0),
+            descriptionAr = "Moving catcher arcade game. Slide a wicker basket left/right at bottom of screen to catch "
+        )
+        ,
+        InteractiveGame(
+            id = "game_41_hidden_mosque",
+            titleAr = "البحث عن المعالم",
+            titleEn = "Hidden Mosque Objects",
+            category = InteractiveGameCategories.KIDS,
+            route = "game_41_hidden_mosque",
+            icon = Icons.Default.Pets,
+            accentColor = Color(0xFFFFD700),
+            descriptionAr = "Hidden object discovery. Explore a detailed warm illustration of a mosque library/courtyar"
+        )
+        ,
+        InteractiveGame(
+            id = "game_25_letter_shift",
+            titleAr = "سلسلة الحروف",
+            titleEn = "Letter Shift Ladder",
+            category = InteractiveGameCategories.WORDS,
+            route = "game_25_letter_shift",
+            icon = Icons.Default.WaterDrop,
+            accentColor = Color(0xFF00E676),
+            descriptionAr = "Combination lock letter reels. Tap up/down arrows on vertical letter columns to shift lett"
+        )
+        ,
+        InteractiveGame(
+            id = "game_09_medina_maze",
+            titleAr = "متاهة المدينة",
+            titleEn = "Medina Labyrinth",
+            category = InteractiveGameCategories.FUN,
+            route = "game_09_medina_maze",
+            icon = Icons.Default.Terrain,
+            accentColor = Color(0xFF80D8FF),
+            descriptionAr = "2D Maze pathfinding. Drag or guide a glowing traveler orb through complex vector maze corr"
+        )
+        ,
+        InteractiveGame(
+            id = "game_53_oasis_bridge",
+            titleAr = "جسر المحبة",
+            titleEn = "Oasis Bridge Architect",
+            category = InteractiveGameCategories.EDUCATIONAL,
+            route = "game_53_oasis_bridge",
+            icon = Icons.Default.Lock,
+            accentColor = Color(0xFF64FFDA),
+            descriptionAr = "Physics bridge building sandbox. Drag wooden beams and ropes onto structural anchor points"
+        )
+        ,
+        InteractiveGame(
+            id = "game_24_petal_word_wheel",
+            titleAr = "زهرة الحروف",
+            titleEn = "Letter Petal Wheel",
+            category = InteractiveGameCategories.WORDS,
+            route = "game_24_petal_word_wheel",
+            icon = Icons.Default.Favorite,
+            accentColor = Color(0xFFB388FF),
+            descriptionAr = "Circular letter wheel word builder (Wordscapes style). Drag across letters arranged on a c"
+        )
+        ,
+        InteractiveGame(
+            id = "game_16_piano_anachid",
+            titleAr = "نغمات الروح",
+            titleEn = "Anachid Rhythm Tiles",
+            category = InteractiveGameCategories.SKILL,
+            route = "game_16_piano_anachid",
+            icon = Icons.Default.Visibility,
+            accentColor = Color(0xFFFFAB00),
+            descriptionAr = "Falling lane rhythm tap (Piano Tiles style). Tap glowing light tiles as they descend along"
+        )
+        ,
+        InteractiveGame(
+            id = "game_34_pinball_minaret",
+            titleAr = "مغناطيس المنار",
+            titleEn = "Minaret Steel Pinball",
+            category = InteractiveGameCategories.FUN,
+            route = "game_34_pinball_minaret",
+            icon = Icons.Default.Camera,
+            accentColor = Color(0xFFFF5252),
+            descriptionAr = "Pinball physics arcade. Drag back a spring plunger to launch a steel ball into an illumina"
+        )
+        ,
+        InteractiveGame(
+            id = "game_27_rising_word_lanterns",
+            titleAr = "فوانيس الحروف",
+            titleEn = "Rising Word Lanterns",
+            category = InteractiveGameCategories.WORDS,
+            route = "game_27_rising_word_lanterns",
+            icon = Icons.Default.DirectionsRun,
+            accentColor = Color(0xFF1DE9B6),
+            descriptionAr = "Floating letter balloon pop. Tap rising sky lanterns carrying Arabic letters in the correc"
+        )
+        ,
+        InteractiveGame(
+            id = "game_10_scales_of_deeds",
+            titleAr = "ميزان التعادل",
+            titleEn = "Equilibrium Scale",
+            category = InteractiveGameCategories.FUN,
+            route = "game_10_scales_of_deeds",
+            icon = Icons.Default.Map,
+            accentColor = Color(0xFF82B1FF),
+            descriptionAr = "Physics balance scale puzzle. Drag weighted brass geometric objects onto dual scale pans t"
+        )
+        ,
+        InteractiveGame(
+            id = "game_23_scrambled_blocks",
+            titleAr = "مكعبات الحروف",
+            titleEn = "Scrambled Letter Blocks",
+            category = InteractiveGameCategories.WORDS,
+            route = "game_23_scrambled_blocks",
+            icon = Icons.Default.Timeline,
+            accentColor = Color(0xFF76FF03),
+            descriptionAr = "Anagram block unscrambler. Drag scrambled Arabic wooden letter blocks from the bottom tray"
+        )
+        ,
+        InteractiveGame(
+            id = "game_47_scratch_reveal",
+            titleAr = "كشف المخطوطة",
+            titleEn = "Gold Manuscript Scratch",
+            category = InteractiveGameCategories.KIDS,
+            route = "game_47_scratch_reveal",
+            icon = Icons.Default.Widgets,
+            accentColor = Color(0xFF18FFFF),
+            descriptionAr = "Scratch canvas image reveal. Swipe finger back and forth across a dusty screen canvas to b"
+        )
+        ,
+        InteractiveGame(
+            id = "game_44_shape_silhouette",
+            titleAr = "ظلال المعالم",
+            titleEn = "Minaret Silhouette Match",
+            category = InteractiveGameCategories.KIDS,
+            route = "game_44_shape_silhouette",
+            icon = Icons.Default.Brush,
+            accentColor = Color(0xFF536DFE),
+            descriptionAr = "Shape silhouette drag & snap puzzle. Drag colorful architectural pieces (crescent, minaret"
+        )
+        ,
+        InteractiveGame(
+            id = "game_14_silk_runner",
+            titleAr = "عداء طريق الحرير",
+            titleEn = "Silk Road Runner",
+            category = InteractiveGameCategories.SKILL,
+            route = "game_14_silk_runner",
+            icon = Icons.Default.Build,
+            accentColor = Color(0xFF00BFA5),
+            descriptionAr = "Endless 2D side-scrolling runner. Guide a merchant running through desert dunes; swipe up "
+        )
+        ,
+        InteractiveGame(
+            id = "game_42_simon_lanterns",
+            titleAr = "أنوار الفوانيس",
+            titleEn = "Simon Lantern Sequence",
+            category = InteractiveGameCategories.KIDS,
+            route = "game_42_simon_lanterns",
+            icon = Icons.Default.SportsEsports,
+            accentColor = Color(0xFFFF80AB),
+            descriptionAr = "Simon Says light & sound memory. Watch 4 colorful hanging lanterns flash and chime in sequ"
+        )
+        ,
+        InteractiveGame(
+            id = "game_35_spiral_zuma",
+            titleAr = "قطار القافلة",
+            titleEn = "Caravan Zuma Stream",
+            category = InteractiveGameCategories.FUN,
+            route = "game_35_spiral_zuma",
+            icon = Icons.Default.Extension,
+            accentColor = Color(0xFFE0E0E0),
+            descriptionAr = "Rolling chain marble shooter (Zuma style). Aim a central date cannon at a rolling spiral c"
+        )
+        ,
+        InteractiveGame(
+            id = "game_40_spot_difference",
+            titleAr = "افحص الصورة",
+            titleEn = "Spot the Difference",
+            category = InteractiveGameCategories.KIDS,
+            route = "game_40_spot_difference",
+            icon = Icons.Default.AutoAwesome,
+            accentColor = Color(0xFFFFD700),
+            descriptionAr = "Side-by-side visual difference search. Compare two adjacent cartoon illustrations of mosqu"
+        )
+        ,
+        InteractiveGame(
+            id = "game_51_water_saver",
+            titleAr = "ترشيد الماء",
+            titleEn = "Oasis Water Saver",
+            category = InteractiveGameCategories.EDUCATIONAL,
+            route = "game_51_water_saver",
+            icon = Icons.Default.Star,
+            accentColor = Color(0xFF00E676),
+            descriptionAr = "Timed valve control puzzle. Tap leaky pipe joints and turn valve handles on a timed water "
+        )
+        ,
+        InteractiveGame(
+            id = "game_43_whack_seeds",
+            titleAr = "بستان الخير",
+            titleEn = "Good Seed Whack",
+            category = InteractiveGameCategories.KIDS,
+            route = "game_43_whack_seeds",
+            icon = Icons.Default.EmojiEvents,
+            accentColor = Color(0xFF80D8FF),
+            descriptionAr = "Whack-a-mole reaction tap. Tap bright sprouting dates and flowers as they pop up randomly "
+        )
+        ,
+        InteractiveGame(
+            id = "game_28_word_chain",
+            titleAr = "وصلة الحروف",
+            titleEn = "Word Chain Link",
+            category = InteractiveGameCategories.WORDS,
+            route = "game_28_word_chain",
+            icon = Icons.Default.Casino,
+            accentColor = Color(0xFF64FFDA),
+            descriptionAr = "Word connection chain puzzle. Drag connecting lines between word nodes where the last lett"
+        )
+        ,
+        InteractiveGame(
+            id = "game_21_word_matrix",
+            titleAr = "مسار الكلمات",
+            titleEn = "Quranic Word Matrix",
+            category = InteractiveGameCategories.WORDS,
+            route = "game_21_word_matrix",
+            icon = Icons.Default.Games,
+            accentColor = Color(0xFFB388FF),
+            descriptionAr = "Word search line connector. Drag finger across adjacent letter tiles on a 5x5 grid in any "
+        )
+        ,
+        InteractiveGame(
+            id = "game_33_zellige_color_number",
+            titleAr = "تلوين الزليج",
+            titleEn = "Zellige Color-by-Number",
+            category = InteractiveGameCategories.FUN,
+            route = "game_33_zellige_color_number",
+            icon = Icons.Default.Spa,
+            accentColor = Color(0xFFFFAB00),
+            descriptionAr = "Paint fill by number canvas. Tap a numbered color swatch from the bottom palette, then tap"
+        )
+        ,
+        InteractiveGame(
+            id = "game_38_zigzag_caravan",
+            titleAr = "طريق الجبل",
+            titleEn = "ZigZag Caravan Trail",
+            category = InteractiveGameCategories.FUN,
+            route = "game_38_zigzag_caravan",
+            icon = Icons.Default.SportsBasketball,
+            accentColor = Color(0xFFFF5252),
+            descriptionAr = "Direction switcher runner (Tap Tap Dash style). A camel walks forward automatically along "
+        )
     )
 }

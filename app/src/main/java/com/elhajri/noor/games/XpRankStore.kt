@@ -1,4 +1,5 @@
 package com.elhajri.noor.games
+import androidx.compose.foundation.BorderStroke
 
 import com.elhajri.noor.settings.t
 import com.elhajri.noor.settings.toArabicDigits

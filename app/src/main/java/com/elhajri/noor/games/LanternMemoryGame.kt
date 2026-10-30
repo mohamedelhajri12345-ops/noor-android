@@ -1,4 +1,5 @@
 package com.elhajri.noor.games
+import androidx.compose.foundation.BorderStroke
 
 import android.content.Context
 import androidx.compose.animation.*
